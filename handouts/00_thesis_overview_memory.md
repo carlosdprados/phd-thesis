@@ -74,7 +74,8 @@ The key chemical insight: the difference in Lewis acid–base interaction streng
 ## 4. Device Architecture
 
 Vertical 2-T sandwich structure:
-```
+
+```text
          [Ag, 100 nm, evaporated]
          [Active layer, ~209 nm]
 [ITO-patterned glass substrate, transparent]
@@ -138,7 +139,7 @@ Memory regimes explained by Lewis acid–base chemistry:
 
 ## 8. Thesis Narrative Arc (v2 — 5-chapter structure)
 
-```
+```text
 Chapter 1: Introduction
     (Computing crisis → neuromorphic computing → memristors →
      organic electronics → polymer composites → ionic memristors →
@@ -174,7 +175,7 @@ Chapter 5: Conclusions & Outlook
 
 ## 9. Key Publications and Citations (for BibTeX use)
 
-```
+```bibtex
 @article{PradoSocorro2022,
   author  = {Prado-Socorro, Carlos David and Giménez-Santamarina, Silvia and 
              Mardegan, Lorenzo and Escalera-Moreno, Luis and Bolink, Henk J. and 

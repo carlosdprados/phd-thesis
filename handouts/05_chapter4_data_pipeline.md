@@ -46,7 +46,7 @@ Given these three, the discrete-time dynamical model of §3 is fully identified 
 
 ### 2.1 Root path
 
-```
+```text
 Nanomem_Devices_Library/DEVICES_LAB_DATA/
     YYYY-QN/
         NM_vXXX_<polymer><salt><electrode><speed><temp>/
@@ -80,9 +80,11 @@ Chapter 4 uses a **curated subset** of the NM_vXXX series, not the full 300+ gen
 4. At least ≥ 3 devices per ion species that pass criteria 1–3, so that a parameter distribution (not only a point estimate) can be extracted in §3.
 
 The final curated device list is to be frozen at the start of Chapter 4 writing and stored in a single CSV manifest:
-```
+
+```text
 handouts/ch4_device_manifest.csv
 ```
+
 with columns `device_id, ion, quarter, electrode, speed_rpm, anneal_C, has_hyst, has_npulse, has_delaytime, notes`. The manifest is the canonical reference; every figure in Chapter 4 must cite at least one row from it.
 
 ---
@@ -152,9 +154,11 @@ The existing Python analysis pipeline (`Nanomem_Devices_Library/scripts_general/
 ### 5.1 Pipeline entry point
 
 A single orchestrating script is required. Suggested location and name:
-```
+
+```text
 Nanomem_Devices_Library/scripts_general/chapter4_pipeline.py
 ```
+
 Inputs: the device manifest CSV from §2.3.  
 Outputs: everything listed in §5.2–§5.5, written to a single timestamped output directory `ch4_outputs/<timestamp>/`.
 
@@ -181,7 +185,7 @@ For each device, the pipeline must fit and persist:
 
 The pipeline must aggregate the per-device fits into three **parameter cards**, one per ion species. Each card is a single JSON (or YAML) file:
 
-```
+```text
 ch4_outputs/<timestamp>/parameter_cards/
     Li.json
     Na.json
