@@ -1,3 +1,4 @@
+<!-- markdownlint-disable-file MD013 -->
 # Chapter 4 — Data-Driven Temporal Computing with Volatile Ion-Mediated Polymeric Memristors: Detailed Outline
 **Author:** Carlos David Prado-Socorro  
 **Date:** April 11, 2026  

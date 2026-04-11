@@ -1,3 +1,4 @@
+<!-- markdownlint-disable-file MD013 -->
 # Chapter 1 — Introduction: Detailed Outline
 **Author:** Carlos David Prado-Socorro  
 **Date:** April 11, 2026  

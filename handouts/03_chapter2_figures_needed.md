@@ -1,3 +1,4 @@
+<!-- markdownlint-disable-file MD013 -->
 # Chapter 2 — Figures Reference List
 **Author:** Carlos David Prado-Socorro  
 **Date:** April 7, 2026  

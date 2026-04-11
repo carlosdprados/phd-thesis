@@ -1,3 +1,4 @@
+<!-- markdownlint-disable-file MD013 -->
 # PhD Thesis — Durable Memory Document
 **Author:** Carlos David Prado-Socorro  
 **Institution:** Universitat de València — Institute of Molecular Science (ICMol)  

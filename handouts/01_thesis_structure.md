@@ -1,3 +1,4 @@
+<!-- markdownlint-disable-file MD013 -->
 # Thesis Chapter Structure
 **Author:** Carlos David Prado-Socorro  
 **Date:** April 11, 2026  
