@@ -24,7 +24,7 @@ Key topics: von Neumann bottleneck → neuromorphic computing → memristors →
 Scope: ~25–35 pages  
 Key content: Materials design rationale, full fabrication protocol, morphological characterisation (AFM, profilometry), complete electrical characterisation (I–V hysteresis, EPSC, STM/LTM, STDP), ion transport mechanism, device stability, comparison with state of the art.
 
-**Status: Written (April 2026) — see `handouts/chapter2_proof_of_concept.tex`**
+Status: Written (April 2026) — see `handouts/chapter2_proof_of_concept.tex`
 
 ### Chapter 3 — Ion-Dependent Device Physics in Silver-Electrode Devices
 
@@ -61,7 +61,7 @@ Key content:
 - Circuit-integration constraints: 1T1M addressing, current compliance, read/write protocols, variability envelopes
 - Design rules: where these devices are useful, and — equally important — where they are not
 
-**Status: Not started. See companion outline `handouts/04_chapter4_temporal_computing_plan.md`.**
+Status: Not started. See companion outline `handouts/04_chapter4_temporal_computing_plan.md`.
 
 ### Chapter 5 — Conclusions and Outlook
 
@@ -111,12 +111,12 @@ This structure satisfies the requirements of a monograph-style PhD thesis: coher
 ## Key Framing Decision
 
 **Do not frame these devices as bad non-volatile memories.**  
-**Frame them as good volatile, heterogeneous temporal elements.**
+Frame them as good volatile, heterogeneous temporal elements.
 
 This single decision propagates across all five chapters:
 
 | Chapter | Framing consequence |
-|---------|--------------------|
+| --------- | -------------------- |
 | Ch. 1 | Introduce event-driven / temporal computing alongside crossbar computing. Add a subsection on "why some useful computing elements should forget". |
 | Ch. 2 | No change in content, but language around STM / LTM avoids apologising for short retention — retention is a feature, not a defect. |
 | Ch. 3 | Present Li/Na/K as a *timescale ladder*, not as a retention ranking. Variability → heterogeneity resource. |
@@ -128,7 +128,7 @@ This single decision propagates across all five chapters:
 ## Target Length (Approximate)
 
 | Chapter | Estimated pages |
-|---------|----------------|
+| --------- | ---------------- |
 | Chapter 1 (Introduction) | 45–65 |
 | Chapter 2 (PoC) | 25–35 |
 | Chapter 3 (Ion-dependent physics) | 30–40 |

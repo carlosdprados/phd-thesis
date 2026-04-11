@@ -12,7 +12,7 @@
 
 The introduction must take any physical chemist or materials scientist — even one unfamiliar with neuromorphic devices — from first principles through to the precise scientific niche this thesis occupies. The flow is:
 
-**Computing limits → Brain-inspired solutions → The memristor (static *and* dynamic views) → Inorganic implementations → Why organic → Why polymer composites → Why ionic → Why volatility and variability are resources → This thesis**
+Computing limits → Brain-inspired solutions → The memristor (static *and* dynamic views) → Inorganic implementations → Why organic → Why polymer composites → Why ionic → Why volatility and variability are resources → This thesis
 
 The revised flow adds two inflection points:
 

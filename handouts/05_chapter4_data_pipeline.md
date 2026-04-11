@@ -1,4 +1,7 @@
+<!-- markdownlint-disable-file MD013 -->
+
 # Chapter 4 — Data, Protocols and Analysis Pipeline Specification
+
 **Author:** Carlos David Prado-Socorro  
 **Date:** April 11, 2026  
 **Status:** Specification document. Defines exactly which datasets exist for Li/Na/K devices, where they live, which measurement protocols are common across the three ion species, and which analysis outputs are required before Chapter 4 writing starts. This document is the contract between the experimental archive and Chapter 4.
@@ -22,7 +25,7 @@ This handout fixes all three before writing begins. Every simulation figure in C
 Across the Ag-electrode NM_vXXX series employing LiTFSI, NaTFSI and KTFSI salts, the **common** experimental measurements — i.e. those present for all three ion species under a comparable protocol — are exactly three:
 
 | Short name | Measurement | Folder convention | What it captures |
-|------------|-------------|-------------------|------------------|
+| ------------ | ------------- | ------------------- | ------------------ |
 | **I–V** | Triangular-sweep current–voltage hysteresis | `Day1_Hyst` | Threshold, conductance window, read/write asymmetry, nonlinearity of the steady-state transfer |
 | **N-pulse** | Variable-number-of-pulses potentiation (fixed amplitude, fixed width) | `Day2_NmbPls` | Per-pulse conductance update, saturation curve, cumulative potentiation law |
 | **Delay-time** | Depotentiation by variable wait time after a fixed potentiation burst | `Day2_DlyTime` | Fading-memory decay, characteristic time constant, stretched-exponential shape |
@@ -42,6 +45,7 @@ Given these three, the discrete-time dynamical model of §3 is fully identified 
 ## 2. Data Location and Naming Convention
 
 ### 2.1 Root path
+
 ```
 Nanomem_Devices_Library/DEVICES_LAB_DATA/
     YYYY-QN/
@@ -61,11 +65,13 @@ Nanomem_Devices_Library/DEVICES_LAB_DATA/
 - `<temp>` — annealing temperature in °C
 
 ### 2.2 File formats
+
 - **CSV / TXT** — primary raw files dumped by the Keithley 2450 TSB scripts
 - **HDF5** — consolidated post-processing containers (used by the Python pipeline)
 - Each measurement subfolder contains one file per sweep/run; multiple runs per device are expected to quantify cycle-to-cycle spread
 
 ### 2.3 Device set for Chapter 4
+
 Chapter 4 uses a **curated subset** of the NM_vXXX series, not the full 300+ generations. The selection criteria are:
 
 1. Ag electrode (consistent with the Chapter 3 Ag-electrode framing).
@@ -86,6 +92,7 @@ with columns `device_id, ion, quarter, electrode, speed_rpm, anneal_C, has_hyst,
 For each dataset type, Chapter 4 requires a **single common protocol** across Li, Na and K so that fitted parameters are directly comparable. The protocols below are the reference definition; any device whose measurement deviates significantly must either be re-measured under the common protocol or excluded from the manifest.
 
 ### 3.1 I–V hysteresis (`Day1_Hyst`)
+
 - **Waveform:** triangular voltage sweep, starting at 0 V
 - **Peak amplitude:** fixed across Li/Na/K (to be set from the Chapter 3 common protocol; typical range +1.0 to +3.0 V)
 - **Sweep rate:** fixed across Li/Na/K (typical: 0.25 V/s, as in Paper 1)
@@ -96,6 +103,7 @@ For each dataset type, Chapter 4 requires a **single common protocol** across Li
 **Extracted quantities:** low-V conductance, high-V conductance, hysteresis area, pinched-point voltage, ΔG(V) per sweep, cycle-to-cycle drift of the first three quantities.
 
 ### 3.2 N-pulse potentiation (`Day2_NmbPls`)
+
 - **Pulse amplitude V_write:** fixed across Li/Na/K
 - **Pulse width t_write:** fixed across Li/Na/K
 - **Inter-pulse interval:** fixed and short enough that inter-pulse decay is negligible compared to the per-pulse update
@@ -106,6 +114,7 @@ For each dataset type, Chapter 4 requires a **single common protocol** across Li
 **Extracted quantities:** ΔG/G₀ as a function of N, saturation level, initial slope (per-pulse update at x ≈ 0), saturation knee location.
 
 ### 3.3 Delay-time depotentiation (`Day2_DlyTime`)
+
 - **Pre-burst:** a fixed-N potentiation burst using the same V_write, t_write as in §3.2, sufficient to drive the device to a repeatable elevated state
 - **Wait time Δt:** swept logarithmically, covering at least the range [10⁻¹, 10²] s (three decades), with enough points to resolve a stretched-exponential decay
 - **Read pulse:** a single low-amplitude, sub-threshold read pulse at the end of each wait interval; the read must not significantly perturb the state (verified by the read-disturb check in §3.4)
@@ -114,6 +123,7 @@ For each dataset type, Chapter 4 requires a **single common protocol** across Li
 **Extracted quantities:** G(Δt) normalised to G immediately after the burst, stretched-exponential parameters (τ_i, β_i), asymptotic floor G_∞, effective fading-memory window for the application band.
 
 ### 3.4 Read-disturb sanity check (cross-cutting)
+
 - Before any model is fit, each device must be checked for read-disturb using a long train of pure read pulses in the absence of write pulses. The state must not drift by more than one resolvable level over the timescale of interest for Chapter 4.
 - Devices that fail this check are excluded from the manifest or have their read voltage lowered until they pass.
 
@@ -124,7 +134,7 @@ For each dataset type, Chapter 4 requires a **single common protocol** across Li
 The following data exist, but only for a *subset* of the Li/Na/K devices — typically only for the Paper 1 Li device and a handful of Chapter 3 repeats. Chapter 4 is allowed to use these datasets as **sanity checks and model priors**, but not as the primary fitting input for application simulations, because they are not available uniformly across Li, Na and K.
 
 | Dataset | Available for | Role in Chapter 4 |
-|---------|---------------|-------------------|
+| --------- | --------------- | ------------------- |
 | EPSC (multi-state pulse train) | Paper 1 Li device (Ch. 2); partial Ch. 3 repeats | Sanity check that the fitted φ_i(x) reproduces the measured state ladder |
 | STDP (pre/post paired pulses) | Paper 1 Li device (Ch. 2) | Prior for the coincidence kernel shape in §4.5 of the Ch. 4 plan; *not* used as the sole input for the Na and K coincidence simulations — those are built from the delay-time kernel alone |
 | STM/LTM separated retention (two-voltage protocol) | Paper 1 Li device (Ch. 2) | Prior for the stretched-exponential form used in §3.3; guides the choice of functional form for the Li/Na/K common fits |
@@ -140,6 +150,7 @@ The following data exist, but only for a *subset* of the Li/Na/K devices — typ
 The existing Python analysis pipeline (`Nanomem_Devices_Library/scripts_general/` and project-specific subfolders) already contains the tool families listed in the memory record: visualization, helper, application, device_cleaner, feature_extraction, graphmaker. Chapter 4 does **not** require new tool families. It requires a specific set of *outputs* produced by that pipeline, organised as a single reproducible run.
 
 ### 5.1 Pipeline entry point
+
 A single orchestrating script is required. Suggested location and name:
 ```
 Nanomem_Devices_Library/scripts_general/chapter4_pipeline.py
@@ -148,6 +159,7 @@ Inputs: the device manifest CSV from §2.3.
 Outputs: everything listed in §5.2–§5.5, written to a single timestamped output directory `ch4_outputs/<timestamp>/`.
 
 ### 5.2 Per-device cleaned datasets
+
 For each device in the manifest, the pipeline must emit a consolidated HDF5 (or Parquet) file containing:
 
 - Raw and baseline-corrected I–V sweeps
@@ -157,6 +169,7 @@ For each device in the manifest, the pipeline must emit a consolidated HDF5 (or 
 - A boolean `passed_read_disturb` flag (from §3.4)
 
 ### 5.3 Per-device fitted quantities
+
 For each device, the pipeline must fit and persist:
 
 - **I–V fit:** parameters of a parametric form for f_i(V_read, x) — at minimum low-V slope, high-V slope, and an asymmetry parameter between forward and backward branches
@@ -165,6 +178,7 @@ For each device, the pipeline must fit and persist:
 - Standard errors on all fit parameters
 
 ### 5.4 Per-ion parameter cards
+
 The pipeline must aggregate the per-device fits into three **parameter cards**, one per ion species. Each card is a single JSON (or YAML) file:
 
 ```
@@ -185,6 +199,7 @@ Each card contains, at minimum:
 These three cards are the canonical interface between the experimental data and every simulation in §4.4–§4.6 of the Chapter 4 plan. No simulation figure in Chapter 4 may bypass them.
 
 ### 5.5 Validation artefacts
+
 The pipeline must emit, for transparency:
 
 - Fit-overlay plots for every device (raw data + fitted curve) in a single PDF per ion species
@@ -192,6 +207,7 @@ The pipeline must emit, for transparency:
 - A summary table of all fit parameters across all devices (CSV) for inclusion in the Chapter 4 appendix
 
 ### 5.6 Reproducibility
+
 - The pipeline must be run as a single command with the manifest CSV as its only required argument
 - The output directory must contain a `run.json` capturing: git commit hash of `scripts_general/`, Python version, package versions, manifest hash, command line, date, host
 - Re-running with the same manifest must produce byte-identical parameter cards (given a fixed RNG seed for bootstrap resamples)
@@ -203,7 +219,7 @@ The pipeline must emit, for transparency:
 Every section of the Chapter 4 plan is now grounded in a specific subset of these three datasets. The table below is the traceability matrix.
 
 | Chapter 4 section | I–V (`Day1_Hyst`) | N-pulse (`Day2_NmbPls`) | Delay-time (`Day2_DlyTime`) | Purpose |
-|-------------------|:---:|:---:|:---:|---------|
+| ------------------- | :---: | :---: | :---: | --------- |
 | §4.2 Dataset consolidation | ✓ | ✓ | ✓ | Inventory |
 | §4.3 Compact behavioural model | ✓ (f_i) | ✓ (φ_i) | ✓ (λ_i) | Model identification |
 | §4.4 Reservoir computing (flagship) | ✓ | ✓ | ✓ | Node update + state read-out + fading memory |

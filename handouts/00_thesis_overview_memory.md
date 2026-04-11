@@ -52,7 +52,7 @@ A hyperbranched polyester-amide solid electrolyte. Contains a large density of o
 ### 3.3 Ionic Salts Used
 
 | Salt | Cation | Anion | Paper/Generation |
-|------|--------|-------|-----------------|
+| ------ | -------- | ------- | ----------------- |
 | LiCF₃SO₃ (LiTf) | Li⁺ (hard acid) | CF₃SO₃⁻ (triflate, soft base) | Paper 1; NM_v001–v200 approx. |
 | LiN(SO₂CF₃)₂ (LiBis/LiTFSI) | Li⁺ | bis(trifluoromethanesulfonyl)imide⁻ | Ag-electrode series |
 | NaN(SO₂CF₃)₂ (NaBis/NaTFSI) | Na⁺ | TFSI⁻ | Ag-electrode comparative series |
@@ -73,7 +73,7 @@ The key chemical insight: the difference in Lewis acid–base interaction streng
 
 ## 4. Device Architecture
 
-**Vertical 2-T sandwich structure:**
+Vertical 2-T sandwich structure:
 ```
          [Ag, 100 nm, evaporated]
          [Active layer, ~209 nm]
@@ -91,7 +91,7 @@ The key chemical insight: the difference in Lewis acid–base interaction streng
 ## 5. Characterisation Methods
 
 | Technique | Instrument | What it measures |
-|-----------|-----------|-----------------|
+| ----------- | ----------- | ----------------- |
 | Profilometry | Ambios XP-1 | Active layer thickness |
 | AFM (tapping mode) | Bruker Dimension Icon | Surface topography, RMS roughness |
 | I–V hysteresis | Keithley 2450 + TSB | Memristive switching behaviour |
@@ -105,7 +105,7 @@ The key chemical insight: the difference in Lewis acid–base interaction streng
 ## 6. Key Numerical Results (Paper 1)
 
 | Property | Value |
-|----------|-------|
+| ---------- | ------- |
 | Film thickness | 209 nm |
 | Conductance potentiation | ≥200% (50 pulses, 1 V) |
 | EPSC ratio S₁/S₀ | 7.333 |
@@ -123,13 +123,13 @@ The key chemical insight: the difference in Lewis acid–base interaction streng
 
 ## 7. Theoretical Framework
 
-**Two mechanisms, reconciled by injection regime (van Reenen et al. JACS 2010):**
+Two mechanisms, reconciled by injection regime (van Reenen et al. JACS 2010):
 
 1. **Electrodynamic model** (injection-limited): Ions accumulate at electrodes forming a charged double layer → bends polymer valence/conduction bands → lowers Schottky barrier → more charge injection.
 
 2. **Electrochemical Doping model** (ohmic injection): Ion accumulation dopes the conjugated polymer electronically → changes polymer conductivity.
 
-**Memory regimes explained by Lewis acid–base chemistry:**
+Memory regimes explained by Lewis acid–base chemistry:
 
 - CF₃SO₃⁻ (triflate): soft Lewis base → weak interaction with Hybrane O → displaced by low voltage (1 V) → STM (fast relaxation 10–15 s)
 - Li⁺: hard Lewis acid → strong coordination with Hybrane O → requires high voltage (3 V) to displace → LTM (slow relaxation >45 s)
@@ -221,7 +221,7 @@ Chapter 5: Conclusions & Outlook
 ## 10. Status of Written Work (as of 2026-04-11)
 
 | Item | Status | Location |
-|------|--------|----------|
+| ------ | -------- | ---------- |
 | Memory document (v2) | ✅ Complete | `handouts/00_thesis_overview_memory.md` |
 | Thesis structure — 5 chapters (v2) | ✅ Complete | `handouts/01_thesis_structure.md` |
 | Introduction chapter plan (v2, with temporal computing sections) | ✅ Complete | `handouts/02_introduction_chapter_plan.md` |

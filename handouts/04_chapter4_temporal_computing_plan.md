@@ -16,7 +16,7 @@ The answer, argued in detail in the chapter, is that the SY/Hybrane/Li–Na–K 
 
 **One-sentence thesis of the chapter:** *Volatile, variable, ion-mediated organic memristive devices are not flawed non-volatile memories — they are heterogeneous fading-memory primitives, and when treated as such they deliver physical reservoir computing, spike coincidence detection, and multi-timescale transient filtering directly from the datasets of Chapters 2 and 3.*
 
-**What the chapter does *not* claim:**
+What the chapter does *not* claim:
 
 - It does not claim these devices beat crossbar ReRAM or SRAM on density, endurance, or retention.
 - It does not present newly fabricated circuits or on-chip demonstrations.
@@ -26,7 +26,7 @@ The answer, argued in detail in the chapter, is that the SY/Hybrane/Li–Na–K 
 
 ## Natural Conceptual Flow
 
-**Reframe → Consolidate → Model → Apply → Constrain → Rules**
+Reframe → Consolidate → Model → Apply → Constrain → Rules
 
 1. **Reframe** the device family from "weak non-volatile memory" to "heterogeneous temporal primitive".
 2. **Consolidate** the datasets from Chapters 2 and 3 into a single experimental basis.
@@ -83,7 +83,7 @@ The answer, argued in detail in the chapter, is that the SY/Hybrane/Li–Na–K 
 The only datasets Chapter 4 assumes as universally available across Li, Na and K are the three listed below. They map one-to-one to the three ingredients of the compact model in §4.3.
 
 | Dataset type | Folder | Li | Na | K | Quantity extracted | Model role |
-|--------------|--------|:--:|:--:|:--:|---------------------|------------|
+| -------------- | -------- | :--: | :--: | :--: | --------------------- | ------------ |
 | I–V hysteresis (triangular sweep) | `Day1_Hyst` | ✓ | ✓ | ✓ | Threshold, nonlinearity, read/write asymmetry, conductance window | Read transfer function f_i(V_read, x) |
 | N-pulse potentiation (log-sweep in N) | `Day2_NmbPls` | ✓ | ✓ | ✓ | Per-pulse conductance update, saturation curve | State update φ_i(V_write, t_write, x) |
 | Delay-time depotentiation (log-sweep in Δt) | `Day2_DlyTime` | ✓ | ✓ | ✓ | Stretched-exponential τ_i, β_i; fading-memory window; asymptotic floor | Fading-memory decay λ_i(Δt) |
@@ -95,7 +95,7 @@ Device-to-device and cycle-to-cycle spread are obtained from replicates within e
 The following datasets exist but only for a *subset* of the Li/Na/K devices — typically only for the Paper 1 Li device and a few Chapter 3 repeats. Chapter 4 uses them as **sanity checks and functional-form priors**, never as the primary fitting input for application simulations.
 
 | Dataset | Available for | Role in Chapter 4 |
-|---------|---------------|-------------------|
+| --------- | --------------- | ------------------- |
 | EPSC (multi-state pulse train) | Paper 1 Li; partial Ch. 3 repeats | Sanity check that fitted φ_i(x) reproduces the measured state ladder |
 | STDP (paired-pulse kernel) | Paper 1 Li | Prior for the coincidence kernel shape in §4.5; *not* used for Na and K claims |
 | Separated STM/LTM retention (two-voltage protocol) | Paper 1 Li | Prior on stretched-exponential functional form in §4.3 |
@@ -132,7 +132,7 @@ The following datasets exist but only for a *subset* of the Li/Na/K devices — 
 The model is identified from exactly the three common Li/Na/K datasets. Each of the three ingredients λ_i, φ_i, f_i is fit from one, and only one, of them. Supplementary ion-specific datasets (see §4.2.3) are used as priors and sanity checks only.
 
 | Experimental dataset (common Li/Na/K) | Extracted quantity | Role in the model |
-|---------------------------------------|---------------------|-------------------|
+| --------------------------------------- | --------------------- | ------------------- |
 | I–V hysteresis (`Day1_Hyst`) | Low-V slope, high-V slope, conductance window, forward/backward asymmetry | Shape of f_i(V_read, x) |
 | N-pulse potentiation (`Day2_NmbPls`) | Initial per-pulse update, saturation knee, asymptotic state | Form of φ_i(V_write, t_write, x) at the fixed protocol |
 | Delay-time depotentiation (`Day2_DlyTime`) | Stretched-exponential τ_i, β_i, asymptotic floor | Form of λ_i(Δt); also serves as the fading-memory temporal kernel K_i(Δt) used in §4.5 |
@@ -141,7 +141,7 @@ The model is identified from exactly the three common Li/Na/K datasets. Each of 
 Supplementary (Paper 1 Li only; used only as prior / sanity check):
 
 | Supplementary dataset | Use |
-|-----------------------|-----|
+| ----------------------- | ----- |
 | EPSC multi-state pulse train | Sanity check that fitted φ_i(x) reproduces the measured state ladder on the Li device |
 | STDP paired-pulse kernel | Functional-form prior for the Li coincidence kernel; not used for Na/K |
 | Separated STM/LTM retention (two-voltage protocol) | Prior for stretched-exponential functional form |
@@ -341,7 +341,7 @@ Supplementary (Paper 1 Li only; used only as prior / sanity check):
 #### 4.8.3 Design rules in one table
 
 | Design goal | Lever | Mechanism |
-|-------------|-------|-----------|
+| ------------- | ------- | ----------- |
 | Longer fading memory | Harder-acid cation (Li) | Stronger cation–oxygen coordination in Hybrane |
 | Shorter fading memory | Softer-acid cation (K) | Weaker coordination, faster relaxation |
 | More heterogeneous reservoir | Mixed-species device population | Distinct λ_i and φ_i per device |
@@ -363,7 +363,7 @@ Supplementary (Paper 1 Li only; used only as prior / sanity check):
 *(Analogous in scope to the Chapter 2 figure reference list in `03_chapter2_figures_needed.md`. Numbering is indicative only.)*
 
 | Label | Description | Source / How generated |
-|-------|-------------|-----------------------|
+| ------- | ------------- | ----------------------- |
 | `fig:ch4_framing` | Conceptual schematic contrasting a static-weight crossbar with a heterogeneous fading-memory bank | Original schematic |
 | `fig:ch4_dataset_map` | Visual inventory of the three common Li/Na/K datasets (I–V, N-pulse, delay-time) across the `ch4_device_manifest.csv` devices | `chapter4_pipeline.py` over `Nanomem_Devices_Library/` |
 | `fig:ch4_model_fits` | Example model fits overlayed on I–V (`Day1_Hyst`), N-pulse potentiation (`Day2_NmbPls`), and delay-time depotentiation (`Day2_DlyTime`) for one Li, one Na and one K device | `chapter4_pipeline.py` |
@@ -384,14 +384,14 @@ Supplementary (Paper 1 Li only; used only as prior / sanity check):
 
 *Authoritative specification: `handouts/05_chapter4_data_pipeline.md`.*
 
-**Common Li/Na/K datasets (primary inputs for every simulation):**
+Common Li/Na/K datasets (primary inputs for every simulation):
 
 - I–V hysteresis (`Day1_Hyst`) — triangular sweep, common protocol across Li/Na/K
 - N-pulse potentiation (`Day2_NmbPls`) — fixed V_write/t_write, logarithmic sweep in N
 - Delay-time depotentiation (`Day2_DlyTime`) — fixed potentiation burst, logarithmic sweep in Δt
 - Replicates within each of the above provide both device-to-device and cycle-to-cycle spread
 
-**Paper 1 Li supplementary datasets (priors and sanity checks only, *never* used to support Na/K claims):**
+Paper 1 Li supplementary datasets (priors and sanity checks only, *never* used to support Na/K claims):
 
 - EPSC multi-state pulse train
 - STDP paired-pulse kernel
