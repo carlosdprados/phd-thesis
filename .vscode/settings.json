@@ -1,5 +1,28 @@
 {
   "latex-workshop.latex.outDir": "%WORKSPACE_FOLDER%/build/%RELATIVE_DIR%",
+  "files.exclude": {
+    "**/.DS_Store": true,
+    "**/*.aux": true,
+    "**/*.bbl": true,
+    "**/*.bcf": true,
+    "**/*.bcf-SAVE-ERROR": true,
+    "**/*.blg": true,
+    "**/*.fdb_latexmk": true,
+    "**/*.fls": true,
+    "**/*.log": true,
+    "**/*.out": true,
+    "**/*.run.xml": true,
+    "**/*.synctex.gz": true,
+    ".claude": true,
+    "build": true
+  },
+  "search.exclude": {
+    "build": true
+  },
+  "files.watcherExclude": {
+    "**/.claude/**": true,
+    "**/build/**": true
+  },
   "latex-workshop.latex.tools": [
     {
       "name": "latexmk-relative",
