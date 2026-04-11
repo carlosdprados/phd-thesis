@@ -1,5 +1,7 @@
 <!-- markdownlint-disable-file MD013 -->
+
 # PhD Thesis — Durable Memory Document
+
 **Author:** Carlos David Prado-Socorro  
 **Institution:** Universitat de València — Institute of Molecular Science (ICMol)  
 **Group:** Nanotech / Memristive Devices  
@@ -20,15 +22,19 @@
 ## 2. The Scientific Problem Being Solved
 
 ### 2.1 Von Neumann Bottleneck
+
 Modern computers physically separate the CPU from memory (RAM/storage), forcing data to traverse a shared bus for every operation. This creates a throughput ceiling — the "von Neumann bottleneck" — that becomes critical as AI workloads demand processing of petabytes of data at high frequency.
 
 ### 2.2 Neuromorphic Computing as the Solution
+
 Biological neural networks avoid this bottleneck by co-locating computation and memory at the synapse. The synapse implements both short-term potentiation (working memory) and long-term potentiation (persistent learning) via changes in synaptic weight. Hardware that mimics this can perform in-memory computation with orders of magnitude better energy efficiency.
 
 ### 2.3 The Role of the Memristor
+
 A memristor (Chua, 1971) is a 2-terminal passive element whose resistance depends on the history of charge or current flow. It is the natural hardware analogue of a biological synapse. The conductance of a memristor maps directly onto synaptic weight; its history-dependent resistance embodies memory; its continuous variability enables analog computation.
 
 ### 2.4 Why Organic Materials?
+
 Inorganic memristors (TiO₂, phase-change, conductive-bridge) suffer from: poor reproducibility due to stochastic filament formation; limited chemical tunability; rigid substrates; toxicity; and biocompatibility issues for nervetronic applications. Organic materials, by contrast, offer: molecular-level tunability via synthetic chemistry; solution processability (inkjet, spin-coating); mechanical flexibility; low cost; biocompatibility; and the possibility of exploiting multiple mechanisms (ionic, redox, conformational) for richer synaptic behaviour.
 
 ---
@@ -36,12 +42,15 @@ Inorganic memristors (TiO₂, phase-change, conductive-bridge) suffer from: poor
 ## 3. Materials System
 
 ### 3.1 Super Yellow (SY)
+
 Poly[{2,5-di(3′,7′-dimethyloctyloxy)-1,4-phenylenevinylene}-co-{3-(4′-(3′′,7′′-dimethyloctyloxy)phenyl)-1,4-phenylenevinylene}-co-{3-(3′-(3′,7′-dimethyloctyloxy)phenyl)-1,4-phenylenevinylene}] — a PPV-family conjugated polymer. Acts as the semiconducting matrix providing electronic conductance pathways. Soluble in cyclohexanone. Well-characterised in LECs (Mardegan et al. Adv. Funct. Mater. 2021, demonstrating 1600 h electroluminescence lifetime when formulated with Hybrane).
 
 ### 3.2 Hybrane DEO750 8500
+
 A hyperbranched polyester-amide solid electrolyte. Contains a large density of oxygen atoms (ether and ester groups) on its side chains that act as hard Lewis bases, preferentially coordinating hard Lewis acid cations (Li⁺ > Na⁺ > K⁺ in order of charge density). Its low cohesive energy allows segmental motion, facilitating ion hopping and solvation. Serves as the ion-conductive mediator — the polymer "highway" along which ions migrate.
 
 ### 3.3 Ionic Salts Used
+
 | Salt | Cation | Anion | Paper/Generation |
 |------|--------|-------|-----------------|
 | LiCF₃SO₃ (LiTf) | Li⁺ (hard acid) | CF₃SO₃⁻ (triflate, soft base) | Paper 1; NM_v001–v200 approx. |
@@ -52,6 +61,7 @@ A hyperbranched polyester-amide solid electrolyte. Contains a large density of o
 The key chemical insight: the difference in Lewis acid–base interaction strength between the cation and the Hybrane oxygen atoms determines how easily each ion migrates under an electric field, thereby governing the memory retention time (harder acid → stronger coordination → harder to displace → longer memory).
 
 ### 3.4 Composite Formulation (Paper 1)
+
 - SY: 15 → 8.72 mg/mL (after mixing)
 - Hybrane: 10 → 2.62 mg/mL
 - LiCF₃SO₃: 5 → 0.78 mg/mL
@@ -69,6 +79,7 @@ The key chemical insight: the difference in Lewis acid–base interaction streng
          [Active layer, ~209 nm]
 [ITO-patterned glass substrate, transparent]
 ```
+
 - Active area per junction: 0.0825 cm²
 - ITO bottom electrode: pre-patterned; cleaned ultrasonically (Mucasol, water, 2-propanol); dried under N₂
 - Spin-coating: 2000 rpm, 60 s; anneal 75°C, 3 h (under N₂)
@@ -119,6 +130,7 @@ The key chemical insight: the difference in Lewis acid–base interaction streng
 2. **Electrochemical Doping model** (ohmic injection): Ion accumulation dopes the conjugated polymer electronically → changes polymer conductivity.
 
 **Memory regimes explained by Lewis acid–base chemistry:**
+
 - CF₃SO₃⁻ (triflate): soft Lewis base → weak interaction with Hybrane O → displaced by low voltage (1 V) → STM (fast relaxation 10–15 s)
 - Li⁺: hard Lewis acid → strong coordination with Hybrane O → requires high voltage (3 V) to displace → LTM (slow relaxation >45 s)
 

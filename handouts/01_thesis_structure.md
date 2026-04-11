@@ -1,5 +1,7 @@
 <!-- markdownlint-disable-file MD013 -->
+
 # Thesis Chapter Structure
+
 **Author:** Carlos David Prado-Socorro  
 **Date:** April 11, 2026  
 **Revision:** v2 — 5-chapter structure (adds application-level data-driven chapter)
@@ -9,12 +11,14 @@
 ## Proposed 5-Chapter Structure
 
 ### Chapter 1 — Introduction
+
 *Full narrative background to justify the research, contextualise the problem, and establish the scientific framework for Chapters 2, 3 and 4. Critically, this revised introduction re-frames the target device: not as a candidate non-volatile memory that must compete with crossbar ReRAM, but as a volatile, heterogeneous, temporally rich element whose natural place is in event-driven and temporal computing architectures.*
 
 Scope: ~45–65 pages  
 Key topics: von Neumann bottleneck → neuromorphic computing → memristors → organic electronics → polymer composites → ionic memristors → **volatile vs. non-volatile dynamics** → **temporal and event-driven computing paradigms** → thesis objectives.
 
 ### Chapter 2 — Proof of Concept: Polymer-Based Composite Organic Memristive Devices
+
 *Based on Paper 1 (Prado-Socorro et al., Adv. Electron. Mater. 2022). Expanded PhD-thesis treatment of the SY/Hybrane/LiCF₃SO₃ composite device fabrication and characterisation.*
 
 Scope: ~25–35 pages  
@@ -23,10 +27,12 @@ Key content: Materials design rationale, full fabrication protocol, morphologica
 **Status: Written (April 2026) — see `handouts/chapter2_proof_of_concept.tex`**
 
 ### Chapter 3 — Ion-Dependent Device Physics in Silver-Electrode Devices
+
 *Based on experimental findings from the NM_vXXX Ag-electrode device series employing Li⁺, Na⁺, and K⁺ TFSI salts. Systematic comparison of how cation identity (charge density, Lewis acid strength, ionic radius) determines memristive dynamics. The chapter is framed as a physical-chemistry investigation of the device — not as a performance shoot-out against digital memories.*
 
 Scope: ~30–40 pages  
 Key content:
+
 - Motivation for exploring multiple ionic species (beyond Li)
 - Comparative synthesis of composite formulations with LiTFSI, NaTFSI, KTFSI
 - Device fabrication (optimised Ag-electrode protocol)
@@ -40,10 +46,12 @@ Key content:
 - **Explicit reframing:** ion identity is treated as a *timescale-engineering knob*, not as a defect that prevents persistence. Variability (device-to-device and cycle-to-cycle) is characterised quantitatively as a *resource* that Chapter 4 will exploit.
 
 ### Chapter 4 — Data-Driven Temporal Computing with Volatile Ion-Mediated Polymeric Memristors
+
 *Translates the experimental datasets of Chapters 2 and 3 into application-level functionality using compact, experimentally grounded behavioural models. Uses only datasets already acquired in the NM_vXXX series — no additional fabrication is required. The chapter argues, and then demonstrates in simulation, that the Li/Na/K device family is naturally suited to heterogeneous physical reservoir computing, spike coincidence detection, and multi-timescale transient filtering.*
 
 Scope: ~35–45 pages  
 Key content:
+
 - Re-statement of the design philosophy: volatile, variable, heterogeneous elements as temporal computing primitives, not as flawed non-volatile memories
 - Consolidation of experimental datasets from Chapters 2 and 3, with the **common Li/Na/K basis explicitly limited to I–V hysteresis, N-pulse potentiation, and delay-time depotentiation**; EPSC, STDP, separated STM/LTM retention, and impedance are retained as Li-dominant priors / sanity checks where available
 - Extraction of a compact behavioural model per ion species (Li, Na, K), with fading-memory time constant, nonlinear pulse update, device-to-device spread, and read transfer function
@@ -56,10 +64,12 @@ Key content:
 **Status: Not started. See companion outline `handouts/04_chapter4_temporal_computing_plan.md`.**
 
 ### Chapter 5 — Conclusions and Outlook
+
 *Synthesis of contributions, limitations, and forward-looking research directions across the device-chemistry axis (Chapters 2 and 3) and the application-level axis (Chapter 4).*
 
 Scope: ~12–18 pages  
 Key content:
+
 - Summary of key scientific contributions in three layers: (i) a reversible 2-T organic memristive platform, (ii) ion-chemistry control of its dynamics, (iii) a demonstration that these dynamics are exploitable as temporal computing primitives
 - Benchmarking not against digital memory but against other temporal / reservoir / neuromorphic hardware
 - Limitations of the current material system (stability, retention drift, encapsulation, read-disturb under continuous pulsing)
