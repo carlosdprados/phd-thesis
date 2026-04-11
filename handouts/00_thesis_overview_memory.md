@@ -227,10 +227,10 @@ Chapter 5: Conclusions & Outlook
 | Thesis structure — 5 chapters (v2) | ✅ Complete | `handouts/01_thesis_structure.md` |
 | Introduction chapter plan (v2, with temporal computing sections) | ✅ Complete | `handouts/02_introduction_chapter_plan.md` |
 | Chapter 2 figures reference list | ✅ Complete | `handouts/03_chapter2_figures_needed.md` |
-| Chapter 2 (LaTeX, full) | ✅ Complete | `handouts/chapter2_proof_of_concept.tex` |
+| Chapter 2 (LaTeX, full) | ✅ Complete | `chapters/chapter2_proof_of_concept.tex` |
 | Chapter 4 planning document | ✅ Complete | `handouts/04_chapter4_temporal_computing_plan.md` |
 | Chapter 4 data / pipeline spec | ✅ Complete | `handouts/05_chapter4_data_pipeline.md` |
-| References database (`references.bib`, with reservoir-computing core added) | ✅ Complete | `handouts/references.bib` |
+| References database (`references.bib`, with reservoir-computing core added) | ✅ Complete | `bibliography/references.bib` |
 | Chapter 1 (writing) | ⬜ Not started | — |
 | Chapter 3 (writing) | ⬜ Not started | — |
 | Chapter 4 (writing) | ⬜ Not started | — |

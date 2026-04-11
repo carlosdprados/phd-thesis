@@ -24,7 +24,7 @@ Key topics: von Neumann bottleneck → neuromorphic computing → memristors →
 Scope: ~25–35 pages  
 Key content: Materials design rationale, full fabrication protocol, morphological characterisation (AFM, profilometry), complete electrical characterisation (I–V hysteresis, EPSC, STM/LTM, STDP), ion transport mechanism, device stability, comparison with state of the art.
 
-Status: Written (April 2026) — see `handouts/chapter2_proof_of_concept.tex`
+Status: Written (April 2026) — see `chapters/chapter2_proof_of_concept.tex`
 
 ### Chapter 3 — Ion-Dependent Device Physics in Silver-Electrode Devices
 

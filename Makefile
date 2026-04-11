@@ -1,6 +1,6 @@
-CHAPTER2_SRC := handouts/chapter2_proof_of_concept.tex
-CHAPTER2_DIR := handouts
-CHAPTER2_OUT := build/handouts
+CHAPTER2_SRC := chapters/chapter2_proof_of_concept.tex
+CHAPTER2_DIR := chapters
+CHAPTER2_OUT := build/chapters
 
 .PHONY: chapter2 chapter2-clean
 
