@@ -1,0 +1,35 @@
+{
+  "latex-workshop.latex.outDir": "%WORKSPACE_FOLDER%/build/%RELATIVE_DIR%",
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk-relative",
+      "command": "latexmk",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-pdf",
+        "-outdir=%OUTDIR%",
+        "%DOCFILE%"
+      ],
+      "env": {}
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "latexmk-relative",
+      "tools": [
+        "latexmk-relative"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipe.default": "first",
+  "latex-workshop.latex.clean.method": "command",
+  "latex-workshop.latex.clean.command": "latexmk",
+  "latex-workshop.latex.clean.args": [
+    "-outdir=%OUTDIR%",
+    "-c",
+    "%DOCFILE_EXT%"
+  ],
+  "latex-workshop.latex.build.fromWorkspaceFolder": false
+}

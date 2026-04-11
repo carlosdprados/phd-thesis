@@ -1,1 +1,23 @@
 .DS_Store
+
+# LaTeX build artefacts
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.toc
+*.bbl
+*.bcf
+*.bcf-SAVE-ERROR
+*.blg
+*.run.xml
+*.synctex.gz
+build/
+
+# Local tool metadata
+.claude/
+.vscode/*
+!.vscode/settings.json
+*.swp
+*~
