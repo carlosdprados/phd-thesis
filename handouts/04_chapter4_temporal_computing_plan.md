@@ -3,18 +3,18 @@
 # Chapter 4 — Data-Driven Temporal Computing with Volatile Ion-Mediated Polymeric Memristors: Detailed Outline
 
 **Author:** Carlos David Prado-Socorro  
-**Date:** April 11, 2026  
-**Status:** Planning document for the new Chapter 4 (5-chapter thesis structure, v2).
+**Date:** April 12, 2026  
+**Status:** Planning document for Chapter 4 (5-chapter thesis structure). v3 — rewritten so that every Chapter 3 reference points at the real experimental corpus: a PEO-based triflate comparative series (PEO/LiTr, PEO/NaTr, PEO/KTr at mass fractions 0.3 / 0.09, plus a PEO/LiTr concentration sub-study), characterised through three common dynamical measurements (I–V hysteresis, variable-N potentiation, variable-delay depotentiation). TMPE-based and alkali-TFSI (LiBis / NaBis / KBis) composites are exploratory side evidence and are *not* treated as comparative fitting targets. EPSC, STDP, separated STM/LTM retention and impedance spectroscopy remain Paper 1 / Chapter 2 (SY/Hybrane/LiTf) data and are used only as Li-specific priors and sanity checks. v2 (2026-04-11) introduced the chapter.
 
 ---
 
 ## Purpose of This Chapter
 
-Chapters 2 and 3 establish *what* the devices are and *why* their behaviour depends on ion identity. Chapter 4 answers the next question: *what are they good for, and how do we use them?*
+Chapters 2 and 3 establish *what* the devices are and *why* their dynamical response depends on composition and cation identity. Chapter 4 answers the next question: *what are they good for, and how do we use them?*
 
-The answer, argued in detail in the chapter, is that the SY/Hybrane/Li–Na–K family is naturally suited to **temporal computing** — computing that uses the transients of a dynamical system, not its steady state, to represent and classify time-varying signals. The chapter re-purposes every dataset already measured in Chapters 2 and 3 as input to compact behavioural models, and uses those models to demonstrate three application schemes in simulation, without any new fabrication.
+The answer, argued in detail in the chapter, is that the PEO/triflate polymer-electrolyte family is naturally suited to **temporal computing** — computing that uses the transients of a dynamical system, not its steady state, to represent and classify time-varying signals. The chapter re-purposes the experimental evidence already acquired — a large, comparable dataset of three common dynamical measurements across the PEO/LiTr concentration series and the PEO/LiTr, PEO/NaTr, PEO/KTr fixed-composition set, plus the Chapter 2 Paper 1 Li device as a richer single-exemplar prior — and turns it into compact behavioural models, and then uses those models to demonstrate three application schemes in simulation, without any new fabrication.
 
-**One-sentence thesis of the chapter:** *Volatile, variable, ion-mediated organic memristive devices are not flawed non-volatile memories — they are heterogeneous fading-memory primitives, and when treated as such they deliver physical reservoir computing, spike coincidence detection, and multi-timescale transient filtering directly from the datasets of Chapters 2 and 3.*
+**One-sentence thesis of the chapter:** *Volatile, variable, polymer-electrolyte memristive devices are not flawed non-volatile memories — they are heterogeneous fading-memory primitives, and the abundant common dynamical dataset of Chapter 3 (I–V hysteresis, variable-N potentiation, variable-delay depotentiation across the PEO/triflate corpus) is enough to deliver physical reservoir computing, spike coincidence detection, and multi-timescale transient filtering.*
 
 What the chapter does *not* claim:
 
@@ -29,8 +29,8 @@ What the chapter does *not* claim:
 Reframe → Consolidate → Model → Apply → Constrain → Rules
 
 1. **Reframe** the device family from "weak non-volatile memory" to "heterogeneous temporal primitive".
-2. **Consolidate** the datasets from Chapters 2 and 3 into a single experimental basis.
-3. **Model** each ion species (Li, Na, K) with a compact, physically motivated behavioural model fitted directly to those datasets.
+2. **Consolidate** the dynamical dataset of Chapter 3 (three common measurements across the PEO/triflate corpus) into a single experimental basis, with the Chapter 2 Paper 1 Li device as a richer single-exemplar prior.
+3. **Model** each PEO/triflate composition–cation combination with a compact, physically motivated behavioural model fitted directly to those three common datasets.
 4. **Apply** the models to three simulated application schemes: reservoir computing (flagship), coincidence detection, and transient filter bank.
 5. **Constrain** the schemes by realistic circuit integration (1T1M addressing, current compliance, read/write protocols, variability envelopes).
 6. **Rules:** distil design rules and scope limits — where these devices are genuinely useful, and where they are not.
@@ -61,8 +61,8 @@ Reframe → Consolidate → Model → Apply → Constrain → Rules
 
 #### 4.1.4 What this chapter will therefore show
 
-- A compact data-driven model of the Li/Na/K family
-- Three application schemes using only that model
+- A compact data-driven model of the PEO/triflate corpus — a composition axis (PEO/LiTr concentration series) and a cation axis (PEO/LiTr, PEO/NaTr, PEO/KTr at mass fractions 0.3 / 0.09) — fitted exclusively from the three common dynamical measurements of Chapter 3
+- Three application schemes using only those models
 - Circuit-level constraints that make the schemes physically plausible
 
 ---
@@ -74,35 +74,35 @@ Reframe → Consolidate → Model → Apply → Constrain → Rules
 #### 4.2.1 Provenance
 
 - Mapping of each dataset to its originating device generation in `Nanomem_Devices_Library/DEVICES_LAB_DATA/YYYY-QN/NM_vXXX_.../`
-- Curated device list frozen in `handouts/ch4_device_manifest.csv` (≥ 3 devices per ion species, all passing the read-disturb sanity check)
-- Chapter 2 Paper 1 Li device: full measurement suite, used as reference / prior
-- Chapter 3 Ag-electrode series (LiTFSI, NaTFSI, KTFSI): common measurement suite restricted to the three datasets below, under a common protocol
+- Curated device list frozen in `handouts/ch4_device_manifest.csv`, with two strata: (i) the **PEO/LiTr concentration series** covering the composition axis; (ii) the **fixed-composition PEO/LiTr, PEO/NaTr, PEO/KTr set** at mass fractions 0.3 / 0.09 covering the cation axis. Each stratum must contain ≥ 3 devices per cell that pass the read-disturb sanity check
+- Chapter 2 Paper 1 device (SY/Hybrane/LiTf): full measurement suite, used strictly as a **Li-only prior / sanity-check source**. It is *not* a Chapter 3 PEO/LiTr device and cannot stand in for one in quantitative fits; it supplies functional-form priors and cross-checks
+- TMPE- and alkali-TFSI (LiBis / NaBis / KBis) devices from the broader archive are **excluded** from the Chapter 4 manifest: their dataset is too sparse for a comparative fit. Chapter 3 reports them as exploratory side evidence; Chapter 4 does not model them
 
-#### 4.2.2 Dataset inventory table — common Li/Na/K data
+#### 4.2.2 Dataset inventory table — common PEO/triflate comparative data
 
-The only datasets Chapter 4 assumes as universally available across Li, Na and K are the three listed below. They map one-to-one to the three ingredients of the compact model in §4.3.
+The only datasets Chapter 4 assumes as universally available across the PEO/triflate corpus are the three listed below. They map one-to-one to the three ingredients of the compact model in §4.3.
 
-| Dataset type | Folder | Li | Na | K | Quantity extracted | Model role |
-| -------------- | -------- | :--: | :--: | :--: | --------------------- | ------------ |
-| I–V hysteresis (triangular sweep) | `Day1_Hyst` | ✓ | ✓ | ✓ | Threshold, nonlinearity, read/write asymmetry, conductance window | Read transfer function f_i(V_read, x) |
-| N-pulse potentiation (log-sweep in N) | `Day2_NmbPls` | ✓ | ✓ | ✓ | Per-pulse conductance update, saturation curve | State update φ_i(V_write, t_write, x) |
-| Delay-time depotentiation (log-sweep in Δt) | `Day2_DlyTime` | ✓ | ✓ | ✓ | Stretched-exponential τ_i, β_i; fading-memory window; asymptotic floor | Fading-memory decay λ_i(Δt) |
+| Dataset type | Folder | PEO/LiTr conc. series | PEO/LiTr 0.3/0.09 | PEO/NaTr 0.3/0.09 | PEO/KTr 0.3/0.09 | Quantity extracted | Model role |
+| -------------- | -------- | :--: | :--: | :--: | :--: | --------------------- | ------------ |
+| I–V hysteresis (triangular sweep) | `Day1_Hyst` | ✓ | ✓ | ✓ | ✓ | Threshold, nonlinearity, read/write asymmetry, conductance window | Read transfer function f(V_read, x) |
+| N-pulse potentiation (log-sweep in N) | `Day2_NmbPls` | ✓ | ✓ | ✓ | ✓ | Per-pulse conductance update, saturation curve | State update φ(V_write, t_write, x) |
+| Delay-time depotentiation (log-sweep in Δt) | `Day2_DlyTime` | ✓ | ✓ | ✓ | ✓ | Stretched-exponential τ, β; fading-memory window; asymptotic floor | Fading-memory decay λ(Δt) |
 
 Device-to-device and cycle-to-cycle spread are obtained from replicates within each of these three datasets, not from a separate measurement type.
 
-#### 4.2.3 Ion-specific supplementary data (sanity checks and priors only)
+#### 4.2.3 Chapter 2 supplementary data (Li-only priors and sanity checks)
 
-The following datasets exist but only for a *subset* of the Li/Na/K devices — typically only for the Paper 1 Li device and a few Chapter 3 repeats. Chapter 4 uses them as **sanity checks and functional-form priors**, never as the primary fitting input for application simulations.
+The following datasets exist for the Chapter 2 Paper 1 device (SY/Hybrane/LiTf) only. They are **not** present in the PEO/triflate comparative corpus with anything like the same uniformity, and must never be treated as comparative Li/Na/K evidence. Chapter 4 uses them as **functional-form priors and sanity checks**, never as primary fitting inputs for application simulations.
 
 | Dataset | Available for | Role in Chapter 4 |
 | --------- | --------------- | ------------------- |
-| EPSC (multi-state pulse train) | Paper 1 Li; partial Ch. 3 repeats | Sanity check that fitted φ_i(x) reproduces the measured state ladder |
-| STDP (paired-pulse kernel) | Paper 1 Li | Prior for the coincidence kernel shape in §4.5; *not* used for Na and K claims |
-| Separated STM/LTM retention (two-voltage protocol) | Paper 1 Li | Prior on stretched-exponential functional form in §4.3 |
-| Impedance spectroscopy | Paper 1 Li; partial Ch. 3 | Hard lower bound on the fastest meaningful Δt; RC-level plausibility check |
-| Long-term profile (`Day14_Prof`) | Subset of Ch. 3 devices | Stability envelope for the §4.7 integration discussion |
+| EPSC (multi-state pulse train) | Paper 1 SY/Hybrane/LiTf device | Sanity check that fitted φ(x) reproduces a measured state ladder on a representative Li device; *not* propagated to Na/K claims |
+| STDP (paired-pulse kernel) | Paper 1 SY/Hybrane/LiTf device | Li-only consistency check on the coincidence-kernel shape in §4.5; *not* used for Na/K claims |
+| Separated STM/LTM retention (two-voltage protocol) | Paper 1 SY/Hybrane/LiTf device | Functional-form prior (stretched-exponential) for the λ(Δt) fits in §4.3 |
+| Impedance spectroscopy | Paper 1 SY/Hybrane/LiTf device | Hard lower bound on the fastest meaningful Δt; RC-level plausibility check |
+| Long-term stability profile (`Day14_Prof`) | Subset of Chapter 3 PEO/triflate devices | Stability envelope for the §4.7 integration discussion, used qualitatively only |
 
-**Rule:** every statement in Chapter 4 that relies on any of these ion-specific datasets must be flagged in the text as "prior" or "sanity check" and must not be used to justify quantitative application-level claims for ion species where the dataset does not exist.
+**Rule:** every statement in Chapter 4 that relies on any of these supplementary datasets must be flagged in the text as "Chapter 2 prior" or "Li-only sanity check" and must not be used to justify quantitative application-level claims for Na or K devices or for any composition on the PEO/triflate axis.
 
 #### 4.2.4 Common pre-processing
 
@@ -118,46 +118,46 @@ The following datasets exist but only for a *subset* of the Li/Na/K devices — 
 
 #### 4.3.1 Model family
 
-- Discrete-time, single-state-variable model per device, indexed by ion species *i* ∈ {Li, Na, K}
+- Discrete-time, single-state-variable model per device, indexed by **composition–cation cell** *c* ∈ {PEO/LiTr concentration points} ∪ {PEO/LiTr@0.3/0.09, PEO/NaTr@0.3/0.09, PEO/KTr@0.3/0.09}
 - State update:
-  \[ x_{k+1} = \lambda_i(\Delta t)\,x_k + \varphi_i(V_\text{write}, t_\text{write}, x_k) + \xi_k \]
+  \[ x_{k+1} = \lambda_c(\Delta t)\,x_k + \varphi_c(V_\text{write}, t_\text{write}, x_k) + \xi_k \]
 
 - Read-out:
-  \[ G_k = g_i(x_k, V_\text{read}),\quad I_k = f_i(V_\text{read}, x_k) \]
+  \[ G_k = g_c(x_k, V_\text{read}),\quad I_k = f_c(V_\text{read}, x_k) \]
 
 - Noise term ξ_k captures cycle-to-cycle variability; device-level parameter draws capture device-to-device variability
 
 #### 4.3.2 Mapping datasets to model parameters
 
-The model is identified from exactly the three common Li/Na/K datasets. Each of the three ingredients λ_i, φ_i, f_i is fit from one, and only one, of them. Supplementary ion-specific datasets (see §4.2.3) are used as priors and sanity checks only.
+The model is identified from exactly the three common dynamical datasets of the PEO/triflate corpus. Each of the three ingredients λ_c, φ_c, f_c is fit from one, and only one, of them. The Chapter 2 SY/Hybrane/LiTf supplementary datasets (see §4.2.3) are used as priors and sanity checks only.
 
-| Experimental dataset (common Li/Na/K) | Extracted quantity | Role in the model |
+| Experimental dataset (common PEO/triflate corpus) | Extracted quantity | Role in the model |
 | --------------------------------------- | --------------------- | ------------------- |
-| I–V hysteresis (`Day1_Hyst`) | Low-V slope, high-V slope, conductance window, forward/backward asymmetry | Shape of f_i(V_read, x) |
-| N-pulse potentiation (`Day2_NmbPls`) | Initial per-pulse update, saturation knee, asymptotic state | Form of φ_i(V_write, t_write, x) at the fixed protocol |
-| Delay-time depotentiation (`Day2_DlyTime`) | Stretched-exponential τ_i, β_i, asymptotic floor | Form of λ_i(Δt); also serves as the fading-memory temporal kernel K_i(Δt) used in §4.5 |
-| Replicates within the three datasets above | Device-to-device and cycle-to-cycle parameter distributions | Prior over (λ_i, φ_i, f_i) across an ensemble |
+| I–V hysteresis (`Day1_Hyst`) | Low-V slope, high-V slope, conductance window, forward/backward asymmetry | Shape of f_c(V_read, x) |
+| N-pulse potentiation (`Day2_NmbPls`) | Initial per-pulse update, saturation knee, asymptotic state | Form of φ_c(V_write, t_write, x) at the fixed protocol |
+| Delay-time depotentiation (`Day2_DlyTime`) | Stretched-exponential τ_c, β_c, asymptotic floor | Form of λ_c(Δt); also serves as the fading-memory temporal kernel K_c(Δt) used in §4.5 |
+| Replicates within the three datasets above | Device-to-device and cycle-to-cycle parameter distributions | Prior over (λ_c, φ_c, f_c) across an ensemble |
 
-Supplementary (Paper 1 Li only; used only as prior / sanity check):
+Supplementary (Chapter 2 Paper 1 SY/Hybrane/LiTf device only; used only as prior / sanity check, never propagated to Na or K claims):
 
 | Supplementary dataset | Use |
 | ----------------------- | ----- |
-| EPSC multi-state pulse train | Sanity check that fitted φ_i(x) reproduces the measured state ladder on the Li device |
-| STDP paired-pulse kernel | Functional-form prior for the Li coincidence kernel; not used for Na/K |
-| Separated STM/LTM retention (two-voltage protocol) | Prior for stretched-exponential functional form |
+| EPSC multi-state pulse train | Sanity check that a fitted φ(x) is capable of reproducing a multi-state ladder on a representative Li device |
+| STDP paired-pulse kernel | Li-only consistency check for the coincidence kernel in §4.5; not used for Na or K |
+| Separated STM/LTM retention (two-voltage protocol) | Functional-form prior (stretched-exponential) for the λ(Δt) fits |
 | Impedance spectroscopy | Hard lower bound on the fastest meaningful Δt (RC-level sanity bound) |
 
 #### 4.3.3 Model validation
 
 - **Leave-one-dataset-out validation** across the three common datasets: fit on {I–V, N-pulse}, predict the delay-time decay shape; then fit on {I–V, delay-time}, predict the N-pulse saturation curve; report R² and residual RMS on the held-out dataset
-- **Cross-species sanity checks:** the Li/Na/K time-constant hierarchy (τ_Li > τ_Na > τ_K, or its measured ordering) must emerge from the delay-time fits, not be imposed by hand
-- **Supplementary sanity checks (Li only):** predicted EPSC state ladder from the fitted φ_Li must reproduce the Paper 1 EPSC measurements within a stated tolerance; predicted coincidence kernel from the fitted λ_Li must be consistent with the Paper 1 STDP data
+- **Cross-cell sanity checks:** any time-constant ordering between PEO/LiTr, PEO/NaTr, PEO/KTr at fixed composition must emerge from the delay-time fits, not be imposed by hand. Any composition-dependent trend along the PEO/LiTr concentration series must likewise come from the fits, not from prior expectation
+- **Chapter 2 sanity checks (SY/Hybrane/LiTf only):** the EPSC state ladder of Chapter 2 must be reproducible from a Li-device-shaped φ(x) within a stated tolerance; the Chapter 2 STDP kernel must be consistent with the λ(Δt) extracted from the Paper 1 device. Neither of these checks is extended to Na or K
 - **Fit-quality metrics:** R² on delay-time curves, RMSE on N-pulse curves, RMSE on I–V low-V and high-V slopes, KL divergence between simulated and measured cycle-to-cycle distributions
 - **Pipeline-level reproducibility:** the validation report is produced automatically by `chapter4_pipeline.py` (see `05_chapter4_data_pipeline.md` §5.5)
 
 #### 4.3.4 Resulting "parameter cards"
 
-- One per ion species, summarising λ_i, φ_i, f_i with mean and spread
+- One per composition–cation cell in the manifest (PEO/LiTr concentration points and PEO/{Li,Na,K}Tr at 0.3 / 0.09), summarising λ_c, φ_c, f_c with mean and spread
 - These cards are the input to every simulation in §4.4–§4.6
 
 ---
@@ -166,17 +166,16 @@ Supplementary (Paper 1 Li only; used only as prior / sanity check):
 
 #### 4.4.1 Why this is the flagship
 
-- Uses almost every dataset type measured in Chapters 2 and 3
+- Uses the three common dynamical datasets of the PEO/triflate corpus — the most abundant and most consistently acquired data in the thesis
 - Makes fading memory and heterogeneity first-order *advantages*, not tolerated flaws
 - Standard benchmarks exist; the chapter can report numbers that the reader can compare
 
 #### 4.4.2 Reservoir architecture
 
 - Input layer: pulse-encoded time series (rate or delta-coded)
-- Reservoir layer: a bank of Li/Na/K devices used as parallel fading-memory nodes
-  - Li bank: slow nodes (long τ)
-  - Na bank: intermediate nodes
-  - K bank: fast nodes
+- Reservoir layer: a bank of PEO/triflate devices used as parallel fading-memory nodes, drawn from the Chapter 3 manifest
+  - Heterogeneity is provided jointly by (i) the composition axis of the PEO/LiTr concentration series and (ii) the cation axis of the PEO/LiTr, PEO/NaTr, PEO/KTr fixed-composition set
+  - The slow / medium / fast labelling of individual banks is assigned *a posteriori*, from the fitted τ_c of the delay-time depotentiation data, rather than asserted *a priori* from cation identity
 
 - Read-out: conductance state sampled at fixed delays, fed into a trained linear classifier
 
@@ -200,14 +199,14 @@ Supplementary (Paper 1 Li only; used only as prior / sanity check):
 - Class separability (Fisher criterion on the reservoir state)
 - Classification accuracy vs. reservoir size
 - Robustness to variability: performance vs. injected device-to-device and cycle-to-cycle spread, using the measured distributions from §4.3
-- Estimated energy per inference, computed from EPSC energy per event (≈ 50 nJ in Paper 1)
+- Estimated energy per inference, using the Chapter 2 SY/Hybrane/LiTf EPSC energy per event (≈ 50 nJ in Paper 1) as a Li-only sanity-check figure, and clearly labelled as such
 - Comparison table with published reservoir implementations (software, memristive, photonic)
 
 #### 4.4.6 Expected scientific claims
 
-- Li/Na/K heterogeneity increases memory capacity vs. a single-species reservoir of the same size
+- Composition- and cation-driven heterogeneity across the PEO/triflate corpus increases memory capacity vs. a homogeneous reservoir of the same size
 - Measured variability *improves* (or at least does not hurt) classification robustness, within a quantified envelope
-- The energy-per-inference figure is competitive at the "temporal edge" scale (sub-kHz signals)
+- The energy-per-inference figure is competitive at the "temporal edge" scale (sub-kHz signals), with the caveat that the per-event energy estimate is anchored on the Chapter 2 device and extrapolated qualitatively to the PEO/triflate corpus
 
 ---
 
@@ -216,35 +215,35 @@ Supplementary (Paper 1 Li only; used only as prior / sanity check):
 #### 4.5.1 Motivation
 
 - Coincidence detection is a canonical biological computation (e.g. sound localisation in the auditory brainstem)
-- Requires exactly the behaviour that Li/Na/K devices already have: a state variable that rises with an event and decays with a controllable time constant
+- Requires exactly the behaviour that the PEO/triflate devices already exhibit in the variable-delay depotentiation dataset: a state variable that rises with an event and decays with a controllable time constant
 - Natural self-reset via volatility avoids explicit erase cycles
 
 #### 4.5.2 Circuit scheme
 
 - Pre-spike stream + post-spike stream → analog summing block → volatile memristor → comparator → event detected / not detected
 - The device's fading memory implements the coincidence window directly
-- Li, Na and K devices provide different (and pre-characterised) coincidence windows
+- Different composition–cation cells of the PEO/triflate corpus provide different (and pre-characterised) coincidence windows, all derived from the same common delay-time depotentiation protocol
 
 #### 4.5.3 Data-driven simulation
 
-- Use the measured **delay-time depotentiation curves** from Chapter 3 (common Li/Na/K dataset) as the temporal correlation function K_i(Δt): the device's fading-memory decay directly defines the coincidence window, because two events separated by Δt interact through the residual state that has not yet decayed
-- For the Paper 1 Li device only, the measured STDP kernel is used as a sanity check that the shape of K_Li(Δt) obtained from the delay-time fit is consistent with the paired-pulse measurement
-- Simulate detection probability vs. inter-event interval Δt for each ion species
+- Use the measured **variable-delay depotentiation curves** from Chapter 3 (common dataset across the PEO/triflate corpus) as the temporal correlation function K_c(Δt): the device's fading-memory decay directly defines the coincidence window, because two events separated by Δt interact through the residual state that has not yet decayed
+- For the Chapter 2 SY/Hybrane/LiTf device only, the Paper 1 STDP kernel is used as a Li-only consistency check that the shape of K(Δt) obtained from a delay-time fit is compatible with a paired-pulse measurement. This check is *not* extended to Na or K devices, for which no STDP data exists
+- Simulate detection probability vs. inter-event interval Δt for each composition–cation cell
 - Inject noise and false-event streams to compute false-positive and false-negative rates
-- Show how swapping Li → Na → K shifts the useful timing window, with the span quantified from the fitted τ_Li, τ_Na, τ_K
+- Show how shifting along the composition axis (PEO/LiTr concentration) and the cation axis (PEO/{Li,Na,K}Tr at 0.3 / 0.09) shifts the useful timing window, with the span quantified directly from the fitted τ_c
 
 #### 4.5.4 Metrics reported
 
-- Detection probability P_det(Δt) for each ion species
+- Detection probability P_det(Δt) for each composition–cation cell
 - ROC-like curves (true positive vs. false positive) under realistic noise
-- Energy per detection event
+- Energy per detection event (with the per-event energy figure anchored on the Chapter 2 Li device, flagged as Li-only)
 - Effective timing resolution and its dependence on cycle-to-cycle variability
 
 #### 4.5.5 Expected scientific claims
 
-- The delay-time kernels from Chapter 3 define a tunable coincidence window bank
-- If the fitted $\tau_i$ values are sufficiently separated, Li/Na/K should provide a composition-controlled span in useful coincidence-window width
-- The accessible timing window is to be reported directly from the fitted delay-time constants; no broader timing-range claim is assumed a priori
+- The delay-time kernels from Chapter 3 define a tunable coincidence-window bank indexed by composition and cation
+- If the fitted τ_c values across the manifest are sufficiently separated, the PEO/triflate corpus should provide a composition- and cation-controlled span in useful coincidence-window width
+- The accessible timing window is to be reported directly from the fitted delay-time constants; no broader timing-range claim is assumed a priori, and none is imported from the Chapter 2 STDP data
 
 ---
 
@@ -254,31 +253,31 @@ Supplementary (Paper 1 Li only; used only as prior / sanity check):
 
 - Many edge-sensing tasks need a leaky integrator or a bank of them (onset detection, burst detection, envelope extraction)
 - A single device with a single τ is a single filter; a heterogeneous bank is a multi-resolution filter
-- Li/Na/K naturally define a slow/medium/fast trio of time constants
+- Selected composition–cation cells from the PEO/triflate corpus are expected to span a usable range of fitted τ, to be confirmed by the Chapter 3 delay-time data
 
 #### 4.6.2 Circuit scheme
 
-- Sensor pulses → split into Li, Na, K branches in parallel → three transient conductance traces → weighted sum / classifier
-- Equivalent to a three-tap temporal wavelet-like decomposition, but at the analog front-end
+- Sensor pulses → split into several parallel branches (one per selected composition–cation cell) → parallel transient conductance traces → weighted sum / classifier
+- Equivalent to a multi-tap temporal wavelet-like decomposition, but at the analog front-end
 - Compatible with 1T1M addressing and shared read-out
 
 #### 4.6.3 Data-driven simulation
 
 - Drive the parameter-card models of §4.3 with canonical inputs: step, impulse, burst, chirp, band-limited noise
-- Compute the impulse responses of each branch directly from the measured **delay-time depotentiation** curves (λ_i) and **N-pulse potentiation** curves (φ_i) — both of which are common Li/Na/K datasets (see §4.2.2)
-- Show decomposition of a composite signal into slow/medium/fast components
-- Demonstrate a simple downstream task (e.g. onset detection, burst-rate estimation) using the three filtered channels
+- Compute the impulse responses of each branch directly from the measured **variable-delay depotentiation** curves (λ_c) and **variable-N potentiation** curves (φ_c) — both of which are common datasets across the PEO/triflate corpus (see §4.2.2)
+- Show decomposition of a composite signal into slow/medium/fast components, where the slow/medium/fast assignment comes from the fitted τ_c, not from prior cation labelling
+- Demonstrate a simple downstream task (e.g. onset detection, burst-rate estimation) using the filtered channels
 
 #### 4.6.4 Metrics reported
 
-- Impulse responses h_i(t) for each ion species, compared to the ideal leaky integrators with the same τ
-- Signal-reconstruction error when only the three bands are used
+- Impulse responses h_c(t) for each composition–cation cell, compared to the ideal leaky integrators with the same fitted τ
+- Signal-reconstruction error when only the selected bands are used
 - Task performance on a simple onset-detection benchmark
 - Sensitivity of task performance to device variability
 
 #### 4.6.5 Expected scientific claims
 
-- Li/Na/K devices act, to first order, as three leaky integrators with measurable and distinct time constants
+- Selected cells of the PEO/triflate corpus act, to first order, as leaky integrators with measurable and distinct fitted time constants
 - The heterogeneity provides a usable multi-resolution analog front-end without digital filtering
 - This is the "cheapest" of the three applications in terms of circuit complexity — a credible near-term target for a physical demonstration
 
@@ -313,11 +312,11 @@ Supplementary (Paper 1 Li only; used only as prior / sanity check):
 - Reported as "acceptable performance region" in a figure: accuracy (or detection probability) vs. injected variability
 - Used to define the *fabrication tolerance* that would be required for a real hardware build
 
-#### 4.7.5 Sanity checks from Paper 1 impedance data
+#### 4.7.5 Sanity checks from Chapter 2 impedance data
 
-- Impedance spectroscopy is a supplementary, Li-only dataset (see §4.2.3): it is used *only* as a cross-check on the fastest meaningful timescale, not as a primary fitting input
-- The RC timescales measured on the Paper 1 Li device set a hard lower bound on the fastest meaningful Δt in every simulation
-- Any application that would require dynamics faster than this bound is explicitly ruled out in the chapter, rather than silently extrapolated to Na and K
+- Impedance spectroscopy is available only on the Chapter 2 Paper 1 SY/Hybrane/LiTf device (see §4.2.3): it is used *only* as a cross-check on the fastest meaningful timescale, not as a primary fitting input
+- The RC timescales measured on that single Li device set a hard lower bound on the fastest meaningful Δt used in every simulation. This bound is used qualitatively when applied to the PEO/triflate corpus, which has a different host polymer
+- Any application that would require dynamics faster than this bound is explicitly ruled out in the chapter, rather than silently extrapolated to Na, K or other compositions
 
 ---
 
@@ -342,13 +341,16 @@ Supplementary (Paper 1 Li only; used only as prior / sanity check):
 
 | Design goal | Lever | Mechanism |
 | ------------- | ------- | ----------- |
-| Longer fading memory | Harder-acid cation (Li) | Stronger cation–oxygen coordination in Hybrane |
-| Shorter fading memory | Softer-acid cation (K) | Weaker coordination, faster relaxation |
-| More heterogeneous reservoir | Mixed-species device population | Distinct λ_i and φ_i per device |
-| Lower write energy | Smaller pulse amplitude / number | Sublinear φ_i at low drive |
-| Lower read disturb | Lower read voltage | Sub-threshold f_i evaluation |
-| Better coincidence timing resolution | Faster species (K) | Narrower K(Δt) |
-| Better memory capacity (reservoir) | Slower species (Li) | Longer λ_i |
+| Longer fading memory | Harder-acid cation (Li) in PEO host | Stronger cation–oxygen coordination on the PEO backbone |
+| Shorter fading memory | Softer-acid cation (K) in PEO host | Weaker coordination, faster relaxation |
+| Composition-driven τ tuning | PEO/LiTr concentration along the Chapter 3 sub-study | Polymer/salt mass ratio alters ionic mobility and available hopping sites |
+| More heterogeneous reservoir | Mixed composition × cation population | Distinct λ_c and φ_c per cell |
+| Lower write energy | Smaller pulse amplitude / number | Sublinear φ_c at low drive |
+| Lower read disturb | Lower read voltage | Sub-threshold f_c evaluation |
+| Better coincidence timing resolution | Cells with smallest fitted τ_c | Narrower K(Δt) |
+| Better memory capacity (reservoir) | Cells with largest fitted τ_c | Longer λ_c |
+
+Note: every entry in the table is a qualitative rule of thumb. The *quantitative* design rules are whatever the Chapter 3 fits actually say about (τ_c, β_c, φ_c, f_c); this table must never be used to override a measured value.
 
 #### 4.8.4 What Chapter 5 will inherit from this chapter
 
@@ -365,17 +367,17 @@ Supplementary (Paper 1 Li only; used only as prior / sanity check):
 | Label | Description | Source / How generated |
 | ------- | ------------- | ----------------------- |
 | `fig:ch4_framing` | Conceptual schematic contrasting a static-weight crossbar with a heterogeneous fading-memory bank | Original schematic |
-| `fig:ch4_dataset_map` | Visual inventory of the three common Li/Na/K datasets (I–V, N-pulse, delay-time) across the `ch4_device_manifest.csv` devices | `chapter4_pipeline.py` over `Nanomem_Devices_Library/` |
-| `fig:ch4_model_fits` | Example model fits overlayed on I–V (`Day1_Hyst`), N-pulse potentiation (`Day2_NmbPls`), and delay-time depotentiation (`Day2_DlyTime`) for one Li, one Na and one K device | `chapter4_pipeline.py` |
-| `fig:ch4_param_cards` | Parameter distributions (f_i from I–V, φ_i from N-pulse, λ_i from delay-time) for Li, Na, K across the manifest devices | `chapter4_pipeline.py` |
-| `fig:ch4_reservoir_arch` | Schematic of the heterogeneous reservoir architecture with Li/Na/K banks and linear readout | Original schematic |
+| `fig:ch4_dataset_map` | Visual inventory of the three common dynamical datasets (I–V, N-pulse, delay-time) across the `ch4_device_manifest.csv` devices, organised along the composition axis (PEO/LiTr concentration series) and the cation axis (PEO/{Li,Na,K}Tr at 0.3 / 0.09) | `chapter4_pipeline.py` over `Nanomem_Devices_Library/` |
+| `fig:ch4_model_fits` | Example model fits overlayed on I–V (`Day1_Hyst`), N-pulse potentiation (`Day2_NmbPls`), and delay-time depotentiation (`Day2_DlyTime`) for one device of each composition–cation cell used in the simulations | `chapter4_pipeline.py` |
+| `fig:ch4_param_cards` | Parameter distributions (f_c from I–V, φ_c from N-pulse, λ_c from delay-time) per composition–cation cell | `chapter4_pipeline.py` |
+| `fig:ch4_reservoir_arch` | Schematic of the heterogeneous reservoir architecture with composition- and cation-diverse PEO/triflate banks and linear readout | Original schematic |
 | `fig:ch4_reservoir_bench` | Memory capacity and classification accuracy vs. reservoir size and heterogeneity | Simulation from parameter cards |
 | `fig:ch4_reservoir_variability` | Accuracy vs. injected device-to-device and cycle-to-cycle spread | Simulation from parameter cards |
-| `fig:ch4_coincidence_kernel` | Fitted delay-time depotentiation curves reinterpreted as coincidence kernels K_i(Δt) for Li, Na, K | From Chapter 3 `Day2_DlyTime` data |
-| `fig:ch4_coincidence_det` | Detection probability vs. Δt for each ion species under noise | Simulation from parameter cards |
-| `fig:ch4_filterbank_impulse` | Impulse responses h_Li(t), h_Na(t), h_K(t) reconstructed from (λ_i, φ_i), compared to ideal leaky integrators with the same τ | Simulation from parameter cards |
-| `fig:ch4_filterbank_task` | Onset / burst-detection performance using the three-channel filter bank | Simulation from parameter cards |
-| `fig:ch4_1t1m` | 1T1M cell schematic, read/write protocol waveforms, read-disturb budget (bound from Paper 1 impedance data) | Original schematic |
+| `fig:ch4_coincidence_kernel` | Fitted delay-time depotentiation curves reinterpreted as coincidence kernels K_c(Δt) across the PEO/triflate corpus | From Chapter 3 `Day2_DlyTime` data |
+| `fig:ch4_coincidence_det` | Detection probability vs. Δt for each composition–cation cell under noise | Simulation from parameter cards |
+| `fig:ch4_filterbank_impulse` | Impulse responses h_c(t) for selected cells, reconstructed from (λ_c, φ_c), compared to ideal leaky integrators with the same τ | Simulation from parameter cards |
+| `fig:ch4_filterbank_task` | Onset / burst-detection performance using the selected-channel filter bank | Simulation from parameter cards |
+| `fig:ch4_1t1m` | 1T1M cell schematic, read/write protocol waveforms, read-disturb budget (qualitative bound from Chapter 2 impedance data) | Original schematic |
 | `fig:ch4_design_rules` | Visual summary of the §4.8.3 design-rules table | Original schematic |
 
 ---
@@ -384,21 +386,23 @@ Supplementary (Paper 1 Li only; used only as prior / sanity check):
 
 *Authoritative specification: `handouts/05_chapter4_data_pipeline.md`.*
 
-Common Li/Na/K datasets (primary inputs for every simulation):
+Common dynamical datasets across the PEO/triflate corpus (primary inputs for every simulation):
 
-- I–V hysteresis (`Day1_Hyst`) — triangular sweep, common protocol across Li/Na/K
-- N-pulse potentiation (`Day2_NmbPls`) — fixed V_write/t_write, logarithmic sweep in N
-- Delay-time depotentiation (`Day2_DlyTime`) — fixed potentiation burst, logarithmic sweep in Δt
+- I–V hysteresis (`Day1_Hyst`) — triangular sweep, common protocol across the PEO/LiTr concentration series and the PEO/LiTr, PEO/NaTr, PEO/KTr fixed-composition set
+- Variable-N potentiation (`Day2_NmbPls`) — fixed V_write/t_write, logarithmic sweep in N
+- Variable-delay depotentiation (`Day2_DlyTime`) — fixed potentiation burst, logarithmic sweep in Δt
 - Replicates within each of the above provide both device-to-device and cycle-to-cycle spread
 
-Paper 1 Li supplementary datasets (priors and sanity checks only, *never* used to support Na/K claims):
+Chapter 2 SY/Hybrane/LiTf supplementary datasets (priors and sanity checks only, *never* used to support Na, K or composition claims):
 
 - EPSC multi-state pulse train
 - STDP paired-pulse kernel
 - Separated STM/LTM retention (two-voltage protocol)
 - Impedance spectroscopy
 
-**Curated device list:** `handouts/ch4_device_manifest.csv`, frozen at the start of Chapter 4 writing, with ≥ 3 devices per ion species all passing the read-disturb sanity check (§3.4 of `05_chapter4_data_pipeline.md`).
+**Explicitly excluded from the Chapter 4 manifest:** TMPE-based composites and alkali-TFSI (LiBis / NaBis / KBis) devices — their coverage of the three common measurements is too sparse for a comparative fit. Chapter 3 reports them as exploratory side evidence; Chapter 4 does not model them.
+
+**Curated device list:** `handouts/ch4_device_manifest.csv`, frozen at the start of Chapter 4 writing, with ≥ 3 devices per composition–cation cell all passing the read-disturb sanity check (§3.4 of `05_chapter4_data_pipeline.md`).
 
 No new fabrication is required. This is a deliberate design choice: it keeps the chapter scope achievable and makes the thesis independent of any future experimental campaign.
 
