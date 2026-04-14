@@ -34,6 +34,7 @@
   range-phrase = \text{--},
   detect-all
 }
+\DeclareSIUnit{\rpm}{rpm}
 
 %% Chemistry
 \usepackage[version=4]{mhchem}   % \ce{} for chemical formulae
@@ -374,7 +375,7 @@ This differential activation barrier translates directly into differential ionic
   \item A voltage of \SI{3}{\volt} across the same film generates approximately \SI{14.4}{\mega\volt\per\metre}. This higher field is required to overcome the substantially larger activation barrier for \ce{Li+} hopping from its Hybrane coordination sites → delayed, stronger ionic redistribution → \textbf{LTM} (retention $> \SI{45}{\second}$, driven by cation redistribution).
 \end{itemize}
 
-This model makes a specific, experimentally testable prediction: replacing \ce{Li+} with a monovalent cation of larger ionic radius (e.g., \ce{Na+} or \ce{K+}) should reduce the charge density and hence the hardness of the Lewis acid, weakening the coordination interaction with Hybrane and decreasing the STM/LTM voltage threshold. Conversely, this would be expected to reduce the retention time of the LTM state. This prediction is systematically tested in Chapter~3 using devices incorporating sodium and potassium triflimide salts.
+This model makes a specific, experimentally testable prediction: replacing \ce{Li+} with a monovalent cation of larger ionic radius (e.g., \ce{Na+} or \ce{K+}) should reduce the charge density and hence the hardness of the Lewis acid, weakening the coordination with the oxygen atoms of the polyether host and shortening the effective fading-memory timescale of the device. This prediction is tested in Chapter~3 on the main comparative corpus of the thesis: a PEO-based polymer-electrolyte series loaded with lithium, sodium and potassium triflate salts (PEO/LiTr, PEO/NaTr, PEO/KTr) at fixed polymer and salt mass fractions, complemented by a dedicated PEO/LiTr concentration sub-study. The expectation is addressed there as a statement about the shift of the measured variable-delay depotentiation timescale when the cation is varied at fixed host chemistry, and not as a claim about the full suite of synaptic metrics presented in the present chapter.
 
 
 %% ------------------------------------------------------------
@@ -414,9 +415,9 @@ This level of reproducibility reflects the benefits of solution-processing over 
     \toprule
     \textbf{Reference} & \textbf{Material} & \textbf{Structure} & \textbf{States} & \textbf{STM} & \textbf{LTM} & \textbf{STDP} & \textbf{Reversible} \\
     \midrule
-    Malliaras 2010~\cite{Zakhidov2010}     & [Ru(bpy)₃]²⁺/PF₆⁻       & 2-T & 2    & ---           & ---        & No  & Partial \\
+    Malliaras 2010~\cite{Zakhidov2010}     & [Ru(bpy)$_3$]$^{2+}$/PF$_6^-$ & 2-T & 2    & ---           & ---        & No  & Partial \\
     Lei 2014~\cite{Lei2014}                & PVA film                  & 2-T & 2    & ---           & ---        & No  & No      \\
-    Liu 2016~\cite{Liu2016}                & [EV(ClO₄)]/(BTPA-F)      & 2-T & cont.& Yes (tunable) & Yes        & No  & No      \\
+    Liu 2016~\cite{Liu2016}                & [EV(ClO$_4$)]/(BTPA-F)   & 2-T & cont.& Yes (tunable) & Yes        & No  & No      \\
     Gkoupidenis 2015~\cite{Gkoupidenis2015}& PEDOT:PSS (OECT)          & 3-T & cont.& Yes           & No         & Yes & Yes     \\
     Xu 2016~\cite{Xu2016}                  & PEDOT:PSS (OECT)          & 3-T & cont.& Yes           & Yes        & No  & Yes     \\
     Kim 2018~\cite{Kim2018}                & Elastic organic composite & 3-T & cont.& Yes           & No         & Yes & Yes     \\
@@ -438,7 +439,7 @@ The table reveals two key gaps that the present work fills:
 
 \textbf{Energy efficiency.} The energy per synaptic event (\SI{\sim 50}{\nano\joule}) is comparable to other organic ionic devices and substantially below the energy cost of conventional CMOS synaptic circuits (\SI{>1}{\micro\joule} per weight update). However, it is above the energy cost of the best inorganic memristors (\SI{<1}{\pico\joule}), reflecting the lower switching speed and larger device area of the organic system. Future work reducing the device area toward the \SI{100}{\nano\metre\squared} scale would reduce this gap by several orders of magnitude.
 
-Because this chapter is an expanded thesis treatment of a 2022 device paper, the comparison above retains the conventional device-level yardsticks used in that literature: reversibility, retention window, energy per event, and stability. Within the thesis-wide argument, however, these metrics serve a narrower purpose. They establish that the platform is reversible, dynamically addressable, and stable enough to support the ion-chemistry study of Chapter~3 and the temporal-computing reinterpretation of Chapter~4; they are not invoked here to claim that the device should be judged by the standards of a high-density non-volatile memory technology.
+Because this chapter is an expanded thesis treatment of a 2022 device paper, the comparison above retains the conventional device-level yardsticks used in that literature: reversibility, retention window, energy per event, and stability. Within the thesis-wide argument, however, these metrics serve a narrower purpose. They establish that the polymer-electrolyte platform introduced here is reversible, dynamically addressable, and stable enough to motivate the main comparative study of Chapter~3 — a PEO-based triflate composition and cation sweep characterised through a common set of three dynamical measurements (I--V hysteresis, variable-number-of-pulses potentiation, and variable-delay-time depotentiation) — and the data-driven temporal-computing reinterpretation of Chapter~4 that is built on those measurements. They are not invoked here to claim that the device should be judged by the standards of a high-density non-volatile memory technology, nor to imply that the richer synaptic metrics reported in the present chapter (EPSC, separated STM/LTM retention, STDP, impedance) are available across the full comparative corpus; those measurements remain specific to the present SY/Hybrane/LiTf device.
 
 
 %% ------------------------------------------------------------
@@ -465,7 +466,7 @@ This chapter has presented the design, fabrication, and comprehensive characteri
   \item \textbf{Stability and reproducibility:} Devices were functional for $\sim$\SI{300}{\hour} under ambient conditions without encapsulation, with device-to-device variability below \SI{15}{\percent} for principal electrical parameters.
 \end{enumerate}
 
-These results establish the SY/Hybrane/ionic salt composite platform as a viable and powerful materials system for the engineering of organic neuromorphic devices. The work identifies the Lewis acid-base chemistry of the cation-polymer interaction as the key tuneable parameter controlling memory timescales — a hypothesis that motivates the systematic investigation of alternative ionic species (Na$^+$, K$^+$) presented in Chapter~3.
+These results establish the SY/Hybrane/LiTf composite as a viable and richly characterised exemplar of a polymer-electrolyte organic memristive device. The work identifies the Lewis acid-base chemistry of the cation-polyether interaction as the key tuneable parameter controlling memory timescales --- a hypothesis that motivates the main comparative study of Chapter~3, which replaces Hybrane with poly(ethylene oxide) and varies both the composition (PEO/LiTr concentration series) and the cation identity (PEO/LiTr, PEO/NaTr, PEO/KTr at fixed polymer and salt mass fractions). In that chapter the hypothesis is tested exclusively through the three common dynamical measurements --- I--V hysteresis, variable-number-of-pulses potentiation, and variable-delay-time depotentiation --- that are available for every device of the comparative corpus. The richer synaptic metrics reported in the present chapter (EPSC, separated STM/LTM retention, STDP, impedance) are not propagated to the later chapters, where they are used only as Li-device priors and sanity checks.
 
 
 %% ============================================================
