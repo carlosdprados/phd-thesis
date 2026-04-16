@@ -1,0 +1,134 @@
+%% ============================================================
+%%  thesis-format.sty
+%%
+%%  Shared formatting layer for the PhD thesis, implementing the
+%%  Universitat de València recommendations for doctoral theses.
+%%
+%%  Usage (from any chapter file):
+%%      \documentclass[12pt, twoside]{report}
+%%      \usepackage{thesis-format}
+%%      \addbibresource{../bibliography/references.bib}
+%%
+%%  Chapter-specific content (extra packages such as chemfig,
+%%  custom \newcommand shortcuts, \DeclareSIUnit, etc.) should
+%%  remain in the individual chapter files.
+%%
+%%  University recommendations captured here:
+%%      * Page trim      : 17 cm x 24 cm
+%%      * Line spacing   : 1.5 on body text
+%%      * Printing       : double-sided (twoside at class level)
+%%      * Font size      : 12 pt (set at class level)
+%%
+%%  Font-size rationale: 12 pt Computer Modern at 1.5 spacing on
+%%  the 17 x 24 cm trim yields roughly 65-70 characters per line
+%%  with the margins below, which is within the 60-75 range
+%%  generally recommended for comfortable reading. 11 pt would
+%%  also be defensible but would compress the text block beyond
+%%  what the UV examples we inspected use. 12 pt is therefore
+%%  retained as the default across all chapters.
+%% ============================================================
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{thesis-format}[2026/04/15 v1.0 PhD thesis shared formatting]
+
+%% --- Fonts and encoding ---
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{lmodern}
+\RequirePackage{microtype}
+
+%% --- Page geometry ---
+%%  Trim: 17 cm wide x 24 cm tall, per UV recommendations.
+%%  Margins: asymmetric to accommodate a bound, double-sided
+%%  thesis. The inner margin is enlarged to leave room for the
+%%  binding gutter; the outer margin is correspondingly reduced.
+%%  Assumptions (documented here so they are easy to revisit):
+%%      * Binding takes ~0.5-0.8 cm of the inner edge at print.
+%%      * A 2.2 cm inner margin leaves ~1.5 cm of visible inner
+%%        white space after binding.
+%%      * Top / bottom margins include a single-line header that
+%%        carries chapter / section marks via fancyhdr.
+\RequirePackage[
+  paperwidth  = 17cm,
+  paperheight = 24cm,
+  inner       = 2.2cm,
+  outer       = 1.8cm,
+  top         = 2.2cm,
+  bottom      = 2.2cm,
+  headheight  = 28pt,   % enlarged so fancyhdr fits under onehalfspacing
+  headsep     = 10pt
+]{geometry}
+
+%% --- Line spacing ---
+%%  setspace is used rather than \baselinestretch so that the
+%%  spacing is also propagated correctly inside amsmath
+%%  environments and floats. \onehalfspacing is exactly the
+%%  1.5 line spacing the UV guidelines ask for.
+\RequirePackage{setspace}
+\onehalfspacing
+
+%% --- Mathematics ---
+\RequirePackage{amsmath, amssymb, amsthm}
+\RequirePackage{bm}
+\RequirePackage{siunitx}
+\sisetup{
+  separate-uncertainty = true,
+  range-phrase         = \text{--},
+  detect-all
+}
+
+%% --- Chemistry ---
+\RequirePackage[version=4]{mhchem}
+
+%% --- Figures and tables ---
+\RequirePackage{graphicx}
+\RequirePackage{float}
+\RequirePackage{booktabs}
+\RequirePackage{array}
+\RequirePackage{tabularx}
+\RequirePackage{multirow}
+\RequirePackage{caption}
+\RequirePackage{subcaption}
+\captionsetup{font=small, labelfont=bf, width=0.9\linewidth}
+
+%% --- Float-placement parameters ---
+%%  Relaxed so that moderately tall figures share their page
+%%  with surrounding text instead of being promoted onto
+%%  dedicated float pages. Needed because 1.5 line spacing
+%%  makes text blocks taller and would otherwise trip the
+%%  default \topfraction=0.7 threshold.
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.85}
+
+%% --- Colours ---
+\RequirePackage[dvipsnames]{xcolor}
+
+%% --- References and links ---
+\RequirePackage[
+  backend  = biber,
+  style    = nature,
+  sorting  = none,
+  maxnames = 6,
+  minnames = 3,
+  doi      = true,
+  url      = false
+]{biblatex}
+
+\RequirePackage[hidelinks, colorlinks=false]{hyperref}
+\RequirePackage{cleveref}
+
+%% --- Headers and footers ---
+\RequirePackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\small\leftmark}
+\fancyhead[RO]{\small\rightmark}
+\fancyfoot[C]{\small\thepage}
+
+%% --- Paragraph spacing ---
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\endinput

@@ -11,75 +11,18 @@
 %% ============================================================
 
 %% ---- If using as standalone file ----
-\documentclass[12pt, a4paper, twoside]{report}
+\documentclass[12pt, twoside]{report}
 
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\usepackage{microtype}
+%% Shared thesis formatting (17x24 cm trim, 1.5 line spacing,
+%% two-sided layout, math/chemistry/graphics/bibliography stack).
+%% See chapters/thesis-format.sty for details.
+\usepackage{thesis-format}
 
-%% Page geometry
-\usepackage[
-  top=2.5cm, bottom=2.5cm,
-  inner=3.0cm, outer=2.5cm,
-  headheight=15pt
-]{geometry}
-
-%% Mathematics
-\usepackage{amsmath, amssymb, amsthm}
-\usepackage{bm}          % bold math
-\usepackage{siunitx}     % SI units: \SI{}, \si{}
-\sisetup{
-  separate-uncertainty = true,
-  range-phrase = \text{--},
-  detect-all
-}
-\DeclareSIUnit{\rpm}{rpm}
-
-%% Chemistry
-\usepackage[version=4]{mhchem}   % \ce{} for chemical formulae
-\usepackage{chemfig}
-
-%% Figures and tables
-\usepackage{graphicx}
-\usepackage{float}
-\usepackage{booktabs}
-\usepackage{array}
-\usepackage{tabularx}
-\usepackage{multirow}
-\usepackage{caption}
-\usepackage{subcaption}
-\captionsetup{font=small, labelfont=bf, width=0.9\linewidth}
-
-%% Colours
-\usepackage[dvipsnames]{xcolor}
-
-%% References and links
-\usepackage[
-  backend=biber,
-  style=nature,
-  sorting=none,
-  maxnames=6,
-  minnames=3,
-  doi=true,
-  url=false
-]{biblatex}
 \addbibresource{../bibliography/references.bib}
 
-\usepackage[hidelinks, colorlinks=false]{hyperref}
-\usepackage{cleveref}
-
-%% Headers and footers
-\usepackage{fancyhdr}
-\pagestyle{fancy}
-\fancyhf{}
-\fancyhead[LE]{\small\leftmark}
-\fancyhead[RO]{\small\rightmark}
-\fancyfoot[C]{\small\thepage}
-
-%% Paragraph spacing
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt}
+%% --- Chapter-2-specific packages and macros ---
+\usepackage{chemfig}          % structural formulae; not needed in other chapters
+\DeclareSIUnit{\rpm}{rpm}     % rpm unit for siunitx (spin-coating speeds)
 
 %% Custom commands
 \newcommand{\SY}{\textit{Super Yellow}}
