@@ -4,42 +4,52 @@ Working repository for the PhD thesis on ion-mediated polymeric memristive devic
 
 ## Structure
 
+- `thesis.tex`: top-level entrypoint that assembles all chapters into a single bound thesis.
 - `handouts/`: planning documents, chapter outlines, and working notes.
 - `chapters/`: LaTeX chapter source files under active thesis development.
 - `bibliography/`: shared BibLaTeX database files.
 - `figures/`: thesis figures and exported graphics.
+- `exports/`: committed PDF snapshots of chapters and the full thesis (tracked in git).
 - `build/`: generated LaTeX outputs. Ignored by git.
 - `.vscode/`: workspace settings for LaTeX Workshop and editor behavior.
 
 ## Current Working Files
 
-- `chapters/chapter2_proof_of_concept.tex`: current Chapter 2 LaTeX draft.
+- `thesis.tex`: top-level build, \include's every chapter.
+- `chapters/chapter1_introduction.tex`: current Chapter 1 draft (also compiles standalone).
+- `chapters/chapter2_proof_of_concept.tex`: current Chapter 2 draft (also compiles standalone).
 - `bibliography/references.bib`: bibliography database used by the LaTeX sources.
 - `handouts/00_...` to `05_...`: thesis planning and structure handouts.
 
 ## LaTeX Workflow
 
-The repository is configured so LaTeX Workshop uses `latexmk` with filename-only arguments and writes generated files to `build/<relative-source-dir>/`.
+Chapter files are designed to compile both standalone and as part of the full
+thesis. Each chapter wraps its standalone preamble in an
+`\ifdefined\thesismode\else ... \fi` guard that `thesis.tex` neutralises by
+defining `\thesismode` before `\include`-ing the chapters. The full-thesis
+build prints a single unified bibliography from `thesis.tex`; standalone
+chapter builds keep their own `\printbibliography` inside the guard.
 
-For the current Chapter 2 draft, the default repo-level commands are:
+Repo-level build targets:
 
 ```sh
-make chapter2
-make chapter2-clean
+make chapter1       # build/chapters/chapter1_introduction.pdf
+make chapter2       # build/chapters/chapter2_proof_of_concept.pdf
+make thesis         # build/thesis.pdf
+make all            # chapter1 + chapter2 + thesis
+make exports        # refresh exports/*.pdf snapshots
+make clean          # remove all generated artefacts
 ```
 
-For the current Chapter 2 draft, the safe terminal workflow is:
+Direct terminal equivalents (run from the repo root):
 
 ```sh
-cd chapters
-latexmk -pdf -outdir=../build/chapters chapter2_proof_of_concept.tex
-```
+# Chapter 1 / Chapter 2 (standalone)
+cd chapters && latexmk -pdf -outdir=../build/chapters chapter1_introduction.tex
+cd chapters && latexmk -pdf -outdir=../build/chapters chapter2_proof_of_concept.tex
 
-To clean generated files for that draft:
-
-```sh
-cd chapters
-latexmk -C -outdir=../build/chapters chapter2_proof_of_concept.tex
+# Full thesis
+TEXINPUTS=./chapters: latexmk -pdf -outdir=build thesis.tex
 ```
 
 ## Conventions

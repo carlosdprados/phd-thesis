@@ -1,0 +1,55 @@
+%% ============================================================
+%%  thesis.tex — Top-level PhD thesis entrypoint
+%%
+%%  Author      : Carlos David Prado-Socorro
+%%  Institution : ICMol, Universitat de València
+%%
+%%  This file assembles the individual chapter sources
+%%  (chapters/chapterN_*.tex) into a single bound thesis.
+%%  Each chapter file also compiles standalone; the shared
+%%  guard \ifdefined\thesismode\else ... \fi in each chapter
+%%  suppresses its standalone preamble when \include'd here.
+%%
+%%  Build (from repo root):
+%%      make thesis        -> build/thesis.pdf
+%%      make all           -> chapters + thesis
+%%
+%%  Direct latexmk invocation (from repo root):
+%%      TEXINPUTS=./chapters: latexmk -pdf -outdir=build thesis.tex
+%% ============================================================
+
+\documentclass[12pt, twoside]{report}
+
+%% Signal to chapter files that they are being \include'd as part
+%% of the full thesis build rather than compiled standalone.
+\def\thesismode{}
+
+%% Shared thesis formatting (17x24 cm trim, 1.5 line spacing,
+%% two-sided layout, math/chemistry/graphics/bibliography stack).
+%% Located at chapters/thesis-format.sty; the Makefile prepends
+%% ./chapters to TEXINPUTS so \usepackage finds it.
+\usepackage{thesis-format}
+
+%% Chapter-2-specific packages that must be loaded in the preamble.
+%% chapter2 also loads chemfig in its own standalone preamble; that
+%% block is skipped here by the \thesismode guard.
+\usepackage{chemfig}
+
+%% Chapter sources use paths relative to chapters/ (e.g. ../figures).
+%% Adding chapters/ to \graphicspath lets \includegraphics resolve
+%% those paths correctly when building from the repo root.
+\graphicspath{{./}{chapters/}}
+
+\addbibresource{bibliography/references.bib}
+
+%% ============================================================
+\begin{document}
+
+%% ---- Chapters ----
+\include{chapters/chapter1_introduction}
+\include{chapters/chapter2_proof_of_concept}
+
+%% ---- Unified bibliography ----
+\printbibliography[heading=bibintoc, title={References}]
+
+\end{document}

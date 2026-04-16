@@ -10,21 +10,28 @@
 %%  (or use latexmk -pdf -biber)
 %% ============================================================
 
-%% ---- If using as standalone file ----
-\documentclass[12pt, twoside]{report}
+%% ---- Standalone preamble (skipped when \include'd from thesis.tex) ----
+%% Chapter-2-specific packages (chemfig) are also loaded by thesis.tex so
+%% the chapter compiles in either mode.
+\ifdefined\thesismode\else
+  \documentclass[12pt, twoside]{report}
 
-%% Shared thesis formatting (17x24 cm trim, 1.5 line spacing,
-%% two-sided layout, math/chemistry/graphics/bibliography stack).
-%% See chapters/thesis-format.sty for details.
-\usepackage{thesis-format}
+  %% Shared thesis formatting (17x24 cm trim, 1.5 line spacing,
+  %% two-sided layout, math/chemistry/graphics/bibliography stack).
+  %% See chapters/thesis-format.sty for details.
+  \usepackage{thesis-format}
 
-\addbibresource{../bibliography/references.bib}
+  \addbibresource{../bibliography/references.bib}
 
-%% --- Chapter-2-specific packages and macros ---
-\usepackage{chemfig}          % structural formulae; not needed in other chapters
+  \usepackage{chemfig}        % structural formulae; not needed in other chapters
+
+  \begin{document}
+  \setcounter{chapter}{1}     % This is Chapter 2 when built standalone
+\fi
+
+%% --- Chapter-2-specific macros (safe to (re)declare in document body) ---
 \DeclareSIUnit{\rpm}{rpm}     % rpm unit for siunitx (spin-coating speeds)
 
-%% Custom commands
 \newcommand{\SY}{\textit{Super Yellow}}
 \newcommand{\Hybrane}{\textit{Hybrane}\textsuperscript{\textregistered} DEO750 8500}
 \newcommand{\LiTf}{\ce{LiCF3SO3}}
@@ -34,11 +41,6 @@
 \newcommand{\EPSC}{excitatory post-synaptic current}
 \newcommand{\ITO}{indium tin oxide}
 \newcommand{\twoterminal}{two-terminal}
-
-%% ============================================================
-\begin{document}
-
-\setcounter{chapter}{1}   % This is Chapter 2
 
 %% ============================================================
 \chapter{Proof of Concept: Polymer-Based Composite Organic Memristive Devices}\label{ch:poc}
@@ -414,9 +416,12 @@ This chapter has presented the design, fabrication, and comprehensive characteri
 These results establish the SY/Hybrane/LiTf composite as a viable and richly characterised exemplar of a polymer-electrolyte organic memristive device. The work identifies the Lewis acid-base chemistry of the cation-polyether interaction as the key tuneable parameter controlling memory timescales --- a hypothesis that motivates the main comparative study of Chapter~3, which replaces Hybrane with poly(ethylene oxide) and varies both the composition (PEO/LiTr concentration series) and the cation identity (PEO/LiTr, PEO/NaTr, PEO/KTr at fixed polymer and salt mass fractions). In that chapter the hypothesis is tested exclusively through the three common dynamical measurements --- I--V hysteresis, variable-number-of-pulses potentiation, and variable-delay-time depotentiation --- that are available for every device of the comparative corpus. The richer synaptic metrics reported in the present chapter (EPSC, separated STM/LTM retention, STDP, impedance) are not propagated to the later chapters, where they are used only as Li-device priors and sanity checks. Beyond this comparative handoff, the volatile two-timescale behaviour established here is the experimental anchor for the temporal-computing reinterpretation of Chapter~4, in which behavioural models fitted to the Chapter~3 corpus drive simulations of a heterogeneous physical reservoir, a coincidence detector, and a multi-timescale filter bank --- paradigms in which the fading memory of the device is the active computational resource rather than a retention defect.
 
 
-%% ============================================================
-%%  Bibliography
-%% ============================================================
-\printbibliography[heading=bibintoc, title={References}]
+%% ---- Standalone close (skipped when \include'd from thesis.tex) ----
+%% A unified bibliography is printed from thesis.tex in the thesis build,
+%% so the per-chapter \printbibliography runs only in standalone mode.
+\ifdefined\thesismode
+  \endinput
+\fi
 
+\printbibliography[heading=bibintoc, title={References}]
 \end{document}

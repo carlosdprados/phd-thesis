@@ -9,18 +9,19 @@
 %%  (or use latexmk -pdf -biber)
 %% ============================================================
 
-%% ---- If using as standalone file ----
-\documentclass[12pt, twoside]{report}
+%% ---- Standalone preamble (skipped when \include'd from thesis.tex) ----
+\ifdefined\thesismode\else
+  \documentclass[12pt, twoside]{report}
 
-%% Shared thesis formatting (17x24 cm trim, 1.5 line spacing,
-%% two-sided layout, math/chemistry/graphics/bibliography stack).
-%% See chapters/thesis-format.sty for details.
-\usepackage{thesis-format}
+  %% Shared thesis formatting (17x24 cm trim, 1.5 line spacing,
+  %% two-sided layout, math/chemistry/graphics/bibliography stack).
+  %% See chapters/thesis-format.sty for details.
+  \usepackage{thesis-format}
 
-\addbibresource{../bibliography/references.bib}
+  \addbibresource{../bibliography/references.bib}
 
-%% ============================================================
-\begin{document}
+  \begin{document}
+\fi
 
 %% ============================================================
 \chapter{Introduction}\label{ch:intro}
@@ -445,4 +446,10 @@ The narrative arc of the thesis can therefore be summarised as motivation in the
 
 The next chapter takes up the first link in that chain. It presents the proof-of-concept SY/Hybrane/LiTf device in detail, establishes that the composite architecture supports a complete set of memristive and synaptic functionalities in a single two-terminal platform, and develops the mechanistic interpretation that anchors all subsequent comparative and computational work.
 
+%% ---- Standalone close (skipped when \include'd from thesis.tex) ----
+\ifdefined\thesismode
+  \endinput
+\fi
+
+\printbibliography[heading=bibintoc, title={References}]
 \end{document}
