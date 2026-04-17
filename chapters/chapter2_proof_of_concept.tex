@@ -354,11 +354,12 @@ This level of reproducibility reflects the benefits of solution-processing over 
 
 \Cref{tab:comparison} presents a systematic comparison of the device reported in this chapter with the most significant prior art in organic and hybrid memristive devices reported at the time of publication (2022).
 
-\begin{table}[htb]
+\begin{sidewaystable}
   \centering
   \caption{Comparison of key performance metrics of the present work with representative organic and hybrid memristive devices from the literature. ``2-T'' = two-terminal; ``3-T'' = three-terminal; ``STM'' = short-term memory; ``LTM'' = long-term memory; ``STDP'' = spike-timing dependent plasticity; ``---'' = not reported or not applicable.}\label{tab:comparison}
-  \small
-  \begin{tabularx}{\linewidth}{lXXXXXXX}
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{llccllcc}
     \toprule
     \textbf{Reference} & \textbf{Material} & \textbf{Structure} & \textbf{States} & \textbf{STM} & \textbf{LTM} & \textbf{STDP} & \textbf{Reversible} \\
     \midrule
@@ -371,10 +372,10 @@ This level of reproducibility reflects the benefits of solution-processing over 
     Goswami 2017~\cite{Goswami2017}        & Molecular switch          & 2-T & 2    & ---           & Yes        & No  & Yes     \\
     Seo 2019~\cite{Seo2019}                & P3HT organic FET          & 3-T & cont.& Yes           & No         & Yes & Yes     \\
     \midrule
-    \textbf{This work}~\cite{PradoSocorro2022} & \textbf{SY/Hybrane/LiTf}  & \textbf{2-T} & \textbf{cont.} & \textbf{Yes (10--15 s)} & \textbf{Yes (>45 s)} & \textbf{Yes} & \textbf{Full} \\
+    \textbf{This work}~\cite{PradoSocorro2022} & \textbf{SY/Hybrane/LiTf}  & \textbf{2-T} & \textbf{cont.} & \textbf{Yes (10--15\,s)} & \textbf{Yes (>45\,s)} & \textbf{Yes} & \textbf{Full} \\
     \bottomrule
-  \end{tabularx}
-\end{table}
+  \end{tabular}
+\end{sidewaystable}
 
 The table reveals two key gaps that the present work fills:
 
