@@ -23,7 +23,7 @@ THESIS_TEXINPUTS := TEXINPUTS=./$(CHAPTER_DIR):
 
 .PHONY: all thesis chapter1 chapter2 \
         thesis-clean chapter1-clean chapter2-clean clean \
-        exports
+        exports chapter1-text chapter2-text texts
 
 all: chapter1 chapter2 thesis
 
@@ -53,3 +53,16 @@ exports: all
 	cp $(BUILD_CHAPTERS)/chapter1_introduction.pdf $(EXPORTS)/
 	cp $(BUILD_CHAPTERS)/chapter2_proof_of_concept.pdf $(EXPORTS)/
 	cp $(BUILD_THESIS)/thesis.pdf $(EXPORTS)/
+
+## Plain-text exports for AI-detection tools (one paragraph per line, no
+## figures, tables, citations, or LaTeX markup). Safe to copy-paste into
+## GPTZero and similar.
+chapter1-text:
+	@mkdir -p $(EXPORTS)
+	python3 scripts/export_plaintext.py $(CHAPTER_DIR)/$(CHAPTER1_SRC) $(EXPORTS)/chapter1_introduction.txt
+
+chapter2-text:
+	@mkdir -p $(EXPORTS)
+	python3 scripts/export_plaintext.py $(CHAPTER_DIR)/$(CHAPTER2_SRC) $(EXPORTS)/chapter2_proof_of_concept.txt
+
+texts: chapter1-text chapter2-text
