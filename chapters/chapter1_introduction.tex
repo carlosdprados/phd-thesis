@@ -53,7 +53,28 @@ Wulf and McKee~\cite{WulfMcKee1995} diagnosed the quantitative severity of this 
   \label{fig:vonneumann_bottleneck}
 \end{figure}
 
-The memory wall is a performance argument. A second and more fundamental argument has to do with energy. Horowitz's 2014 survey of elementary-operation costs in a representative CMOS process~\cite{Horowitz2014} showed that a 32-bit integer addition costs on the order of \SI{0.1}{\pico\joule}, and a register-file read a few picojoules, while an on-chip SRAM fetch costs tens of picojoules and a DRAM fetch reaches several hundred picojoules to nanojoules---three to four orders of magnitude more than the arithmetic operation it enables. In any workload dominated by data movement, the total energy budget is then fixed by the cost of shuffling operands, not by the cost of computing results. That asymmetry is the \textit{energy wall}. It reflects the fact that moving charge across a wire dissipates energy in the wire's parasitic capacitance, and that the total wire length in a memory subsystem far exceeds the wire length inside an arithmetic unit. Any architecture that spatially separates computation from storage is therefore bounded in speed and in energy by interconnect physics, and that bound does not scale away with transistor miniaturisation.
+The memory wall is a performance argument. A second and more fundamental argument has to do with energy. Horowitz's 2014 survey of elementary-operation costs in a representative CMOS process~\cite{Horowitz2014} put numbers on this in a way that has been widely cited since: a 32-bit integer addition costs on the order of \SI{0.1}{\pico\joule}, and a register-file read a few picojoules, while an on-chip SRAM fetch costs tens of picojoules and a DRAM fetch reaches several hundred picojoules to nanojoules---three to four orders of magnitude more than the arithmetic operation it enables (\cref{tab:energy_per_op}). In any workload dominated by data movement, the total energy budget is then fixed by the cost of shuffling operands, not by the cost of computing results. That asymmetry is the \textit{energy wall}. It reflects the fact that moving charge across a wire dissipates energy in the wire's parasitic capacitance, and that the total wire length in a memory subsystem far exceeds the wire length inside an arithmetic unit. Any architecture that spatially separates computation from storage is therefore bounded in speed and in energy by interconnect physics, and that bound does not scale away with transistor miniaturisation.
+
+\begin{table}[!htb]
+  \centering
+  \caption{Approximate energy cost per operation in a representative \SI{45}{\nano\metre} CMOS process, after Horowitz~\cite{Horowitz2014}. Memory accesses cost between one and four orders of magnitude more energy than the arithmetic they enable, and the asymmetry widens with the size of the memory addressed and with the distance the data has to travel.}\label{tab:energy_per_op}
+  \footnotesize
+  \begin{tabular}{lrl}
+    \toprule
+    \textbf{Operation} & \textbf{Energy} & \textbf{Class} \\
+    \midrule
+    8-bit integer add                                         & \SI{0.03}{\pico\joule} & Arithmetic       \\
+    32-bit integer add                                        & \SI{0.1}{\pico\joule}  & Arithmetic       \\
+    32-bit floating-point add                                 & \SI{0.9}{\pico\joule}  & Arithmetic       \\
+    32-bit floating-point multiply                            & \SI{3.7}{\pico\joule}  & Arithmetic       \\
+    Register-file read                                        & \SI{0.1}{\pico\joule}  & On-chip storage  \\
+    SRAM read (8\,kB)                                         & \SI{5}{\pico\joule}    & On-chip storage  \\
+    SRAM read (1\,MB)                                         & \SI{100}{\pico\joule}  & On-chip storage  \\
+    Cross-chip wire (\(\sim\)\SI{10}{\milli\metre})           & \SI{100}{\pico\joule}  & Interconnect     \\
+    DRAM read                                                 & \SI{1.3}{\nano\joule}  & Off-chip storage \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 For several decades these architectural inefficiencies were absorbed, rather than eliminated, by the exponential improvement of the underlying silicon. Moore's observation~\cite{Moore1965} that transistor counts double at regular intervals was paired with Dennard scaling~\cite{Dennard1974}: scaling every linear MOSFET dimension and the supply voltage by \(1/k\) makes the transistor switch \(k\) times faster, consume \(1/k^{2}\) of the energy per switch, and occupy \(1/k^{2}\) of the area, leaving power density at constant activity invariant. While the two laws held together, each generation delivered more transistors that were also faster and cooler, and the memory and energy walls felt distant rather than binding.
 
@@ -194,7 +215,26 @@ The mechanistic heterogeneity surveyed in \cref{subsec:memristor_classes} is ref
 
 These parameters have their natural setting in the evaluation of devices intended for \textit{trained-weight} storage in analogue in-memory-computing arrays~\cite{IelminiWong2018, Prezioso2015}. In that setting the target application is a fixed conductance matrix implementing a trained neural network. Retention has to be long enough to preserve trained weights between re-programming events, typically anywhere from seconds to years depending on the deployment scenario. Endurance has to cover occasional re-training and periodic write--verify cycles. Linearity and symmetry sit at the centre of the numerical accuracy of gradient-based training performed in place on the array, and variability translates directly into a loss of inference accuracy at deployment. A large fraction of the memristor-device literature is written from this standpoint, and it is one of the main contexts in which organic and polymer-composite devices have been judged. They have often come off badly, because their retention times are short, their endurance is limited, and their device-to-device variability is high.
 
-Not every entry in this parameter list is unambiguously good when maximised. The retention case is the one already developed in \cref{subsec:paradigms}, and applied parameter-by-parameter it extends naturally to switching speed, write energy, linearity, and symmetry: the optima of those quantities differ between the trained-weight and fading-memory regimes, and they cannot in general be satisfied simultaneously by a single device. The design target for a fading-memory device is a retention matched to the signal timescale, not ``as long as possible''.
+Not every entry in this parameter list is unambiguously good when maximised. The retention case is the one already developed in \cref{subsec:paradigms}, and applied parameter-by-parameter it extends naturally to switching speed, write energy, linearity, and symmetry: the optima of those quantities differ between the trained-weight and fading-memory regimes, and they cannot in general be satisfied simultaneously by a single device. The design target for a fading-memory device is a retention matched to the signal timescale, not ``as long as possible''. \cref{tab:param_optima} sets the two optima alongside one another for each parameter.
+
+\begin{table}[!htb]
+  \centering
+  \caption{Direction in which each device parameter should be optimised under the trained-weight regime (\cref{subsec:memristor_params}) and under the fading-memory regime (\cref{subsec:volatile_paradigms}). Several optima are not merely different in magnitude but opposed in direction, which is why a single device cannot in general satisfy both regimes simultaneously.}\label{tab:param_optima}
+  \footnotesize
+  \begin{tabularx}{\linewidth}{l X X}
+    \toprule
+    \textbf{Parameter} & \textbf{Trained-weight optimum} & \textbf{Fading-memory optimum} \\
+    \midrule
+    Retention                       & As long as possible (s--years)             & Matched to the input-signal timescale \\
+    Switching speed                 & As fast as possible                        & Matched to the input event rate \\
+    Write energy                    & Minimised (programmed once, read many)     & Minimised within the fast-event budget \\
+    Conductance update linearity    & Linear and uniform                         & Less critical; nonlinearity exploited as a feature \\
+    Update symmetry (\(\pm\) pulses)& Symmetric                                  & Less critical; asymmetry can be exploited \\
+    Cycle-to-cycle variability      & Minimised                                  & Minimised (intra-device drift remains a defect) \\
+    Device-to-device heterogeneity  & Minimised                                  & Useful as reservoir diversity~\cite{Tanaka2019} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
 
 Variability needs a slightly finer distinction. Intra-device instability (a given device failing to reproduce its own response under the same protocol) remains a defect under either regime. Inter-device heterogeneity, on the other hand, is penalised under weight storage but useful under reservoir operation. A reservoir of elements with a spread of time constants and nonlinear transfer characteristics is more expressive than a set of identical elements, because the spread provides independent nonlinear projections of the input onto different readout axes~\cite{Tanaka2019}. The distinction between intra-device instability and inter-device heterogeneity recurs in the evaluation of polymer-composite devices in the later chapters.
 
@@ -274,7 +314,25 @@ A third constraint concerns \textit{fabrication and integration}. The inorganic 
 
 A fourth constraint is the mechanistic stochasticity inherent to filamentary and phase-change operation. In reservoir computing, stochasticity can usefully contribute to reservoir diversity, provided it shows up as inter-device heterogeneity rather than as intra-device instability (in the sense of \cref{subsec:memristor_params}). The inorganic families above tend to display both at once, and pulling them apart requires considerable process control. A device class in which inter-device heterogeneity can be introduced deliberately through composition, with intra-device stability preserved by the collective character of the conduction mechanism, would offer a cleaner route into the controlled-variability operating regime.
 
-Taken together, these constraints point at a gap. Analogue, ion-mediated, chemically tunable, timescale-rich behaviour on soft, solution-processable platforms is simply not where the inorganic families are strongest. The next section asks whether organic and polymeric ion-mediated materials can fill that gap. \cref{fig:inorganic_comparison_matrix} summarises the position of each inorganic family and forward-references the soft-ionic route.
+Taken together, these constraints point at a gap. Analogue, ion-mediated, chemically tunable, timescale-rich behaviour on soft, solution-processable platforms is simply not where the inorganic families are strongest. The next section asks whether organic and polymeric ion-mediated materials can fill that gap. \cref{fig:inorganic_comparison_matrix} summarises the position of each inorganic family qualitatively, and \cref{tab:inorganic_summary} gives the corresponding quantitative envelope.
+
+\begin{table}[!htb]
+  \centering
+  \caption{Typical operating envelope of the inorganic memristor families surveyed in \cref{sec:inorganic_memristors}. Diffusive (volatile) metal-filament devices are listed separately because they are deliberately operated in the fading-memory rather than the non-volatile regime. Numerical ranges are conservative orders of magnitude drawn from the indicated reviews; individual devices may sit outside them. ``cont.'' = quasi-continuous conductance.}\label{tab:inorganic_summary}
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{l c c c c c c}
+    \toprule
+    \textbf{Family} & \textbf{Switching} & \textbf{Retention} & \textbf{ON/OFF} & \textbf{Endurance} & \textbf{Energy/write} & \textbf{Analogue states} \\
+    \midrule
+    VCM~\cite{Yang2008,YangStrukovStewart2013,Sun2019}             & 1--100\,ns         & years          & \(10\)--\(10^{3}\)     & \(10^{9}\)--\(10^{12}\) & 0.1--10\,pJ  & 4--8 \\
+    CBRAM~\cite{YangStrukovStewart2013,IelminiWong2018}            & 1--100\,ns         & years          & \(10^{4}\)--\(10^{6}\) & \(10^{8}\)--\(10^{10}\) & 0.1--10\,pJ  & 2--4 \\
+    PCM~\cite{Sebastian2014,Koelmans2015,LGallo2018,Ambrogio2018}  & 10--100\,ns        & years (drifts) & \(10^{2}\)--\(10^{3}\) & \(10^{8}\)--\(10^{10}\) & 10--100\,pJ  & 8--16 \\
+    STT--MTJ~\cite{Torrejon2017,Mizrahi2018}                       & 1--10\,ns          & years          & 2--3                   & \(>10^{12}\)            & 0.1--1\,pJ   & 2 \\
+    Diffusive (volatile)~\cite{Du2017,Midya2019,Zhong2021}         & \(\mu\)s--ms       & ms--s          & \(10\)--\(10^{3}\)     & \(\sim 10^{6}\)         & 0.1--10\,pJ  & cont.\ (volatile) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 \begin{figure}[!htb]
   \centering
@@ -332,6 +390,26 @@ The microscopic picture is closely related to the operation of light-emitting el
 This fourth family is central to the thesis. The state variable is easy to name (the position of mobile ions in a polymer host), and its dynamics are governed by ionic transport kinetics that depend on the polymer binding environment and on the ion chemistry. When the bias is removed, relaxation is a fading-memory process whose characteristic time constant can be estimated from the physical chemistry of the composite and engineered through cation identity, host polymer, salt concentration, and film morphology. These variables are directly accessible to the materials chemist, in a way that the trap depths or redox overpotentials controlling relaxation in the charge-trapping and redox families are not. The costs are that ionic motion is slower than the purely electronic processes underlying filamentary or charge-trapping switching, and that side reactions between mobile ions and electrodes have to be controlled through chemistry and contact-metal choice.
 
 A fifth family, included for completeness, is filamentary conduction in which metallic species (typically \ce{Ag+} or \ce{Cu+} from an active top electrode) migrate through the organic matrix to form conductive bridges analogous to those of inorganic CBRAM. Such devices inherit the strengths (large on/off ratios, low switching voltages) and the weaknesses (stochastic filament formation, intra-device instability) of their inorganic counterparts (\cref{subsec:metal_oxide_memristors}). They illustrate that the same mechanism can be realised on either side of the organic--inorganic boundary; the distinctively organic mechanisms are those in which the chemical specificity of the components contributes to the internal-state physics.
+
+The five families and their relative trade-offs are collected in \cref{tab:organic_mechanisms}.
+
+\begin{table}[!htb]
+  \centering
+  \caption{Mechanism families behind organic memristive behaviour, as developed in \cref{subsec:organic_mechanisms}. The thesis-relevant family, listed in the fourth row, is the only one that combines an identifiable, single-valued state variable with continuous analogue gradation and a tuning handle (host chemistry) that spans several orders of magnitude in timescale.}\label{tab:organic_mechanisms}
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabularx}{\linewidth}{l X l l l l}
+    \toprule
+    \textbf{Family} & \textbf{State variable} & \textbf{Reversibility} & \textbf{Analogue gradation} & \textbf{Timescale tunability} & \textbf{Refs.} \\
+    \midrule
+    Charge trapping                       & Trap occupation                          & Partial             & Limited (often binary)    & Low                             & \cite{Lei2014} \\
+    Redox                                 & Oxidation state of a moiety              & Variable            & Bistable to few-state     & Low--medium                     & \cite{Liu2016, Zakhidov2010} \\
+    Conformational                        & Molecular geometry / isomer              & Good (per design)   & Bistable / few-state      & Low (per molecule)              & \cite{Goswami2017, Goswami2020} \\
+    \textbf{Mixed ionic--electronic}      & \textbf{Mobile-ion distribution}         & \textbf{Good}       & \textbf{Continuous}       & \textbf{High (host chemistry)}  & \cite{VanDeBurgt2017, Fuller2019, VanDeBurgt2018} \\
+    Filamentary (organic CBRAM)           & Metallic filament                        & Limited (stochastic)& Few states                & Low                             & \cite{Shih2017} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
 
 Among the organic options, ion-mediated mixed ionic--electronic systems couple an identifiable internal state variable to kinetics that can be engineered through chemistry. Within that subset, polymeric ionic hosts (polymer electrolytes) add a useful feature: ionic transport kinetics are controlled by host segmental motion, and segmental motion can in turn be tuned through backbone choice and glass-transition temperature. Polymer-electrolyte composites, in which a conjugated semiconductor is blended with an oxygen-rich ion-conducting polymer host loaded with a dissociated salt, are for that reason developed in detail in the next section.
 
