@@ -1,0 +1,305 @@
+rpm
+
+Super Yellow Hybrane DEO750 8500 LiCF3SO3 short-term memory long-term memory spike-timing dependent plasticity excitatory post-synaptic current indium tin oxide two-terminal
+
+Proof of Concept: Polymer-Based Composite Organic Memristive Devices
+
+Introduction and Motivation
+
+The development of a functional organic memristive device that simultaneously satisfies the requirements of reversibility, analog multi-state conductance, biological fidelity of synaptic learning functions, and reproducible fabrication from solution represents one of the defining challenges in the field of neuromorphic materials science. Despite more than a decade of exploratory work on organic electronic devices with memristive phenomenology, no prior contribution had demonstrated all of these properties in a single (2-T) device architecture.
+
+The fundamental difficulty in achieving this with organic materials lies in the conflicting requirements placed on the active layer. On one hand, the material must possess adequate electronic conductance to be addressable at low voltages; on the other, it must harbour mobile ionic species whose redistribution under an applied electric field modulates that electronic conductance. In addition, the relaxation of the ionic configuration once the driving field is removed must be slow enough to constitute a technologically useful memory state, yet fast enough to permit repeated potentiation and depression cycles without irreversible chemical degradation.
+
+Inorganic memristors based on the migration of oxygen vacancies, metal filament formation, or phase transformations address these requirements through the rigid thermodynamic and kinetic constraints imposed by crystalline lattices. However, the inherent rigidity of these lattices also limits their chemical tunability and produces stochastic behaviour at the nanoscale — most critically, the probabilistic nucleation and dissolution of conducting filaments — which leads to large device-to-device and cycle-to-cycle variability that fundamentally restricts the number of reliably distinguishable resistance states.
+
+Organic and polymer-based materials, by contrast, provide a soft structural environment in which the interaction between mobile ions and the host matrix can be tuned continuously and predictably through molecular chemistry. The pioneering observation by Malliaras and co-workers that an electrochemical cell incorporating a ruthenium polypyridyl complex exhibited bistable resistance under ionic redistribution established that organic ionic devices can show memristive phenomenology. However, the system was not reversible on demand and did not show analog gradation. The 2-T redox device reported by Liu et al. advanced the field significantly by demonstrating tunable -to- transitions, but at the cost of irreversible chemical transformations in the redox-active organic layer, precluding practical cyclic operation.
+
+The present chapter addresses this gap by reporting the design, fabrication, and comprehensive electrical characterisation of a novel 2-T organic memristive device based on a ternary polymer composite. The active layer consists of three components: a semiconducting poly(phenylene vinylene) (PPV) derivative, an ion-conducting hyperbranched polyester, and a dissociated lithium salt (lithium triflate,). This chemically engineered structure produces a material that is simultaneously electronically conductive, ionically mobile, and mechanically cohesive — conditions sufficient to give rise to stable, reversible, analog memristive behaviour.
+
+The results reported herein establish that the composite exhibits: (i) current–voltage hysteresis characteristic of memristive switching; (ii) analog multi-state conductance tunable through at least 200% by application of a pulsed voltage protocol; (iii) excitatory post-synaptic current responses with four readily distinguishable readout states; (iv) coexistence of a short-lived and a longer-lived memory regime, denoted throughout this chapter as and following the terminology standard in artificial-synapse devices; and (v), the Hebbian learning function required for implementation of these devices in spike-based neural network hardware. A theoretical analysis of the ion transport mechanism is presented to explain these observations in terms of Lewis acid-base chemistry between the solvated ions and the coordination sites of the polymer matrix.
+
+Within the arc of this thesis, the present chapter occupies a deliberately narrow role. It is the only chapter in which the complete synaptic characterisation suite — EPSC, separated short- and long-term memory retention, STDP, and impedance spectroscopy — is treated as primary evidence; Chapters 3 and 4 rely instead on three common dynamical measurements (I–V hysteresis, variable-number-of-pulses potentiation, and variable-delay depotentiation) that are abundant across the full comparative corpus, and the richer metrics reported here enter those chapters only as Li-device priors and sanity checks. Two specific handoffs close the present chapter onto the rest of the thesis. The HSAB mechanism developed in the Theoretical Framework: Ion Transport and the Origin of Memristance section yields a concrete cation-substitution prediction that Chapter 3 tests on a PEO-based Li+/Na+/K+ triflate series. The volatile two-timescale behaviour established here is the first experimental demonstration of the chemically tunable fading memory that Chapter 4 exploits computationally: behavioural models fitted to the Chapter 3 corpus drive simulated demonstrations of a heterogeneous physical reservoir, a coincidence detector, and a multi-timescale filter bank — paradigms in which the volatility and compositional timescale spread first established in the present device are the active computational resource rather than retention defects to be suppressed.
+
+This chapter is structured as follows. The Materials Design and Composite Formulation section describes the molecular composition and design rationale of the composite. The Device Architecture and Fabrication section provides the complete fabrication protocol and morphological characterisation of the active layer. The Electrical Characterisation section presents the full electrical characterisation, and the Theoretical Framework: Ion Transport and the Origin of Memristance section develops the theoretical framework. The Device Stability and Reproducibility section addresses device stability and reproducibility. The Comparison with the State of the Art section contextualises the results with respect to the state of the art. The Summary section summarises the chapter.
+
+Materials Design and Composite Formulation
+
+Design Rationale
+
+The fundamental operating principle of the device reported here is ionic migration within a solid-state polymer matrix under the influence of an applied electric field. This ionic redistribution modifies the local charge distribution near the electrodes, which in turn alters the energy barriers for charge injection and the doping level of the semiconducting polymer — and thereby the electronic conductance of the device. Three distinct functional requirements must be met by the active layer materials:
+
+Electronic conductance pathway: A semiconducting polymer provides the medium through which electronic current flows and whose conductivity is susceptible to modulation by ionic redistribution or electrochemical doping.
+
+Ion-transport medium: A polymer electrolyte provides a structural environment in which dissolved ions remain mobile under an applied electric field, yet are sufficiently retarded by intermolecular interactions to generate persistent conductance states after the field is removed.
+
+Ion source: A dissociated ionic salt provides the mobile charge carriers (cation and anion) whose differential response to the electric field generates distinct memory regimes.
+
+The critical design insight of this work is the deliberate selection of a salt with a large asymmetry in Lewis acid-base character between its constituent ions. Lithium triflate was chosen because Li+ is a hard Lewis acid with a high charge-to-radius ratio (= z/r 1.36, where r_Li^+ = 0.73), whereas the triflate anion CF3SO3- is a soft Lewis base with a diffuse, low-charge-density anionic centre. The ion-transport polymer, contains a high concentration of oxygen atoms (ethylene oxide and ester groups) that act as hard Lewis bases. According to the Hard and Soft Acids and Bases (HSAB) principle of Pearson, hard acids preferentially associate with hard bases. Consequently, Li+ ions are tightly coordinated by the oxygen atoms, whereas CF3SO3- ions interact only weakly with the polymer matrix. Under an applied electric field, the weakly coordinated triflate anions are displaced at low voltage, whilst the strongly coordinated lithium cations require a substantially higher field to break free of their coordination environment. This differential mobility is the molecular origin of the two-regime memory behaviour (STM and LTM) observed in this device.
+
+Super Yellow: The Semiconducting Polymer
+
+The semiconducting component of the composite is, the trivial name for the high-molecular-weight poly(phenylene vinylene) (PPV) copolymer poly[\2,5-di(3',7'-dimethyloctyloxy)-1,4-phenylenevinylene\-co-\3-(4'-(3”,7”-dimethyloctyloxy)phenyl)-1,4-phenylenevinylene\-co-\3-(3'-(3',7'-dimethyloctyloxy)phenyl)-1,4-phenylenevinylene\] (commercial name: PDY-132, Merck). The chemical structure features a -conjugated backbone of alternating phenylene and vinylene units with branched alkoxy side chains that confer solubility in common organic solvents and reduce intermolecular packing to mitigate crystallisation-induced phase separation in blends.
+
+The optical bandgap of is approximately 2.4, giving rise to yellow emission under photoexcitation and electroluminescence, which is the origin of its application in organic light-emitting devices. In the context of memristive applications, the relevant properties are: (i) adequate hole mobility in the bulk of the film, which provides the baseline electronic conductance pathway; (ii) susceptibility to electrochemical p-doping by accumulation of cations at the polymer chains (or n-doping by anion accumulation), which modifies conductance under the electrochemical doping mechanism; and (iii) processability in cyclohexanone, which is compatible with the other components of the composite.
+
+The suitability of in ion-containing composite systems has been validated previously in the context of light-emitting electrochemical cells (LECs), where films incorporating together with Hybrane and lithium salt demonstrated electroluminescence lifetimes exceeding 1600, confirming the photochemical and electrochemical stability of the blend under long-term operation.
+
+Hybrane DEO750 8500: The Ion-Transport Polymer
+
+is a hyperbranched polyester-amide synthesised by the polymerisation of a bis-2-oxazoline monomer with a dicarboxylic acid, produced by Polymer Factory (Sweden). The hyperbranched architecture generates a highly irregular, amorphous macromolecular structure with an exceptionally large number of chain ends. These chain ends, together with the ether and ester oxygens distributed throughout the backbone, provide a dense array of hard Lewis base coordination sites capable of solvating alkali metal cations.
+
+Two properties of make it uniquely suitable as the ion-conductive component of this composite. First, its glass transition temperature T_g is sufficiently low that significant segmental mobility of the polymer chains is maintained at room temperature, enabling the ion-hopping transport that underlies ionic conductivity in solid polymer electrolytes. Second, the cohesive energy of the hyperbranched architecture is low: unlike linear semicrystalline polymers such as poly(ethylene oxide) (PEO), does not crystallise, ensuring a homogeneous amorphous matrix throughout the film. Crystalline domains in PEO-based solid electrolytes are well known to impede ionic transport, so the use of an amorphous ion-transport polymer is an important design advantage.
+
+The ion-transport mechanism in is primarily segmental: as polymer chain segments undergo local conformational relaxation, coordinated cations are passed from one oxygen coordination site to the next along the segmental motion pathway. This process is thermally activated and governed by the Williams–Landel–Ferry (WLF) equation relative to T_g. At room temperature, the activation energy for ion hopping in such systems is of order 50, consistent with the observation that relatively modest applied voltages (3) are sufficient to displace ions over short distances (sub-µm) within the thin-film device.
+
+Lithium Triflate: The Ionic Salt
+
+Lithium trifluoromethanesulfonate (LiCF3SO3) is a well-characterised solid electrolyte salt widely employed in polymer batteries and LECs. Its choice for this system is motivated by three considerations: (i) it dissolves readily in cyclohexanone and blends homogeneously with and without phase separation; (ii) the lithium cation is a hard Lewis acid with a small ionic radius (0.73 for tetrahedral coordination) and a formal charge of +1, giving a charge density well matched to the hard Lewis base oxygen atoms; and (iii) the triflate anion has a large, diffuse anionic centre with the negative charge delocalised over the three electronegative fluorine atoms and the sulfonyl oxygen atoms, rendering it a soft Lewis base with low affinity for the Hybrane oxygen coordination sites.
+
+The dissociation of in the composite is enhanced by the solvating ability of the ethylene oxide segments, analogous to the solvation of lithium salts in PEO-based electrolytes. The equilibrium ionic conductivity of the composite is governed by the ion pair dissociation equilibrium, the number density of free charge carriers, and their individual mobilities within the matrix. In the memristive context, however, the relevant quantity is not the equilibrium conductivity of the composite, but the ability to reversibly redistribute the ions on the timescale of the applied voltage pulses — a kinetic, rather than thermodynamic, property.
+
+Composite Formulation and Preparation
+
+The three components were dissolved separately in cyclohexanone at initial concentrations of 15, 10, and 5. The solution was stirred continuously at 50 overnight to ensure complete dissolution of the high-molecular-weight polymer. The three solutions were then combined in a volumetric ratio that results in a mass ratio: = 1:0.30:0.09. After mixing, the final concentrations are 8.72, 2.62, and 0.78. All solution handling was performed under a dry nitrogen atmosphere to prevent moisture absorption, which would introduce uncontrolled ionic species and degrade reproducibility.
+
+The compositional ratios were arrived at through systematic optimisation. Increasing the relative concentration of beyond the chosen ratio was found to produce phase separation detectable by optical microscopy and a deterioration in film homogeneity. Conversely, reducing the salt content below the chosen ratio produced devices with insufficient ionic carrier density to generate well-defined conductance states. The chosen ratio represents a balance between maximising ionic carrier concentration and maintaining film morphological integrity.
+
+It should be noted that this composite is identical in formulation to the active layer employed in the LECs studied by Mardegan et al., where its electroluminescent performance and long operational lifetime (>1600) were established. The present work exploits the same material architecture for memristive applications, demonstrating the versatility of the composite system.
+
+Device Architecture and Fabrication
+
+Device Geometry: The Two-Terminal Vertical Structure
+
+The device adopts a vertical sandwich geometry, in which the active layer is sandwiched between a bottom transparent electrode and a top metallic electrode (see the figure). This architecture is the simplest possible memristive configuration: it contains no gate electrode and requires no transistor to address the device, in contrast to the three-terminal (3-T) organic synaptic transistors described in the literature.
+
+The choice of a 2-T structure is significant for two reasons. First, it reduces fabrication complexity: the device can be made by a sequence of only three depositions (ITO substrate, spin-coated active layer, evaporated metal). This simplicity directly translates to higher throughput and lower cost. Second, from a fundamental perspective, a 2-T device that shows coexisting STM and LTM without requiring an independent gating signal demonstrates that the memory physics is entirely intrinsic to the active material — a conceptually important advance over 3-T approaches where the gate field provides an extrinsic driving force for the memory state.
+
+The bottom electrode is a pre-patterned layer of (ITO) deposited on borosilicate glass. ITO combines optical transparency with adequate electronic conductance (e4), allowing optical inspection of the active layer and characterisation of the device stack by techniques such as UV-Vis spectroscopy and electroluminescence imaging. The work function of ITO (_ITO 4.7) is well matched to the ionisation potential of PPV-family semiconductors, facilitating hole injection into the active layer.
+
+The top electrode is silver (Ag), deposited by thermal evaporation. Ag was selected over gold for reasons of cost and practical feasibility; its work function (_Ag 4.3) creates a modest electron injection barrier with the conduction band, consistent with asymmetric injection conditions often observed in LEC-type structures. The junction active area defined by the shadow mask geometry is 0.0825.
+
+Substrate Preparation
+
+ITO-patterned glass substrates were subjected to a sequential ultrasonic cleaning procedure prior to device fabrication. The substrates were ultrasonicated successively in aqueous Mucasol detergent solution, deionised water, and 2-propanol, each for 15. This procedure removes organic contaminants and metallic particulates from the ITO surface, both of which would increase surface roughness and create pinhole defects in the subsequently deposited active layer. After ultrasonic cleaning, the substrates were dried under a flow of dry nitrogen gas and transferred immediately into a nitrogen-filled glovebox (oxygen and water levels < 1 ppm), where all subsequent processing steps were performed.
+
+Surface contamination of the ITO is a critical concern in the fabrication of thin-film organic devices: even sub-nanometre organic residues on the substrate surface can disrupt the wetting behaviour of the solution during spin-coating, leading to dewetting instabilities, pinholes, and non-uniform coverage. The Mucasol cleaning step is particularly effective at removing hydrocarbon contaminants, and the final 2-propanol rinse removes any residual Mucasol surfactant.
+
+Active Layer Deposition
+
+The composite solution (prepared as described in the Composite Formulation and Preparation section) was deposited onto the cleaned ITO-glass substrates by spin-coating at 2000 for 60 s. The spin speed was selected on the basis of a systematic optimisation study in which spin speeds ranging from 500 to 3000 were investigated (see Supporting Information of Ref.). At lower spin speeds, the resulting films were too thick and exhibited non-uniform coverage; at higher speeds, film thickness was reduced to the point where statistical roughness from the substrate became a significant fraction of the total film thickness, compromising device reproducibility.
+
+Following deposition, the coated substrates were transferred to a hotplate within the glovebox and annealed at 75 for 3. The annealing step serves: (i) remove residual cyclohexanone solvent, which would otherwise act as a plasticiser and modify the ionic mobility of the matrix; (ii) allow the polymer chains to relax into a morphologically stable configuration; and (iii) promote intimate mixing of the three components at the molecular scale, maximising the number of Li+ coordination sites accessible to the triflate anion within the Hybrane matrix.
+
+Morphological Characterisation of the Active Layer
+
+Film Thickness by Profilometry
+
+The thickness of the deposited active layer was determined by contact profilometry using an Ambios XP-1 profilometer. A step edge was created by masking part of the substrate during deposition and measuring the height difference between the coated and uncoated regions. The measured thickness at 2000 spin speed is 209 nm. This value is typical for single-layer active materials in organic electronic devices and represents a balance between: (i) providing sufficient ionic carrier density in a three-dimensional bulk (proportional to film thickness at constant volume concentration); and (ii) maintaining low series resistance in the electronic conduction channel (resistance scales with thickness for ohmic conduction).
+
+Surface Topography by Atomic Force Microscopy
+
+The surface topography of the active layer was characterised by atomic force microscopy (AFM) in tapping mode using a Bruker Dimension Icon instrument. A silicon probe with resonant frequency 300 and force constant 40 was employed at a scan rate of 0.6. Films deposited at several spin speeds were imaged to assess the relationship between processing conditions and surface morphology (see Supporting Information of Ref.).
+
+The AFM images reveal a smooth, uniform surface with root-mean-square (RMS) roughness in the range of 3 across the range of spin speeds investigated. The absence of large-scale phase-separated domains or crystalline features confirms that the three-component composite remains homogeneously blended in the solid state, consistent with the role of in suppressing salt crystallisation. The low roughness is important for device performance: rough surfaces create local field enhancements at protrusions that can cause premature electrical breakdown during characterisation, and they also increase the statistical spread of active layer thickness across the device area, which would broaden the distribution of switching voltages.
+
+Top Electrode Deposition
+
+After morphological characterisation, the top Ag electrode was deposited by thermal evaporation in a dedicated evaporation system housed within the glovebox. A shadow mask defining the 0.0825 junction area was placed in contact with the active layer surface. Ag was evaporated at a deposition rate of 0.5 to a total thickness of 100 nm, monitored in real time by a quartz crystal microbalance. The slow initial evaporation rate was employed to minimise the kinetic energy of impinging Ag atoms and thereby prevent penetration of the metal into the soft polymer film, which would create metallic filaments and short-circuit the device.
+
+The completed device was stored under nitrogen atmosphere until measurement. It should be noted that the devices were functional without encapsulation under ambient air conditions for the duration of most experiments; degradation studies (see the Device Stability and Reproducibility section) confirm a functional lifetime of approximately two weeks (300) under ambient conditions.
+
+Electrical Characterisation
+
+All electrical measurements were performed using a Keithley 2450 SourceMeter connected to a custom-built probe station. Measurement protocols were implemented in the Keithley TestScript Builder (TSB) programming environment. All measurements were carried out under a nitrogen atmosphere unless otherwise stated (degradation studies explicitly employed ambient air conditions). Throughout this section, voltage is applied to the Ag top electrode relative to the grounded ITO bottom electrode.
+
+Current-Voltage Hysteresis: Signature of Memristive Behaviour
+
+The fundamental electrical fingerprint of a memristive device is a current-voltage (I–V) hysteresis loop with a characteristic pinched appearance at zero voltage. This shape arises because, at V = 0, the net current is zero regardless of the history of the device (a memristor cannot spontaneously drive current), yet the slope of the I–V curve at zero voltage (i.e., the instantaneous conductance) depends on the history of applied voltage.
+
+The figure shows the I–V curves obtained by applying successive triangular voltage sweeps to the device at a sweep rate of 0.25, with the voltage ramped from 0 to a maximum of +1.2 and back to 0 (single polarity, positive). A waiting period of 10 s was observed between successive sweeps to allow partial ionic relaxation. Ten sequential sweeps are shown.
+
+Several features of these curves are noteworthy:
+
+Progressive increase of conductance. The current at any fixed voltage increases with each successive sweep. From the first to the second cycle, the current at 1 increases by 140. By the tenth cycle, the incremental increase from cycle 9 to cycle 10 is 6.3 — suggesting that the system is approaching a saturation conductance level asymptotically. This behaviour reflects the progressive redistribution of ions toward the electrodes with each sweep: each successive cycle leaves the ions in a slightly more asymmetric configuration than the previous one, producing a slightly lower resistance state.
+
+Hysteresis without current rectification. In all cycles, the return sweep (decreasing voltage) produces lower current than the forward sweep (increasing voltage) at the same voltage, generating the characteristic clockwise hysteresis loop for positive voltage sweeps. This is distinct from simple rectification (diode behaviour): a diode would produce the same forward and reverse I–V curves; the hysteresis here reflects a time-dependent internal state variable (the ionic configuration) that lags the applied voltage.
+
+Absence of abrupt switching. Unlike digital resistance switching (SET/RESET transitions), where the resistance changes abruptly by orders of magnitude at a threshold voltage, the conductance here evolves continuously and smoothly with each cycle. This analog gradation is a key advantage for neuromorphic applications: it allows the device state to be tuned to any of a large number of distinguishable intermediate levels, rather than being confined to two (or a few) binary states.
+
+Behaviour under negative polarity. Application of negative voltage sweeps (not shown individually in the main figure) produces a qualitatively different hysteresis: the current decreases rather than increases with successive negative cycles. This has been attributed to electrochemical side-reactions in the vicinity of the ITO electrode under large negative bias, which generate a thin insulating layer at the ITO/active layer interface analogous to the behaviour reported in MEH-PPV-based LECs. This effect is not detrimental to memristive operation when devices are used in the single-polarity positive regime.
+
+Analog Multi-State Conductance Tunability
+
+The ability to set the device conductance to a specific value by applying a controlled number of voltage pulses — and to subsequently decrease it back toward the initial value by pulses of opposite polarity — is demonstrated by the potentiation/depression experiment shown in the figure.
+
+A pulsed voltage protocol was applied: 50 consecutive write pulses of +1 amplitude and 0.1 s duration, followed by 50 write pulses of -2. The conductance was monitored at the peak of each pulse (i.e., at the +1 and -2 levels, respectively). This protocol is analogous to the repeated pre-synaptic stimulation of a biological synapse and its subsequent inhibition.
+
+The results demonstrate that the conductance can be continuously potentiated from its initial value by more than 200 during the +1 pulse train, and subsequently depotentiated back toward the initial value during the -2 train. The potentiation and depression curves are smooth and monotonic, without any abrupt transitions. The full reversibility of the process — the conductance returns to a value near the initial level after the complete depression protocol — confirms that the underlying ionic redistribution is non-destructive and does not permanently alter the chemical composition or morphology of the active layer.
+
+The energy cost of each synaptic event (one write pulse of 1, 0.1 s) can be estimated from the average current during the pulse. The resulting energy per event is approximately 50 nJ, or approximately 6 per 100 nm of device area. This value is consistent with those reported for organic synaptic devices operating in the picojoule-to-nanojoule range, and substantially more energy-efficient than the microjoule-to-millijoule energy costs of early inorganic devices.
+
+Excitatory Post-Synaptic Current
+
+The measurement is a standard protocol in the field of artificial synaptic devices, designed to quantify the number and stability of distinguishable conductance states accessible to the device. The protocol employed here closely mimics the biological experiment in which a patch-clamped neuron is subjected to a defined sequence of pre-synaptic inputs and the post-synaptic current is monitored.
+
+The measurement protocol is as follows. The device is first initialised to its ground state S_0 by applying a reading voltage V_0 = +1 for 1 s. A short positive write pulse of +2 for 50 ms is then applied; the device is subsequently held at +1 for 1 s, during which the conductance spontaneously relaxes to a new excited steady state S_1. The same sequence is repeated to produce a second excited state S_2. Subsequently, two negative write pulses of -2.5 for 50 ms are applied, producing inhibitory states S_3 and S_4.
+
+The four excited states are readily distinguishable from each other and from the ground state. Defining the readout ratio as the signed current response of state S_n normalised to that of the ground state S_0 under the fixed measurement convention used in the experiment, the values obtained are: G_S_1/G_S_0 = 7.33, G_S_2/G_S_0 = 15.55, G_S_3/G_S_0 = -3.72, G_S_4/G_S_0 = -16.97. The large absolute ratios (up to 16-fold increase or 17-fold decrease relative to S_0) provide an ample margin for reliable state identification in a practical device, even in the presence of noise.
+
+Crucially, the states S_1 and S_2 are achieved by excitatory (positive polarity) stimulation, while S_3 and S_4 are achieved by inhibitory (negative polarity) stimulation — direct analogues of long-term potentiation (LTP) and long-term depression (LTD) in the biological synapse. The coexistence of both excitatory and inhibitory states in the same 2-T device, without the need for an independent gate terminal, constitutes a significant advance over most prior organic implementations.
+
+Short-Term and Long-Term Memory: Retention Kinetics
+
+The investigation of memory retention kinetics represents one of the most important characterisation protocols for neuromorphic devices, because it determines whether the device can emulate short-lived and longer-lived synaptic states on experimentally accessible timescales. In the artificial-synapse literature these regimes are commonly labelled and; in the present system, the longer-lived regime remains on the sub-minute scale and should therefore be understood operationally rather than as a claim of indefinitely persistent storage.
+
+Measurement Protocol
+
+The retention experiment employs a two-step protocol. First, a reading pulse (V_read = 0.5) is applied to establish the initial conductance G_0. This reading voltage is intentionally low: the activation threshold for ionic redistribution in this system was determined by independent experiments to lie above 0.7; thus, V_read = 0.5 measures the conductance state without perturbing it. Next, a train of N_pulses write pulses (V_write, duration 0.1 s each) is applied. After a variable waiting time t_wait under open-circuit (high impedance) conditions, a second reading pulse is applied to measure the final conductance G_f. The conductance change is reported as the percentage ratio G = (G_f/G_0) x 100.
+
+Between experiments, the device is fully reset by connecting the junction to a short circuit for 300 s, which discharges the ionic double layers and restores the homogeneous equilibrium ion distribution. The suitability of this reset protocol was verified by confirming that G_0 returns to its original value within the measurement uncertainty before each new experiment.
+
+Potentiation as a Function of Pulse Number
+
+The figure shows the dependence of G on N_pulses for V_write = 1 and t_wait = 150 ms. The conductance ratio increases monotonically with N_pulses, reaching values in excess of 10^3% for N_pulses > 10^3. The relationship is approximately linear in log-log space for N_pulses < 100 and saturates at large pulse numbers, consistent with a scenario in which the degree of ionic asymmetry that can be built up under a given write voltage is bounded by the total number of mobile ionic carriers.
+
+The device-to-device reproducibility is high: the shaded error band in the figure represents the standard deviation across measurements on multiple independent devices, and the relative standard deviation is below 10 for N_pulses < 100. The dispersion increases modestly at large pulse numbers, reflecting the probabilistic nature of the ionic migration dynamics at large driving forces.
+
+Memory Retention as a Function of Waiting Time
+
+The figure shows the dependence of G on t_wait for three excitation conditions: (i) V_write = 1, N_pulses = 10 (STM, blue); (ii) V_write = 1, N_pulses = 50 (STM, red); and (iii) V_write = 3, N_pulses = 10 (LTM, black).
+
+For short waiting times (t_wait < 500 ms for STM conditions, t_wait < 2 s for LTM conditions), the conductance first increases slightly relative to the value immediately after the write pulse train. This counterintuitive behaviour is attributed to ionic inertia: the ions, displaced by the write pulse sequence, continue to migrate briefly in the same direction under their momentum even after the driving voltage is removed. This brief further ionic displacement produces a short-lived enhancement in conductance before the diffusion-driven relaxation sets. An analogous phenomenon has been described as “post-tetanic potentiation” in biological synaptic preparations.
+
+For longer waiting times, the expected exponential relaxation of conductance is observed as the ionic configuration relaxes back toward equilibrium by thermal diffusion. The relaxation curves were fitted to a modified Kohlrausch (stretched exponential) function:
+
+where is the characteristic relaxation time, is the stretch exponent (0 < 1), G_0 is the initial conductance change, and G_ is the residual (non-relaxing) conductance change. The stretched exponential form arises naturally when the relaxation involves a distribution of characteristic times rather than a single time constant — physically, this reflects the heterogeneous environment within the polymer matrix, in which individual ions experience a range of local coordination environments and hence a distribution of activation barriers for migration.
+
+The fitted characteristic times are _S = 2.53.0 for STM conditions and _L = 4.7 s for LTM conditions. The retention time — defined operationally as the waiting time at which G_f/G_0 returns to within 5 of the baseline (i.e., G_f/G_0 < 1.05) — is 15 for STM and exceeds 45 s for the longer-lived regime labelled LTM. These values are directly relevant to the timescales of spike-based computation: the 15 STM window is sufficient to maintain working memory over a series of sequential spike inputs, while the > 45 s LTM window shows that the device can preserve a write history over many subsequent events without approaching the retention regime of a conventional non-volatile memory.
+
+The molecular mechanism underlying the STM/LTM distinction is discussed in detail in the Theoretical Framework: Ion Transport and the Origin of Memristance section.
+
+Spike-Timing Dependent Plasticity
+
+Spike-timing dependent plasticity is the Hebbian learning rule first formulated by Hebb and later confirmed experimentally in biological preparations. It states that the change in synaptic weight depends on the relative timing of pre- and postsynaptic action potentials: if the presynaptic neuron fires shortly before the postsynaptic neuron (causal ordering, t < 0), the synapse is potentiated (LTP); if the presynaptic neuron fires shortly after the postsynaptic neuron (anti-causal ordering, t > 0), the synapse is depressed (LTD). The magnitude of the change decays exponentially with | t|. This temporal asymmetry is essential for the synaptic encoding of causal relationships in neural circuits and underlies the ability of STDP-based learning rules to implement unsupervised feature extraction and pattern recognition.
+
+Experimental Protocol
+
+The STDP experiment requires the emulation of pre- and postsynaptic spike waveforms by voltage pulses applied at the two electrodes of the device. In a 2-T device, both pulses must be applied at the same physical terminal (the Ag electrode), so the experimentally measured total voltage V(t) is the algebraic sum of the presynaptic and postsynaptic voltage waveforms separated by the delay t:
+
+Each spike waveform consists of a unipolar triangular pulse with maximum amplitude V_sp and duration 1.2 s. The delay t was varied from -600 ms to +600 ms. The amplitude V_sp = 1.55 was chosen to be large enough to activate ionic migration (above the threshold of approximately 0.7) while remaining below the onset of electrochemical degradation of the active layer (conservatively estimated at 2 for the pristine device).
+
+For t < 0 (pre fires before post), the two spike waveforms partially overlap in time with additive polarity, producing a composite pulse whose peak voltage exceeds V_sp and which is directed in the positive sense → ions redistribute toward the ITO electrode → conductance increases → synaptic potentiation.
+
+For t > 0 (post fires before pre), the overlap produces an anti-causal summation; depending on the exact waveforms, the effective net voltage can be of reduced amplitude or reversed polarity relative to the causal case → reduced or reversed ionic redistribution → conductance decreases → synaptic depression.
+
+STDP Curve and Fitting
+
+The figure shows the measured STDP function: the percentage conductance change G plotted against the timing delay t. The characteristic anti-Hebbian asymmetry is observed: negative t (causal) produces positive G (potentiation), and positive t (anti-causal) produces negative G (depression). Both branches are well described by a decaying exponential function:
+
+where A and G_0 are fitting constants and is the time constant of the synaptic function. The best-fit values of for both the potentiation and depression branches are in the range 90. This is in excellent quantitative agreement with the characteristic timescale of biological STDP, which is approximately 100 ms. The device, therefore, not only qualitatively replicates the STDP function but does so with biologically realistic time constants.
+
+The result that the obtained learning rule corresponds to asymmetric anti-Hebbian STDP (rather than the symmetric Hebbian or asymmetric Hebbian variants also observed in biology) reflects the specific voltage waveform design and the polarity conventions of the electrode configuration. Different waveform designs would be expected to produce different STDP kernels, offering an additional degree of tunability in the design of hardware neural network architectures built from these devices.
+
+Theoretical Framework: Ion Transport and the Origin of Memristance
+
+Equilibrium Ion Distribution and Response to an Applied Field
+
+In the absence of an applied voltage, the ions (Li+ cations and CF3SO3- anions) are distributed homogeneously throughout the active layer. The equilibrium distribution is not strictly uniform at the atomic scale — each Li+ ion occupies a local coordination site within the Hybrane matrix, and the triflate anions occupy interstitial positions between the coordinated cations — but on the scale of the film thickness (209 nm), the macroscopic charge density is uniform and the net electric field within the film is zero (apart from any built-in field arising from the electrode work function difference).
+
+When a voltage is applied across the device, an electric field E = V/d (where d is the film thickness) is established. In the absence of free charge carriers that could screen this field, it would be uniform throughout the film. However, the mobile ions respond to the field by migrating: cations drift toward the cathode (ITO at positive bias on Ag), and anions drift toward the anode (Ag). This migration leads to the build-up of a charged double layer at each electrode interface on a timescale determined by the ionic mobility and the film thickness.
+
+The resulting non-uniform ionic charge distribution modifies the internal electric field profile of the device significantly: the field is concentrated in a thin screening length near each electrode, while the bulk of the film is field-free. This spatial redistribution of field has profound consequences for charge injection, as described in the two competing models below.
+
+Electrodynamic Model: Injection-Limited Transport
+
+In the electrodynamic (ED) model, first formulated by deMello et al. to describe LECs, charge injection at the electrode–organic interface is considered to be the rate-limiting step for current flow. In this injection-limited regime, the current density is governed by thermionic emission over the Schottky barrier at the metal–polymer interface, described:
+
+where _B is the effective barrier height, T is the absolute temperature, and k_B is the Boltzmann constant. The presence of the ionic double layer at the electrode interface reduces the effective barrier height _B by bending the valence and conduction bands of the polymer: the concentration of positive ionic charge near the ITO electrode lowers the energy of the polymer conduction band edge at that interface, while the concentration of negative ionic charge near the Ag electrode raises the energy of the polymer valence band edge. In both cases, the result is a reduction of the effective injection barrier, increasing the current injection rate.
+
+In the memristive context, the key implication of the ED model is that changes in conductance arise from changes in the interface ion concentration, which modifies _B and hence the injection rate. The conductance is determined by the instantaneous ionic configuration near the electrodes: a higher concentration of positive ions near ITO means lower _B at ITO, higher hole injection, and higher conductance. After the driving field is removed, the ions relax back toward their equilibrium distribution by thermal diffusion, restoring the original barrier height and conductance — this is the physical basis of the memory decay.
+
+Electrochemical Doping Model: Ohmic Injection
+
+The electrochemical doping (ECD) model, formulated by Pei et al. and developed by subsequent authors, considers instead that charge injection at the electrodes is ohmic (i.e., not rate-limiting). In this regime, the majority of the voltage drop occurs in the bulk of the film rather than at the interfaces, and the current is limited by the bulk conductivity. The crucial feature of this model is that ion accumulation is sufficient to electrochemically dope the conjugated polymer: cations accumulate on the chains near the cathode, stabilising injected electrons and producing n-doped regions; anions accumulate near the anode, stabilising injected holes and producing p-doped regions. The doped regions have substantially higher conductivity than the undoped polymer, so the formation of the doped layers dramatically increases the overall device conductance.
+
+In the ECD model, the degree of doping — and hence the conductance — is determined by the extent of ionic migration, which is in turn governed by the history of applied voltage. This provides a natural mechanism for memristive behaviour: the conductance records the cumulative history of ionic displacement through the degree of polymer doping.
+
+Resolution of the Two Models and the Role of Injection Regime
+
+A prolonged debate in the LEC community regarding the relative validity of the ED and ECD models was resolved by van Reenen et al., who showed that both models are correct in different limits. The ED model applies when the injection is strongly limited by the barrier (low-conductance organic semiconductor, large electrode work function mismatch); the ECD model applies when injection is ohmic (high-conductance semiconductor, small work function mismatch). In practice, a device may operate in the ED regime at early times (before significant ionic redistribution has occurred) and transition toward the ECD regime as the ionic double layers build up.
+
+For the present SY/Hybrane/LiTf system, the polymer has moderate hole mobility and a moderate injection barrier from ITO, suggesting that both mechanisms may contribute simultaneously. The ED mechanism accounts for the rapid conductance changes observed at short timescales (milliseconds to seconds), driven primarily by the fast-moving triflate anions. The ECD mechanism accounts for the larger, slower conductance changes observed at longer timescales (seconds to tens of seconds), driven by the slower-moving Li+ cations. This hierarchy of timescales is the physical origin of the STM/LTM dichotomy.
+
+Lewis Acid-Base Chemistry and the Two Memory Regimes
+
+The central theoretical contribution of this work is the identification of Lewis acid-base chemistry between the ions and the Hybrane matrix as the molecular mechanism that determines the characteristic timescales of each memory regime.
+
+In HSAB theory, the strength of interaction between a Lewis acid and a Lewis base in a coordination environment is determined by the matching of their hardness/softness. The hard–hard interaction between Li+ (a small, hard Lewis acid with charge density 1.36) and the ether oxygen atoms of Hybrane (hard Lewis bases) is governed by predominantly electrostatic forces and is therefore thermodynamically strong and geometrically specific. The coordination geometry around Li+ in polyether environments is typically tetrahedral or octahedral with oxygen–lithium distances of 2.1, and the binding energy of each coordination site is of order k_BT x 10^2 at room temperature, making the thermal activation barrier for ion hopping substantially larger than k_BT.
+
+The soft–soft (or rather, hard–soft mismatch) interaction between the CF3SO3- triflate anion and the Hybrane oxygen atoms is fundamentally weaker: the diffuse, low-charge-density triflate anion does not engage in strong electrostatic interactions with the hard-base oxygen atoms, and the interaction is governed predominantly by weaker van der Waals forces. The energy barrier for displacement of a triflate anion from one interstitial site to the next is therefore substantially lower than for a Li+ cation.
+
+This differential activation barrier translates directly into differential ionic mobility under an applied field, and hence into different voltage thresholds for achieving significant ionic redistribution:
+
+A modest voltage of 1 applied across a 209 nm film generates a field of approximately 4.8. This is sufficient to overcome the activation barrier for triflate anion hopping, producing rapid anionic redistribution → rapid conductance change → STM (retention 15, driven by triflate relaxation).
+
+A voltage of 3 across the same film generates approximately 14.4. This higher field is required to overcome the substantially larger activation barrier for Li+ hopping from its Hybrane coordination sites → delayed, stronger ionic redistribution → LTM (retention > 45 s, driven by cation redistribution).
+
+This model makes a specific, experimentally testable prediction: replacing Li+ with a monovalent cation of larger ionic radius (e.g., Na+ or K+) should reduce the charge density and hence the hardness of the Lewis acid, weakening the coordination with the oxygen atoms of the polyether host and shortening the effective fading-memory timescale of the device. This prediction is tested in Chapter 3 on the main comparative corpus of the thesis: a PEO-based polymer-electrolyte series loaded with lithium, sodium and potassium triflate salts (PEO/LiTr, PEO/NaTr, PEO/KTr) at fixed polymer and salt mass fractions, complemented by a dedicated PEO/LiTr concentration sub-study. The expectation is addressed there as a statement about the shift of the measured variable-delay depotentiation timescale when the cation is varied at fixed host chemistry, and not as a claim about the full suite of synaptic metrics presented in the present chapter.
+
+Device Stability and Reproducibility
+
+Operational Lifetime
+
+The operational lifetime of a memristive device — the number of switching cycles over which it maintains its performance parameters within specified tolerances — is one of the most important practical metrics for neuromorphic applications. In hardware neural networks, a device that degrades significantly after a few thousand switching events is incompatible with the millions-to-billions of weight updates required during training.
+
+The devices reported here were characterised at regular intervals over a period of two weeks (300) after fabrication, without encapsulation, while stored in ambient air at room temperature (see Supporting Information of Ref.). The key metrics monitored were: the baseline conductance G_0, the maximum achievable conductance change G_max, and the STM retention time _S.
+
+The results show that all three metrics remain within 20 of their initial values over the full two-week measurement period. This stability is notably superior to other organic memristive devices reported in the literature, which typically exhibit significant degradation within hours to days under ambient conditions. The enhanced stability is attributed to the solid-state nature of the composite: unlike devices based on liquid electrolytes or gel polymers, the Hybrane matrix provides a mechanically cohesive environment that protects the ions from evaporation and the polymer films from delamination.
+
+The stability under ambient conditions is expected to be further enhanced by encapsulation, which is standard practice in organic electronic device manufacturing. Encapsulation with a thin film of SiO2 or Si3N4 deposited by atomic layer deposition (ALD) or chemical vapour deposition (CVD) would eliminate oxygen and water ingress, the two primary degradation pathways. The demonstration that even unencapsulated devices survive for two weeks validates the fundamental robustness of the composite material system.
+
+Device-to-Device Reproducibility
+
+Reproducibility is a persistent challenge for memristive devices, particularly those based on filamentary switching in inorganic materials, where the stochastic nucleation of conducting filaments produces large device-to-device and cycle-to-cycle variability. The present system, which operates by uniform bulk ionic redistribution rather than localised filament formation, is intrinsically less susceptible to this type of variability.
+
+Reproducibility was assessed by measuring the protocol and the potentiation/depression pulse sequence on multiple independent devices fabricated in the same batch. The relative standard deviation (RSD) of the EPSC ratios across devices is below 15 for all four states (S_1 through S_4). The RSD of the G values in the potentiation experiment is below 10 for N_pulses < 100, as shown by the shaded error bands in the figure.
+
+This level of reproducibility reflects the benefits of solution-processing over physical vapour deposition (PVD) for organic devices: the active layer is deposited from a well-mixed, homogeneous solution, so the composition and morphology of the film are governed by thermodynamic equilibrium rather than the kinetics of vapour phase deposition. Batch-to-batch reproducibility was also assessed and found to be within 20 for the principal electrical parameters.
+
+Comparison with the State of the Art
+
+The table presents a systematic comparison of the device reported in this chapter with the most significant prior art in organic and hybrid memristive devices reported at the time of publication (2022).
+
+The table reveals two key gaps that the present work fills:
+
+1. Coexistence of STM and LTM in a single 2-T device with full reversibility. Of all prior contributions, Liu et al. is the closest in this regard, having demonstrated tunable STM/LTM in a 2-T structure. However, the redox-active nature of the Liu device means that each switching cycle irreversibly modifies the organic material, precluding practical cyclability. The present work achieves comparable STM/LTM functionality with demonstrated full reversibility (conductance returns to G_0 after the reset protocol) and superior retention stability.
+
+2. Demonstration of STDP in a 2-T fully reversible device. Prior demonstrations of STDP in organic devices relied uniformly on 3-T transistor architectures, which require an independent gate voltage to implement the learning function. The present work implements STDP in a 2-T device by exploiting the voltage-summing mechanism inherent to the superposition of pre- and postsynaptic pulses — a more faithful emulation of the biological synapse, which also lacks a separate gating terminal.
+
+Stability comparison. The operational lifetime of the present device (300 under ambient conditions) exceeds that of most comparable organic memristive devices by at least one order of magnitude. While it remains substantially below the durability of inorganic devices (which can operate for 10^10 or more switching cycles), it is a significant advance for the organic materials class and demonstrates a route toward practical operation.
+
+Energy efficiency. The energy per synaptic event (50 nJ) is comparable to other organic ionic devices and substantially below the energy cost of conventional CMOS synaptic circuits (>1 per weight update). However, it is above the energy cost of the best inorganic memristors (<1 pJ), reflecting the lower switching speed and larger device area of the organic system. Future work reducing the device area toward the 100 nm scale would reduce this gap by several orders of magnitude.
+
+Because this chapter is an expanded thesis treatment of a 2022 device paper, the comparison above retains the conventional device-level yardsticks used in that literature: reversibility, retention window, energy per event, and stability. Within the thesis-wide argument, however, these metrics serve a narrower purpose. They establish that the polymer-electrolyte platform introduced here is reversible, dynamically addressable, and stable enough to motivate the main comparative study of Chapter 3 — a PEO-based triflate composition and cation sweep characterised through a common set of three dynamical measurements (I–V hysteresis, variable-number-of-pulses potentiation, and variable-delay-time depotentiation) — and the data-driven temporal-computing reinterpretation of Chapter 4 that is built on those measurements. They are not invoked here to claim that the device should be judged by the standards of a high-density non-volatile memory technology, nor to imply that the richer synaptic metrics reported in the present chapter (EPSC, separated STM/LTM retention, STDP, impedance) are available across the full comparative corpus; those measurements remain specific to the present SY/Hybrane/LiTf device.
+
+Summary
+
+This chapter has presented the design, fabrication, and comprehensive characterisation of the first fully reversible, two-terminal organic memristive device demonstrating simultaneous STM, LTM, and STDP in a single polymer composite component. The key contributions are:
+
+Materials design: A ternary composite of (semiconducting polymer), (ion-transport polymer), and (ionic salt) was identified as a material that satisfies all requirements for analog memristive operation: electronic conductance, ionic carrier density, and mechanical stability.
+
+Device fabrication: A robust 2-T vertical sandwich device (ITO / composite / Ag) was fabricated entirely from solution processing and thermal evaporation, yielding films of 209 nm thickness with RMS roughness below 3 nm and excellent batch-to-batch reproducibility.
+
+Analog multi-state switching: Current-voltage hysteresis measurements revealed continuously increasing conductance with successive voltage sweeps (up to +140% from cycle 1 to cycle 2). Pulse-train measurements confirmed that conductance can be potentiated and depotentiated over a range exceeding 200, with energy cost of 50 nJ per event.
+
+EPSC and multi-state memory: Four readily distinguishable readout states were established around the device ground level, with signed EPSC ratios spanning from -17 to +16 relative to G_0 under the fixed measurement convention.
+
+STM and LTM: Two distinct memory regimes were characterised: STM (_S = 2.53, retention 15) accessible with 1 pulses, and a longer-lived regime conventionally denoted LTM (_L = 4.7 s, retention > 45 s) accessible with 3 pulses. Both decay curves obey a stretched Kohlrausch exponential, consistent with heterogeneous ionic transport kinetics.
+
+STDP: An asymmetric anti-Hebbian STDP function was measured, with time constant = 8590 — quantitatively consistent with biological synapses (100 ms).
+
+Mechanistic understanding: The STM/LTM dichotomy was explained by the differential Lewis acid-base interaction between the mobile ions (Li+ as hard acid, CF3SO3- as soft base) and the Hybrane matrix (hard Lewis base oxygen atoms). Weakly coordinated triflate anions migrate at low voltage (1) → STM; strongly coordinated lithium cations require higher voltage (3) for migration → LTM. Both the electrodynamic and electrochemical doping models were invoked to describe the injection and bulk transport physics, following the reconciling framework of van Reenen et al.
+
+Stability and reproducibility: Devices were functional for 300 under ambient conditions without encapsulation, with device-to-device variability below 15 for principal electrical parameters.
+
+These results establish the SY/Hybrane/LiTf composite as a viable and richly characterised exemplar of a polymer-electrolyte organic memristive device. The work identifies the Lewis acid-base chemistry of the cation-polyether interaction as the key tuneable parameter controlling memory timescales — a hypothesis that motivates the main comparative study of Chapter 3, which replaces Hybrane with poly(ethylene oxide) and varies both the composition (PEO/LiTr concentration series) and the cation identity (PEO/LiTr, PEO/NaTr, PEO/KTr at fixed polymer and salt mass fractions). In that chapter the hypothesis is tested exclusively through the three common dynamical measurements — I–V hysteresis, variable-number-of-pulses potentiation, and variable-delay-time depotentiation — that are available for every device of the comparative corpus. The richer synaptic metrics reported in the present chapter (EPSC, separated STM/LTM retention, STDP, impedance) are not propagated to the later chapters, where they are used only as Li-device priors and sanity checks. Beyond this comparative handoff, the volatile two-timescale behaviour established here is the experimental anchor for the temporal-computing reinterpretation of Chapter 4, in which behavioural models fitted to the Chapter 3 corpus drive simulations of a heterogeneous physical reservoir, a coincidence detector, and a multi-timescale filter bank — paradigms in which the fading memory of the device is the active computational resource rather than a retention defect.

@@ -136,6 +136,35 @@ def replace_headings(text: str) -> str:
     return text
 
 
+def title_to_plaintext(title: str) -> str:
+    """Convert a LaTeX heading title into compact plain text."""
+    title = re.sub(r"\\texorpdfstring\{([^{}]*)\}\{[^{}]*\}", r"\1", title)
+    for cmd in ("textit", "textbf", "emph", "textsc", "texttt", "textsf"):
+        title = re.sub(r"\\" + cmd + r"\{([^{}]*)\}", r"\1", title)
+    title = title.replace("~", " ")
+    title = title.replace("---", "—").replace("--", "–")
+    title = re.sub(r"\\[a-zA-Z]+\*?", "", title)
+    title = title.replace("{", "").replace("}", "")
+    return re.sub(r"\s+", " ", title).strip()
+
+
+def collect_label_titles(text: str) -> dict[str, str]:
+    """Map labels attached to headings to their plain-text titles."""
+    label_titles: dict[str, str] = {}
+    heading = r"\\(?:chapter|section|subsection|subsubsection)\*?\{([^{}]*)\}"
+    label = r"\\label\{([^{}]*)\}"
+
+    for match in re.finditer(heading + r"\s*" + label, text):
+        title, label_name = match.groups()
+        label_titles[label_name] = title_to_plaintext(title)
+
+    for match in re.finditer(label + r"\s*" + heading, text):
+        label_name, title = match.groups()
+        label_titles[label_name] = title_to_plaintext(title)
+
+    return label_titles
+
+
 def strip_label_like(text: str) -> str:
     """Remove labels, refs, citations, indexing commands."""
     patterns = [
@@ -157,6 +186,73 @@ def strip_label_like(text: str) -> str:
     ]
     for p in patterns:
         text = re.sub(p, "", text)
+    return text
+
+
+def replace_cross_references(text: str, label_titles: dict[str, str]) -> str:
+    """Replace cross-references with plain nouns instead of dropping them.
+
+    Removing a reference outright can leave broken prose such as
+    ``traces the limits'' with no subject. Parenthetical-only cross-references
+    are still removed, since they do not carry prose content.
+    """
+
+    # Parenthetical references are layout/navigation aids, not prose.
+    text = re.sub(r"\(\s*\\[cC]ref\{[^{}]*\}\s*\)", "", text)
+
+    kind_map = {
+        "ch": "chapter",
+        "chap": "chapter",
+        "sec": "section",
+        "subsec": "section",
+        "subsubsec": "section",
+        "fig": "figure",
+        "tab": "table",
+        "tbl": "table",
+        "eq": "equation",
+        "equation": "equation",
+        "app": "appendix",
+    }
+
+    def kind_for(label: str) -> str:
+        prefix = label.split(":", 1)[0].strip().lower()
+        return kind_map.get(prefix, "reference")
+
+    def named_noun(label: str):
+        kind = kind_for(label)
+        title = label_titles.get(label)
+        if title and kind in {"chapter", "section", "appendix"}:
+            return f"{title} {kind}"
+        return None
+
+    def ref_phrase(command: str, label_text: str) -> str:
+        labels = [part.strip() for part in label_text.split(",") if part.strip()]
+        kinds = [kind_for(label) for label in labels] or ["reference"]
+        named = [named_noun(label) for label in labels]
+        if labels and all(named):
+            if len(named) == 1:
+                noun = named[0]
+            else:
+                kind = kinds[0] if len(set(kinds)) == 1 else "reference"
+                titles = [name.removesuffix(f" {kind}") for name in named]
+                noun = f"{', '.join(titles[:-1])} and {titles[-1]} {kind}s"
+        elif len(set(kinds)) == 1:
+            noun = kinds[0] if len(kinds) == 1 else f"{kinds[0]}s"
+        else:
+            noun = "references"
+        phrase = f"the {noun}"
+        if command and command[0].isupper():
+            phrase = phrase[:1].upper() + phrase[1:]
+        return phrase
+
+    def sentence_ref_repl(match: re.Match) -> str:
+        return match.group(1) + ref_phrase("Cref", match.group(2))
+
+    def ref_repl(match: re.Match) -> str:
+        return ref_phrase("cref", match.group(2))
+
+    text = re.sub(r"(^|[.!?]\s+)\\[cC]ref\{([^{}]*)\}", sentence_ref_repl, text, flags=re.MULTILINE)
+    text = re.sub(r"\\([cC]ref|autoref|ref)\{([^{}]*)\}", ref_repl, text)
     return text
 
 
@@ -297,6 +393,7 @@ def collapse_paragraphs(text: str) -> str:
 
 
 def convert(tex: str) -> str:
+    label_titles = collect_label_titles(tex)
     tex = strip_comments(tex)
     tex = strip_conditional_blocks(tex)
     tex = strip_environments(
@@ -313,6 +410,7 @@ def convert(tex: str) -> str:
     )
     tex = expand_lists(tex)
     tex = replace_headings(tex)
+    tex = replace_cross_references(tex, label_titles)
     tex = strip_label_like(tex)
     tex = replace_units(tex)
     tex = replace_chemistry(tex)
