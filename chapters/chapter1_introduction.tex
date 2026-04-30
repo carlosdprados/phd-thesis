@@ -113,7 +113,14 @@ The division between storage and computation, along with the argument for time-s
 
 A neuron is a polarised cell specialised to receive, integrate, and transmit electrical signals~\cite{Drubach2000}. Dendrites (the branching extensions of a neuron) collect inputs from other cells. The soma (the neuron cell body) then integrates those inputs and, once the membrane potential crosses a certain threshold, the axon hillock (the cone-shaped region of the soma) fires an outgoing signal. The axon then propagates that signal over distances that range from millimetres to metres, and its terminals release a chemical messenger onto downstream cells. A mature animal neuron typically receives signals from \(10^{3}\)--\(10^{4}\) other neurons through their dendritic contacts. Each such contact is a \textit{synapse}. The way a neuron computes information is then influenced heavily by the number and strength of its synaptic contacts, and by how they change over time, more than by the soma itself.
 
-The signal travelling along the axon is the \textit{action potential}: a stereotyped millisecond depolarisation caused by the opening of voltage-gated \ce{Na+} channels, followed by \ce{K+}-mediated repolarisation. Action potentials are all-or-nothing events. Their waveform carries little information about the strength of the stimulus that produced them; instead, information is carried in the timing, rate, and coincidence of spike trains. In that literal physical sense, neural computation is event-driven (\cref{subsec:paradigms}). Between spikes, a neuron consumes only a leakage current. During a spike, it dissipates a small and relatively fixed amount of energy. The computation comes from the patterned arrival of events at many synapses, not from a global clock updating a shared register.
+The signal travelling along the axon is the \textit{action potential}: a stereotyped millisecond depolarisation caused by the opening of voltage-gated \ce{Na+} channels, followed by \ce{K+}-mediated repolarisation. Action potentials are all-or-nothing events. Their waveform carries little information about the strength of the stimulus that produced them; instead, information is carried in the timing, rate, and coincidence of spike trains. In that literal physical sense, neural computation is event-driven (\cref{subsec:paradigms}). Between spikes, a neuron consumes only a leakage current. During a spike, it dissipates a small and relatively fixed amount of energy. The computation comes from the patterned arrival of events at many synapses, not from a global clock updating a shared register. The neuron-level anatomy and the action-potential waveform are summarised in \cref{fig:neuron_action_potential}.
+
+\begin{figure}[!tbp]
+  \centering
+  \includegraphics[width=0.9\linewidth]{../figures/chapter1/ch1_fig3_neuron_action_potential.png}
+  \caption{Anatomy of a neuron and the action-potential waveform. (a) A neuron collects synaptic inputs through its dendrites, integrates them at the soma, and fires an outgoing electrical event when the membrane potential at the axon hillock crosses a threshold; the resulting waveform propagates unidirectionally along the axon to the synaptic terminals, where it triggers chemical transmission onto downstream cells (the zoom shown in \cref{fig:synapse_plasticity}). (b) The action potential is a stereotyped millisecond-scale depolarisation produced by the opening of voltage-gated \ce{Na+} channels, followed by a \ce{K+}-mediated repolarisation and a brief after-hyperpolarisation before the return to the resting potential; its all-or-nothing character means that information about the input is carried by the timing and rate of these events rather than by their amplitude, which is the cellular basis of the event-driven view of neural computation introduced in \cref{subsec:paradigms}.}
+  \label{fig:neuron_action_potential}
+\end{figure}
 
 Synaptic transmission is mostly chemical. When an action potential reaches an axon terminal, the depolarisation opens voltage-gated \ce{Ca^{2+}} channels. The resulting \ce{Ca^{2+}} influx triggers vesicles loaded with neurotransmitter, typically glutamate in excitatory cortical synapses, to fuse with the pre-synaptic membrane. The transmitter then diffuses across the \(\sim\)\SI{20}{\nano\metre} synaptic cleft and binds to receptors on the post-synaptic membrane. These receptors open ion channels directly or through second-messenger cascades. The resulting ionic current, either an excitatory or inhibitory post-synaptic current (EPSC or IPSC), briefly shifts the post-synaptic membrane potential. Its amplitude and kinetics define the \textit{strength} of the synapse at that moment. Crucially, the same molecular machinery that propagates the signal can also modify the strength of later transmissions.
 
@@ -121,7 +128,7 @@ The synapse is at once a transmission element, a modulator, and a memory element
 
 \begin{figure}[!tbp]
   \centering
-  \includegraphics[width=0.9\linewidth]{../figures/chapter1/ch1_fig3_synapse_plasticity.png}
+  \includegraphics[width=0.9\linewidth]{../figures/chapter1/ch1_fig4_synapse_plasticity.png}
   \caption{Anatomy and plasticity regimes of the chemical synapse. (a) A presynaptic terminal releases neurotransmitter vesicles into the synaptic cleft in response to a calcium-triggered action potential, and postsynaptic receptors convert the released signal into an excitatory postsynaptic current. (b) The same synapse supports a graded hierarchy of plasticity regimes --- short-term facilitation and depression on millisecond timescales, spike-timing-dependent plasticity on tens of milliseconds, and long-term potentiation and depression on timescales from minutes to hours --- each associated with distinct microscopic mechanisms. This hierarchy, spanning several orders of magnitude in time in a single physical element, is the engineering target against which candidate synaptic hardware is judged in the remainder of the chapter.}
   \label{fig:synapse_plasticity}
 \end{figure}
@@ -192,7 +199,7 @@ The impact of this result was larger than the novelty of the oxide physics alone
 
 \begin{figure}[tbp]
   \centering
-  \includegraphics[width=0.9\linewidth]{../figures/chapter1/ch1_fig4_memristor_theory_fingerprint.png}
+  \includegraphics[width=0.9\linewidth]{../figures/chapter1/ch1_fig5_memristor_theory_fingerprint.png}
   \caption{The memristor as a constitutive element and its experimental fingerprint. (a) The four fundamental two-terminal passive circuit elements, arranged by the pair of constitutive variables they relate: the resistor ($v$--$i$), the capacitor ($v$--$q$), the inductor ($i$--$\varphi$), and the memristor ($q$--$\varphi$), which completes the quadrant. (b) A memristive device driven by a periodic voltage exhibits a pinched current--voltage hysteresis loop that narrows with increasing driving frequency and that passes through the origin at each zero-crossing; this loop is the canonical experimental fingerprint of memristive operation and is observed in all of the device families surveyed in the remainder of the chapter.}
   \label{fig:memristor_theory_fingerprint}
 \end{figure}
@@ -260,7 +267,7 @@ The memristor, in this view, is more than a candidate memory cell. It is a circu
 
 \begin{figure}[tbp]
   \centering
-  \includegraphics[width=0.9\linewidth]{../figures/chapter1/ch1_fig5_static_vs_fading.png}
+  \includegraphics[width=0.9\linewidth]{../figures/chapter1/ch1_fig6_static_vs_fading.png}
   \caption{Two complementary computational roles for memristive devices. (a) A trained crossbar holds programmed conductances as non-volatile weights and performs matrix--vector multiplication by Ohm's and Kirchhoff's laws; here retention, endurance, linearity and symmetry are the relevant figures of merit. (b) A reservoir of volatile fading-memory nodes, driven by a time-varying input, projects temporal signals into a high-dimensional dynamical state; only a linear readout layer is trained, and the relevant figures of merit become memory capacity, class separability, and the spread of available time constants. The thesis treats these two modes as complementary targets for memristive hardware rather than as a hierarchy, and develops the second of them as the primary application of the polymer-electrolyte composite family.}
   \label{fig:static_vs_fading}
 \end{figure}
@@ -340,7 +347,7 @@ These limitations define the gap addressed here. Analogue, ion-mediated, chemica
 
 \begin{figure}[!htb]
   \centering
-  \includegraphics[width=0.9\linewidth]{../figures/chapter1/ch1_fig6_inorganic_comparison_matrix.png}
+  \includegraphics[width=0.9\linewidth]{../figures/chapter1/ch1_fig7_inorganic_comparison_matrix.png}
   \caption{Comparison of inorganic memristor families with the soft-ionic composite route pursued in this thesis. For each family, qualitative assessments are shown along five axes: retention (the range of fading-memory to non-volatile behaviour that has been demonstrated), analogue tunability (the number of reliably programmable intermediate states), chemical tunability (the extent to which composition acts as an independent handle on the switching physics), substrate compatibility (vacuum/high-temperature workflows versus solution-processable and mild-temperature workflows), and reservoir-readiness (suitability as a fading-memory node in a temporal-computing scheme). The comparison locates each family rather than ranking them; the soft-ionic row is forward-referenced and is developed in \cref{sec:organic_memristors,sec:polymer_electrolyte_composites}.}
   \label{fig:inorganic_comparison_matrix}
 \end{figure}
@@ -437,7 +444,7 @@ What had not been consolidated was the full set of features in one simple two-te
 
 \begin{figure}[!htb]
   \centering
-  \includegraphics[width=0.9\linewidth]{../figures/chapter1/ch1_fig7_organic_timeline.png}
+  \includegraphics[width=0.9\linewidth]{../figures/chapter1/ch1_fig8_organic_timeline.png}
   \caption{Historical map of organic memristive and organic synaptic devices, arranged by mechanism family and by year of representative publication. Early ionic and electrochemical demonstrations, simple polymer-film bistable devices, two-terminal redox biomimetics, three-terminal electrochemical-transistor synaptic devices, flexible and nervetronic synaptic devices, molecular memristors, and organic reservoir-computing demonstrations are shown as parallel streams rather than as steps of a single lineage. The view supports the observation that, by the early 2020s, several of the individually demanding features of a neuromorphic organic device had each been demonstrated, but that no single two-terminal platform combined reversibility, multi-state analogue behaviour, and an interpretable ion-mediated mechanism.}
   \label{fig:organic_timeline}
 \end{figure}
@@ -518,7 +525,7 @@ The experimental chapters test the rationale in two stages: first on a single Hy
 
 \begin{figure}[!htb]
   \centering
-  \includegraphics[width=0.9\linewidth]{../figures/chapter1/ch1_fig8_composite_architecture_timescale_ladder.png}
+  \includegraphics[width=0.9\linewidth]{../figures/chapter1/ch1_fig9_composite_architecture_timescale_ladder.png}
   \caption{The thesis-specific polymer-electrolyte composite device and its chemically tunable dynamical timescale. (a) Vertical two-terminal stack: a solution-processed composite active layer, combining a conjugated semiconducting polymer network with an oxygen-rich ion-conducting host, coordinated alkali-metal cations, and a dissociated salt, is sandwiched between a patterned ITO bottom electrode and an evaporated silver top electrode; the internal state of the device is set by the residual ionic distribution that remains after a driving bias is removed. (b) Qualitative timescale ladder on which the cation identity (\ce{Li+} through \ce{Na+} to \ce{K+}, weakening the cation--oxygen coordination) and the composition knobs of the host/salt ratios are expected to place the fading-memory time constant of the device. The ordering is the central hypothesis developed from the physical-chemistry argument of \cref{sec:polymer_electrolyte_composites}; its quantitative test is the object of Chapter 3.}
   \label{fig:composite_architecture_timescale_ladder}
 \end{figure}

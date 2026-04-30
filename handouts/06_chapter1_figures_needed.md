@@ -18,7 +18,7 @@ A figure was retained only if it met all three of the following:
 
 Figures that would merely duplicate the paragraph immediately above them, or that would arrive before the underlying concept had been introduced, were rejected. In all cases the figure is placed **after** the paragraph that creates the need for it, not before.
 
-Eight insertion points met the criteria. They are listed in reading order.
+Nine insertion points met the criteria. They are listed in reading order.
 
 ---
 
@@ -47,7 +47,20 @@ Eight insertion points met the criteria. They are listed in reading order.
 
 ---
 
-## Figure 3 — The chemical synapse and the plasticity timescales
+## Figure 3 — Neuron anatomy and the action-potential waveform
+
+- **Proposed label.** `fig:neuron_action_potential`
+- **Section placement.** §1.2, `subsec:neural_signal`.
+- **Position relative to prose.** After the second paragraph of `subsec:neural_signal` (the paragraph that introduces the action potential, the \ce{Na+}/\ce{K+} channel sequence, the all-or-nothing character, and the explicit callback to event-driven computing in `subsec:paradigms`). The figure earns its place there because both of its panels' contents have just been described in prose: neuron anatomy in the preceding paragraph and the action-potential waveform in the paragraph it follows. It also lands before the synapse-level discussion picks up in the next paragraph and before \cref{fig:synapse_plasticity}, so the chapter's biology coverage progresses cleanly from neuron level to synapse level.
+- **Figure type.** Two-panel didactic schematic. Panel (a): a labelled neuron cartoon — dendrites collecting inputs, soma, axon hillock as the firing threshold region, axon (myelinated segments optional), and axon terminals contacting a downstream cell; small arrows indicate dendritic input integration, threshold crossing at the hillock, and unidirectional propagation along the axon to the terminals. Panel (b): the action-potential waveform on a membrane-potential vs. time axis, showing resting potential, threshold, the \ce{Na+}-driven depolarisation, the peak, the \ce{K+}-driven repolarisation, the after-hyperpolarisation, and the return to rest, with the threshold and the stereotyped all-or-nothing character marked. The two panels are connected visually by indicating that the waveform of (b) is what travels along the axon of (a).
+- **Distinction from Figure 4 (`fig:synapse_plasticity`).** Figure 3 is at the *cellular* level — a whole neuron and the electrical event that travels along its axon. Figure 4 is at the *sub-cellular synapse* level — the presynaptic terminal, the cleft, the postsynaptic membrane, and the plasticity-timescale ladder. Figure 3 provides the orientation that lets the reader parse Figure 4's zoom-in: the axon terminal in Figure 4 (a) is the structure at the right-hand end of Figure 3 (a), and the calcium-triggered release event in Figure 4 (a) is initiated by the action potential of Figure 3 (b) arriving at that terminal. The two figures are sequential zooms, not parallel views.
+- **One-sentence message.** A neuron is a polarised cell that integrates dendritic inputs at the soma, fires a stereotyped all-or-nothing action potential at the axon hillock when the membrane potential crosses a threshold, and propagates that waveform to its synaptic terminals — a single physical sequence that anchors every later use of "spike", "spike train", "threshold", and "event-driven" in the chapter.
+- **Caption draft.**
+  > Anatomy of a neuron and the action-potential waveform. (a) A neuron collects synaptic inputs through its dendrites, integrates them at the soma, and fires an outgoing electrical event when the membrane potential at the axon hillock crosses a threshold; the resulting waveform propagates unidirectionally along the axon to the synaptic terminals, where it triggers chemical transmission onto downstream cells (the zoom shown in \cref{fig:synapse_plasticity}). (b) The action potential is a stereotyped millisecond-scale depolarisation produced by the opening of voltage-gated \ce{Na+} channels, followed by a \ce{K+}-mediated repolarisation and a brief after-hyperpolarisation before the return to the resting potential; its all-or-nothing character means that information about the input is carried by the timing and rate of these events rather than by their amplitude, which is the cellular basis of the event-driven view of neural computation introduced in \cref{subsec:paradigms}.
+
+---
+
+## Figure 4 — The chemical synapse and the plasticity timescales
 
 - **Proposed label.** `fig:synapse_plasticity`
 - **Section placement.** §1.2. The figure opens at the end of `subsec:neural_signal` and is referenced again in `subsec:plasticity`.
@@ -59,7 +72,7 @@ Eight insertion points met the criteria. They are listed in reading order.
 
 ---
 
-## Figure 4 — The memristor as the fourth circuit element and its pinched-hysteresis fingerprint
+## Figure 5 — The memristor as the fourth circuit element and its pinched-hysteresis fingerprint
 
 - **Proposed label.** `fig:memristor_theory_fingerprint`
 - **Section placement.** §1.3. The figure is positioned at the end of `subsec:tio2_memristor`, once the TiO₂ demonstration has been discussed.
@@ -71,7 +84,7 @@ Eight insertion points met the criteria. They are listed in reading order.
 
 ---
 
-## Figure 5 — Static programmable weights versus volatile fading-memory elements
+## Figure 6 — Static programmable weights versus volatile fading-memory elements
 
 - **Proposed label.** `fig:static_vs_fading`
 - **Section placement.** §1.3. End of `subsec:volatile_paradigms`.
@@ -83,7 +96,7 @@ Eight insertion points met the criteria. They are listed in reading order.
 
 ---
 
-## Figure 6 — Inorganic memristor families: comparison matrix
+## Figure 7 — Inorganic memristor families: comparison matrix
 
 - **Proposed label.** `fig:inorganic_comparison_matrix`
 - **Section placement.** §1.4. End of `subsec:inorganic_limits`. Replaces the existing `% TODO:` comment at the end of §1.4 and supersedes the original intention to defer it until after the organic section; the organic section is now drafted, so the comparison can be made symmetric with a final "soft ionic" column for the polymer-electrolyte route developed in §1.5 and §1.6.
@@ -95,7 +108,7 @@ Eight insertion points met the criteria. They are listed in reading order.
 
 ---
 
-## Figure 7 — Organic memristor historical landscape
+## Figure 8 — Organic memristor historical landscape
 
 - **Proposed label.** `fig:organic_timeline`
 - **Section placement.** §1.5. End of `subsec:organic_history`. Replaces the existing `% TODO:` comment at the end of that subsection.
@@ -107,7 +120,7 @@ Eight insertion points met the criteria. They are listed in reading order.
 
 ---
 
-## Figure 8 — Two-terminal polymer-electrolyte composite architecture and the composition/cation timescale ladder
+## Figure 9 — Two-terminal polymer-electrolyte composite architecture and the composition/cation timescale ladder
 
 - **Proposed label.** `fig:composite_architecture_timescale_ladder`
 - **Section placement.** §1.6. End of `subsec:composite_rationale`. Replaces the existing `% TODO:` comment at the end of §1.6.
@@ -121,10 +134,10 @@ Eight insertion points met the criteria. They are listed in reading order.
 
 ## Not selected, with reason
 
-The following candidates were considered but not retained in the current eight-figure plan:
+The following candidates were considered but not retained in the current nine-figure plan:
 
-- **HSAB periodic-table excerpt in §1.6.1.** The HSAB ordering is compact enough to carry in prose and is reused in Figure 8 (b) as a labelled axis; a dedicated periodic-table figure would duplicate material that the reader can already parse.
-- **Taxonomy figure in `subsec:memristor_classes`.** The mechanism classification is already absorbed into Figure 6 (the inorganic comparison matrix) and Figure 7 (the organic timeline) from the opposite direction; a separate taxonomy figure in §1.3.3 would duplicate those without adding a new axis of comparison.
+- **HSAB periodic-table excerpt in §1.6.1.** The HSAB ordering is compact enough to carry in prose and is reused in Figure 9 (b) as a labelled axis; a dedicated periodic-table figure would duplicate material that the reader can already parse.
+- **Taxonomy figure in `subsec:memristor_classes`.** The mechanism classification is already absorbed into Figure 7 (the inorganic comparison matrix) and Figure 8 (the organic timeline) from the opposite direction; a separate taxonomy figure in §1.3.3 would duplicate those without adding a new axis of comparison.
 - **Dedicated LEC operating-principle schematic in `subsec:lec_precedent`.** The LEC argument is conceptual, not architectural, and the section is explicit that the thesis is not about light emission; a figure there would divert attention from the precedent argument to the LEC device itself.
 - **Detailed behavioural-model block diagram for Chapter 4 in §1.7.** Chapter 4 has its own planning document (`handouts/04_chapter4_temporal_computing_plan.md`) and its own figure budget; the Chapter 1 outline should not preempt it.
 
@@ -132,7 +145,7 @@ The following candidates were considered but not retained in the current eight-f
 
 ## Next actions (for later passes, not now)
 
-1. Commission or draft the eight figures as vector graphics.
+1. Commission or draft the nine figures as vector graphics.
 2. Assign filenames under `figures/chapter1/` at that point.
-3. Insert `\begin{figure} ... \end{figure}` floats carrying the labels and captions above, positioned as specified. Three of the eight (Figures 6, 7, 8) replace existing `% TODO:` comments at the ends of §1.4, §1.5, and §1.6; the remaining five (Figures 1, 2, 3, 4, 5) are fresh insertions in subsections that do not currently carry a TODO marker.
+3. Insert `\begin{figure} ... \end{figure}` floats carrying the labels and captions above, positioned as specified. Three of the nine (Figures 7, 8, 9) replace existing `% TODO:` comments at the ends of §1.4, §1.5, and §1.6; the remaining six (Figures 1, 2, 3, 4, 5, 6) are fresh insertions in subsections that do not currently carry a TODO marker.
 4. Re-run `pdflatex → biber → pdflatex × 2` and verify that all cross-references to the new labels resolve.
