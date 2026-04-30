@@ -18,7 +18,7 @@ A figure was retained only if it met all three of the following:
 
 Figures that would merely duplicate the paragraph immediately above them, or that would arrive before the underlying concept had been introduced, were rejected. In all cases the figure is placed **after** the paragraph that creates the need for it, not before.
 
-Seven insertion points met the criteria. They are listed in reading order.
+Eight insertion points met the criteria. They are listed in reading order.
 
 ---
 
@@ -34,7 +34,20 @@ Seven insertion points met the criteria. They are listed in reading order.
 
 ---
 
-## Figure 2 — The chemical synapse and the plasticity timescales
+## Figure 2 — Architectural responses to the von Neumann bottleneck: in-memory and event-driven paradigms
+
+- **Proposed label.** `fig:paradigms_responses`
+- **Section placement.** §1.1, `subsec:paradigms`.
+- **Position relative to prose.** After the opening paragraph of `subsec:paradigms` that names the two responses (in-memory / near-memory / processing-in-memory, and event-driven / temporal). The figure operates as a roadmap: the reader sees both architectures side-by-side before the prose describes each one in turn, so the deep-dive paragraphs that follow can be parsed against an already-loaded visual.
+- **Figure type.** Three-panel architectural schematic that builds on Figure 1 and is deliberately disjoint from Figure 4. Panel (a) recapitulates the classical von Neumann data path (CPU ↔ shared bus ↔ memory) with the bus highlighted as the bottleneck inherited from Figure 1, drawn small enough to act as a visual anchor rather than a repeat. Panel (b) shows the *in-memory* response: a resistive crossbar with input voltages on rows, programmed conductances encoding a matrix, column currents emerging as the matrix–vector product, and an explicit annotation that no datum crosses a CPU–memory boundary during the operation. Panel (c) shows the *event-driven* response: a sparse, time-resolved input event train enters a dynamical substrate whose intrinsic relaxation is itself the computation, with only a trained linear readout downstream; a small inset trace contrasts a clocked dense waveform with the asynchronous event stream. Throughout, the emphasis is on **data flow relative to the bottleneck**, not on device figures of merit.
+- **Distinction from Figure 4 (`fig:static_vs_fading`).** Figure 2 lives at the *architecture* level — it answers "where does data move during a computation, relative to the bottleneck of Figure 1." Figure 4 lives at the *device* level — it answers "what figures of merit must a single memristive cell satisfy to play either role." The two figures are deliberately complementary: Figure 2 motivates *why* two architectures are pursued; Figure 4 specifies *what the device must do* in each. Figure 2 has three panels (vN baseline + the two responses) and no figures-of-merit table; Figure 4 has two panels (one per device mode) plus the figures-of-merit inset. Figure 2 shows information flow with arrows; Figure 4 shows static device-mode contrasts. The crossbar appears in both but plays different rhetorical roles — in Figure 2 as a system that bypasses the bus, in Figure 4 as a programmable-weight cell whose retention/endurance/linearity are the metrics of interest.
+- **One-sentence message.** The in-memory and event-driven paradigms attack the von Neumann bottleneck from two different directions — the first by collapsing the storage/compute boundary in space, the second by replacing clocked dense data movement with sparse temporal events flowing through a dynamical substrate whose own physics performs the computation.
+- **Caption draft.**
+  > Two architectural responses to the von Neumann bottleneck. (a) In the classical stored-program architecture (recapitulated from \cref{fig:vonneumann_bottleneck}), every operation traverses a CPU–memory bus that fixes the bandwidth and energy ceilings of the system. (b) In the in-memory paradigm, computation is performed inside the memory array: a resistive crossbar with programmed conductances executes an analogue matrix–vector multiplication by Ohm's and Kirchhoff's laws, so the dot product no longer crosses the CPU–memory boundary. (c) In the event-driven paradigm, dense clocked data are replaced by a sparse stream of asynchronous events that drive a dynamical substrate whose intrinsic relaxation is itself the computation; only a linear readout layer downstream is trained. The figure is intended as an architectural roadmap for \cref{subsec:paradigms} and is complementary to \cref{fig:static_vs_fading}, which addresses the device-level requirements that each paradigm places on a single memristive cell.
+
+---
+
+## Figure 3 — The chemical synapse and the plasticity timescales
 
 - **Proposed label.** `fig:synapse_plasticity`
 - **Section placement.** §1.2. The figure opens at the end of `subsec:neural_signal` and is referenced again in `subsec:plasticity`.
@@ -46,7 +59,7 @@ Seven insertion points met the criteria. They are listed in reading order.
 
 ---
 
-## Figure 3 — The memristor as the fourth circuit element and its pinched-hysteresis fingerprint
+## Figure 4 — The memristor as the fourth circuit element and its pinched-hysteresis fingerprint
 
 - **Proposed label.** `fig:memristor_theory_fingerprint`
 - **Section placement.** §1.3. The figure is positioned at the end of `subsec:tio2_memristor`, once the TiO₂ demonstration has been discussed.
@@ -58,7 +71,7 @@ Seven insertion points met the criteria. They are listed in reading order.
 
 ---
 
-## Figure 4 — Static programmable weights versus volatile fading-memory elements
+## Figure 5 — Static programmable weights versus volatile fading-memory elements
 
 - **Proposed label.** `fig:static_vs_fading`
 - **Section placement.** §1.3. End of `subsec:volatile_paradigms`.
@@ -70,7 +83,7 @@ Seven insertion points met the criteria. They are listed in reading order.
 
 ---
 
-## Figure 5 — Inorganic memristor families: comparison matrix
+## Figure 6 — Inorganic memristor families: comparison matrix
 
 - **Proposed label.** `fig:inorganic_comparison_matrix`
 - **Section placement.** §1.4. End of `subsec:inorganic_limits`. Replaces the existing `% TODO:` comment at the end of §1.4 and supersedes the original intention to defer it until after the organic section; the organic section is now drafted, so the comparison can be made symmetric with a final "soft ionic" column for the polymer-electrolyte route developed in §1.5 and §1.6.
@@ -82,7 +95,7 @@ Seven insertion points met the criteria. They are listed in reading order.
 
 ---
 
-## Figure 6 — Organic memristor historical landscape
+## Figure 7 — Organic memristor historical landscape
 
 - **Proposed label.** `fig:organic_timeline`
 - **Section placement.** §1.5. End of `subsec:organic_history`. Replaces the existing `% TODO:` comment at the end of that subsection.
@@ -94,7 +107,7 @@ Seven insertion points met the criteria. They are listed in reading order.
 
 ---
 
-## Figure 7 — Two-terminal polymer-electrolyte composite architecture and the composition/cation timescale ladder
+## Figure 8 — Two-terminal polymer-electrolyte composite architecture and the composition/cation timescale ladder
 
 - **Proposed label.** `fig:composite_architecture_timescale_ladder`
 - **Section placement.** §1.6. End of `subsec:composite_rationale`. Replaces the existing `% TODO:` comment at the end of §1.6.
@@ -108,10 +121,10 @@ Seven insertion points met the criteria. They are listed in reading order.
 
 ## Not selected, with reason
 
-The following candidates were considered but not retained in the current seven-figure plan:
+The following candidates were considered but not retained in the current eight-figure plan:
 
-- **HSAB periodic-table excerpt in §1.6.1.** The HSAB ordering is compact enough to carry in prose and is reused in Figure 7 (b) as a labelled axis; a dedicated periodic-table figure would duplicate material that the reader can already parse.
-- **Taxonomy figure in `subsec:memristor_classes`.** The mechanism classification is already absorbed into Figure 5 (the inorganic comparison matrix) and Figure 6 (the organic timeline) from the opposite direction; a separate taxonomy figure in §1.3.3 would duplicate those without adding a new axis of comparison.
+- **HSAB periodic-table excerpt in §1.6.1.** The HSAB ordering is compact enough to carry in prose and is reused in Figure 8 (b) as a labelled axis; a dedicated periodic-table figure would duplicate material that the reader can already parse.
+- **Taxonomy figure in `subsec:memristor_classes`.** The mechanism classification is already absorbed into Figure 6 (the inorganic comparison matrix) and Figure 7 (the organic timeline) from the opposite direction; a separate taxonomy figure in §1.3.3 would duplicate those without adding a new axis of comparison.
 - **Dedicated LEC operating-principle schematic in `subsec:lec_precedent`.** The LEC argument is conceptual, not architectural, and the section is explicit that the thesis is not about light emission; a figure there would divert attention from the precedent argument to the LEC device itself.
 - **Detailed behavioural-model block diagram for Chapter 4 in §1.7.** Chapter 4 has its own planning document (`handouts/04_chapter4_temporal_computing_plan.md`) and its own figure budget; the Chapter 1 outline should not preempt it.
 
@@ -119,7 +132,7 @@ The following candidates were considered but not retained in the current seven-f
 
 ## Next actions (for later passes, not now)
 
-1. Commission or draft the seven figures as vector graphics.
+1. Commission or draft the eight figures as vector graphics.
 2. Assign filenames under `figures/chapter1/` at that point.
-3. Replace the three outstanding `% TODO:` comments in the chapter source with `\begin{figure} ... \end{figure}` floats carrying the labels and captions above, positioned as specified.
+3. Insert `\begin{figure} ... \end{figure}` floats carrying the labels and captions above, positioned as specified. Three of the eight (Figures 6, 7, 8) replace existing `% TODO:` comments at the ends of §1.4, §1.5, and §1.6; the remaining five (Figures 1, 2, 3, 4, 5) are fresh insertions in subsections that do not currently carry a TODO marker.
 4. Re-run `pdflatex → biber → pdflatex × 2` and verify that all cross-references to the new labels resolve.
