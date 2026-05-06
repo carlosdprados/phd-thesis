@@ -18,7 +18,7 @@ A figure was retained only if it met all three of the following:
 
 Figures that would merely duplicate the paragraph immediately above them, or that would arrive before the underlying concept had been introduced, were rejected. In all cases the figure is placed **after** the paragraph that creates the need for it, not before.
 
-Nine insertion points met the criteria. They are listed in reading order.
+Ten insertion points met the criteria. They are listed in reading order.
 
 ---
 
@@ -39,8 +39,8 @@ Nine insertion points met the criteria. They are listed in reading order.
 - **Proposed label.** `fig:paradigms_responses`
 - **Section placement.** §1.1, `subsec:paradigms`.
 - **Position relative to prose.** After the opening paragraph of `subsec:paradigms` that names the two responses (in-memory / near-memory / processing-in-memory, and event-driven / temporal). The figure operates as a roadmap: the reader sees both architectures side-by-side before the prose describes each one in turn, so the deep-dive paragraphs that follow can be parsed against an already-loaded visual.
-- **Figure type.** Three-panel architectural schematic that builds on Figure 1 and is deliberately disjoint from Figure 4. Panel (a) recapitulates the classical von Neumann data path (CPU ↔ shared bus ↔ memory) with the bus highlighted as the bottleneck inherited from Figure 1, drawn small enough to act as a visual anchor rather than a repeat. Panel (b) shows the *in-memory* response: a resistive crossbar with input voltages on rows, programmed conductances encoding a matrix, column currents emerging as the matrix–vector product, and an explicit annotation that no datum crosses a CPU–memory boundary during the operation. Panel (c) shows the *event-driven* response: a sparse, time-resolved input event train enters a dynamical substrate whose intrinsic relaxation is itself the computation, with only a trained linear readout downstream; a small inset trace contrasts a clocked dense waveform with the asynchronous event stream. Throughout, the emphasis is on **data flow relative to the bottleneck**, not on device figures of merit.
-- **Distinction from Figure 4 (`fig:static_vs_fading`).** Figure 2 lives at the *architecture* level — it answers "where does data move during a computation, relative to the bottleneck of Figure 1." Figure 4 lives at the *device* level — it answers "what figures of merit must a single memristive cell satisfy to play either role." The two figures are deliberately complementary: Figure 2 motivates *why* two architectures are pursued; Figure 4 specifies *what the device must do* in each. Figure 2 has three panels (vN baseline + the two responses) and no figures-of-merit table; Figure 4 has two panels (one per device mode) plus the figures-of-merit inset. Figure 2 shows information flow with arrows; Figure 4 shows static device-mode contrasts. The crossbar appears in both but plays different rhetorical roles — in Figure 2 as a system that bypasses the bus, in Figure 4 as a programmable-weight cell whose retention/endurance/linearity are the metrics of interest.
+- **Figure type.** Three-panel architectural schematic that builds on Figure 1 and is deliberately disjoint from Figure 7. Panel (a) recapitulates the classical von Neumann data path (CPU ↔ shared bus ↔ memory) with the bus highlighted as the bottleneck inherited from Figure 1, drawn small enough to act as a visual anchor rather than a repeat. Panel (b) shows the *in-memory* response: a resistive crossbar with input voltages on rows, programmed conductances encoding a matrix, column currents emerging as the matrix–vector product, and an explicit annotation that no datum crosses a CPU–memory boundary during the operation. Panel (c) shows the *event-driven* response: a sparse, time-resolved input event train enters a dynamical substrate whose intrinsic relaxation is itself the computation, with only a trained linear readout downstream; a small inset trace contrasts a clocked dense waveform with the asynchronous event stream. Throughout, the emphasis is on **data flow relative to the bottleneck**, not on device figures of merit.
+- **Distinction from Figure 7 (`fig:static_vs_fading`).** Figure 2 lives at the *architecture* level — it answers "where does data move during a computation, relative to the bottleneck of Figure 1." Figure 7 lives at the *device* level — it answers "what figures of merit must a single memristive cell satisfy to play either role." The two figures are deliberately complementary: Figure 2 motivates *why* two architectures are pursued; Figure 7 specifies *what the device must do* in each. Figure 2 has three panels (vN baseline + the two responses) and no figures-of-merit table; Figure 7 has two panels (one per device mode) plus the figures-of-merit inset. Figure 2 shows information flow with arrows; Figure 7 shows static device-mode contrasts. The crossbar appears in both but plays different rhetorical roles — in Figure 2 as a system that bypasses the bus, in Figure 7 as a programmable-weight cell whose retention/endurance/linearity are the metrics of interest.
 - **One-sentence message.** The in-memory and event-driven paradigms attack the von Neumann bottleneck from two different directions — the first by collapsing the storage/compute boundary in space, the second by replacing clocked dense data movement with sparse temporal events flowing through a dynamical substrate whose own physics performs the computation.
 - **Caption draft.**
   > Two architectural responses to the von Neumann bottleneck. (a) In the classical stored-program architecture (recapitulated from \cref{fig:vonneumann_bottleneck}), every operation traverses a CPU–memory bus that fixes the bandwidth and energy ceilings of the system. (b) In the in-memory paradigm, computation is performed inside the memory array: a resistive crossbar with programmed conductances executes an analogue matrix–vector multiplication by Ohm's and Kirchhoff's laws, so the dot product no longer crosses the CPU–memory boundary. (c) In the event-driven paradigm, dense clocked data are replaced by a sparse stream of asynchronous events that drive a dynamical substrate whose intrinsic relaxation is itself the computation; only a linear readout layer downstream is trained. The figure is intended as an architectural roadmap for \cref{subsec:paradigms} and is complementary to \cref{fig:static_vs_fading}, which addresses the device-level requirements that each paradigm places on a single memristive cell.
@@ -72,7 +72,26 @@ Nine insertion points met the criteria. They are listed in reading order.
 
 ---
 
-## Figure 5 — The memristor as the fourth circuit element and its pinched-hysteresis fingerprint
+## Figure 5 — Energy and density of synaptic-equivalent operations across biology, digital CMOS, and memristive devices
+
+- **Proposed label.** `fig:synaptic_energy_density`
+- **Section placement.** §1.2, `subsec:why_hw`.
+- **Position relative to prose.** After the opening paragraph of `subsec:why_hw` that quotes \(\sim 10^{14}\)–\(10^{15}\) synapses operating at \(\sim 20\,\mathrm{W}\) in biology and contrasts that envelope with the per-operation cost of a von-Neumann CMOS implementation. The figure earns its place there because the prose has just committed to the comparison numerically; the chart fixes the comparison visually before §1.3 introduces the device alternative. It also breaks up the long stretch of unillustrated text between `fig:synapse_plasticity` (end of §1.2.2) and `fig:memristor_theory_fingerprint` (in §1.3.1), which currently spans the entirety of §1.2.3 and the §1.3 / §1.3.1 introductions.
+- **Figure type.** Single-panel log–log scatter / bubble plot. Axes: energy per synaptic-equivalent event (x) versus areal synaptic density (y). Marker classes:
+  - **Biology** anchor: cortical synaptic region placed from the per-event energy estimate of Attwell & Laughlin and the cortical synaptic-density estimate of Herculano-Houzel, drawn as a labelled bounded region rather than a point to acknowledge the spread.
+  - **Digital CMOS neuromorphic** envelope: representative ranges drawn from the published large-scale platforms cited via Indiveri & Liu (e.g., TrueNorth-class, Loihi-class, SpiNNaker-class order-of-magnitude regions), with the per-event energy dominated by SRAM-cell access plus arithmetic and the density limited by the cell + multiplier footprint.
+  - **Inorganic memristive** families: metal-oxide filamentary, PCM, and STT-MTJ, drawn from the same review sources as the inorganic comparison matrix (Sun 2019; Ielmini & Wong 2018; Kuzum 2013) so that the two figures stay quantitatively consistent.
+  - **Organic / soft-ionic target band**: forward-referenced to §1.5–§1.6, drawn as a target arrow / shaded band rather than as a published cluster — this is the design space the thesis proposes to occupy, not a survey of existing demonstrations.
+- A diagonal **iso-power reference line** corresponding to the \(\sim 20\,\mathrm{W}\) brain-scale envelope (energy per event × density × characteristic event rate) is overlaid to anchor the plot to the power budget quoted in the prose.
+- All numerical envelopes are conservative orders of magnitude drawn from the indicated reviews; individual devices may sit outside the bands shown. No invented numbers.
+- **Distinction from Figure 1 (`fig:vonneumann_bottleneck`) and from the inorganic comparison matrix (now Figure 8).** Figure 1 expresses the *system-level* energy asymmetry between arithmetic and data movement, qualitatively, with no density axis; this figure expresses the *element-level* energy of one synaptic-equivalent event and pairs it with a density axis. The inorganic comparison matrix compares memristor families on qualitative axes (retention, tunability, substrate compatibility, reservoir-readiness); this figure compares the same families plus biology and digital CMOS on two quantitative physical axes. The three figures answer different questions, and the chapter's energy-and-density argument benefits from carrying all three.
+- **One-sentence message.** Biological synapses, digital CMOS neuromorphic implementations, and present-day inorganic memristive families occupy distinct, largely non-overlapping regions of the energy-per-event / density plane, and the soft-ionic two-terminal route developed in the rest of the chapter is the only one positioned to approach the biological region on both axes simultaneously.
+- **Caption draft.**
+  > Approximate energy and density envelopes of synaptic-equivalent operations across implementation regimes. Each cluster represents a class of physical realisation: biological cortical synapses, digital CMOS neuromorphic implementations in which a synapse occupies an SRAM cell plus an arithmetic unit, the inorganic memristor families surveyed in §\ref{sec:inorganic_memristors}, and the soft-ionic composite target region forward-referenced to §\ref{sec:polymer_electrolyte_composites}. The diagonal reference line marks the brain-scale iso-power envelope (\(\sim 20\,\mathrm{W}\) for \(\sim 10^{14}\)–\(10^{15}\) synapses) introduced at the start of §\ref{subsec:why_hw}. Numerical bounds are conservative orders of magnitude drawn from the reviews cited in the surrounding text (Attwell & Laughlin 2001; Herculano-Houzel 2009; Kuzum 2013; Indiveri & Liu 2015; Ielmini & Wong 2018; Sun 2019); individual devices may sit outside the envelopes shown. The figure complements \cref{fig:vonneumann_bottleneck}, which makes the same energy-asymmetry argument at the system level, and \cref{fig:inorganic_comparison_matrix}, which compares the inorganic families on qualitative rather than quantitative axes.
+
+---
+
+## Figure 6 — The memristor as the fourth circuit element and its pinched-hysteresis fingerprint
 
 - **Proposed label.** `fig:memristor_theory_fingerprint`
 - **Section placement.** §1.3. The figure is positioned at the end of `subsec:tio2_memristor`, once the TiO₂ demonstration has been discussed.
@@ -84,7 +103,7 @@ Nine insertion points met the criteria. They are listed in reading order.
 
 ---
 
-## Figure 6 — Static programmable weights versus volatile fading-memory elements
+## Figure 7 — Static programmable weights versus volatile fading-memory elements
 
 - **Proposed label.** `fig:static_vs_fading`
 - **Section placement.** §1.3. End of `subsec:volatile_paradigms`.
@@ -96,7 +115,7 @@ Nine insertion points met the criteria. They are listed in reading order.
 
 ---
 
-## Figure 7 — Inorganic memristor families: comparison matrix
+## Figure 8 — Inorganic memristor families: comparison matrix
 
 - **Proposed label.** `fig:inorganic_comparison_matrix`
 - **Section placement.** §1.4. End of `subsec:inorganic_limits`. Replaces the existing `% TODO:` comment at the end of §1.4 and supersedes the original intention to defer it until after the organic section; the organic section is now drafted, so the comparison can be made symmetric with a final "soft ionic" column for the polymer-electrolyte route developed in §1.5 and §1.6.
@@ -108,7 +127,7 @@ Nine insertion points met the criteria. They are listed in reading order.
 
 ---
 
-## Figure 8 — Organic memristor historical landscape
+## Figure 9 — Organic memristor historical landscape
 
 - **Proposed label.** `fig:organic_timeline`
 - **Section placement.** §1.5. End of `subsec:organic_history`. Replaces the existing `% TODO:` comment at the end of that subsection.
@@ -120,7 +139,7 @@ Nine insertion points met the criteria. They are listed in reading order.
 
 ---
 
-## Figure 9 — Two-terminal polymer-electrolyte composite architecture and the composition/cation timescale ladder
+## Figure 10 — Two-terminal polymer-electrolyte composite architecture and the composition/cation timescale ladder
 
 - **Proposed label.** `fig:composite_architecture_timescale_ladder`
 - **Section placement.** §1.6. End of `subsec:composite_rationale`. Replaces the existing `% TODO:` comment at the end of §1.6.
@@ -145,7 +164,7 @@ The following candidates were considered but not retained in the current nine-fi
 
 ## Next actions (for later passes, not now)
 
-1. Commission or draft the nine figures as vector graphics.
+1. Commission or draft the ten figures as vector graphics.
 2. Assign filenames under `figures/chapter1/` at that point.
-3. Insert `\begin{figure} ... \end{figure}` floats carrying the labels and captions above, positioned as specified. Three of the nine (Figures 7, 8, 9) replace existing `% TODO:` comments at the ends of §1.4, §1.5, and §1.6; the remaining six (Figures 1, 2, 3, 4, 5, 6) are fresh insertions in subsections that do not currently carry a TODO marker.
+3. Insert `\begin{figure} ... \end{figure}` floats carrying the labels and captions above, positioned as specified. Three of the ten (Figures 8, 9, 10) replace existing `% TODO:` comments at the ends of §1.4, §1.5, and §1.6; the remaining seven (Figures 1, 2, 3, 4, 5, 6, 7) are fresh insertions in subsections that do not currently carry a TODO marker.
 4. Re-run `pdflatex → biber → pdflatex × 2` and verify that all cross-references to the new labels resolve.
