@@ -246,10 +246,9 @@ These parameters are most naturally interpreted for devices intended to store \t
 
 However, not every parameter is improved by making it as large, as small, or as stable as possible. Retention is the clearest example: for a trained-weight memory, the longer the retention, the better, but for a fading-memory device, the useful retention is precisely the one matched to the signal timescale. The same shift in interpretation applies to switching speed, write energy, update linearity, and symmetry. Their optimum values differ between trained-weight storage and temporal computing and, in general, a single device cannot optimise both regimes at once. \Cref{tab:param_optima} sets the two targets side by side.
 
-\begin{table}[!htb]
+\begin{sidewaystable}
   \centering
   \caption{Direction in which each device parameter should be optimised under the trained-weight regime (\cref{subsec:memristor_params}) and under the fading-memory regime (\cref{subsec:volatile_paradigms}). Several optima are not merely different in magnitude but opposed in direction, which is why a single device cannot in general satisfy both regimes simultaneously.}\label{tab:param_optima}
-  \footnotesize
   \begin{tabularx}{\linewidth}{l X X}
     \toprule
     \textbf{Parameter} & \textbf{Trained-weight optimum} & \textbf{Fading-memory optimum} \\
@@ -263,7 +262,7 @@ However, not every parameter is improved by making it as large, as small, or as 
     Device-to-device heterogeneity  & Minimised                                  & Useful as reservoir diversity~\cite{Tanaka2019} \\
     \bottomrule
   \end{tabularx}
-\end{table}
+\end{sidewaystable}
 
 Variability is another concept that requires a more precise language. Intra-device instability, where the same device fails to reproduce its own response under the same protocol, remains a defect. Inter-device heterogeneity, on the other hand, is a different matter altogether. It is harmful in a trained-weight array, yet useful in a reservoir, given that a set of devices with different time constants and nonlinear transfer functions provides a much richer projection of the input than a set of identical devices would~\cite{Tanaka2019}.
 
