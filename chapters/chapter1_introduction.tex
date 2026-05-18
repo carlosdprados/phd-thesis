@@ -396,7 +396,14 @@ Unlike \emph{phase-change memory} or \emph{valence-change memory} devices, \emph
 
 The first family is that of charge trapping and detrapping in an insulating or weakly conducting matrix. The active layer contains deep or shallow traps associated with molecular defects, embedded nanoparticles, or interfaces between incompatible polymer phases. Under bias, carriers occupy or empty those traps. The device state is then defined by the trap occupation, and the resistance changes given that the local space-charge environment modifies electronic transport through the matrix.
 
-This route is promising, since trapping is common in disordered organic semiconductors and can occur at modest voltages. Its weakness, however, comes from the limited analogue control. The state space is often just binary, the conductance can depend non-monotonically on trap occupation, and the microscopic identity of the traps is, in many cases, difficult to establish. Retention is then set by trap depth relative to thermal energy, and that depth is not easy to tune systematically through composition alone.
+This route is promising, since trapping is common in disordered organic semiconductors and can occur at modest voltages. Its weakness, however, comes from the limited analogue control. The state space is often just binary, the conductance can depend non-monotonically on trap occupation, and the microscopic identity of the traps is, in many cases, difficult to establish. Retention is then set by trap depth relative to thermal energy, and that depth is not easy to tune systematically through composition alone. Panel (a) of \cref{fig:organic_mechanism_gallery} sketches this trap-occupation mechanism at the active-layer chemistry level, while panels (b)--(e) preview the four families described below.
+
+\begin{figure}[tbp]
+  \centering
+  \includegraphics[width=0.95\linewidth]{../figures/chapter1/ch1_fig10_organic_mechanism_gallery.png}
+  \caption{Molecular-level representation of the five mechanism families behind organic memristive behaviour, drawn at the level of the active-layer chemistry only. (a) Charge trapping: localised trap sites associated with defects, embedded nanoparticles, or interphase boundaries in a disordered polymer matrix, filled and emptied under bias. (b) Redox switching: a redox-active moiety alternating between its oxidised and reduced states, with the local electronic structure changing accordingly. (c) Conformational switching: a molecular unit toggling between two well-defined geometric or isomeric states with different conjugation or transport pathways. (d) Mixed ionic--electronic redistribution: a population of mobile cations within an electronically conducting polymer matrix, displaced and accumulated near an interface under bias and relaxing back toward equilibrium when the bias is removed. (e) Organic filamentary conduction: metallic cations (typically \ce{Ag+} or \ce{Cu+}) from an active electrode migrating through the organic matrix to form a conductive bridge. The figure is intended as a chemical complement to the stack-level device taxonomy of \cref{fig:mechanism_gallery} and to the qualitative comparison of \cref{tab:organic_mechanisms}.}
+  \label{fig:organic_mechanism_gallery}
+\end{figure}
 
 The second family is that of redox switching. Here, the active layer (or one component of it) contains a species whose oxidation state can be changed under bias. This species can be a discrete molecule in a polymer host, a redox-active polymer, or a redox unit attached to a conjugated backbone. The device state is defined by the distribution of oxidised and reduced species, given that this distribution shifts the local electronic structure and the conductance. In this case, the state variable is a chemical oxidation state, the relevant potentials are experimentally accessible, and the process can be reversible over many cycles. Important examples include redox-active conjugated polymer systems~\cite{Liu2016, Goswami2017, Goswami2020} and early electrochemical devices based on coordination complexes~\cite{Zakhidov2010}.
 
@@ -456,7 +463,7 @@ What had not yet been consolidated, however, was the full set of features in a s
 
 \begin{figure}[!htb]
   \centering
-  \includegraphics[width=0.9\linewidth]{../figures/chapter1/ch1_fig10_organic_timeline.png}
+  \includegraphics[width=0.9\linewidth]{../figures/chapter1/ch1_fig11_organic_timeline.png}
   \caption{Historical map of organic memristive and organic synaptic devices, arranged by mechanism family and by year of representative publication. Early ionic and electrochemical demonstrations, simple polymer-film bistable devices, two-terminal redox biomimetics, three-terminal electrochemical-transistor synaptic devices, flexible and nervetronic synaptic devices, molecular memristors, and organic reservoir-computing demonstrations are shown as parallel streams rather than as steps of a single lineage. The view supports the observation that, by the early 2020s, several of the individually demanding features of a neuromorphic organic device had each been demonstrated, but that no single two-terminal platform combined reversibility, multi-state analogue behaviour, and an interpretable ion-mediated mechanism.}
   \label{fig:organic_timeline}
 \end{figure}
@@ -537,7 +544,7 @@ The experimental chapters then test this rationale in two stages: first on a sin
 
 \begin{figure}[!htb]
   \centering
-  \includegraphics[width=0.9\linewidth]{../figures/chapter1/ch1_fig11_composite_architecture_timescale_ladder.png}
+  \includegraphics[width=0.9\linewidth]{../figures/chapter1/ch1_fig12_composite_architecture_timescale_ladder.png}
   \caption{The thesis-specific polymer-electrolyte composite device and its chemically tunable dynamical timescale. (a) Vertical two-terminal stack: a solution-processed composite active layer, combining a conjugated semiconducting polymer network with an oxygen-rich ion-conducting host, coordinated alkali-metal cations, and a dissociated salt, is sandwiched between a patterned ITO bottom electrode and an evaporated silver top electrode; the internal state of the device is set by the residual ionic distribution that remains after a driving bias is removed. (b) Qualitative timescale ladder on which the cation identity (\ce{Li+} through \ce{Na+} to \ce{K+}, weakening the cation--oxygen coordination) and the composition knobs of the host/salt ratios are expected to place the fading-memory time constant of the device. The ordering is the central hypothesis developed from the physical-chemistry argument of \cref{sec:polymer_electrolyte_composites}; its quantitative test is the object of Chapter 3.}
   \label{fig:composite_architecture_timescale_ladder}
 \end{figure}
