@@ -398,12 +398,12 @@ The first family is that of charge trapping and detrapping in an insulating or w
 
 This route is promising, since trapping is common in disordered organic semiconductors and can occur at modest voltages. Its weakness, however, comes from the limited analogue control. The state space is often just binary~\cite{Lei2014}, the conductance can depend non-monotonically on trap occupation, and the microscopic identity of the traps is, in many cases, difficult to establish. Retention is then set by trap depth relative to thermal energy, and that depth is not easy to tune systematically through composition alone. Panel (a) of \cref{fig:organic_mechanism_gallery} sketches this trap-occupation mechanism at the active-layer chemistry level, while panels (b)--(e) preview the four families described below.
 
-\begin{figure}[tbp]
+\begin{sidewaysfigure}
   \centering
-  \includegraphics[width=0.95\linewidth]{../figures/chapter1/ch1_fig10_organic_mechanism_gallery.png}
+  \includegraphics[width=0.95\textheight]{../figures/chapter1/ch1_fig10_organic_mechanism_gallery.png}
   \caption{Molecular-level representation of the five mechanism families behind organic memristive behaviour. (a) Charge trapping: localised trap sites associated with defects, embedded nanoparticles, or interphase boundaries in a disordered polymer matrix, filled and emptied under bias. (b) Redox switching: a redox-active moiety alternating between its oxidised and reduced states, with the local electronic structure changing accordingly. (c) Conformational switching: a molecular unit toggling between two well-defined geometric or isomeric states with different conjugation or transport pathways. (d) Mixed ionic--electronic redistribution: a population of mobile cations within an electronically conducting polymer matrix, displaced and accumulated near an interface under bias and relaxing back toward equilibrium when the bias is removed. (e) Organic filamentary conduction: metallic cations (typically \ce{Ag+} or \ce{Cu+}) from an active electrode migrating through the organic matrix to form a conductive bridge.}
   \label{fig:organic_mechanism_gallery}
-\end{figure}
+\end{sidewaysfigure}
 
 The second family concerns redox switching. Here, the active layer (or one component of it) contains a species whose oxidation state can be changed under bias. This species can be a discrete molecule in a polymer host, a redox-active polymer, or a redox unit attached to a conjugated backbone. The device state is defined by the distribution of oxidised and reduced species, given that this distribution shifts the local electronic structure and the conductance. In this case, the state variable is a chemical oxidation state, the relevant potentials are experimentally accessible, and the process can be reversible over many cycles. Important examples include redox-active conjugated polymer systems~\cite{Liu2016, Goswami2017, Goswami2020} and early electrochemical devices based on coordination complexes~\cite{Zakhidov2010}.
 
@@ -441,7 +441,7 @@ The five families and their trade-offs are collected in \cref{tab:organic_mechan
 
 \subsection{Historical Development of Organic Memristors}\label{subsec:organic_history}
 
-The organic memristor literature of the last three decades does not really follow a single lineage. It is rather a set of parallel streams, each based on different mechanisms and architectures. In this sense, the useful question is not which device came first, but which problems each stream solved, and which combinations of features were still missing when the work reported in this thesis began.
+The organic memristor literature of the last three decades does not really follow a single storyline, instead having parallel developments, each based on different mechanisms and architectures. In this sense, the useful question is not which device came first, but which problems each stream solved, and which combinations of features were still missing when the work reported in this thesis began.
 
 An early strand repurposed the slow, history-dependent ionic redistribution of light-emitting electrochemical cells as a memristive function. Zakhidov and co-workers reported a \emph{light-emitting memristor}~\cite{Zakhidov2010} in which an ionic \(\ce{[Ru(bpy)3]^{2+}}\) complex supplied both the emissive species and the mobile ionic component. Its importance here was mostly mechanistic: it showed that ionic redistribution in a polymer host could produce memristive behaviour, even if the device itself was not yet a practical memory element. In parallel, resistive switching was reported in simple polymer films such as poly(vinyl alcohol)~\cite{Lei2014}. These devices made it clear that memristive phenomena were accessible in inexpensive polymer matrices, but they were typically binary, mechanistically opaque, and not analogue.
 
