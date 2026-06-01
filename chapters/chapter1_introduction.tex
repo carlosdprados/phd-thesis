@@ -252,13 +252,17 @@ Ionic systems are intrinsically history-dependent: the distribution of mobile sp
 \subsection{Key Memristive Parameters}\label{subsec:memristor_params}
 
 Since memristive devices exhibit diverse mechanisms, they are typically evaluated using a shared set of practical parameters~\cite{YangStrukovStewart2013, IelminiWong2018}:
-\begin{itemize}
-  \item The accessible conductance range is defined by the \textit{high-resistance state} (HRS) and \textit{low-resistance state} (LRS), with their ratio indicating the \textit{ON/OFF ratio}.
-  \item The \textit{set} and \textit{reset voltages} determine the electrical stimuli required to switch between states, while the \textit{write energy} reflects the cost of each programming event.
-  \item \textit{Switching speed} indicates how quickly the device responds, and \textit{retention} measures how long a state is maintained without reprogramming.
-  \item \textit{Endurance} shows the number of cycles before degradation.
-  \item For analogue use, it is also important to consider additional factors such as the \textit{linearity} and \textit{symmetry} of conductance changes under positive and negative pulses, along with \textit{device-to-device} and \textit{cycle-to-cycle variability}~\cite{Sun2019}.
-\end{itemize}
+\begin{description}
+  \item[High- and low-resistance states (HRS, LRS).] The two bounds of the accessible conductance range.
+  \item[ON/OFF ratio.] The ratio between the HRS and LRS conductances.
+  \item[Set and reset voltages.] The electrical stimuli required to switch between states.
+  \item[Write energy.] The cost of each programming event.
+  \item[Switching speed.] How quickly the device responds.
+  \item[Retention.] How long a state is maintained without reprogramming.
+  \item[Endurance.] The number of cycles before degradation.
+  \item[Linearity and symmetry.] For analogue use, how uniform the conductance changes are under positive and negative pulses.
+  \item[Variability.] The device-to-device and cycle-to-cycle spread of the achieved states~\cite{Sun2019}.
+\end{description}
 
 These parameters are most naturally understood in the context of devices designed to store \textit{trained weights} in analogue in-memory-computing arrays~\cite{IelminiWong2018, Prezioso2015}. In this scenario, the goal is a stable conductance matrix representing a trained neural network. Retention must be long enough to preserve weights between programming events, and endurance must cover re-training and write--verify cycles. Linearity and symmetry, in turn, determine the numerical accuracy of in-place gradient-based training, while variability reduces inference accuracy. Much of the memristor research is based on this perspective. As a result, organic and polymer-composite devices are often seen as less desirable due to their shorter retention times, limited durability, and greater variability between devices.
 
