@@ -83,7 +83,12 @@ The composition adopted here is built around a deliberate asymmetry in Lewis aci
 
 The semiconducting component of the composite is \SY{}, the trivial name for the high-molecular-weight poly(phenylene vinylene) (PPV) copolymer poly[\{2,5-di(3$'$,7$'$-dimethyloctyloxy)-1,4-phenylenevinylene\}-\textit{co}-\{3-(4$'$-(3$''$,7$''$-dimethyloctyloxy)phenyl)-1,4-phenylenevinylene\}-\textit{co}-\{3-(3$'$-(3$'$,7$'$-dimethyloctyloxy)phenyl)-1,4-phenylenevinylene\}] (commercial name: PDY-132, Merck). The chemical structure features a $\pi$-conjugated backbone of alternating phenylene and vinylene units with branched alkoxy side chains that confer solubility in common organic solvents and reduce intermolecular packing to mitigate crystallisation-induced phase separation in blends.
 
-The frontier orbital levels of \SY{} (\(E_{\mathrm{HOMO}} \approx \SI{-5.4}{\electronvolt}\), \(E_{\mathrm{LUMO}} \approx \SI{-3.0}{\electronvolt}\)) give a HOMO--LUMO gap of approximately \SI{2.4}{\electronvolt}~\cite{Zhang2015}, consistent with the yellow emission under photoexcitation and electroluminescence that underlies its application in organic light-emitting devices~\cite{Friend1999}. In the context of memristive applications, the relevant properties are: (i) adequate hole mobility in the bulk of the film, which provides the baseline electronic conductance pathway; (ii) susceptibility to electrochemical $p$-doping by accumulation of cations at the polymer chains (or \textit{n}-doping by anion accumulation), which modifies conductance under the electrochemical doping mechanism; and (iii) processability in cyclohexanone, which is compatible with the other components of the composite.
+The frontier orbital levels of \SY{} (\(E_{\mathrm{HOMO}} \approx \SI{-5.4}{\electronvolt}\), \(E_{\mathrm{LUMO}} \approx \SI{-3.0}{\electronvolt}\)) give a HOMO--LUMO gap of approximately \SI{2.4}{\electronvolt}~\cite{Zhang2015}, consistent with the yellow emission under photoexcitation and electroluminescence that underlies its application in organic light-emitting devices~\cite{Friend1999}. In the context of memristive applications, three properties are relevant:
+\begin{enumerate}
+  \item \textbf{Hole mobility:} adequate hole transport through the bulk of the film provides the baseline electronic-conductance pathway.
+  \item \textbf{Electrochemical doping:} susceptibility to $p$-doping by accumulation of cations at the polymer chains (or \textit{n}-doping by anion accumulation) modifies the conductance under the electrochemical-doping mechanism.
+  \item \textbf{Solution processability:} solubility in cyclohexanone makes it compatible with the other components of the composite.
+\end{enumerate}
 
 The suitability of \SY{} in ion-containing composite systems has been validated previously in the context of light-emitting electrochemical cells (LECs)~\cite{Mardegan2021}, where films incorporating \SY{} together with Hybrane and lithium salt demonstrated electroluminescence lifetimes exceeding \SI{1600}{\hour}, confirming the photochemical and electrochemical stability of the blend under long-term operation.
 
@@ -97,7 +102,12 @@ The ion-transport mechanism in \Hybrane{} is primarily segmental: as polymer cha
 
 \subsection{Lithium Triflate: The Ionic Salt}\label{subsec:litf}
 
-Lithium trifluoromethanesulfonate (\LiTf{}, \ce{LiCF3SO3}) is a well-characterised solid electrolyte salt widely employed in polymer batteries and LECs~\cite{Pei1995, Wagberg2008}. Its choice for this system is motivated by three considerations: (i) it dissolves readily in cyclohexanone and blends homogeneously with \SY{} and \Hybrane{} without phase separation; (ii) the lithium cation is a hard Lewis acid with a small ionic radius (\SIrange{0.59}{0.76}{\angstrom} for four- to six-fold oxygen coordination~\cite{Shannon1976}) and a formal charge of $+1$, giving a charge density well matched to the hard Lewis base oxygen atoms of \Hybrane{}; and (iii) the triflate anion has a large, diffuse anionic centre with the negative charge delocalised over the three electronegative fluorine atoms and the sulfonyl oxygen atoms, rendering it a soft Lewis base with low affinity for the Hybrane oxygen coordination sites.
+Lithium trifluoromethanesulfonate (\LiTf{}, \ce{LiCF3SO3}) is a well-characterised solid electrolyte salt widely employed in polymer batteries and LECs~\cite{Pei1995, Wagberg2008}. Its choice for this system is motivated by three considerations:
+\begin{enumerate}
+  \item \textbf{Processing compatibility:} it dissolves readily in cyclohexanone and blends homogeneously with \SY{} and \Hybrane{} without phase separation.
+  \item \textbf{Hard cation:} the lithium cation is a hard Lewis acid with a small ionic radius (\SIrange{0.59}{0.76}{\angstrom} for four- to six-fold oxygen coordination~\cite{Shannon1976}) and a formal charge of $+1$, giving a charge density well matched to the hard Lewis base oxygen atoms of \Hybrane{}.
+  \item \textbf{Soft anion:} the triflate anion has a large, diffuse anionic centre with the negative charge delocalised over the three electronegative fluorine atoms and the sulfonyl oxygen atoms, rendering it a soft Lewis base with low affinity for the Hybrane oxygen coordination sites.
+\end{enumerate}
 
 The dissociation of \LiTf{} in the composite is enhanced by the solvating ability of the ethylene oxide segments of \Hybrane{}, analogous to the solvation of lithium salts in PEO-based electrolytes~\cite{Armand1989}. The equilibrium ionic conductivity of the composite is governed by the ion pair dissociation equilibrium, the number density of free charge carriers, and their individual mobilities within the matrix. In the memristive context, however, the relevant quantity is not the equilibrium conductivity of the composite, but the ability to reversibly redistribute the ions on the timescale of the applied voltage pulses — a kinetic, rather than thermodynamic, property.
 
@@ -134,7 +144,12 @@ Surface contamination of the ITO is a critical concern in the fabrication of thi
 
 The composite solution (prepared as described in \cref{subsec:formulation}) was deposited onto the cleaned ITO-glass substrates by spin-coating at \SI{2000}{\rpm} for \SI{60}{\second}. The spin speed was selected on the basis of a systematic optimisation study in which spin speeds ranging from \SI{500}{\rpm} to \SI{3000}{\rpm} were investigated (see Supporting Information of Ref.~\cite{PradoSocorro2022}). At lower spin speeds, the resulting films were too thick and exhibited non-uniform coverage; at higher speeds, film thickness was reduced to the point where statistical roughness from the substrate became a significant fraction of the total film thickness, compromising device reproducibility.
 
-Following deposition, the coated substrates were transferred to a hotplate within the glovebox and annealed at \SI{75}{\celsius} for \SI{3}{\hour}. The annealing step serves to: (i) remove residual cyclohexanone solvent, which would otherwise act as a plasticiser and modify the ionic mobility of the matrix; (ii) allow the polymer chains to relax into a morphologically stable configuration; and (iii) promote intimate mixing of the three components at the molecular scale, maximising the number of \ce{Li+} coordination sites accessible to the triflate anion within the Hybrane matrix.
+Following deposition, the coated substrates were transferred to a hotplate within the glovebox and annealed at \SI{75}{\celsius} for \SI{3}{\hour}. The annealing step serves three purposes:
+\begin{enumerate}
+  \item \textbf{Solvent removal:} it removes residual cyclohexanone solvent, which would otherwise act as a plasticiser and modify the ionic mobility of the matrix.
+  \item \textbf{Chain relaxation:} it allows the polymer chains to relax into a morphologically stable configuration.
+  \item \textbf{Component mixing:} it promotes intimate mixing of the three components at the molecular scale, maximising the number of \ce{Li+} coordination sites accessible to the triflate anion within the Hybrane matrix.
+\end{enumerate}
 
 \subsection{Morphological Characterisation of the Active Layer}\label{subsec:morphology}
 
@@ -195,7 +210,13 @@ The energy cost of each synaptic event (one write pulse of \SI{1}{\volt}, \SI{0.
 
 \subsubsection{Quantitative Pulsed Read--Write Protocol}
 
-To quantify the potentiation as a function of pulse number, and to separate the act of writing from the act of reading, a non-perturbing read protocol was adopted; the same protocol is reused for the depotentiation measurement of \cref{subsec:stm_ltm}. The read--write--wait sequence is shown schematically in \cref{fig:stm_ltm}. A reading pulse ($V_{\mathrm{read}} = \SI{0.5}{\volt}$) is first applied to establish the initial conductance $G_0$. This reading voltage is intentionally low: the activation threshold for ionic redistribution in this system was determined by independent experiments to lie above \SI{0.7}{\volt}; thus, $V_{\mathrm{read}} = \SI{0.5}{\volt}$ measures the conductance state without perturbing it. Next, a train of $N_{\mathrm{pulses}}$ write pulses ($V_{\mathrm{write}}$, duration \SI{0.1}{\second} each) is applied. After a waiting time $t_{\mathrm{wait}}$ under open-circuit (high impedance) conditions, a second reading pulse is applied to measure the final conductance $G_f$. The conductance change is reported as the percentage ratio $\Delta G = (G_f/G_0) \times 100$.
+To quantify the potentiation as a function of pulse number, and to separate the act of writing from the act of reading, a non-perturbing read protocol was adopted; the same protocol is reused for the depotentiation measurement of \cref{subsec:stm_ltm}. The read--write--wait sequence, shown schematically in \cref{fig:stm_ltm}, comprises three steps:
+\begin{enumerate}
+  \item \textbf{Read.} A reading pulse ($V_{\mathrm{read}} = \SI{0.5}{\volt}$) is applied to establish the initial conductance $G_0$. This reading voltage is intentionally low: the activation threshold for ionic redistribution in this system was determined by independent experiments to lie above \SI{0.7}{\volt}, so $V_{\mathrm{read}} = \SI{0.5}{\volt}$ measures the conductance state without perturbing it.
+  \item \textbf{Write.} A train of $N_{\mathrm{pulses}}$ write pulses ($V_{\mathrm{write}}$, duration \SI{0.1}{\second} each) is applied.
+  \item \textbf{Wait and read.} After a waiting time $t_{\mathrm{wait}}$ under open-circuit (high-impedance) conditions, a second reading pulse is applied to measure the final conductance $G_f$.
+\end{enumerate}
+The conductance change is reported as the percentage ratio $\Delta G = (G_f/G_0) \times 100$.
 
 Between experiments, the device is fully reset by connecting the junction to a short circuit for \SI{300}{\second}, which discharges the ionic double layers and restores the homogeneous equilibrium ion distribution. The suitability of this reset protocol was verified by confirming that $G_0$ returns to its original value within the measurement uncertainty before each new experiment.
 
@@ -230,7 +251,12 @@ The molecular mechanism underlying the STM/LTM distinction is discussed in detai
 
 The \EPSC{} measurement is a standard protocol in the field of artificial synaptic devices, designed to quantify the number and stability of distinguishable conductance states accessible to the device~\cite{Kim2018, VanDeBurgt2018}. The protocol employed here closely mimics the biological experiment in which a patch-clamped neuron is subjected to a defined sequence of pre-synaptic inputs and the post-synaptic current is monitored.
 
-The measurement protocol is as follows (\cref{fig:epsc}). The device is first initialised to its ground state $S_0$ by applying a reading voltage $V_0 = \SI{+1}{\volt}$ for \SI{1}{\second}. A short positive write pulse of \SI{+2}{\volt} for \SI{50}{\milli\second} is then applied; the device is subsequently held at \SI{+1}{\volt} for \SI{1}{\second}, during which the conductance spontaneously relaxes to a new excited steady state $S_1$. The same sequence is repeated to produce a second excited state $S_2$. Subsequently, two negative write pulses of \SI{-2.5}{\volt} for \SI{50}{\milli\second} are applied, producing inhibitory states $S_3$ and $S_4$.
+The measurement protocol is as follows (\cref{fig:epsc}):
+\begin{enumerate}
+  \item \textbf{Initialisation.} The device is initialised to its ground state $S_0$ by applying a reading voltage $V_0 = \SI{+1}{\volt}$ for \SI{1}{\second}.
+  \item \textbf{Excitation.} A short positive write pulse of \SI{+2}{\volt} for \SI{50}{\milli\second} is applied; the device is subsequently held at \SI{+1}{\volt} for \SI{1}{\second}, during which the conductance spontaneously relaxes to a new excited steady state $S_1$. The same sequence is repeated to produce a second excited state $S_2$.
+  \item \textbf{Inhibition.} Two negative write pulses of \SI{-2.5}{\volt} for \SI{50}{\milli\second} are applied, producing inhibitory states $S_3$ and $S_4$.
+\end{enumerate}
 
 The four excited states are readily distinguishable from each other and from the ground state. Defining the \EPSC{} readout ratio as the signed current response of state $S_n$ normalised to that of the ground state $S_0$ under the fixed measurement convention used in the experiment, the values obtained are: $G_{S_1}/G_{S_0} = 7.33$, $G_{S_2}/G_{S_0} = 15.55$, $G_{S_3}/G_{S_0} = -3.72$, $G_{S_4}/G_{S_0} = -16.97$. The large absolute ratios (up to $\sim$16-fold increase or $\sim$17-fold decrease relative to $S_0$) provide an ample margin for reliable state identification in a practical device, even in the presence of noise. The four-state sequence used here is a representative demonstration rather than an upper bound: given the continuous, analogue conductance tunability established in \cref{subsec:pulse_potentiation}, the number of distinguishable readout states is not intrinsically limited to four, and many more intermediate levels could in principle be resolved by the same protocol within the available margin.
 
