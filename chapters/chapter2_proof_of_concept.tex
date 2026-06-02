@@ -349,14 +349,14 @@ For \(\Delta t > 0\) (post fires before pre), the overlap produces an anti-causa
 
 \subsubsection{STDP Curve and Fitting}
 
-\Cref{fig:stdp} shows the measured STDP function: the percentage conductance change $\Delta G$ plotted against the timing delay $\Delta t$. The characteristic anti-Hebbian asymmetry is observed: negative $\Delta t$ (causal) produces positive $\Delta G$ (potentiation), and positive $\Delta t$ (anti-causal) produces negative $\Delta G$ (depression). Both branches are well described by a decaying exponential function:
+\Cref{fig:stdp} shows the measured STDP function: the percentage conductance change $\Delta G$ plotted against the timing delay $\Delta t$. The characteristic anti-Hebbian asymmetry is observed: negative $\Delta t$ (causal) produces positive $\Delta G$ (potentiation), and positive $\Delta t$ (anti-causal) produces negative $\Delta G$ (depression). Each branch (potentiation for $\Delta t < 0$, depression for $\Delta t > 0$) is fitted separately, as a function of the absolute delay $|\Delta t|$, by a decaying exponential:
 
 \begin{equation}
-  \Delta G(\Delta t) = A \exp\!\left(\frac{-\Delta t}{\tau}\right) + G_0
+  \Delta G(\Delta t) = A_{\pm}\,\exp\!\left(-\frac{|\Delta t|}{\tau_{\pm}}\right) + G_0
   \label{eq:stdp_fit}
 \end{equation}
 
-where $A$ and $G_0$ are fitting constants and $\tau$ is the time constant of the synaptic function. The best-fit values of $\tau$ for both the potentiation and depression branches are in the range \SIrange{85}{90}{\milli\second}. This is in close quantitative agreement with the characteristic timescale of biological STDP, which is approximately \SI{100}{\milli\second}~\cite{Kuzum2013, Bi1998}. The device, therefore, not only qualitatively replicates the STDP function but does so with biologically realistic time constants.
+where $A_{\pm}$ and $\tau_{\pm}$ are the branch-specific amplitude and time constant ($+$ for the potentiation branch, $-$ for the depression branch) and $G_0$ is a constant offset. The best-fit values of $\tau_{\pm}$ for both the potentiation and depression branches lie in the range \SIrange{85}{90}{\milli\second}. This is in close quantitative agreement with the characteristic timescale of biological STDP, which is approximately \SI{100}{\milli\second}~\cite{Kuzum2013, Bi1998}. The device, therefore, not only qualitatively replicates the STDP function but does so with biologically realistic time constants.
 
 \begin{figure}[htbp]
   \centering
