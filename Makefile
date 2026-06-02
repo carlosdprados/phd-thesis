@@ -47,8 +47,11 @@ thesis-clean:
 
 clean: chapter1-clean chapter2-clean thesis-clean
 
-## Snapshot the current PDFs into exports/ (tracked in git).
-exports: all
+## Snapshot cleanly rebuilt PDFs into exports/ (tracked in git).
+## Separate recursive invocations enforce ordering, including under make -j.
+exports:
+	$(MAKE) clean
+	$(MAKE) all
 	@mkdir -p $(EXPORTS)
 	cp $(BUILD_CHAPTERS)/chapter1_introduction.pdf $(EXPORTS)/
 	cp $(BUILD_CHAPTERS)/chapter2_proof_of_concept.pdf $(EXPORTS)/
