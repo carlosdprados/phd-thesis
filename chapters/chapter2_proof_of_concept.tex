@@ -312,7 +312,7 @@ The \EPSC{} measurement is a standard protocol in the field of artificial synapt
 
 The measurement protocol is as follows (\cref{fig:epsc}):
 \begin{enumerate}
-  \item \textbf{Initialisation.} The device is initialised to its ground state $S_0$ by applying a reading voltage $V_0 = \SI{+1}{\volt}$ for \SI{1}{\second}.
+  \item \textbf{Initialisation.} The device is initialised to its ground state $S_0$ by applying a fixed read-out bias $V_0 = \SI{+1}{\volt}$ for \SI{1}{\second}. This bias differs in purpose from the sub-threshold probe ($V_{\mathrm{read}} = \SI{0.5}{\volt}$) used for the non-perturbing read-out of \cref{subsec:pulse_potentiation,subsec:stm_ltm}: the EPSC states are defined operationally by the current response at a single common read-out bias against which all states $S_0$--$S_4$ are referenced, not by a passive probe required to leave the state untouched.
   \item \textbf{Excitation.} A short positive write pulse of \SI{+2}{\volt} for \SI{50}{\milli\second} is applied; the device is subsequently held at \SI{+1}{\volt} for \SI{1}{\second}, during which the conductance spontaneously relaxes to a new excited steady state $S_1$. The same sequence is repeated to produce a second excited state $S_2$.
   \item \textbf{Inhibition.} Two negative write pulses of \SI{-2.5}{\volt} for \SI{50}{\milli\second} are applied, producing inhibitory states $S_3$ and $S_4$.
 \end{enumerate}
