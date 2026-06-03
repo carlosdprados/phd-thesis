@@ -13,8 +13,8 @@
 - **Method:** analysis driven from `Nanomem_Devices_Library/DATABASE` (regenerated May 2025) — `UPDATED_DEVICES_LIBRARY.csv` for chemistry, the `*_PIXEL_INFO.csv` tables for measurement presence, `FILTERED_DEVICES.csv` for erratic-pixel flags. Corpus = **PEO host + triflate salt = 149 devices**.
 - **Artifact:** [`ch3_ch4_device_inventory.csv`](ch3_ch4_device_inventory.csv) — one row per PEO/triflate device with chemistry, electrode, and per-type pixel counts. Regenerate with the script noted in §5.
 - **Done:** §1–§3 coverage/scope/ledger, §6 first-pass trends, §7 manifest candidates, §8 dynamics, §9 cross-validation, §10 **τ,β** alignment, §11 cation expansion, §12 PNG QA (2023-10), §13 **read-voltage confound (decisive)**. Artifacts: `ch3_ch4_device_inventory.csv`, `ch4_device_manifest_DRAFT.csv`, `ch4_decay_fits.csv`, `ch4_pulse_descriptors.csv`, `scripts/ch3_4_dynamics_fits.py`.
-- **Cation verdict (C3) resolved:** not extractable — read voltage (uncontrolled, suprathreshold) dominates τ and flips the order; reframe as future subthreshold-read work. **Composition result (C1/C2) stands** (uniform 2.0 V).
-- **Next:** USER still reviewing TFSI batches (v321–326, v333–338) — at matched read V they could add a within-protocol cation datapoint; fold into §13 if clean. Then **(A)** formalise the Ch4 model (φ(x) + read transfer function; cycle-vs-device variance) or **(B)** draft Ch3 from §6/§8/§10 (composition spine) + §11–§13 (cation = honest negative + read-V finding). Always restrict cross-device τ to one read voltage; refit after point-level QA.
+- **Cation verdict (C3):** at matched protocol (4 V/2 V) PEO/triflate shows Li longest (HSAB-consistent, n=1 Na/K) but it does **not** generalise across host/anion → no universal Li>Na>K. The dominant τ lever is **potentiation amplitude** (write/read protocol), not cation (§13, C12). **Composition result (C1/C2) stands** (uniform 4 V/2 V).
+- **Next:** USER still reviewing TFSI batches (v321–326, v333–338) — already at the standard 4 V/2 V protocol, so they slot straight into §13's matched table; fold in cleaned τ if their PNGs are good. Then **(A)** formalise the Ch4 model (φ(x) + read transfer function; cycle-vs-device variance) or **(B)** draft Ch3 from §6/§8/§10 (composition spine) + §11–§13 (cation = honest negative; amplitude confound). Always restrict cross-device τ to one matched protocol; refit after point-level QA.
 - **Caveats on current numbers:** "has measurement" = ≥1 pixel row in that type's `PIXEL_INFO`; the §1 coverage counts do **not** exclude flagged pixels (they are an upper bound), whereas the §6/§7 trend + clean-manifest counts **do**. Neither yet verifies a common protocol or replicate quality.
 - **Flag granularity (verified 2026-06-03):** FILTERED exclusion is applied per `(device, day, pixel, measurement_type)`, **not** per device — a flag removes only that pixel's that-type aggregate. All **221 flags match a real measurement row (100%)**, partial flagging is preserved (e.g. NM_v009: 6 of 27 HYST pixels dropped, 21 kept), and including `day` is equivalent to `(device, pixel)` for the current flags. **Caveat — flagging is HYST-heavy: 207 HYST vs only 3 PULSES + 11 DELAYTIME flags.** FILTERED has screened almost nothing in PULSES/DELAYTIME, so the decay (τ/β) and potentiation fits must apply their **own** goodness-of-fit + read-disturb screening rather than rely on FILTERED.
 
@@ -69,7 +69,7 @@ Status key: ✅ supported by data · 🟡 limited / preliminary · 🔴 unsuppor
 | --- | --- | --- | --- | --- |
 | C1 | PEO/LiTr memristive response (switching window, potentiation) is tunable by composition | 3 (core) | ✅ | Coherent across HYST window (§6.2), potentiation steepness+peak (§8.2) and fading-memory t½ (§8.1): higher PEO → weaker response. n = 2–9 dev/cell. |
 | C2 | Composition sets the fading-memory timescale in PEO/LiTr | 3→4 | ✅ | Model-free t½ composition-tunable ≈ 3–19 s, longest at PEO0.3/0.09; identified τ agrees (§8.1). **Corroborated by the pipeline's pre-computed exp-τ (corr 0.93–0.97; old τ reproduces the trend — §9).** The Ch4 timescale ladder. |
-| C3 | Cation identity orders the dynamics Li > Na > K (timescale / retention) | 3 (secondary) | 🔴 | **Not extractable.** Order flips with read voltage (PEO/Tr: Li>K>Na @2.0 V vs Na>K>Li @3.0 V; same device v114 τ 4.6→15.5 s, 1.5→3.0 V — §13). Read voltage uncontrolled across the series + n=1 per cation ⇒ no intrinsic cation ordering, not even "Li longest". Reframe as future subthreshold-read work. |
+| C3 | Cation identity orders the dynamics Li > Na > K (timescale / retention) | 3 (secondary) | 🔴 | At **matched protocol** (4 V/2 V) PEO/triflate → Li(~20 s)>K(10.7)>Na(3.0): Li longest, HSAB-consistent, but Na<K and n=1 Na/K, and **not reproduced** in TMPE or TFSI families (§13). No universal Li>Na>K. Potentiation amplitude — not cation — is the dominant τ lever. Reframe + future subthreshold, protocol-locked cation series. |
 | C4 | All three common measurements (I–V, N-pulse, delay) exist across the comparative corpus | 3/4 | 🟡 | True only for the Li composition grid; 41/149 overall, thin (n≤2) for Na/K. |
 | C5 | EPSC / STDP / separated STM-LTM / impedance compared across Li/Na/K | 3/4 | 🔴 | Ch2 (Paper 1, SY/Hybrane/LiTf) only. Use as Li-only priors/sanity checks; never propagate to Na/K. (Matches `01`/`05`.) |
 | C6 | Compact behavioural models (read fn, pulse update, decay) identifiable per composition cell | 4 | 🟡 | Per-cell parameters extracted (t½, retention, potentiation exp/peak/turnover; §8.5). Decay τ only ~half-identified at 8 pts; full φ(x) update + read transfer function still to formalise. |
@@ -78,7 +78,7 @@ Status key: ✅ supported by data · 🟡 limited / preliminary · 🔴 unsuppor
 | C9 | Large device-to-device / cycle variability — usable as heterogeneity for reservoir computing | 3/4 | ✅ | Feature sd ≈ mean across cells (§6); the t½ ladder (≈3–19 s, §8.1) is a concrete heterogeneity resource. |
 | C10 | Potentiation saturates / reverses (turnover) at high N — caps usable pulse count | 3/4 | ✅ | ~half the cells peak then decline by N=1000 (§8.2); sets a safe operating range for Ch4 pulse protocols. |
 | C11 | Anion (triflate vs TFSI) and host modulate retention τ more strongly than cation | 3 | 🟡 | PEO/triflate τ≈20 s vs PEO/TFSI τ≈1 s; host shifts τ too (§11). Striking at n=2/cell — needs PNG QA + replication. |
-| C12 | Read voltage (suprathreshold) dominates apparent retention τ and flips cation order | 3 (method) | ✅ | Same device v114: τ 4.6 s @1.5 V → 15.5 s @3.0 V; PEO/Tr order reverses 2.0↔3.0 V (§13). Read V must be held constant and ideally subthreshold (≤0.7 V). Confounds all cross-device τ unless controlled. |
+| C12 | Potentiation amplitude (write/read protocol) dominates apparent retention τ | 3 (method) | ✅ | Same device v114: τ 4.6 s (3 V write/1.5 V read) → 15.5 s (6 V/3 V); #pulses (30) & timing (0.103 s) constant, write/read voltages locked (§13). Cross-device τ must use one matched protocol; ideally subthreshold read. Higher write drives more ion/electrode processes → deeper, longer-lived state. |
 
 ---
 
@@ -295,21 +295,29 @@ The user visually inspected the per-pixel PNGs of the 2023-10 set. Verdicts and 
 
 ---
 
-## 13. Read-voltage confound — the decisive catch (2026-06-03)
+## 13. Write/read protocol-amplitude confound + the matched-protocol comparison (2026-06-03)
 
-User-guided point selection salvaged the old 2022 PEO/triflate devices (clean fits): **v114 Li τ=14.4 s, v115 Na τ=34.0 s, v116 K τ=27.1 s** (R²≥0.96). But checking read voltages exposed the real story: the **2022 batch (v114/115/116) was read at 3.0 V**, the **2023 batch (v248/v249) at 2.0 V**. The Li anchor v114 was measured at *both*:
+User point-selection salvaged the old 2022 PEO/triflate devices (clean fits): **v114 Li τ=14.4 s, v115 Na τ=34.0 s, v116 K τ=27.1 s** (R²≥0.96). Pulling the **full delay protocol** (`DELAYTIME_PIXEL_INFO`: reading voltage, pulse voltage, number of pulses, timing) then reframed the confound. Number of potentiation pulses (**30**) and inter-pulse timing (**0.103 s**) are **constant across the whole archive**; the only variable is amplitude, and write/read voltages are *locked together*:
 
-> **v114, same device: τ = 4.6 s @ 1.5 V → 15.5 s @ 3.0 V (≈3× inflation).**
+| protocol | pulse V (write) | read V | devices |
+| --- | --- | --- | --- |
+| low | 3.0 V | 1.5 V | v114 (day 2) |
+| **standard** | **4.0 V** | **2.0 V** | entire 2023–2025 corpus (~30 devices) |
+| old | 6.0 V | 3.0 V | 2022 batch: v114/115/116, v120/121/122 |
 
-All these reads are **suprathreshold** (> ~0.7 V ionic threshold), so the read pulse itself re-drives ions (read-disturb) and inflates apparent τ. The cation order therefore **flips with read voltage**:
+Decisive evidence — **same device v114 at two amplitudes: τ = 4.6 s (3 V write / 1.5 V read) → 15.5 s (6 V write / 3 V read)**. Higher potentiation drives more ion displacement (and at 6 V likely electrode reactions) → a deeper, longer-lived written state; the suprathreshold read (>0.7 V threshold) compounds it. **The potentiation amplitude is the dominant lever on apparent τ, not the cation** (the earlier "read-voltage flip" was really 4 V vs 6 V write).
 
-| read V | Li | Na | K | apparent order |
-| --- | --- | --- | --- | --- |
-| 2.0 V | ~20 s (pool) | 3.0 (v248) | 10.7 (v249) | Li > K > Na |
-| 3.0 V | 14.4 (v114) | 34.0 (v115) | 27.1 (v116) | **Na > K > Li** (reversed) |
+**Fix — compare only within the matched standard protocol (4 V write / 2 V read):**
 
-Same cations, opposite order. With read voltage uncontrolled across the cation series and n=1 per cation per (batch, read V), **no intrinsic cation-retention ordering is extractable** — the weaker "Li longest" claim from §12 also collapses (true only at 2.0 V). The 2.0 V Li "pool" is itself scattered (pipeline τ 0.09–2040 s incl. bad fits) → per-device QA mandatory.
+| family (4 V/2 V) | Li (clean) | Na | K |
+| --- | --- | --- | --- |
+| PEO · triflate | ~20 s (v140 19.6, v146 23, v241 25, v269 8.7, v270 7.9) | 3.0 (v248) | 10.7 (v249) |
+| TMPE · triflate | ~3 s (v250 3.8, v291 3.4, v314 3.0, v315 2.7) | 5.0 (v251) | 6.7 (v252) |
+| PEO · TFSI | 0.4–1.6 (v321/322) | 1.0–2.0 (v323/324) | 0.1–0.5 (v325/326) |
+| TMPE · TFSI | 3.7–9.0 (v333/334) | 6.6–7.5 (v335/336) | 3.2–3.7 (v337/338) |
 
-**Final verdict (this evidence).** The dominant, repeatable factor on retention is **read voltage** (a protocol confound), then **host/anion/composition**, with **cation last / indistinguishable**. This is a genuine, publishable-grade finding: it explains why the existing archive cannot test the Li>Na>K hypothesis and motivates a dedicated **subthreshold-read (≤0.7 V, as in Paper 1's 0.5 V) cation series** as future work. Data quality is fine; protocol control is the gap.
+At matched protocol: **PEO/triflate → Li (~20 s) > K (10.7) > Na (3.0)** — Li retains longest (HSAB-consistent), though Na<K breaks the strict order and Na/K are n=1. It does **not** generalise: TMPE/triflate is a flat ~3–7 s cluster, PEO/TFSI all sub-2 s, TMPE/TFSI ~3–9 s. **Host and anion dominate; cation is a weak, non-universal effect even at matched protocol.**
 
-**Important scope note:** the §8/§10 **composition** result used a *uniform 2.0 V read* across all its cells, so it is **not** affected by this confound — the headline composition-tunes-τ finding stands. Only the **cation** comparison is compromised, because it unavoidably mixed the 2022 (3.0 V) and 2023 (2.0 V) batches. Going forward, restrict any cross-device τ comparison to a single read voltage.
+**Caveats:** pipeline τ has many bad fits even at matched protocol (v266 0.1 s, v267 2040 s, v268 79 s, v294 74 s, v120 2×10⁵ s) → per-device QA is mandatory before trusting any τ. Na/K stay n=1 per matched-protocol family.
+
+**Scope note (unchanged):** §8/§10 **composition** used uniform 4 V/2 V, so that headline result is *not* affected — only the **cation** comparison was confounded (it mixed 4 V and 6 V batches).
