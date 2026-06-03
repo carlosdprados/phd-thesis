@@ -70,9 +70,11 @@ Nanomem_Devices_Library/DEVICES_LAB_DATA/
 
 ### 2.2 File formats
 
-- **CSV / TXT** — primary raw files dumped by the Keithley 2450 TSB scripts
-- **HDF5** — consolidated post-processing containers (used by the Python pipeline)
+- **CSV / TXT** — primary raw files dumped by the Keithley 2450 TSB scripts; the working feature-extraction pipeline reads and writes CSV/TXT only.
+- **HDF5** — *planned* consolidated post-processing containers for the Chapter 4 pipeline (see §5.2); these do **not** exist yet. The only HDF5 currently in the archive is raw SR865A lock-in frequency-sweep data under `Common/Au_TMPE_Li-Na-K_Lock-in-Amplifier_Freq_Sweeps/`, which the feature-extraction pipeline does not consume.
 - Each measurement subfolder contains one file per sweep/run; multiple runs per device are expected to quantify cycle-to-cycle spread
+
+**Correction (2026-06-03).** An earlier version of this list described HDF5 as already "used by the Python pipeline." Verified against disk, the as-built pipeline is CSV/TXT only; consolidated HDF5/Parquet remains a Chapter 4 target. The full as-built archive + pipeline reference is [`docs/experimental_archive_and_pipeline.md`](../docs/experimental_archive_and_pipeline.md).
 
 ### 2.3 Device set for Chapter 4
 

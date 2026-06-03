@@ -69,6 +69,7 @@ The proof-of-concept chapter expands the published work:
 | [`bibliography/`](bibliography) | Shared BibLaTeX database |
 | [`exports/`](exports) | Committed PDF snapshots and plain-text chapter exports |
 | [`handouts/`](handouts) | Planning documents, outlines, and working notes |
+| [`docs/`](docs) | Reference docs about the experimental archive and analysis pipeline (data and code live in the sibling `Nanomem_Devices_Library/`) |
 
 ## Build The Thesis
 
