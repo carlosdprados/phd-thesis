@@ -65,13 +65,15 @@ Status key: ✅ supported by data · 🟡 limited / preliminary · 🔴 unsuppor
 
 | # | Candidate claim | Chapter | Status | Evidence / why |
 | --- | --- | --- | --- | --- |
-| C1 | PEO/LiTr conductance & switching are tunable by composition (PEO and salt mass fraction) | 3 (core) | ⏳ | Coverage strong: 3×3 grid, n=3 all-3 per cell. Trend not yet tested. |
-| C2 | Composition sets the fading-memory timescale (delay-time decay) in PEO/LiTr | 3→4 | ⏳ | Same grid; needs DELAYTIME decay-fit trend across the grid. |
-| C3 | Cation identity orders the dynamics Li > Na > K (timescale / retention) | 3 (secondary) | 🟡 | Only n=3 Na, n=3 K devices. At best a labelled preliminary trend; never a primary quantitative claim. |
+| C1 | PEO/LiTr switching window (on-off ratio, loop area) is tunable by composition | 3 (core) | 🟡 | Window shrinks as PEO rises at fixed salt; large spread, not cleanly monotonic (§6.2). Qualitatively yes; a quantitative law needs proper fits. |
+| C2 | Composition sets the fading-memory timescale (delay-time decay) in PEO/LiTr | 3→4 | 🟡 | Forgetting present everywhere; composition slope weak/noisy (§6.3). Needs stretched-exp τ fits on a matched protocol. |
+| C3 | Cation identity orders the dynamics Li > Na > K (timescale / retention) | 3 (secondary) | 🔴 | Clean HYST n=1 for Na and K; delay/pulse n=2; point estimates do **not** follow Li>Na>K (§6.1, §6.3). Qualitative/preliminary at most — not a quantitative claim. |
 | C4 | All three common measurements (I–V, N-pulse, delay) exist across the comparative corpus | 3/4 | 🟡 | True only for the Li composition grid; 41/149 overall, thin (n≤2) for Na/K. |
 | C5 | EPSC / STDP / separated STM-LTM / impedance compared across Li/Na/K | 3/4 | 🔴 | Ch2 (Paper 1, SY/Hybrane/LiTf) only. Use as Li-only priors/sanity checks; never propagate to Na/K. (Matches `01`/`05`.) |
 | C6 | Compact behavioural models (read fn, pulse update, decay) identifiable per composition cell | 4 | ⏳ | Requires the three fits per cell on the Li grid; feasible given coverage, pending fit quality. |
 | C7 | Heterogeneous reservoir / coincidence / filter-bank simulations grounded in measured cells | 4 | ⏳ | Depends on C1/C2/C6; the timescale spread to exploit is composition-driven (per §2), not cation-driven. |
+| C8 | Devices show volatile fading memory (forgetting) and pulse potentiation across the corpus | 2/3/4 | ✅ | Delay slopes negative and pulse slopes positive in every cell tested (§6.3). Robust qualitative behaviour. |
+| C9 | Large device-to-device / cycle variability — usable as heterogeneity for reservoir computing | 3/4 | ✅ | Feature sd ≈ mean across cells (§6); reframed as a resource, consistent with the thesis framing. |
 
 ---
 
@@ -89,3 +91,50 @@ Status key: ✅ supported by data · 🟡 limited / preliminary · 🔴 unsuppor
 ## 5. Reproducibility
 
 Coverage numbers and [`ch3_ch4_device_inventory.csv`](ch3_ch4_device_inventory.csv) were produced by an ad-hoc Python pass over the DATABASE CSVs on 2026-06-03 (pandas-free, stdlib `csv`). When this is promoted to a committed script it should live at `scripts/` (thesis repo) or `scripts_general/chapter4_pipeline.py` (`05` §5.1) and take the inventory/manifest as output.
+
+---
+
+## 6. First-pass trend findings (2026-06-03)
+
+**Method & caveat.** Features aggregated per cell from the DATABASE tables, **excluding FILTERED (erratic) and `is broken` pixels**. HYST uses the pre-extracted `*_PIXEL_INFO` features. DELAYTIME/PULSES use a *crude* per-device slope — a linear fit of `ratio` vs `log₁₀(delay s)` (forgetting → negative) and `ratio` vs `log₁₀(N pulses)` (potentiation → positive). These are **rough directional indicators only**: not normalized, not protocol-matched, not stretched-exponential fits. Magnitudes are unreliable; proper τ/β decay fits and saturating-update fits on protocol-matched subsets are the Chapter-4 pipeline job.
+
+### 6.1 HYST — cation cell (PEO 0.3 / salt 0.09), clean pixels
+
+| Cation | devices | pixels | on-off ratio | \|norm. area\| | activation V |
+| --- | --: | --: | --- | --- | --- |
+| Li | 19 | 79 | 3.67 ± 1.73 | 0.31 ± 0.14 | 2.29 ± 0.86 |
+| Na | **1** | 4 | 1.65 ± 0.12 | 0.11 | 2.37 |
+| K | **1** | 2 | 4.08 ± 0.18 | 0.33 | 2.38 |
+
+After flag/broken exclusion the cation comparison collapses to **n = 1 device each for Na and K** (one of the two "all-3" devices per cation had its HYST pixels flagged or broken). Activation voltage ≈ 2.3–2.4 V for all three; on-off ratio does **not** follow Li>Na>K. → no quantitative cation claim from HYST.
+
+### 6.2 HYST — PEO/LiTr composition grid, clean pixels
+
+on-off ratio / |norm. area| (device count); activation V ≈ 2.2–2.4 V everywhere with no composition trend:
+
+| PEO ↓ \ salt → | 0.045 | 0.09 | 0.18 |
+| --- | --- | --- | --- |
+| 0.15 | 2.0 / 0.05 (1) | — | — |
+| 0.3 | 7.8 / 0.50 (4) | 3.7 / 0.31 (19) | 2.4 / 0.24 (2) |
+| 0.6 | 2.1 / 0.12 (3) | 3.5 / 0.21 (6) | 3.0 / 0.24 (3) |
+| 1.2 | 1.9 / 0.09 (3) | 2.5 / 0.18 (6) | 2.4 / 0.19 (3) |
+
+At fixed salt 0.09 the switching window (on-off, area) **decreases as PEO rises** 0.3→1.2; the `PEO0.3/salt0.045` cell is a standout (on-off ≈ 7.8, area ≈ 0.5). Spreads are large (sd ≈ 30–50 % of mean) and the surface is not cleanly monotonic.
+
+### 6.3 DELAYTIME (forgetting) & PULSES (potentiation) slopes
+
+| Cell | delay slope d(ratio)/d(log₁₀ s) | pulse slope d(ratio)/d(log₁₀ N) |
+| --- | --- | --- |
+| Li 0.3/0.09 | −19.2 ± 40.5 (n=10) | +25.6 ± 24.9 (n=11) |
+| Na 0.3/0.09 | −10.3 ± 9.8 (n=2) | +7.3 ± 5.2 (n=2) |
+| K 0.3/0.09 | −30.4 ± 4.7 (n=2) | +22.5 ± 9.4 (n=2) |
+| Li PEO0.6/0.09 | −19.3 ± 10.2 (n=3) | +66.4 ± 29.1 (n=3) |
+| Li PEO1.2/0.09 | −9.3 ± 8.5 (n=3) | +15.6 ± 13.0 (n=2) |
+
+- **Qualitative behaviour holds everywhere:** delay slopes negative (forgetting), pulse slopes positive (potentiation) → supports C8.
+- **Cation ordering Li>Na>K not supported:** n=2 for Na/K, Li sd > |mean|, and point estimates don't follow the predicted order (Na slowest, K fastest).
+- **Variability is large** (sd ≈ mean throughout) → supports C9 (heterogeneity resource), not a defect.
+
+### 6.4 Strategic implication for Chapter 3
+
+Lead with **composition (PEO/LiTr concentration series)** as the quantitative spine; present **cation identity (Li/Na/K) as an honestly-limited, n≤3 preliminary observation** that motivates future work — exactly the delimited "side evidence" framing in `01`/`05`. The volatile-forgetting + potentiation behaviours and the large heterogeneity are the durable, defensible through-line into Chapter 4.
