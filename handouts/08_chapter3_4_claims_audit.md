@@ -12,8 +12,8 @@
 
 - **Method:** analysis driven from `Nanomem_Devices_Library/DATABASE` (regenerated May 2025) — `UPDATED_DEVICES_LIBRARY.csv` for chemistry, the `*_PIXEL_INFO.csv` tables for measurement presence, `FILTERED_DEVICES.csv` for erratic-pixel flags. Corpus = **PEO host + triflate salt = 149 devices**.
 - **Artifact:** [`ch3_ch4_device_inventory.csv`](ch3_ch4_device_inventory.csv) — one row per PEO/triflate device with chemistry, electrode, and per-type pixel counts. Regenerate with the script noted in §5.
-- **Done:** §1 coverage, §2 scope, §3 ledger, §6 first-pass trends + verdicts, §7 clean manifest candidates ([`ch4_device_manifest_DRAFT.csv`](ch4_device_manifest_DRAFT.csv)).
-- **Next:** stretched-exponential τ/β decay fits (DELAYTIME) and saturating pulse-update fits (PULSES) on the clean stratum-A composition cells = the Chapter-4 model identification (`05` §3, §5.3), then per-cell parameter cards (`05` §5.4). Optional: confirm common protocols (sweep rate, V_write, Δt range) within each cell before fitting.
+- **Done:** §1 coverage, §2 scope, §3 ledger, §6 first-pass trends, §7 clean manifest candidates, §8 quantitative dynamics (t½ ladder + potentiation), §9 cross-validation vs pipeline pre-computed features. Artifacts: `ch3_ch4_device_inventory.csv`, `ch4_device_manifest_DRAFT.csv`, `ch4_decay_fits.csv`, `ch4_pulse_descriptors.csv`, `scripts/ch3_4_dynamics_fits.py`.
+- **Next:** formalise the Ch4 behavioural model (state-dependent pulse-update φ(x) + read transfer function), separate cycle-to-cycle vs device-to-device variance, run the read-disturb check to freeze the manifest. Ch3 prose/figures can already be drafted from §6/§8/§9.
 - **Caveats on current numbers:** "has measurement" = ≥1 pixel row in that type's `PIXEL_INFO`; the §1 coverage counts do **not** exclude flagged pixels (they are an upper bound), whereas the §6/§7 trend + clean-manifest counts **do**. Neither yet verifies a common protocol or replicate quality.
 - **Flag granularity (verified 2026-06-03):** FILTERED exclusion is applied per `(device, day, pixel, measurement_type)`, **not** per device — a flag removes only that pixel's that-type aggregate. All **221 flags match a real measurement row (100%)**, partial flagging is preserved (e.g. NM_v009: 6 of 27 HYST pixels dropped, 21 kept), and including `day` is equivalent to `(device, pixel)` for the current flags. **Caveat — flagging is HYST-heavy: 207 HYST vs only 3 PULSES + 11 DELAYTIME flags.** FILTERED has screened almost nothing in PULSES/DELAYTIME, so the decay (τ/β) and potentiation fits must apply their **own** goodness-of-fit + read-disturb screening rather than rely on FILTERED.
 
@@ -67,7 +67,7 @@ Status key: ✅ supported by data · 🟡 limited / preliminary · 🔴 unsuppor
 | # | Candidate claim | Chapter | Status | Evidence / why |
 | --- | --- | --- | --- | --- |
 | C1 | PEO/LiTr memristive response (switching window, potentiation) is tunable by composition | 3 (core) | ✅ | Coherent across HYST window (§6.2), potentiation steepness+peak (§8.2) and fading-memory t½ (§8.1): higher PEO → weaker response. n = 2–9 dev/cell. |
-| C2 | Composition sets the fading-memory timescale in PEO/LiTr | 3→4 | ✅ | Model-free t½ composition-tunable ≈ 3–19 s, longest at PEO0.3/0.09; identified τ agrees (§8.1). This is the Ch4 timescale ladder. |
+| C2 | Composition sets the fading-memory timescale in PEO/LiTr | 3→4 | ✅ | Model-free t½ composition-tunable ≈ 3–19 s, longest at PEO0.3/0.09; identified τ agrees (§8.1). **Corroborated by the pipeline's pre-computed exp-τ (corr 0.93–0.97; old τ reproduces the trend — §9).** The Ch4 timescale ladder. |
 | C3 | Cation identity orders the dynamics Li > Na > K (timescale / retention) | 3 (secondary) | 🔴 | Clean HYST n=1 for Na and K; delay/pulse n=2; point estimates do **not** follow Li>Na>K (§6.1, §6.3). Qualitative/preliminary at most — not a quantitative claim. |
 | C4 | All three common measurements (I–V, N-pulse, delay) exist across the comparative corpus | 3/4 | 🟡 | True only for the Li composition grid; 41/149 overall, thin (n≤2) for Na/K. |
 | C5 | EPSC / STDP / separated STM-LTM / impedance compared across Li/Na/K | 3/4 | 🔴 | Ch2 (Paper 1, SY/Hybrane/LiTf) only. Use as Li-only priors/sanity checks; never propagate to Na/K. (Matches `01`/`05`.) |
@@ -201,3 +201,24 @@ HYST window (§6.2), potentiation (§8.2) and fading-memory time (§8.1) all poi
 ### 8.5 Parameter set now available for Chapter 4 models
 
 Per composition cell: fading-memory `t½` (and identified τ where available), `retention@60 s`, potentiation `growth exponent` + `peak gain` + `turnover-N`. These seed the per-cell behavioural model (read function / pulse update φ / decay λ): the ~3→19 s timescale ladder is the resource for heterogeneous reservoir computing; the turnover-N sets the safe operating range. **Still to do for a full Ch4 model:** formalise φ(x) (state-dependent update) and a read transfer function, and quantify cycle-to-cycle vs device-to-device variance separately.
+
+---
+
+## 9. Cross-validation against pipeline pre-computed features (2026-06-03)
+
+The DATABASE `PIXEL_INFO` tiers already carry pipeline-computed features from years ago — DELAYTIME `exp decay: tau (s)` (a **simple**-exponential fit) and `max ratio`; PULSES `max ratio`, `number of pulses at saturation`, `is pixel saturated`. Checking my fresh analysis against them:
+
+**DELAYTIME (30 matched pixels).**
+
+- my `r1` ≡ pipeline `max ratio`: corr **1.000** (data join verified).
+- my model-free `t½` vs pipeline `exp-τ`: corr **0.93**; my identified stretched-τ vs pipeline `exp-τ`: corr **0.97** → independent methods agree on the timescale.
+- median `t½/τ_pipeline` ≈ **0.95** (not the 0.69 of a pure single-exponential) ⇒ the decays are **stretched** (Kohlrausch, β<1); the pipeline's single-exp τ is an *effective* constant. Consistent with Paper 1's stretched-exponential retention.
+- **The pipeline's τ (computed long ago) independently reproduces the composition trend:** PEO0.3 ≈ 21–25 s (longest) → PEO0.6/1.2 ≈ 1.5–10 s. ⇒ strongly corroborates C2.
+
+**PULSES (31 matched pixels).**
+
+- my `peak_ratio` ≡ pipeline `max ratio`: corr **1.000**.
+- my `N_peak` ≡ pipeline `number of pulses at saturation`: corr **1.000**, exact match on all 13 pixels where the pipeline recorded one ⇒ corroborates the peak/turnover (C10).
+- **Discrepancy (definitional, not a contradiction):** pipeline `is pixel saturated` = False for *all* matched pixels, although 42 % show turnover and the pipeline itself recorded a saturation-N for many. Its *numeric* saturation agrees with mine; its *boolean* flag uses a stricter/unpopulated criterion. Don't rely on `is pixel saturated`; use `number of pulses at saturation` (or my turnover).
+
+**Verdict.** The freshly-extracted findings are **consistent with, and corroborated by, the pipeline's pre-computed values** — the fading-memory composition trend is reproduced by two independent computations. For Chapter 4, the pipeline's per-pixel `exp decay: tau (s)` can be used directly as a complementary timescale estimate (available for the full 117 DELAYTIME pixel rows, beyond my fitted subset).
