@@ -12,8 +12,8 @@
 
 - **Method:** analysis driven from `Nanomem_Devices_Library/DATABASE` (regenerated May 2025) — `UPDATED_DEVICES_LIBRARY.csv` for chemistry, the `*_PIXEL_INFO.csv` tables for measurement presence, `FILTERED_DEVICES.csv` for erratic-pixel flags. Corpus = **PEO host + triflate salt = 149 devices**.
 - **Artifact:** [`ch3_ch4_device_inventory.csv`](ch3_ch4_device_inventory.csv) — one row per PEO/triflate device with chemistry, electrode, and per-type pixel counts. Regenerate with the script noted in §5.
-- **Done:** §1 coverage inventory, §2 scope implication, §3 initial claims ledger.
-- **Next:** (a) Na/K cell depth audit — pixels, flagged %, measurement days, common protocol; (b) trend tests — DELAYTIME Li/Na/K ordering, HYST switching window, PULSES potentiation; (c) PEO/LiTr concentration-grid trend tests; (d) freeze a Chapter-4 manifest subset (`05` §2.3).
+- **Done:** §1 coverage, §2 scope, §3 ledger, §6 first-pass trends + verdicts, §7 clean manifest candidates ([`ch4_device_manifest_DRAFT.csv`](ch4_device_manifest_DRAFT.csv)).
+- **Next:** stretched-exponential τ/β decay fits (DELAYTIME) and saturating pulse-update fits (PULSES) on the clean stratum-A composition cells = the Chapter-4 model identification (`05` §3, §5.3), then per-cell parameter cards (`05` §5.4). Optional: confirm common protocols (sweep rate, V_write, Δt range) within each cell before fitting.
 - **Caveats on current numbers:** "has measurement" = ≥1 pixel row in that type's `PIXEL_INFO`; this does **not** yet exclude flagged/erratic pixels, nor verify a common protocol, nor check replicate quality. §1 counts are an upper bound on usable coverage; later passes tighten them.
 
 ---
@@ -138,3 +138,23 @@ At fixed salt 0.09 the switching window (on-off, area) **decreases as PEO rises*
 ### 6.4 Strategic implication for Chapter 3
 
 Lead with **composition (PEO/LiTr concentration series)** as the quantitative spine; present **cation identity (Li/Na/K) as an honestly-limited, n≤3 preliminary observation** that motivates future work — exactly the delimited "side evidence" framing in `01`/`05`. The volatile-forgetting + potentiation behaviours and the large heterogeneity are the durable, defensible through-line into Chapter 4.
+
+---
+
+## 7. Clean manifest candidates (2026-06-03) — `ch4_device_manifest_DRAFT.csv`
+
+Re-counting with **clean all-3** (flag-excluded everywhere; HYST also `is broken`-excluded) and stratum tags yields **31 manifest-candidate devices** ([`ch4_device_manifest_DRAFT.csv`](ch4_device_manifest_DRAFT.csv), `manifest_candidate=1`). This is the realistic curated set — tighter than the loose §1 coverage, and the basis for the eventual frozen `05` manifest.
+
+**Cation cell (stratum B, PEO 0.3 / salt 0.09), clean all-3:** Li = **9**, Na = **1**, K = **1**. Confirms C3 cannot be quantitative (n=1 per non-Li cation).
+
+**Composition design (stratum A, Li), clean all-3 device counts:**
+
+| PEO ↓ \ salt → | 0.045 | 0.09 | 0.18 |
+| --- | --: | --: | --: |
+| 0.3 | 4 | 9 \* | 0 |
+| 0.6 | 3 | 3 | 2 |
+| 1.2 | 3 | 2 | 3 |
+
+\* The 0.3/0.09 reference is tagged stratum B but is shared by both designs. The PEO 0.15 row and the PEO 0.3 / salt 0.18 cell have **no** clean all-3 device and drop out.
+
+This supports a defensible **2-axis composition design with replicates**: a **PEO sweep** (0.3→0.6→1.2) at fixed salt (clean columns at salt 0.045 and 0.09) **and** a **salt sweep** (0.045→0.09→0.18) at fixed PEO (clean rows at PEO 0.6 and 1.2), n ≈ 2–4 devices each. That is the quantitative spine for Chapters 3–4; cation identity rides along as n ≤ 1-per-cation honest side evidence. **Caveat:** `passed_read_disturb` and common-protocol checks are not yet done — both required by `05` before the manifest is frozen.
