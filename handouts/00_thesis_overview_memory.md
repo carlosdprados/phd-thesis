@@ -7,7 +7,7 @@
 **Group:** Nanotech / Memristive Devices  
 **Supervisor:** Salvador Cardona-Serra (PI: Eugenio Coronado)  
 **Generated:** April 7, 2026  
-**Revision:** v3 — April 12, 2026. The comparative-chapter chemistry has been re-scoped to match the actual experimental archive. The main Chapter 3 corpus is now explicitly PEO-based triflate composites (PEO/LiTr, PEO/NaTr, PEO/KTr at PEO and salt mass concentrations of 0.3 and 0.09), supplemented by a PEO/LiTr concentration series, and the common comparative measurements are restricted to I–V hysteresis, variable-number-of-pulses potentiation, and variable-delay-time depotentiation. TMPE-based and LiBis/NaBis/KBis (TFSI) devices are retained only as exploratory side systems. EPSC, STDP, separated STM/LTM retention, and impedance spectroscopy remain Chapter 2 (Paper 1) results and are no longer presented as common across the Li/Na/K family. Previous revisions: v2 (2026-04-11) inserted the data-driven temporal computing chapter and switched the framing to volatile, heterogeneous temporal computing primitives.  
+**Revision:** v4 — 2026-06-03. After direct, QA'd analysis of the archive (handouts `08_chapter3_4_claims_audit.md` and `10_chapter3_comparative_plan.md`): Chapter 3's **quantitative spine is the PEO/LiTr composition grid** (the only statistically-replicated axis, n=2–4); **host/anion/cation form an illustrative, sample-limited tuning landscape** (n≤2 per matched cell); the **Li>Na>K cation hypothesis is reported as an honest negative** (confounded by drive-protocol amplitude and electrode); and **potentiation amplitude is shown to set the apparent fading-memory τ** (methodological result). Previous: v3 — April 12, 2026. The comparative-chapter chemistry had been re-scoped to match the actual experimental archive. The main Chapter 3 corpus is now explicitly PEO-based triflate composites (PEO/LiTr, PEO/NaTr, PEO/KTr at PEO and salt mass concentrations of 0.3 and 0.09), supplemented by a PEO/LiTr concentration series, and the common comparative measurements are restricted to I–V hysteresis, variable-number-of-pulses potentiation, and variable-delay-time depotentiation. TMPE-based and LiBis/NaBis/KBis (TFSI) devices are retained only as exploratory side systems. EPSC, STDP, separated STM/LTM retention, and impedance spectroscopy remain Chapter 2 (Paper 1) results and are no longer presented as common across the Li/Na/K family. Previous revisions: v2 (2026-04-11) inserted the data-driven temporal computing chapter and switched the framing to volatile, heterogeneous temporal computing primitives.  
 
 ---
 
@@ -15,7 +15,7 @@
 
 **Title (working):** *Organic Memristive Devices Based on Polymer–Electrolyte Composites for Neuromorphic Computing*
 
-**Core thesis:** That a carefully engineered composite of a semiconducting polymer (Super Yellow) and an ion-conducting polyether matrix loaded with a dissociated alkali-metal triflate salt, deposited as a thin film between two electrodes, constitutes a functional two-terminal organic memristive device whose analog, reversible conductance dynamics and fading-memory timescales are tuned by the ionic chemistry of the composite. The proof of concept (Chapter 2) is built on SY/Hybrane/LiTf and exhibits the full range of memristive functionalities — analog multi-state switching, short- and long-term memory, excitatory post-synaptic current, and spike-timing-dependent plasticity — in a single device. The main comparative study (Chapter 3) is built on PEO + LiTr/NaTr/KTr composites at fixed mass concentrations (PEO 0.3, salt 0.09), with a PEO/LiTr concentration series as a systematic sub-study and TMPE or alkali-TFSI (LiBis/NaBis/KBis) formulations as clearly delimited exploratory side evidence. The comparative corpus is defensible on three common dynamical measurements — I–V hysteresis, variable-number-of-pulses potentiation, and variable-delay-time depotentiation — and the richer synaptic metrics (EPSC, STDP, separated STM/LTM, impedance) are retained only for the Chapter 2 device.
+**Core thesis:** That a carefully engineered composite of a semiconducting polymer (Super Yellow) and an ion-conducting polyether matrix loaded with a dissociated alkali-metal triflate salt, deposited as a thin film between two electrodes, constitutes a functional two-terminal organic memristive device whose analog, reversible conductance dynamics and fading-memory timescales are tuned by the ionic chemistry of the composite. The proof of concept (Chapter 2) is built on SY/Hybrane/LiTf and exhibits the full range of memristive functionalities — analog multi-state switching, short- and long-term memory, excitatory post-synaptic current, and spike-timing-dependent plasticity — in a single device. The main comparative study (Chapter 3) has its **quantitative spine in the PEO/LiTr composition grid** (the only axis that replicates, n=2–4): switching window, potentiation, and a Kohlrausch fading-memory τ (≈ 2–20 s) all vary systematically with composition. Electrolyte **chemistry — host (PEO/TMPE), anion (triflate/TFSI), cation (Li/Na/K) — is surveyed as an illustrative, sample-limited tuning landscape** (n≤2 per matched cell); the **Li>Na>K cation hypothesis is an honest negative** (confounded by drive-protocol amplitude and electrode), and a methodological result shows **potentiation amplitude sets the apparent τ**. The corpus rests on three common dynamical measurements — I–V hysteresis, variable-number-of-pulses potentiation, and variable-delay-time depotentiation — and the richer synaptic metrics (EPSC, STDP, separated STM/LTM, impedance) are retained only for the Chapter 2 device.
 
 ---
 
@@ -169,15 +169,14 @@ Chapter 2: Proof of Concept — SY/Hybrane/LiTf
      device on which EPSC, STDP, separated STM/LTM and impedance
      are treated as primary evidence.)
     ↓
-Chapter 3: PEO–Triflate Comparative Series (main experimental chapter)
-    (Core: PEO/LiTr concentration series, characterised by the
-     three common dynamical measurements — I–V hysteresis, variable-N
-     potentiation, variable-delay depotentiation. Secondary: PEO/LiTr,
-     PEO/NaTr, PEO/KTr comparative set at fixed mass fractions
-     PEO = 0.3, salt = 0.09, under the same common measurements.
-     Exploratory side systems: TMPE-based composites and LiBis/NaBis/KBis
-     (TFSI) devices, used only as side evidence and clearly labelled as
-     sparse / exploratory.)
+Chapter 3: Compositional & Chemical Control of Volatile Dynamics (main experimental chapter)
+    (Quantitative spine: PEO/LiTr composition grid — the only replicated
+     axis (n=2-4) — via the three common measurements; switching window,
+     potentiation, and Kohlrausch fading-memory tau (~2-20 s) vary with
+     composition. Illustrative tuning landscape: host (PEO/TMPE), anion
+     (triflate/TFSI), cation (Li/Na/K), all n<=2 per matched cell.
+     Li>Na>K is an honest negative (drive-amplitude + electrode confounds);
+     potentiation amplitude sets the apparent tau (methodological result).)
     ↓
 Chapter 4: Data-Driven Temporal Computing
     (No new fabrication. Compact behavioural models extracted from the
@@ -197,7 +196,7 @@ Chapter 5: Conclusions & Outlook
      hardware, not from digital memory.)
 ```
 
-**Key framing decision carried through every chapter:** these devices are not framed as failed non-volatile memories. They are framed as good volatile, heterogeneous, temporally rich elements. **Second key framing rule (v3):** the thesis does *not* claim a uniformly measured Li/Na/K synaptic suite. What it claims is a defensible, abundant dynamical dataset — I–V hysteresis, variable-N potentiation, variable-delay depotentiation — shared across the PEO/triflate comparative corpus, plus the Chapter 2 Paper 1 device as the only fully characterised synaptic exemplar. See `handouts/01_thesis_structure.md` for the framing-consequence table.
+**Key framing decision carried through every chapter:** these devices are not framed as failed non-volatile memories. They are framed as good volatile, heterogeneous, temporally rich elements. **Second key framing rule (v4):** the thesis claims a **replicated, quantitative composition result** (the PEO/LiTr grid) plus an **illustrative chemical-tuning landscape** (host/anion/cation, n-limited); it does *not* claim a **Li>Na>K cation law** (reported as an honest negative, drive-amplitude/electrode-confounded) nor a uniformly measured Li/Na/K synaptic suite. The defensible shared dataset is the three common measurements; EPSC/STDP/separated STM-LTM/impedance remain the Chapter-2 device only. See `handouts/01_thesis_structure.md` (framing table) and `handouts/10_chapter3_comparative_plan.md` (full plan).
 
 ---
 
@@ -251,15 +250,18 @@ Chapter 5: Conclusions & Outlook
 
 | Item | Status | Location |
 | ------ | -------- | ---------- |
-| Memory document (v2) | ✅ Complete | `handouts/00_thesis_overview_memory.md` |
-| Thesis structure — 5 chapters (v2) | ✅ Complete | `handouts/01_thesis_structure.md` |
+| Memory document (v4) | ✅ Complete | `handouts/00_thesis_overview_memory.md` |
+| Thesis structure — 5 chapters (v4) | ✅ Complete | `handouts/01_thesis_structure.md` |
 | Introduction chapter plan (v2, with temporal computing sections) | ✅ Complete | `handouts/02_introduction_chapter_plan.md` |
 | Chapter 2 figures reference list | ✅ Complete | `handouts/03_chapter2_figures_needed.md` |
 | Chapter 2 (LaTeX, full) | ✅ Complete | `chapters/chapter2_proof_of_concept.tex` |
 | Chapter 4 planning document | ✅ Complete | `handouts/04_chapter4_temporal_computing_plan.md` |
 | Chapter 4 data / pipeline spec | ✅ Complete | `handouts/05_chapter4_data_pipeline.md` |
+| Chapter 3 & 4 claims audit (data-driven, §1–§16) | ✅ Complete | `handouts/08_chapter3_4_claims_audit.md` (+ `ch3_*.csv`, `scripts/ch3_4_dynamics_fits.py`) |
+| Chapter 3 full plan (v4) + proposal/diff | ✅ Complete | `handouts/10_chapter3_comparative_plan.md`, `handouts/09_chapter3_revised_plan_PROPOSAL.md` |
 | References database (`references.bib`, with reservoir-computing core added) | ✅ Complete | `bibliography/references.bib` |
 | Chapter 1 (writing) | ⬜ Not started | — |
+| Chapter 3 (plan, v4) | ✅ Complete | `handouts/10_chapter3_comparative_plan.md` |
 | Chapter 3 (writing) | ⬜ Not started | — |
 | Chapter 4 (writing) | ⬜ Not started | — |
 | Chapter 5 (writing) | ⬜ Not started | — |
