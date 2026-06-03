@@ -78,7 +78,7 @@ Status key: ✅ supported by data · 🟡 limited / preliminary · 🔴 unsuppor
 | C8 | Devices show volatile fading memory (forgetting) and pulse potentiation across the corpus | 2/3/4 | ✅ | Delay slopes negative and pulse slopes positive in every cell tested (§6.3). Robust qualitative behaviour. |
 | C9 | Large device-to-device / cycle variability — usable as heterogeneity for reservoir computing | 3/4 | ✅ | Feature sd ≈ mean across cells (§6); the t½ ladder (≈3–19 s, §8.1) is a concrete heterogeneity resource. |
 | C10 | Potentiation saturates / reverses (turnover) at high N — caps usable pulse count | 3/4 | ✅ | ~half the cells peak then decline by N=1000 (§8.2); sets a safe operating range for Ch4 pulse protocols. |
-| C11 | Anion (triflate vs TFSI) and host (PEO vs TMPE) modulate retention τ more strongly than cation | 3 | 🟡→✅ (host) | Anion: PEO/triflate τ≈20 s vs PEO/TFSI τ≈1 s (§11). **Host: PEO/LiTr τ≈24 s (n=6) vs TMPE/LiTr τ≈3 s — ~6× (§15), best-replicated non-composition comparison.** Host effect Li-specific on current data (Na/K n=1). |
+| C11 | Anion (triflate vs TFSI) and host (PEO vs TMPE) modulate retention τ more strongly than cation | 3 | 🟡 (illustrative) | Anion: PEO/Tr τ≈20 s vs PEO/TFSI τ≈1 s. Host: Ag-matched PEO/LiTr τ≈20–25 s (n=3) vs TMPE/LiTr τ≈3.8 s (n=1) — ~6× (§15). Real, directionally clear effects, but **n≤2 on a side once electrode+protocol matched (§16)** → illustrative, not powered. |
 | C12 | Potentiation amplitude (write/read protocol) dominates apparent retention τ | 3 (method) | ✅ | Same device v114: τ 4.6 s (3 V write/1.5 V read) → 15.5 s (6 V/3 V); #pulses (30) & timing (0.103 s) constant, write/read voltages locked (§13). Cross-device τ must use one matched protocol; ideally subthreshold read. Higher write drives more ion/electrode processes → deeper, longer-lived state. |
 
 ---
@@ -357,4 +357,30 @@ Better-supported than any cation cell, because both hosts have multiple Li devic
 | PEO/LiTr | 8.7, 19.6, 23.2, 25.1, 67, 79 → median **~24 s** | 6 | strong (4–79×) |
 | TMPE/LiTr | v250 3.8 clear; v291 3.4 / v314 3.0 / v315 2.7 weak | 1 clear + ~3 weak | weak (1.5–10×) |
 
-**Finding:** **PEO/LiTr retains ~6× longer (τ ≈ 24 s) and far more strongly than TMPE/LiTr (τ ≈ 3 s, weak amplitude).** Robust on the PEO side (n=6, heterogeneous 9–79 s — itself a Ch4 resource); suggestive on the TMPE side (only v250 shows a clear decay; the other TMPE/LiTr barely potentiate). Na/K host pairs (n=1) are smaller/mixed (Na: PEO 3.0 vs TMPE 5.0; K: PEO 10.7 vs TMPE 6.7) → the large host effect appears Li-specific, but n=1 there. **This is the best-replicated non-composition comparison in the corpus and a strong argument for treating host as a first-class axis (C11).**
+**Finding:** **PEO/LiTr retains ~6× longer (τ ≈ 20–25 s) than TMPE/LiTr (τ ≈ 3.8 s).** ⚠️ **Correction (per §16 audit):** the "n=6 PEO" above mixed **3 Ag (v140 19.6, v146 23.2, v241 25.1 — tight) + 3 Au (v265 67, v268 79, v269 8.7)**; the wide 9–79 s spread was largely the **Au** devices. Electrode-matched **Ag-only PEO/LiTr is n=3 (~20–25 s, tight)** vs TMPE/LiTr Ag **n=1 (v250 3.8 s)** — v291/v314/v315 are also Au. So the host effect (~6×) holds directionally but rests on n=3 (Ag PEO) vs n=1 (Ag TMPE), not n=6. Na/K host pairs n=1, mixed. **Host is a real but n-limited (illustrative) axis — see §16.**
+
+---
+
+## 16. Coverage audit (step A) — what each axis can actually claim (2026-06-03)
+
+Clean all-3 (flag- and broken-excluded) device counts per cell, SY-based, **Ag electrode, 0.3/0.09** unless noted. Full matrix: [`ch3_coverage_audit.csv`](ch3_coverage_audit.csv).
+
+**Axis 1 — Composition (PEO/LiTr/Ag), peo × salt:**
+
+| PEO ↓ \ salt → | 0.045 | 0.09 | 0.18 |
+| --- | --: | --: | --: |
+| 0.3 | 4 | 4 | 0 |
+| 0.6 | 2 | 3 | 2 |
+| 1.2 | 3 | 2 | 3 |
+
+→ a genuine **3×3 grid, n=2–4/cell** (PEO0.15 row and PEO0.3/0.18 empty). **The only axis with real replication.**
+
+**Axis 2 — Cation @0.3/0.09/Ag (Li / Na / K):** PEO/Tr 4/1/1 · PEO/TFSI 1/1/1 · TMPE/Tr 1/2/2 · **TMPE/TFSI 2/2/2** (best). No cell reaches n≥3 for all cations.
+
+**Axis 3 — Host @0.3/0.09/Ag (PEO vs TMPE):** Tr/Li **4 vs 1** · TFSI/Li 1 vs 2 · Na/K 1–2 each. No host pair has n≥3 on both sides.
+
+**Axis 4 — Anion @0.3/0.09/Ag (Tr vs TFSI):** PEO/Li **4 vs 1** · TMPE/Li 1 vs 2 · Na/K 1–2 each.
+
+**Electrode confound:** 7 Au-electrode all-3 devices (v265, v268, v269, v270, v291, v314, v315) — keep **separate** from Ag (this corrected §15).
+
+**Verdict for the rework.** Only **composition (PEO/LiTr/Ag/4 V)** sustains real replication (n=2–4 across a 3×3 grid) — it is the **only statistically-claimable quantitative axis**. **Host, anion, and cation are all n≤2 on at least one matched side** → present them as *illustrative trends/observations with explicit n*, not as powered claims. Best comparison cell anywhere = TMPE/TFSI cation (2/2/2). This argues for a disciplined reframe: composition-led quantitative spine + a clearly-labelled qualitative "chemical-tuning landscape" (host/anion/cation), **not** four co-equal first-class axes. Confounds to hold fixed in any τ comparison: protocol amplitude (§13), electrode (§16), composition.
