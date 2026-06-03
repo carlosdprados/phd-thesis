@@ -26,9 +26,9 @@
 |------|-------|-------|------|-----------|
 | 0 | Blocking — chapter non-functional | 1 | 1 | 0 |
 | 1 | Rigor / correctness | 7 | 5 | 2 (1.2, 1.7) |
-| 2 | Completeness / strengthening | 6 | 2 | 4 (2.1, 2.2, 2.4, 2.6) |
+| 2 | Completeness / strengthening | 6 | 3 | 3 (2.1, 2.4, 2.6) |
 | 3 | Polish | 4 | 4 | 0 |
-| **Total** | | **18** | **12** | **6** |
+| **Total** | | **18** | **13** | **5** |
 
 ---
 
@@ -47,7 +47,7 @@ All resolved items were committed individually, each gated on a clean `make expo
 | 1.6 | ☑ Done | `fix(chapter2): separate cycling endurance…` | Section retitled "Ambient Shelf Stability"; endurance flagged uncharacterised. |
 | 1.7 | ☐ **BLOCKED (needs data)** | — | Device/batch N for every RSD/error-band; cannot be fabricated. |
 | 2.1 | ☐ **PARTIAL** | (figures via 0.1) | Eight main floats scaffolded; importing the AFM/profilometry/degradation SI data + plots still pending. |
-| 2.2 | ☐ **PARTIAL (CrossRef)** | `fix(chapter2): close five citation gaps…` (2026-06-03) | 6 of 59 keys CrossRef-verified (the 6 added/wired in the gap pass); 53 originals still unverified. See 2026-06-03 addendum. |
+| 2.2 | ☑ Done | `docs(chapter2): complete CrossRef audit…` (2026-06-03) | All 59 keys verified real & correctly attributed. 53 done by automated DOI→CrossRef diff + 6 earlier. 2 books (`Hebb1949`, `Gray1991`) retyped `@article`→`@book`. See 2026-06-03 addendum. |
 | 2.3 | ☑ Done | `fix(chapter2): correct first-author attribution…` | "Malliaras 2010" → "Zakhidov 2010" in the comparison table. |
 | 2.4 | ☐ **BLOCKED (needs data)** | — | Stretch exponent β and fit quality from the actual retention fits. |
 | 2.5 | ☑ Done | `docs(chapter2): frame ED/ECD timescale assignment…` | Marked a working interpretation with a Ch.3-testable consequence. |
@@ -57,7 +57,7 @@ All resolved items were committed individually, each gated on a clean `make expo
 | 3.3 | ☑ Done | `docs(chapter2): make the STDP fit explicitly piecewise…` | Per-branch fit in absolute delay with branch-specific `A_±`, `τ_±`. |
 | 3.4 | ☑ Done | `docs(chapter2): distinguish Li+ site binding energy…` | Well-depth vs migration-barrier disambiguated. |
 
-**What is needed to clear the remaining six.** 1.7 and 2.4 need the per-device statistics and retention-fit parameters from the experimental archive. 2.2 is now **partially** done — the 6 keys added/wired in the 2026-06-03 gap pass are CrossRef-verified; the 53 original keys still need verification. 2.1 needs the SI datasets brought in (and folds into the real-figure effort that finishes 0.1). 2.6 needs the plotted I–V data to confirm the within/across-sweep description. 1.2 needs your decision on the STDP polarity label.
+**What is needed to clear the remaining five.** 1.7 and 2.4 need the per-device statistics and retention-fit parameters from the experimental archive. (2.2 — full CrossRef audit — is now **done**; see the 2026-06-03 addendum.) 2.1 needs the SI datasets brought in (and folds into the real-figure effort that finishes 0.1). 2.6 needs the plotted I–V data to confirm the within/across-sweep description. 1.2 needs your decision on the STDP polarity label.
 
 ---
 
@@ -75,7 +75,13 @@ A separate read flagged five claims that lacked a citation. Closing them surface
 
 **Note for the committee-facing draft:** the energy section previously read as systematically favourable to the organic device (competitors quoted at µJ–mJ when they are pJ–nJ). The corrected text no longer claims a per-event energy advantage; the honest position is that 50 nJ is a proof-of-concept figure, above optimised CMOS and inorganic platforms, with area scaling as the route to close the gap.
 
-**Item 2.2 impact:** the 6 keys above are CrossRef-verified; this is logged as partial progress on 2.2 (6 of 59 done, 53 to go).
+**Item 2.2 — full CrossRef audit COMPLETE (2026-06-03).** All **59** Chapter 2 citation keys checked: the 6 above plus the remaining 53, audited automatically (parse each bib DOI → query CrossRef → diff title/first-author/year; script at `/tmp/crossref_audit.py`). **Every key resolves to a real, correctly attributed work — no hallucinations.** 46/53 matched cleanly; the 7 flags were all benign and confirmed by hand:
+
+- **False positives (metadata correct):** `Lightfoot1993` (title diff was CrossRef's `<sub>` HTML markup), `deMello1998` / `deMello2002` (CrossRef writes "deMello", bib "de Mello" — same author).
+- **Online-vs-print year (bib uses the correct print/issue year):** `Heremans2011` (CrossRef issued 2010, print 2011), `Liu2016` (CrossRef issued 2015, print 2016) — no change needed; the comparison-table labels "Liu 2016" etc. are correct.
+- **Books with no DOI (legitimate, now fixed):** `Hebb1949` (Wiley, 1949) and `Gray1991` (RSC *Polymer Electrolytes*, 1997) were typed `@article` with the publisher in `journal`; both retyped to `@book` with `publisher`/`address`. Note the `Gray1991` key name vs its 1997 metadata (rendered year is 1997; the 1991 VCH book is a different title) — flagged in a bib comment, key left unchanged to avoid touching `\cite`s.
+
+`make chapter2` rebuilds clean (0 citation-undefined; only the expected cross-chapter `\cref`s to Chapter 1 remain in the standalone build).
 
 ---
 
@@ -232,7 +238,7 @@ A separate read flagged five claims that lacked a citation. Closing them surface
 - ☑ `make thesis` (full build) resolves all `\cref` to Chapter 1 (`ch:intro`, `subsec:*`) — these are expected-undefined only in the standalone build. *(Verified: full thesis build has 0 undefined references.)*
 - ☑ Every figure is cited in the text *before* it appears, and every caption matches the numbers in the body. *(Each float placed after its first citation; captions cross-checked against body.)*
 - ☐ All chapter numbers, ratios, τ/β values, and energies are internally consistent between text, equations, figure captions, and the summary list (`sec:ch2_summary`). *(Pending β from item 2.4.)*
-- ☐ The comparison table (`tab:comparison`) author labels match the verified bibliography. *(Author label fixed in 2.3; full bib verification pending item 2.2.)*
+- ☑ The comparison table (`tab:comparison`) author labels match the verified bibliography. *(Author label fixed in 2.3; full CrossRef verification done in item 2.2 on 2026-06-03 — all table keys confirmed, including "Liu 2016" and "Zakhidov 2010".)*
 
 ---
 
