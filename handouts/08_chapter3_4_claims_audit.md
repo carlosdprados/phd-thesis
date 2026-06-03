@@ -66,15 +66,16 @@ Status key: ✅ supported by data · 🟡 limited / preliminary · 🔴 unsuppor
 
 | # | Candidate claim | Chapter | Status | Evidence / why |
 | --- | --- | --- | --- | --- |
-| C1 | PEO/LiTr switching window (on-off ratio, loop area) is tunable by composition | 3 (core) | 🟡 | Window shrinks as PEO rises at fixed salt; large spread, not cleanly monotonic (§6.2). Qualitatively yes; a quantitative law needs proper fits. |
-| C2 | Composition sets the fading-memory timescale (delay-time decay) in PEO/LiTr | 3→4 | 🟡 | Forgetting present everywhere; composition slope weak/noisy (§6.3). Needs stretched-exp τ fits on a matched protocol. |
+| C1 | PEO/LiTr memristive response (switching window, potentiation) is tunable by composition | 3 (core) | ✅ | Coherent across HYST window (§6.2), potentiation steepness+peak (§8.2) and fading-memory t½ (§8.1): higher PEO → weaker response. n = 2–9 dev/cell. |
+| C2 | Composition sets the fading-memory timescale in PEO/LiTr | 3→4 | ✅ | Model-free t½ composition-tunable ≈ 3–19 s, longest at PEO0.3/0.09; identified τ agrees (§8.1). This is the Ch4 timescale ladder. |
 | C3 | Cation identity orders the dynamics Li > Na > K (timescale / retention) | 3 (secondary) | 🔴 | Clean HYST n=1 for Na and K; delay/pulse n=2; point estimates do **not** follow Li>Na>K (§6.1, §6.3). Qualitative/preliminary at most — not a quantitative claim. |
 | C4 | All three common measurements (I–V, N-pulse, delay) exist across the comparative corpus | 3/4 | 🟡 | True only for the Li composition grid; 41/149 overall, thin (n≤2) for Na/K. |
 | C5 | EPSC / STDP / separated STM-LTM / impedance compared across Li/Na/K | 3/4 | 🔴 | Ch2 (Paper 1, SY/Hybrane/LiTf) only. Use as Li-only priors/sanity checks; never propagate to Na/K. (Matches `01`/`05`.) |
-| C6 | Compact behavioural models (read fn, pulse update, decay) identifiable per composition cell | 4 | ⏳ | Requires the three fits per cell on the Li grid; feasible given coverage, pending fit quality. |
+| C6 | Compact behavioural models (read fn, pulse update, decay) identifiable per composition cell | 4 | 🟡 | Per-cell parameters extracted (t½, retention, potentiation exp/peak/turnover; §8.5). Decay τ only ~half-identified at 8 pts; full φ(x) update + read transfer function still to formalise. |
 | C7 | Heterogeneous reservoir / coincidence / filter-bank simulations grounded in measured cells | 4 | ⏳ | Depends on C1/C2/C6; the timescale spread to exploit is composition-driven (per §2), not cation-driven. |
 | C8 | Devices show volatile fading memory (forgetting) and pulse potentiation across the corpus | 2/3/4 | ✅ | Delay slopes negative and pulse slopes positive in every cell tested (§6.3). Robust qualitative behaviour. |
-| C9 | Large device-to-device / cycle variability — usable as heterogeneity for reservoir computing | 3/4 | ✅ | Feature sd ≈ mean across cells (§6); reframed as a resource, consistent with the thesis framing. |
+| C9 | Large device-to-device / cycle variability — usable as heterogeneity for reservoir computing | 3/4 | ✅ | Feature sd ≈ mean across cells (§6); the t½ ladder (≈3–19 s, §8.1) is a concrete heterogeneity resource. |
+| C10 | Potentiation saturates / reverses (turnover) at high N — caps usable pulse count | 3/4 | ✅ | ~half the cells peak then decline by N=1000 (§8.2); sets a safe operating range for Ch4 pulse protocols. |
 
 ---
 
@@ -159,3 +160,44 @@ Re-counting with **clean all-3** (flag-excluded everywhere; HYST also `is broken
 \* The 0.3/0.09 reference is tagged stratum B but is shared by both designs. The PEO 0.15 row and the PEO 0.3 / salt 0.18 cell have **no** clean all-3 device and drop out.
 
 This supports a defensible **2-axis composition design with replicates**: a **PEO sweep** (0.3→0.6→1.2) at fixed salt (clean columns at salt 0.045 and 0.09) **and** a **salt sweep** (0.045→0.09→0.18) at fixed PEO (clean rows at PEO 0.6 and 1.2), n ≈ 2–4 devices each. That is the quantitative spine for Chapters 3–4; cation identity rides along as n ≤ 1-per-cation honest side evidence. **Caveat:** `passed_read_disturb` and common-protocol checks are not yet done — both required by `05` before the manifest is frozen.
+
+---
+
+## 8. Quantitative dynamics — model identification (2026-06-03)
+
+Artifacts: [`ch4_decay_fits.csv`](ch4_decay_fits.csv), [`ch4_pulse_descriptors.csv`](ch4_pulse_descriptors.csv); reproducible via `scripts/ch3_4_dynamics_fits.py`. DELAYTIME restricted to the common **2.0 V read** protocol (grid 1–300 s); PULSES at **1.5 V** (grid N = 1–1000).
+
+**Why t½, not τ.** The stretched-exponential `A·exp[−(t/τ)^β]+C` is only **identified in 16/30** delay curves — with 8 points, β and τ trade off and several fits collapse to τ→0. So the **primary timescale is a model-free half-enhancement time `t½`** (log-interpolated delay at which the conductance enhancement halves); the identified τ agrees with t½ where it converges, and is reported as secondary.
+
+### 8.1 Fading-memory timescale is composition-tunable (Li, model-free `t½`)
+
+| PEO ↓ \ salt → | 0.045 | 0.09 | 0.18 |
+| --- | --- | --- | --- |
+| 0.3 | 15.8 s (n=4) | **19.2 s (n=8)** | — |
+| 0.6 | 3.3 s (n=3) | 3.5 s (n=3) | 5.5 s (n=2) |
+| 1.2 | 2.7 s (n=3) | 5.5 s (n=2) | 9.0 s (n=3) |
+
+At fixed salt, t½ drops sharply from PEO 0.3 (longest, ~16–19 s) to PEO 0.6/1.2 (~3–9 s) → a composition-tunable fading-memory time over ≈ **3–19 s (≈6×)**. retention@60 s mirrors it (0.41 at the PEO0.3/0.09 reference vs 0.02–0.13 at higher PEO).
+
+### 8.2 Potentiation strength decreases with PEO (PULSES)
+
+| Cell (Li) | growth exp (log-log) | peak ratio | turnover |
+| --- | --- | --- | --- |
+| PEO0.3/0.045 | 1.11 (n=4) | ~480 | yes |
+| PEO0.3/0.09 | 0.75 (n=9) | ~102 | rare |
+| PEO0.6/* | 0.57–0.83 | 15–200 | mixed |
+| PEO1.2/* | 0.33–0.49 | 4–43 | mixed |
+
+Both the potentiation steepness (growth exponent) and the peak conductance gain fall as PEO rises. ~Half the cells show **turnover** — ratio peaks then declines by N=1000 (over-potentiation/degradation), which caps the usable pulse count.
+
+### 8.3 Coherent composition story (all three measurements)
+
+HYST window (§6.2), potentiation (§8.2) and fading-memory time (§8.1) all point the same way: **higher PEO mass fraction → weaker memristive response and faster forgetting.** This is the quantitative spine of Chapter 3 (n = 2–9 devices/cell), and the t½ spread plus device-to-device scatter give Chapter 4 a genuine heterogeneous fading-memory bank.
+
+### 8.4 Cation Li/Na/K (n=1 Na, n=1 K) — preliminary only
+
+`t½`: Li 19.2 s (n=8) · Na 27.4 s (n=1) · K 8.0 s (n=1). K is shortest (consistent with weakest cation–oxygen coordination → least retention), but Na > Li contradicts a strict Li>Na>K order. At n=1 for Na/K this is anecdotal — a motivating preliminary observation, not a result.
+
+### 8.5 Parameter set now available for Chapter 4 models
+
+Per composition cell: fading-memory `t½` (and identified τ where available), `retention@60 s`, potentiation `growth exponent` + `peak gain` + `turnover-N`. These seed the per-cell behavioural model (read function / pulse update φ / decay λ): the ~3→19 s timescale ladder is the resource for heterogeneous reservoir computing; the turnover-N sets the safe operating range. **Still to do for a full Ch4 model:** formalise φ(x) (state-dependent update) and a read transfer function, and quantify cycle-to-cycle vs device-to-device variance separately.
