@@ -12,8 +12,8 @@
 
 - **Method:** analysis driven from `Nanomem_Devices_Library/DATABASE` (regenerated May 2025) — `UPDATED_DEVICES_LIBRARY.csv` for chemistry, the `*_PIXEL_INFO.csv` tables for measurement presence, `FILTERED_DEVICES.csv` for erratic-pixel flags. Corpus = **PEO host + triflate salt = 149 devices**.
 - **Artifact:** [`ch3_ch4_device_inventory.csv`](ch3_ch4_device_inventory.csv) — one row per PEO/triflate device with chemistry, electrode, and per-type pixel counts. Regenerate with the script noted in §5.
-- **Done:** §1 coverage, §2 scope, §3 ledger, §6 first-pass trends, §7 clean manifest candidates, §8 quantitative dynamics (t½ ladder + potentiation), §9 cross-validation vs pipeline pre-computed features. Artifacts: `ch3_ch4_device_inventory.csv`, `ch4_device_manifest_DRAFT.csv`, `ch4_decay_fits.csv`, `ch4_pulse_descriptors.csv`, `scripts/ch3_4_dynamics_fits.py`.
-- **Next:** formalise the Ch4 behavioural model (state-dependent pulse-update φ(x) + read transfer function), separate cycle-to-cycle vs device-to-device variance, run the read-disturb check to freeze the manifest. Ch3 prose/figures can already be drafted from §6/§8/§9.
+- **Done:** §1 coverage, §2 scope, §3 ledger, §6 first-pass trends, §7 clean manifest candidates, §8 dynamics (potentiation + t½), §9 cross-validation vs pipeline, §10 decay params aligned to thesis (**τ, β** canonical), §11 cation expansion (3 designed batches; no consistent ordering). Artifacts: `ch3_ch4_device_inventory.csv`, `ch4_device_manifest_DRAFT.csv`, `ch4_decay_fits.csv`, `ch4_pulse_descriptors.csv`, `scripts/ch3_4_dynamics_fits.py`.
+- **Next:** USER reviews PNGs for the three designed cation batches (§11: 2023-10 v247–252, 2025-03 v321–326, 2025-05 v333–338) → resolve C3 (report "no ordering / K-shortest-in-TFSI" vs scrap). Then formalise the Ch4 model (φ(x) + read transfer function; cycle-vs-device variance split) and/or draft Ch3 from §6/§8/§10/§11.
 - **Caveats on current numbers:** "has measurement" = ≥1 pixel row in that type's `PIXEL_INFO`; the §1 coverage counts do **not** exclude flagged pixels (they are an upper bound), whereas the §6/§7 trend + clean-manifest counts **do**. Neither yet verifies a common protocol or replicate quality.
 - **Flag granularity (verified 2026-06-03):** FILTERED exclusion is applied per `(device, day, pixel, measurement_type)`, **not** per device — a flag removes only that pixel's that-type aggregate. All **221 flags match a real measurement row (100%)**, partial flagging is preserved (e.g. NM_v009: 6 of 27 HYST pixels dropped, 21 kept), and including `day` is equivalent to `(device, pixel)` for the current flags. **Caveat — flagging is HYST-heavy: 207 HYST vs only 3 PULSES + 11 DELAYTIME flags.** FILTERED has screened almost nothing in PULSES/DELAYTIME, so the decay (τ/β) and potentiation fits must apply their **own** goodness-of-fit + read-disturb screening rather than rely on FILTERED.
 
@@ -68,7 +68,7 @@ Status key: ✅ supported by data · 🟡 limited / preliminary · 🔴 unsuppor
 | --- | --- | --- | --- | --- |
 | C1 | PEO/LiTr memristive response (switching window, potentiation) is tunable by composition | 3 (core) | ✅ | Coherent across HYST window (§6.2), potentiation steepness+peak (§8.2) and fading-memory t½ (§8.1): higher PEO → weaker response. n = 2–9 dev/cell. |
 | C2 | Composition sets the fading-memory timescale in PEO/LiTr | 3→4 | ✅ | Model-free t½ composition-tunable ≈ 3–19 s, longest at PEO0.3/0.09; identified τ agrees (§8.1). **Corroborated by the pipeline's pre-computed exp-τ (corr 0.93–0.97; old τ reproduces the trend — §9).** The Ch4 timescale ladder. |
-| C3 | Cation identity orders the dynamics Li > Na > K (timescale / retention) | 3 (secondary) | 🔴 | Clean HYST n=1 for Na and K; delay/pulse n=2; point estimates do **not** follow Li>Na>K (§6.1, §6.3). Qualitative/preliminary at most — not a quantitative claim. |
+| C3 | Cation identity orders the dynamics Li > Na > K (timescale / retention) | 3 (secondary) | 🔴 | Expanded to 3 designed same-batch sets (§11). τ shows **no consistent Li>Na>K**: PEO/triflate ≈ equal (~20 s); K shortest only in TFSI families. Anion/host/composition dominate. A defensible *nuanced negative* result, pending PNG QA. |
 | C4 | All three common measurements (I–V, N-pulse, delay) exist across the comparative corpus | 3/4 | 🟡 | True only for the Li composition grid; 41/149 overall, thin (n≤2) for Na/K. |
 | C5 | EPSC / STDP / separated STM-LTM / impedance compared across Li/Na/K | 3/4 | 🔴 | Ch2 (Paper 1, SY/Hybrane/LiTf) only. Use as Li-only priors/sanity checks; never propagate to Na/K. (Matches `01`/`05`.) |
 | C6 | Compact behavioural models (read fn, pulse update, decay) identifiable per composition cell | 4 | 🟡 | Per-cell parameters extracted (t½, retention, potentiation exp/peak/turnover; §8.5). Decay τ only ~half-identified at 8 pts; full φ(x) update + read transfer function still to formalise. |
@@ -76,6 +76,7 @@ Status key: ✅ supported by data · 🟡 limited / preliminary · 🔴 unsuppor
 | C8 | Devices show volatile fading memory (forgetting) and pulse potentiation across the corpus | 2/3/4 | ✅ | Delay slopes negative and pulse slopes positive in every cell tested (§6.3). Robust qualitative behaviour. |
 | C9 | Large device-to-device / cycle variability — usable as heterogeneity for reservoir computing | 3/4 | ✅ | Feature sd ≈ mean across cells (§6); the t½ ladder (≈3–19 s, §8.1) is a concrete heterogeneity resource. |
 | C10 | Potentiation saturates / reverses (turnover) at high N — caps usable pulse count | 3/4 | ✅ | ~half the cells peak then decline by N=1000 (§8.2); sets a safe operating range for Ch4 pulse protocols. |
+| C11 | Anion (triflate vs TFSI) and host modulate retention τ more strongly than cation | 3 | 🟡 | PEO/triflate τ≈20 s vs PEO/TFSI τ≈1 s; host shifts τ too (§11). Striking at n=2/cell — needs PNG QA + replication. |
 
 ---
 
@@ -222,3 +223,46 @@ The DATABASE `PIXEL_INFO` tiers already carry pipeline-computed features from ye
 - **Discrepancy (definitional, not a contradiction):** pipeline `is pixel saturated` = False for *all* matched pixels, although 42 % show turnover and the pipeline itself recorded a saturation-N for many. Its *numeric* saturation agrees with mine; its *boolean* flag uses a stricter/unpopulated criterion. Don't rely on `is pixel saturated`; use `number of pulses at saturation` (or my turnover).
 
 **Verdict.** The freshly-extracted findings are **consistent with, and corroborated by, the pipeline's pre-computed values** — the fading-memory composition trend is reproduced by two independent computations. For Chapter 4, the pipeline's per-pixel `exp decay: tau (s)` can be used directly as a complementary timescale estimate (available for the full 117 DELAYTIME pixel rows, beyond my fitted subset).
+
+---
+
+## 10. Decay parameters aligned to the thesis & pipeline (τ, β) — adopt going forward
+
+**Canonical model = Kohlrausch stretched exponential** (Ch2 `eq:kohlrausch`, identical symbols):
+
+ΔG(t) = ΔG₀·exp[−(t/τ)^β] + ΔG∞ — **τ** = characteristic relaxation time, **β** = stretch exponent (0<β≤1), ΔG₀ initial change, ΔG∞ residual. Paper 1: τ_S ≈ 2.5–3 s (STM), τ_L ≈ 4.7 s (LTM).
+
+The pipeline `exp decay: A / tau (s) / y0` is the **β = 1 special case** (ΔG₀ / τ / ΔG∞). **Decision (more useful going forward): report τ + β; use the pipeline τ as the primary value** (stable, already computed for all 117 delay pixels), with β from stretched fits to capture the multi-timescale character; the model-free t½ of §8 is kept only as a robustness cross-check (t½ ≈ τ here).
+
+Per-cell **τ (pipeline, β=1)** for the Li PEO grid — replaces t½ as the headline, same trend, now in thesis units:
+
+| PEO ↓ \ salt → | 0.045 | 0.09 | 0.18 |
+| --- | --- | --- | --- |
+| 0.3 | 25.0 s (n=4) | **19.6 s (n=11)** | — |
+| 0.6 | 1.9 s (n=3) | 4.1 s (n=3) | 5.0 s (n=3) |
+| 1.2 | 1.5 s (n=3) | 6.2 s (n=3) | 10.4 s (n=3) |
+
+β is mostly **0.6–0.9 (< 1)** → stretched/multi-timescale within a *single* device (matches the "distribution of activation barriers" reading in Ch2). Context: PEO0.3 (τ ≈ 20–25 s) sits *beyond* the Paper-1 LTM (4.7 s), while high-PEO cells (τ ≈ 2–5 s) sit in the STM range — composition tunes the device across the STM↔LTM ladder (cross-host comparison, qualitative).
+
+---
+
+## 11. Cation comparison — expanded candidates & cross-family τ (2026-06-03)
+
+The strict PEO/triflate clean-all-3 set gave only n=1 Na/K (§7). Broadening to **all hosts (PEO, TMPE) × anions (Tr, TFSI)** at fixed 0.3/0.09 yields ~2 devices per (host, anion, cation) and, importantly, **three *designed* same-batch Li/Na/K sets**:
+
+- **2023-10 (triflate):** PEO v247(Li)/v248(Na)/v249(K) + TMPE v250(Li)/v251(Na)/v252(K) — all carry EIS. Cleanest matched comparison.
+- **2025-03 (PEO·TFSI):** v321/322(Li), v323/324(Na), v325/326(K). n=2 each, clean, 2.0 V.
+- **2025-05 (TMPE·TFSI):** v333/334(Li), v335/336(Na), v337/338(K). n=2 each, clean, 2.0 V.
+
+**Cross-family τ (pipeline, s) at 0.3/0.09:**
+
+| Family | Li | Na | K |
+| --- | --- | --- | --- |
+| PEO · triflate | 19.6 (n=11) | 19.2 (n=2) | 20.4 (n=2) |
+| PEO · TFSI | 1.0 (n=2) | 1.5 (n=2) | 0.3 (n=2) |
+| TMPE · triflate | 3.6 (n=6) | 3.2 (n=2) | 7.7 (n=2) |
+| TMPE · TFSI | 6.3 (n=2) | 7.0 (n=2) | 3.5 (n=2) |
+
+**Verdict: no consistent Li>Na>K ordering**, even with the expansion. PEO/triflate shows ~equal τ (~20 s) across cations; the dominant effects are **anion** (PEO/Tr ~20 s vs PEO/TFSI ~1 s) and host/composition. The only repeatable cation hint is **K shortest in the TFSI families**. This is a more rigorous basis than n=1 anecdote — it points to a *negative/nuanced* result (cation effect weak, anion/host-dependent), which is itself defensible.
+
+**Caveats (to settle by PNG review):** v115/v116 (old PEO/Tr Na/K) are flagged ×6 and read at **3.0 V** (off-protocol vs 2.0 V) → their long τ (30–38 s) is suspect. Most Na/K devices have only **1 delay pixel**. Au-electrode TMPE devices (v298, v300/301/304/305/306) lack pulse/delay data. **Next:** user reviews PNGs for the three designed batches; if decays are clean, report "no robust cation ordering across n=2×3 batches; anion/host/composition dominate" (a real finding), and possibly "K shortest with TFSI". Then C3 is resolved (not merely scraped).
