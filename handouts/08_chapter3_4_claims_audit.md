@@ -14,7 +14,8 @@
 - **Artifact:** [`ch3_ch4_device_inventory.csv`](ch3_ch4_device_inventory.csv) — one row per PEO/triflate device with chemistry, electrode, and per-type pixel counts. Regenerate with the script noted in §5.
 - **Done:** §1–§3 coverage/scope/ledger, §6 first-pass trends, §7 manifest candidates, §8 dynamics, §9 cross-validation, §10 **τ,β** alignment, §11 cation expansion, §12 PNG QA (2023-10), §13 **read-voltage confound (decisive)**. Artifacts: `ch3_ch4_device_inventory.csv`, `ch4_device_manifest_DRAFT.csv`, `ch4_decay_fits.csv`, `ch4_pulse_descriptors.csv`, `scripts/ch3_4_dynamics_fits.py`.
 - **Cation verdict (C3):** at matched protocol (4 V/2 V) PEO/triflate shows Li longest (HSAB-consistent, n=1 Na/K) but it does **not** generalise across host/anion → no universal Li>Na>K. The dominant τ lever is **potentiation amplitude** (write/read protocol), not cation (§13, C12). **Composition result (C1/C2) stands** (uniform 4 V/2 V).
-- **Next:** USER still reviewing TFSI batches (v321–326, v333–338) — already at the standard 4 V/2 V protocol, so they slot straight into §13's matched table; fold in cleaned τ if their PNGs are good. Then **(A)** formalise the Ch4 model (φ(x) + read transfer function; cycle-vs-device variance) or **(B)** draft Ch3 from §6/§8/§10 (composition spine) + §11–§13 (cation = honest negative; amplitude confound). Always restrict cross-device τ to one matched protocol; refit after point-level QA.
+- **TFSI QA done (§14):** PEO/TFSI collapsed (only v321 Li usable); TMPE/TFSI all clean → cleanest cation comparison = K shortest, Li≈Na (n=2), but not robust across families. Cation analysis is now **complete**: no universal ordering; potentiation amplitude ≫ host > anion > cation.
+- **Next:** the data-analysis phase is essentially done. Choose **(A)** formalise the Ch4 model (φ(x) + read transfer function; cycle-vs-device variance) or **(B)** draft Ch3 — composition spine (§6/§8/§10) as the quantitative core + the cation/amplitude story (§11–§14) as the honest negative/methodological result. Always restrict cross-device τ to one matched protocol; refit after point-level QA; per-device pipeline τ needs QA (many bad fits).
 - **Caveats on current numbers:** "has measurement" = ≥1 pixel row in that type's `PIXEL_INFO`; the §1 coverage counts do **not** exclude flagged pixels (they are an upper bound), whereas the §6/§7 trend + clean-manifest counts **do**. Neither yet verifies a common protocol or replicate quality.
 - **Flag granularity (verified 2026-06-03):** FILTERED exclusion is applied per `(device, day, pixel, measurement_type)`, **not** per device — a flag removes only that pixel's that-type aggregate. All **221 flags match a real measurement row (100%)**, partial flagging is preserved (e.g. NM_v009: 6 of 27 HYST pixels dropped, 21 kept), and including `day` is equivalent to `(device, pixel)` for the current flags. **Caveat — flagging is HYST-heavy: 207 HYST vs only 3 PULSES + 11 DELAYTIME flags.** FILTERED has screened almost nothing in PULSES/DELAYTIME, so the decay (τ/β) and potentiation fits must apply their **own** goodness-of-fit + read-disturb screening rather than rely on FILTERED.
 
@@ -69,7 +70,7 @@ Status key: ✅ supported by data · 🟡 limited / preliminary · 🔴 unsuppor
 | --- | --- | --- | --- | --- |
 | C1 | PEO/LiTr memristive response (switching window, potentiation) is tunable by composition | 3 (core) | ✅ | Coherent across HYST window (§6.2), potentiation steepness+peak (§8.2) and fading-memory t½ (§8.1): higher PEO → weaker response. n = 2–9 dev/cell. |
 | C2 | Composition sets the fading-memory timescale in PEO/LiTr | 3→4 | ✅ | Model-free t½ composition-tunable ≈ 3–19 s, longest at PEO0.3/0.09; identified τ agrees (§8.1). **Corroborated by the pipeline's pre-computed exp-τ (corr 0.93–0.97; old τ reproduces the trend — §9).** The Ch4 timescale ladder. |
-| C3 | Cation identity orders the dynamics Li > Na > K (timescale / retention) | 3 (secondary) | 🔴 | At **matched protocol** (4 V/2 V) PEO/triflate → Li(~20 s)>K(10.7)>Na(3.0): Li longest, HSAB-consistent, but Na<K and n=1 Na/K, and **not reproduced** in TMPE or TFSI families (§13). No universal Li>Na>K. Potentiation amplitude — not cation — is the dominant τ lever. Reframe + future subthreshold, protocol-locked cation series. |
+| C3 | Cation identity orders the dynamics Li > Na > K (timescale / retention) | 3 (secondary) | 🔴 | No universal ordering. Cleanest comparison (TMPE/TFSI, n=2 same batch, §14): **K shortest ~3.5 s < Li≈Na ~6–7 s**; but PEO/triflate (matched, n=1 Na/K) gave Li>K>Na and TMPE/triflate K-longest → families contradict. Dominant τ levers: potentiation amplitude ≫ host > anion > cation. Reframe as future subthreshold, protocol-locked, n≥3 cation series. |
 | C4 | All three common measurements (I–V, N-pulse, delay) exist across the comparative corpus | 3/4 | 🟡 | True only for the Li composition grid; 41/149 overall, thin (n≤2) for Na/K. |
 | C5 | EPSC / STDP / separated STM-LTM / impedance compared across Li/Na/K | 3/4 | 🔴 | Ch2 (Paper 1, SY/Hybrane/LiTf) only. Use as Li-only priors/sanity checks; never propagate to Na/K. (Matches `01`/`05`.) |
 | C6 | Compact behavioural models (read fn, pulse update, decay) identifiable per composition cell | 4 | 🟡 | Per-cell parameters extracted (t½, retention, potentiation exp/peak/turnover; §8.5). Decay τ only ~half-identified at 8 pts; full φ(x) update + read transfer function still to formalise. |
@@ -321,3 +322,26 @@ At matched protocol: **PEO/triflate → Li (~20 s) > K (10.7) > Na (3.0)** — L
 **Caveats:** pipeline τ has many bad fits even at matched protocol (v266 0.1 s, v267 2040 s, v268 79 s, v294 74 s, v120 2×10⁵ s) → per-device QA is mandatory before trusting any τ. Na/K stay n=1 per matched-protocol family.
 
 **Scope note (unchanged):** §8/§10 **composition** used uniform 4 V/2 V, so that headline result is *not* affected — only the **cation** comparison was confounded (it mixed 4 V and 6 V batches).
+
+---
+
+## 14. TFSI-batch QA + the cleanest cation comparison (2026-06-03)
+
+User PNG review of the 2025 TFSI batches:
+
+- **PEO/TFSI collapses:** only **v321** (Li) usable — refit on points {1,2,5,10,60,300 s} → τ≈**0.4 s** (R²=0.99). v322 flat/broken; **v323/v324 (Na) and v325/v326 (K) are not proper decays** → discard. So *no* PEO/TFSI cation comparison.
+- **TMPE/TFSI (v333–338) all clean** (R²≥0.97) → the **only n=2-per-cation, same-batch, matched-protocol (4 V/2 V) cation comparison** in the archive:
+
+| TMPE/TFSI (4 V/2 V) | τ (devices) | median | shape |
+| --- | --- | --- | --- |
+| Li | v333 9.0, v334 3.7 | 6.3 s | stretched (β≈0.8–0.9) |
+| Na | v335 7.5, v336 6.6 | 7.0 s | sharp/compressed |
+| K | v337 3.7, v338 3.2 | **3.5 s** | sharp/compressed |
+
+**Result: K shortest (~3.5 s) < Li ≈ Na (~6–7 s)** — consistent with the weakest K⁺–ether-oxygen coordination (HSAB), but Li/Na indistinguishable (no full Li>Na>K).
+
+**Does not reconcile across families:** TMPE/triflate (n=1) had K *longest* (6.7 s vs Li 3.8, Na 5.0); PEO/triflate (n=1 Na/K) had Na shortest, K middle, Li longest. So **"K shortest" is a TFSI-only pattern, not robust.**
+
+**Host effect (fixed Li/TFSI):** PEO-Li-TFSI (v321) ≈ 0.4 s vs TMPE-Li-TFSI ≈ 6.3 s → **~15× longer in TMPE**. Host strongly modulates τ.
+
+**Net cation verdict (all evidence).** No cation ordering is robust across host × anion. The single highest-quality comparison (TMPE/TFSI, n=2, same batch) gives **K shortest, Li≈Na** — reportable as the best available datapoint *if* explicitly caveated that triflate families contradict it. **Dominant τ levers, in order: potentiation amplitude ≫ host > anion > cation.** Curve shapes also vary (TFSI Na/K are compressed "cliff" decays, β≈2; triflate/PEO are stretched, β<1) — a heterogeneity in relaxation form worth noting for Ch4.
