@@ -51,7 +51,7 @@ Composition provides an additional tuning knob through the polymer-host and salt
 | --- | --- | --- |
 | 1. Introduction | Computing bottlenecks, synaptic inspiration, memristors, organic materials, and the polymer-electrolyte strategy | Draft available |
 | 2. Proof of concept | A fully characterised `SY/Hybrane/LiOTf` two-terminal device with analogue switching, short- and long-term retention, EPSC-like response, and STDP | Draft available |
-| 3. Comparative study | How composition and cation identity change the dynamics of `PEO/LiOTf`, `PEO/NaOTf`, and `PEO/KOTf` devices | Planned |
+| 3. Comparative study | How **composition** (the `PEO/LiOTf` grid) tunes the volatile dynamics — switching, potentiation, and a fading-memory time constant — and how electrolyte **chemistry** (host, anion, cation) shifts them further; the `Li/Na/K` cation effect is examined critically | Planned |
 | 4. Temporal computing | Data-driven models and simulations for heterogeneous reservoirs, coincidence detection, and transient filter banks | Planned |
 | 5. Conclusions | Contributions, limitations, and future directions | Planned |
 

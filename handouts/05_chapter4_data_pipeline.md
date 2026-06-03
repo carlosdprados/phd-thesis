@@ -8,6 +8,13 @@
 
 **v3 (2026-04-12) — correction of scope.** Earlier revisions described the comparative corpus as an Ag-electrode NM_vXXX series employing LiTFSI / NaTFSI / KTFSI salts in a Hybrane-class / TMPE host. That description was inherited from a stale planning note and does not reflect the real archive. The actual comparative corpus is a PEO-based triflate series: a PEO/LiTr concentration sub-study plus a PEO/LiTr, PEO/NaTr, PEO/KTr fixed-composition set at PEO and salt mass fractions of 0.3 and 0.09. TMPE-based composites and alkali-TFSI (LiBis / NaBis / KBis) devices exist but are *exploratory* and are explicitly excluded from the Chapter 4 manifest. Chapter 2 supplementary measurements (EPSC, STDP, separated STM/LTM, impedance) remain Paper 1 (SY/Hybrane/LiTf) data and are used only as Li-only priors and sanity checks.
 
+**v4 (2026-06-03) — analysis-driven refinement (handouts `08_chapter3_4_claims_audit.md`, `10_chapter3_comparative_plan.md`).** Direct, QA'd analysis sharpened the corpus picture for Chapter 4:
+
+- **Composition (PEO/LiTr, Ag) is the only statistically-replicated axis** (n=2–4 across a 3×3 grid) → it is the **primary basis for the Ch4 behavioural model**. Host/anion/cation are illustrative (n≤2 per matched cell) — usable to *seed parameter spread*, not for powered per-cation models.
+- **Cation Li>Na>K is an honest negative** (confounded by drive-protocol amplitude and electrode). Do not build Na/K-specific quantitative models; the cleanest cation datapoint (TMPE/TFSI: K shortest < Li≈Na) is illustrative only.
+- **New mandatory controls for model identification:** (i) **drive-protocol amplitude sets the apparent τ** (same device v114: 4.6→15.5 s at 3→6 V write) — fit only within **one matched protocol** (the standard 4 V write / 2 V read, 30 pulses, 0.103 s set); (ii) **electrode** Ag vs Au must be matched (exclude Au, §16 of handout 08); (iii) the pipeline `exp decay: tau` is **not robust to outliers** — per-device point-level QA + refit (Kohlrausch τ, β) is required before any τ enters a parameter card (§13/§16).
+- **Manifest focus:** the frozen Ch4 manifest should centre on the **composition grid** (matched protocol + electrode), with chemistry cells included only as labelled illustrative extras. (HDF5 status already corrected in §2.2.)
+
 ---
 
 ## Purpose
