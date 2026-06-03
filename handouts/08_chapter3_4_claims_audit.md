@@ -16,8 +16,9 @@
 - **Cation verdict (C3):** at matched protocol (4 V/2 V) PEO/triflate shows Li longest (HSAB-consistent, n=1 Na/K) but it does **not** generalise across host/anion → no universal Li>Na>K. The dominant τ lever is **potentiation amplitude** (write/read protocol), not cation (§13, C12). **Composition result (C1/C2) stands** (uniform 4 V/2 V).
 - **TFSI QA done (§14):** PEO/TFSI collapsed (only v321 Li usable); TMPE/TFSI all clean → cleanest cation comparison = K shortest, Li≈Na (n=2), but not robust across families. Cation analysis is now **complete**: no universal ordering; potentiation amplitude ≫ host > anion > cation.
 - **Coverage audit (step A) done — §16 + `ch3_coverage_audit.csv`:** only composition (PEO/LiTr/Ag) is replicated (n=2–4); host/anion/cation are n≤2 illustrative; Au-electrode confound caught (corrected §15).
-- **Revised Ch3 plan (step B) drafted — `09_chapter3_revised_plan_PROPOSAL.md`** (composition-led spine + qualitative chemical-tuning landscape + protocol-amplitude methodological result). PROPOSAL only; `00/01/05` untouched pending advisor sign-off.
-- **Next:** advisor review of handout 09 → if approved, update `00/01/05` (v4) in one pass. Otherwise **(A)** formalise the Ch4 model, or refit the composition grid (point-level QA) to publish clean per-cell τ/β/potentiation. Always match protocol + electrode + composition for any τ comparison.
+- **Rework APPROVED & SHIPPED (v4):** full Ch3 plan = `10_chapter3_comparative_plan.md`; canonical `00`/`01`/`05` + README updated to v4. Proposal/diff retained in `09_…PROPOSAL.md`.
+- **Delay-fit QA scan done (§17):** flag (R²<0.9 / τ implausible / maxR<3) reproduces every PNG verdict; rescue candidates **v149, v148** (PNG-check — could strengthen the composition grid); composition spine = good-fit {0.3,0.6,1.2}×{0.045,0.09} cells only (0.15 row & 0.18 column are mostly flat/bad fits).
+- **Next:** user PNG-checks v149/v148; then refit the composition grid over **good-fit** devices (point-level QA) for clean per-cell τ/β/potentiation, and/or formalise the Ch4 model. Always match protocol + electrode + composition.
 - **Caveats on current numbers:** "has measurement" = ≥1 pixel row in that type's `PIXEL_INFO`; the §1 coverage counts do **not** exclude flagged pixels (they are an upper bound), whereas the §6/§7 trend + clean-manifest counts **do**. Neither yet verifies a common protocol or replicate quality.
 - **Flag granularity (verified 2026-06-03):** FILTERED exclusion is applied per `(device, day, pixel, measurement_type)`, **not** per device — a flag removes only that pixel's that-type aggregate. All **221 flags match a real measurement row (100%)**, partial flagging is preserved (e.g. NM_v009: 6 of 27 HYST pixels dropped, 21 kept), and including `day` is equivalent to `(device, pixel)` for the current flags. **Caveat — flagging is HYST-heavy: 207 HYST vs only 3 PULSES + 11 DELAYTIME flags.** FILTERED has screened almost nothing in PULSES/DELAYTIME, so the decay (τ/β) and potentiation fits must apply their **own** goodness-of-fit + read-disturb screening rather than rely on FILTERED.
 
@@ -385,4 +386,28 @@ Clean all-3 (flag- and broken-excluded) device counts per cell, SY-based, **Ag e
 
 **Electrode confound:** 7 Au-electrode all-3 devices (v265, v268, v269, v270, v291, v314, v315) — keep **separate** from Ag (this corrected §15).
 
+**See §17 for a delay-fit quality scan** that flags which devices need the v248-style point-level double-check (esp. low-n cells), and tightens the composition grid to *good-fit* coverage.
+
 **Verdict for the rework.** Only **composition (PEO/LiTr/Ag/4 V)** sustains real replication (n=2–4 across a 3×3 grid) — it is the **only statistically-claimable quantitative axis**. **Host, anion, and cation are all n≤2 on at least one matched side** → present them as *illustrative trends/observations with explicit n*, not as powered claims. Best comparison cell anywhere = TMPE/TFSI cation (2/2/2). This argues for a disciplined reframe: composition-led quantitative spine + a clearly-labelled qualitative "chemical-tuning landscape" (host/anion/cation), **not** four co-equal first-class axes. Confounds to hold fixed in any τ comparison: protocol amplitude (§13), electrode (§16), composition.
+
+---
+
+## 17. Delay-fit quality scan — which decays need the v248-style double-check (2026-06-03)
+
+Scanned every claim-relevant delay curve (64 device·day·pixel groups) with a simple-exp fit; **flagged if R²<0.90, or τ∉[0.3,300] s, or max ratio <3** (weak signal → τ ill-defined). 24 flagged.
+
+**Validation:** the flag reproduces the user's PNG verdicts on all 10 already-reviewed devices — v322/v323/v324/v325/v326 ("not proper decays") R²≈0; v247 (broken) R²=0.17; v248/v114/v115/v116 (the ones we cleaned) all flagged. ⇒ the flag is reliable for the un-reviewed devices.
+
+**High priority — rescue candidates (real signal, bad fit, not yet reviewed):**
+
+| device | cell | maxR | R² | why check |
+| --- | --- | --: | --: | --- |
+| **v149** | PEO/LiTr 0.15/0.09 Ag | 9.1 | 0.00 | strong signal, terrible fit → bad points; best rescue |
+| **v148** | PEO/LiTr **0.3/0.18** Ag | 3.8 | 0.00 | would fill a composition cell empty in the clean grid |
+| v151 | PEO/LiTr 0.15/0.18 Ag | 4.2 | 0.89 | borderline |
+
+**Not worth it (near-flat, maxR<3 → no real decay):** v150, v153, v154, v120 (broken, 6 V), v294, v314, v315.
+
+**Au-electrode (separate confound set, §16):** v266, v267, v270 (maxR 8.9, rescuable if Au sub-analysis), v291.
+
+**Implication for the composition spine.** "Has all-3" (§16) over-counts usable τ: the **PEO 0.15 row and salt-0.18 column are mostly flat/bad fits**. The robust composition τ result rests on the **PEO {0.3, 0.6, 1.2} × salt {0.045, 0.09}** cells. Action: PNG-check v149 / v148 (could rescue 0.15/0.09 and 0.3/0.18); otherwise present the grid as good-fit-only with honest per-cell n. Any quantitative composition τ should come from a refit over **good-fit** devices, not the raw "has-data" set.
