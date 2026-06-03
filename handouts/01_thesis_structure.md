@@ -4,7 +4,7 @@
 
 **Author:** Carlos David Prado-Socorro  
 **Date:** April 12, 2026  
-**Revision:** v3 — Chapter 3 and Chapter 4 re-scoped to match the real experimental archive. The main comparative corpus is PEO + triflate (LiTr, NaTr, KTr) composites at PEO = 0.3 and salt = 0.09 mass fractions, with a PEO/LiTr concentration series as a systematic sub-study. TMPE- and alkali-TFSI-based formulations are treated only as exploratory side evidence. The common comparative measurements are restricted to I–V hysteresis, variable-N potentiation, and variable-delay depotentiation; EPSC, STDP, separated STM/LTM and impedance remain Chapter 2 results only. v2 (2026-04-11) introduced the 5-chapter structure and the temporal-computing framing.
+**Revision:** v4 (2026-06-03) — Chapter 3 re-scoped after **direct, QA'd analysis of the archive** (handout `08_chapter3_4_claims_audit.md`; full plan `10_chapter3_comparative_plan.md`). Key changes: **composition (PEO/LiTr) is the only statistically-replicated axis** (n=2–4 across a 3×3 grid) and becomes the quantitative spine; **host (PEO/TMPE), anion (triflate/TFSI) and cation (Li/Na/K) are documented as an illustrative, sample-limited chemical-tuning landscape** (n≤2 per matched cell), no longer split into "core vs exploratory"; the **Li>Na>K cation hypothesis is reported as an honest negative** (confounded by drive-protocol amplitude and electrode); and the **dependence of fading-memory τ on potentiation amplitude** is a new methodological result. v3 (2026-04-12) had narrowed to PEO+triflate with cation as the secondary headline. v2 (2026-04-11) introduced the 5-chapter structure and temporal-computing framing.
 
 ---
 
@@ -26,22 +26,20 @@ Key content: Materials design rationale, full fabrication protocol, morphologica
 
 Status: Written (April 2026) — see `chapters/chapter2_proof_of_concept.tex`
 
-### Chapter 3 — PEO–Triflate Polymer-Electrolyte Memristive Devices: Composition and Ion-Identity Dependence
+### Chapter 3 — Compositional and Chemical Control of Volatile Polymer-Electrolyte Memristive Dynamics
 
-*The main comparative experimental chapter of the thesis. It is built on the abundant dataset that actually exists for multiple devices: PEO-based polymer-electrolyte composites loaded with alkali-metal triflate salts, characterised across a common set of three dynamical measurements. The chapter is framed as a physical-chemistry investigation of composition- and ion-driven dynamics, not as a performance shoot-out against digital memories.*
+*The main comparative experimental chapter. Built on the dataset that actually **replicates**: SY/PEO/LiTr composites across a composition grid, characterised by the three common dynamical measurements. **Composition is the quantitative spine; electrolyte chemistry (host, anion, cation) is an illustrative tuning landscape; and the drive protocol is shown to set the apparent timescale.** Framed as a physical-chemistry study of volatile dynamics, not a memory shoot-out. Full plan: `10_chapter3_comparative_plan.md`; evidence: `08_chapter3_4_claims_audit.md`.*
 
 Scope: ~30–40 pages  
 Key content:
 
-- Motivation for moving from the Chapter 2 SY/Hybrane/LiTf exemplar to a broader polymer-electrolyte platform, and for focusing on triflate salts in PEO as the hosts where the comparative dataset is most abundant
-- Composite preparation, processing, and device fabrication under a common protocol
-- **Core study — PEO/LiTr concentration series.** Systematic variation of PEO and LiTr mass fractions around the reference composition (PEO = 0.3, salt = 0.09). Common characterisation: (i) I–V hysteresis, (ii) variable-number-of-pulses potentiation, and (iii) variable-delay-time depotentiation. These three datasets define the shared comparative basis for the rest of the chapter and for Chapter 4.
-- **Secondary study — PEO/LiTr, PEO/NaTr, PEO/KTr at fixed composition (0.3 / 0.09).** Cross-cation comparison on the same three common measurements, read as a cation-identity sweep at fixed host chemistry and fixed mass fractions. The ion hierarchy Li > Na > K is discussed as an expected fading-memory timescale ordering, to be confirmed or corrected by the delay-time fits — never imposed.
-- **Exploratory side evidence.** A clearly delimited section reports a small number of TMPE-based composites and alkali-TFSI (LiBis / NaBis / KBis) devices. These are presented honestly as sparse, not as part of the main corpus, and are used only to motivate future work or to cross-check specific trends.
-- HSAB interpretation of the cation–oxygen binding strength, kept as a chemical framing rather than as a quantitative claim that requires EPSC / STDP / impedance data across Li/Na/K.
-- Device-to-device and cycle-to-cycle variability quantified directly from replicates within the three common datasets, not from any separate measurement type.
-- **What this chapter does *not* claim.** It does not present EPSC, STDP, separated STM/LTM retention, or impedance spectroscopy as common comparative measurements across PEO/LiTr, PEO/NaTr and PEO/KTr. Any reference to those measurements points back to the Chapter 2 device and is explicitly labelled as prior / sanity-check evidence.
-- **Explicit reframing:** ion identity and composition are treated as *timescale-engineering knobs*, not as defects that prevent persistence. Variability (device-to-device and cycle-to-cycle) is characterised quantitatively as a *resource* that Chapter 4 will exploit.
+- Motivation: from the single Ch2 SY/Hybrane/LiTf exemplar to a polymer-electrolyte platform; introduce the three common measurements and the explicit claim discipline (quantitative vs illustrative).
+- Fabrication under a **reported, matched protocol** (SY / PEO or TMPE / Li–Na–K triflate or TFSI; Ag electrode; 30 pulses, 4 V write / 2 V read).
+- **Quantitative spine — composition (PEO/LiTr, Ag).** Replicated 3×3 grid (PEO {0.3,0.6,1.2} × salt {0.045,0.09,0.18}, n=2–4/cell): switching window and potentiation strength fall as PEO rises; **fading-memory τ tunable ≈ 2–20 s** (Kohlrausch τ, β≈0.6–0.9); device-to-device heterogeneity quantified as a *resource*.
+- **Chemical-tuning landscape (illustrative, n-explicit).** Host (PEO vs TMPE, ~6× at Li-triflate), anion (triflate vs TFSI, ~20× in PEO), cation (Li/Na/K). Cleanest cation comparison (TMPE/TFSI, n=2): **K shortest < Li≈Na**, caveated as non-generalising. **No robust Li>Na>K.** HSAB kept as qualitative framing only.
+- **Methodological result — the drive protocol sets the timescale.** Potentiation amplitude inflates apparent τ (same device, 4.6→15.5 s at 3→6 V write); cross-device τ comparison requires matched protocol + electrode + composition.
+- **What this chapter does *not* claim.** No Li>Na>K law; no EPSC/STDP/separated STM-LTM/impedance across cations (Chapter-2-only, labelled as prior/sanity-check); host/anion/cation are illustrative (n≤2), not powered.
+- **Reframing:** composition and chemistry as *timescale-engineering knobs*; variability (device-to-device, cycle-to-cycle) as a *resource* that Chapter 4 exploits.
 
 ### Chapter 4 — Data-Driven Temporal Computing with Volatile Polymer-Electrolyte Memristors
 
@@ -90,7 +88,7 @@ The five-chapter structure follows a logical and defensible scientific narrative
 
 2. **Chapter 2** presents the first demonstration of the concept, validated through publication in a peer-reviewed high-impact journal. It establishes all fundamental memristive functionalities in a single, well-characterised device.
 
-3. **Chapter 3** takes the validated concept forward by systematically exploring the *real* comparative corpus that exists in quantity: PEO/triflate polymer-electrolyte composites. The core is a PEO/LiTr concentration series; the secondary study is a PEO/LiTr, PEO/NaTr, PEO/KTr comparative set at fixed mass fractions; exploratory systems (TMPE, alkali-TFSI) are retained only as side evidence and clearly labelled as such. The chapter is anchored in the three common dynamical measurements — I–V hysteresis, variable-N potentiation, and variable-delay depotentiation — and does not overreach into EPSC / STDP / impedance claims for devices where those measurements do not exist.
+3. **Chapter 3** takes the validated concept to a polymer-electrolyte platform. Its **quantitative spine is the PEO/LiTr composition grid** — the only axis that replicates (n=2–4 across a 3×3 grid). Electrolyte **chemistry — host (PEO/TMPE), anion (triflate/TFSI), cation (Li/Na/K) — is an illustrative, sample-limited tuning landscape** (n≤2 per matched cell), with the **Li>Na>K hypothesis reported as an honest negative** (confounded by drive-protocol amplitude and electrode). A **methodological result** shows that potentiation amplitude sets the apparent fading-memory timescale. Anchored in the three common dynamical measurements; no overreach into EPSC / STDP / impedance.
 
 4. **Chapter 4** converts those physical properties into application-level design rules. It uses only existing datasets plus compact data-driven simulations, which makes it fully achievable without further fabrication. It provides the first credible link from the device chemistry of Chapters 2–3 to circuit-level temporal computing schemes, using reservoir computing as the flagship case. Every quantitative application-level claim traces back to the three common dynamical measurements of Chapter 3; the Chapter 2 Paper 1 device provides priors and sanity checks only.
 
@@ -99,7 +97,7 @@ The five-chapter structure follows a logical and defensible scientific narrative
 The logical arc is now:
 
 - **Chapter 2** proves the platform exists on a single, fully characterised SY/Hybrane/LiTf device.
-- **Chapter 3** quantifies how composition (PEO/LiTr concentration series) and cation identity (PEO/LiTr, PEO/NaTr, PEO/KTr at fixed mass fractions) change its dynamical behaviour, through the three common measurements that are abundant across the corpus.
+- **Chapter 3** quantifies how **composition** (the PEO/LiTr grid — the replicated result) tunes the dynamics, and surveys how electrolyte **chemistry** (host/anion/cation) shifts them further (illustrative, n-limited), through the three common measurements.
 - **Chapter 4** shows how those different dynamical behaviours can be *used* for temporal computing.
 - **Chapter 5** generalises and looks forward.
 
@@ -118,7 +116,7 @@ This single decision propagates across all five chapters:
 | --------- | -------------------- |
 | Ch. 1 | Introduce event-driven / temporal computing alongside crossbar computing. Add a subsection on "why some useful computing elements should forget". |
 | Ch. 2 | No change in content, but language around STM / LTM avoids apologising for short retention — retention is a feature, not a defect. |
-| Ch. 3 | Present the PEO/triflate concentration and cation sweeps as *timescale-engineering knobs*, not as retention rankings. Variability → heterogeneity resource. Exploratory TMPE / alkali-TFSI data is kept strictly delimited. |
+| Ch. 3 | Lead with the **composition grid** as the quantitative result; present host/anion/cation as an n-explicit *tuning landscape*, not retention rankings. Variability → heterogeneity resource. Report the Li>Na>K cation hypothesis as an honest negative + the protocol-amplitude confound. |
 | Ch. 4 | Flagship application: heterogeneous physical reservoir computing, grounded in the three common dynamical measurements. Supporting: coincidence detection and transient filter banks. |
 | Ch. 5 | Benchmarks drawn from neuromorphic / reservoir / event-driven hardware, not from DRAM/SRAM/ReRAM. |
 
