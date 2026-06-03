@@ -78,7 +78,7 @@ Status key: ✅ supported by data · 🟡 limited / preliminary · 🔴 unsuppor
 | C8 | Devices show volatile fading memory (forgetting) and pulse potentiation across the corpus | 2/3/4 | ✅ | Delay slopes negative and pulse slopes positive in every cell tested (§6.3). Robust qualitative behaviour. |
 | C9 | Large device-to-device / cycle variability — usable as heterogeneity for reservoir computing | 3/4 | ✅ | Feature sd ≈ mean across cells (§6); the t½ ladder (≈3–19 s, §8.1) is a concrete heterogeneity resource. |
 | C10 | Potentiation saturates / reverses (turnover) at high N — caps usable pulse count | 3/4 | ✅ | ~half the cells peak then decline by N=1000 (§8.2); sets a safe operating range for Ch4 pulse protocols. |
-| C11 | Anion (triflate vs TFSI) and host modulate retention τ more strongly than cation | 3 | 🟡 | PEO/triflate τ≈20 s vs PEO/TFSI τ≈1 s; host shifts τ too (§11). Striking at n=2/cell — needs PNG QA + replication. |
+| C11 | Anion (triflate vs TFSI) and host (PEO vs TMPE) modulate retention τ more strongly than cation | 3 | 🟡→✅ (host) | Anion: PEO/triflate τ≈20 s vs PEO/TFSI τ≈1 s (§11). **Host: PEO/LiTr τ≈24 s (n=6) vs TMPE/LiTr τ≈3 s — ~6× (§15), best-replicated non-composition comparison.** Host effect Li-specific on current data (Na/K n=1). |
 | C12 | Potentiation amplitude (write/read protocol) dominates apparent retention τ | 3 (method) | ✅ | Same device v114: τ 4.6 s (3 V write/1.5 V read) → 15.5 s (6 V/3 V); #pulses (30) & timing (0.103 s) constant, write/read voltages locked (§13). Cross-device τ must use one matched protocol; ideally subthreshold read. Higher write drives more ion/electrode processes → deeper, longer-lived state. |
 
 ---
@@ -345,3 +345,16 @@ User PNG review of the 2025 TFSI batches:
 **Host effect (fixed Li/TFSI):** PEO-Li-TFSI (v321) ≈ 0.4 s vs TMPE-Li-TFSI ≈ 6.3 s → **~15× longer in TMPE**. Host strongly modulates τ.
 
 **Net cation verdict (all evidence).** No cation ordering is robust across host × anion. The single highest-quality comparison (TMPE/TFSI, n=2, same batch) gives **K shortest, Li≈Na** — reportable as the best available datapoint *if* explicitly caveated that triflate families contradict it. **Dominant τ levers, in order: potentiation amplitude ≫ host > anion > cation.** Curve shapes also vary (TFSI Na/K are compressed "cliff" decays, β≈2; triflate/PEO are stretched, β<1) — a heterogeneity in relaxation form worth noting for Ch4.
+
+---
+
+## 15. Host comparison: PEO vs TMPE for triflate (2026-06-03)
+
+Better-supported than any cation cell, because both hosts have multiple Li devices. Matched protocol (4 V/2 V, 0.3/0.09), per-device simple-exp fits with QA (R²≥0.90, plausible τ, real signal max ratio > 2):
+
+| host (Li-triflate) | QA-clean τ (s) | n | signal (max ratio) |
+| --- | --- | --- | --- |
+| PEO/LiTr | 8.7, 19.6, 23.2, 25.1, 67, 79 → median **~24 s** | 6 | strong (4–79×) |
+| TMPE/LiTr | v250 3.8 clear; v291 3.4 / v314 3.0 / v315 2.7 weak | 1 clear + ~3 weak | weak (1.5–10×) |
+
+**Finding:** **PEO/LiTr retains ~6× longer (τ ≈ 24 s) and far more strongly than TMPE/LiTr (τ ≈ 3 s, weak amplitude).** Robust on the PEO side (n=6, heterogeneous 9–79 s — itself a Ch4 resource); suggestive on the TMPE side (only v250 shows a clear decay; the other TMPE/LiTr barely potentiate). Na/K host pairs (n=1) are smaller/mixed (Na: PEO 3.0 vs TMPE 5.0; K: PEO 10.7 vs TMPE 6.7) → the large host effect appears Li-specific, but n=1 there. **This is the best-replicated non-composition comparison in the corpus and a strong argument for treating host as a first-class axis (C11).**
