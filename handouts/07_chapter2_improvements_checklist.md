@@ -47,7 +47,7 @@ All resolved items were committed individually, each gated on a clean `make expo
 | 1.6 | ☑ Done | `fix(chapter2): separate cycling endurance…` | Section retitled "Ambient Shelf Stability"; endurance flagged uncharacterised. |
 | 1.7 | ☐ **BLOCKED (needs data)** | — | Device/batch N for every RSD/error-band; cannot be fabricated. |
 | 2.1 | ☐ **PARTIAL** | (figures via 0.1) | Eight main floats scaffolded; importing the AFM/profilometry/degradation SI data + plots still pending. |
-| 2.2 | ☐ **BLOCKED (needs CrossRef)** | — | Verify metadata of all 53 citations (web/CrossRef). |
+| 2.2 | ☐ **PARTIAL (CrossRef)** | `fix(chapter2): close five citation gaps…` (2026-06-03) | 6 of 59 keys CrossRef-verified (the 6 added/wired in the gap pass); 53 originals still unverified. See 2026-06-03 addendum. |
 | 2.3 | ☑ Done | `fix(chapter2): correct first-author attribution…` | "Malliaras 2010" → "Zakhidov 2010" in the comparison table. |
 | 2.4 | ☐ **BLOCKED (needs data)** | — | Stretch exponent β and fit quality from the actual retention fits. |
 | 2.5 | ☑ Done | `docs(chapter2): frame ED/ECD timescale assignment…` | Marked a working interpretation with a Ch.3-testable consequence. |
@@ -57,7 +57,25 @@ All resolved items were committed individually, each gated on a clean `make expo
 | 3.3 | ☑ Done | `docs(chapter2): make the STDP fit explicitly piecewise…` | Per-branch fit in absolute delay with branch-specific `A_±`, `τ_±`. |
 | 3.4 | ☑ Done | `docs(chapter2): distinguish Li+ site binding energy…` | Well-depth vs migration-barrier disambiguated. |
 
-**What is needed to clear the remaining six.** 1.7 and 2.4 need the per-device statistics and retention-fit parameters from the experimental archive. 2.2 needs CrossRef/web verification. 2.1 needs the SI datasets brought in (and folds into the real-figure effort that finishes 0.1). 2.6 needs the plotted I–V data to confirm the within/across-sweep description. 1.2 needs your decision on the STDP polarity label.
+**What is needed to clear the remaining six.** 1.7 and 2.4 need the per-device statistics and retention-fit parameters from the experimental archive. 2.2 is now **partially** done — the 6 keys added/wired in the 2026-06-03 gap pass are CrossRef-verified; the 53 original keys still need verification. 2.1 needs the SI datasets brought in (and folds into the real-figure effort that finishes 0.1). 2.6 needs the plotted I–V data to confirm the within/across-sweep description. 1.2 needs your decision on the STDP polarity label.
+
+---
+
+## Addendum — 2026-06-03 pass (citation-gap closure)
+
+A separate read flagged five claims that lacked a citation. Closing them surfaced that three were not missing-citation cases at all but **wrong numbers** that no honest source supports. All changes landed in one commit (`fix(chapter2): close five citation gaps and correct overstated energy claims`), gated on a clean build.
+
+| Gap | Location | Disposition |
+|-----|----------|-------------|
+| Inorganic-memristor pJ budget + >10¹⁰-cycle endurance | `sec:comparison` | ☑ Cited `YangStrukovStewart2013` + `IelminiWong2018` (claim was sound; honest as written). |
+| SiO₂/Si₃N₄ encapsulation vs O₂/H₂O ingress | `subsec:lifetime` | ☑ Cited `LewisWeaver2004` (new bib entry). |
+| ITO conductivity | `subsec:device_geometry` | ☑ Cited `Kim1999` (new entry) **and fixed unit** S/m → S/cm (1e4 S/m is ~100× too resistive; 1e4 S/cm matches Kim1999). |
+| CMOS synaptic energy ">1 µJ/event" | `sec:comparison` | ⚠ **Number was wrong** — optimised CMOS neuromorphic is ~tens of pJ/event (TrueNorth ~26, Loihi ~24, ODIN ~12.7), which *inverts* the comparison. Reframed honestly (50 nJ sits above optimised CMOS/inorganic, a PoC value improvable by area scaling); cited `IndiveriLiu2015` + `Horowitz2014`. |
+| "µJ–mJ early inorganic devices" | `subsec:pulse_potentiation` | ⚠ **Overstated** — even early PCM/RRAM are pJ–nJ. Restated as comparable to the pJ–nJ switching energy of inorganic memristive devices; cited `YangStrukovStewart2013`. |
+
+**Note for the committee-facing draft:** the energy section previously read as systematically favourable to the organic device (competitors quoted at µJ–mJ when they are pJ–nJ). The corrected text no longer claims a per-event energy advantage; the honest position is that 50 nJ is a proof-of-concept figure, above optimised CMOS and inorganic platforms, with area scaling as the route to close the gap.
+
+**Item 2.2 impact:** the 6 keys above are CrossRef-verified; this is logged as partial progress on 2.2 (6 of 59 done, 53 to go).
 
 ---
 
@@ -138,12 +156,13 @@ All resolved items were committed individually, each gated on a clean `make expo
 - **Fix:** Add the thesis-only figures already specified in `handouts/03_chapter2_figures_needed.md` (AFM vs spin speed, profilometry trace, degradation time series) to `figures/chapter2/` and reference them in-chapter (or in a thesis appendix). Overlaps with item 0.1.
 - **Done when:** The three supporting datasets appear in the thesis itself, not only as "see SI of Ref."
 
-### ☐ 2.2 — Audit all 53 citations against CrossRef — BLOCKED (needs CrossRef/web verification)
+### ☐ 2.2 — Audit all Chapter 2 citations against CrossRef — PARTIAL (6 of 59 verified)
 
-- **Problem:** `references.bib` has previously contained LLM-hallucinated DOIs/titles (see memory note `bibliography_audit_chapter1.md`). All 53 keys in this chapter resolve, but key existence ≠ correct metadata.
-- **Scope:** every `\cite` in the chapter; prioritise the comparison table (`tab:comparison`).
-- **Fix:** Verify author/title/year/DOI of each entry against CrossRef; correct or remove anything unverifiable.
-- **Done when:** Every Chapter 2 citation is CrossRef-verified and logged.
+- **Problem:** `references.bib` has previously contained LLM-hallucinated DOIs/titles (see memory note `bibliography_audit_chapter1.md`). All keys in this chapter resolve, but key existence ≠ correct metadata.
+- **Scope:** every `\cite` in the chapter (now **59** unique keys after the 2026-06-03 gap pass added 6); prioritise the comparison table (`tab:comparison`).
+- **Progress (2026-06-03):** the 6 keys added/wired while closing the citation gaps are CrossRef-verified (title/authors/journal/year/vol/pages/DOI): `YangStrukovStewart2013` (10.1038/nnano.2012.240), `IelminiWong2018` (10.1038/s41928-018-0092-2), `IndiveriLiu2015` (10.1109/JPROC.2015.2444094), `Horowitz2014` (10.1109/ISSCC.2014.6757323), `Kim1999` (10.1063/1.371708, new entry), `LewisWeaver2004` (10.1109/JSTQE.2004.824072, new entry). The **53 original keys remain unverified**.
+- **Fix:** Verify author/title/year/DOI of each remaining entry against CrossRef; correct or remove anything unverifiable.
+- **Done when:** All 59 Chapter 2 citations are CrossRef-verified and logged (6 done, 53 to go).
 
 ### ☑ 2.3 — Fix the author-name inconsistency for `Zakhidov2010` — DONE
 
