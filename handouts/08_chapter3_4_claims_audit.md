@@ -17,8 +17,9 @@
 - **TFSI QA done (§14):** PEO/TFSI collapsed (only v321 Li usable); TMPE/TFSI all clean → cleanest cation comparison = K shortest, Li≈Na (n=2), but not robust across families. Cation analysis is now **complete**: no universal ordering; potentiation amplitude ≫ host > anion > cation.
 - **Coverage audit (step A) done — §16 + `ch3_coverage_audit.csv`:** only composition (PEO/LiTr/Ag) is replicated (n=2–4); host/anion/cation are n≤2 illustrative; Au-electrode confound caught (corrected §15).
 - **Rework APPROVED & SHIPPED (v4):** full Ch3 plan = `10_chapter3_comparative_plan.md`; canonical `00`/`01`/`05` + README updated to v4. Proposal/diff retained in `09_…PROPOSAL.md`.
-- **Delay-fit QA scan done (§17):** flag (R²<0.9 / τ implausible / maxR<3) reproduces every PNG verdict; rescue candidates **v149, v148** (PNG-check — could strengthen the composition grid); composition spine = good-fit {0.3,0.6,1.2}×{0.045,0.09} cells only (0.15 row & 0.18 column are mostly flat/bad fits).
-- **Next:** user PNG-checks v149/v148; then refit the composition grid over **good-fit** devices (point-level QA) for clean per-cell τ/β/potentiation, and/or formalise the Ch4 model. Always match protocol + electrode + composition.
+- **Delay-fit QA scan (§17)** + **rescue outcomes:** v149 discard (both), v148 delay discard / pulses keep, v151 delay salvageable (2/5/10/60/300 s). Composition spine = good-fit {0.3,0.6,1.2}×{0.045,0.09} cells.
+- **Curation registry shipped (§18):** `handouts/ch3_png_qa_curation.csv` is the single source of truth for hand-picked points; `scripts/ch3_4_dynamics_fits.py` reads + applies it (reproducible refits).
+- **Next:** broaden the fit script beyond manifest candidates to do the **good-fit composition refit** over all PEO/LiTr cells (using the registry, incl. v151), publish clean per-cell τ/β; then write Ch3 or formalise the Ch4 model. Always match protocol + electrode + composition.
 - **Caveats on current numbers:** "has measurement" = ≥1 pixel row in that type's `PIXEL_INFO`; the §1 coverage counts do **not** exclude flagged pixels (they are an upper bound), whereas the §6/§7 trend + clean-manifest counts **do**. Neither yet verifies a common protocol or replicate quality.
 - **Flag granularity (verified 2026-06-03):** FILTERED exclusion is applied per `(device, day, pixel, measurement_type)`, **not** per device — a flag removes only that pixel's that-type aggregate. All **221 flags match a real measurement row (100%)**, partial flagging is preserved (e.g. NM_v009: 6 of 27 HYST pixels dropped, 21 kept), and including `day` is equivalent to `(device, pixel)` for the current flags. **Caveat — flagging is HYST-heavy: 207 HYST vs only 3 PULSES + 11 DELAYTIME flags.** FILTERED has screened almost nothing in PULSES/DELAYTIME, so the decay (τ/β) and potentiation fits must apply their **own** goodness-of-fit + read-disturb screening rather than rely on FILTERED.
 
@@ -411,3 +412,15 @@ Scanned every claim-relevant delay curve (64 device·day·pixel groups) with a s
 **Au-electrode (separate confound set, §16):** v266, v267, v270 (maxR 8.9, rescuable if Au sub-analysis), v291.
 
 **Implication for the composition spine.** "Has all-3" (§16) over-counts usable τ: the **PEO 0.15 row and salt-0.18 column are mostly flat/bad fits**. The robust composition τ result rests on the **PEO {0.3, 0.6, 1.2} × salt {0.045, 0.09}** cells. Action: PNG-check v149 / v148 (could rescue 0.15/0.09 and 0.3/0.18); otherwise present the grid as good-fit-only with honest per-cell n. Any quantitative composition τ should come from a refit over **good-fit** devices, not the raw "has-data" set.
+
+**Rescue outcome (PNG review, 2026-06-04 — recorded in §18 registry):** v149 delay **and** pulses discarded (erratic beyond repair); v148 delay discarded but **pulses kept** (more defensible); **v151 delay salvageable** (keep 2/5/10/60/300 s; pulses discarded). Net: the PEO0.15 row and the 0.3/0.18 delay cell stay thin (v151 partially fills 0.15); the composition τ spine remains the {0.3,0.6,1.2}×{0.045,0.09} cells.
+
+---
+
+## 18. Curation registry — single source of truth for hand-picked points (2026-06-04)
+
+**Gap closed.** Until now the PNG-derived point selections lived only as prose (§12–§17). They are now consolidated in a machine-readable registry — **`handouts/ch3_png_qa_curation.csv`** — one row per (device, measurement_type): `verdict` (use / clean / discard), `kept_points` (hand-picked delay-times in s, or pulse counts), `day`, `pixel`, `reviewer`, `date`, `notes`. **`scripts/ch3_4_dynamics_fits.py` now reads and applies it** (discard → drop the curve; clean → keep only listed points; use/absent → all points), so every refit is reproducible from the registry rather than from scattered notes.
+
+Captured so far (all PNG-reviewed): 2023-10 batch (v247–v252), old PEO/Tr (v114/115/116), TFSI batches (v321–v326, v333–v338), and the §17 rescue candidates (v148/v149/v151). Verified applied: v248's decay now refits on its 6 cleaned points; discarded curves are dropped.
+
+**Maintenance rule:** when a new device is PNG-reviewed, add a registry row and re-run the script — the per-cell τ/β and potentiation summaries update automatically. Note: for weak-signal devices (e.g. v248, max ratio ≈2.7) the model-free `t_half` and the exp-`τ` can diverge (≈24 s vs ≈3 s) — a further reason those n=1 cells are illustrative only.

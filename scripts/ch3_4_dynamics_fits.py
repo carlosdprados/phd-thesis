@@ -11,6 +11,10 @@ Honesty notes baked in:
 - FILTERED barely covers PULSES/DELAYTIME, so we add our own quality screen (R^2,
   monotonicity) instead of trusting FILTERED for these two measurements.
 - DELAYTIME restricted to the common 2.0 V read protocol.
+- PNG-derived human curation (verdict + hand-picked points per device/measurement)
+  is read from handouts/ch3_png_qa_curation.csv and applied: 'discard' drops the
+  curve, 'clean' keeps only the listed points, 'use'/absent keeps all points.
+  This is the single source of truth for the hand-picked points.
 """
 import csv, os, collections
 import numpy as np
@@ -41,6 +45,24 @@ def med(v):
     return float(np.median(v)) if v else float("nan")
 
 
+def load_curation():
+    """PNG-derived human QA: (device, measurement_type) -> (verdict, kept_points_set_or_None)."""
+    cur = {}
+    path = os.path.join(OUT, "ch3_png_qa_curation.csv")
+    if not os.path.exists(path):
+        return cur
+    for r in csv.DictReader(open(path)):
+        dn, mt = G(r, "device_name"), G(r, "measurement_type")
+        v, kp = G(r, "verdict"), G(r, "kept_points")
+        if not dn or not mt:
+            continue
+        kept = None
+        if v == "clean" and kp and kp != "all":
+            kept = set(float(x) for x in kp.split(";") if x.strip())
+        cur[(dn, mt)] = (v, kept)
+    return cur
+
+
 def main():
     # chemistry + manifest candidates
     man = list(csv.DictReader(open(os.path.join(OUT, "ch4_device_manifest_DRAFT.csv"))))
@@ -52,6 +74,8 @@ def main():
     flags = set()
     for r in load("FILTERED_DEVICES.csv"):
         flags.add((G(r, "device_name"), G(r, "day"), G(r, "pixel"), G(r, "measurement_type")))
+
+    curation = load_curation()  # PNG-derived per-device verdicts + hand-picked points
 
     # DELAYTIME read-voltage screen: keep only devices measured at 2.0 V
     rv2 = set()
@@ -69,10 +93,15 @@ def main():
         dn = G(r, "device_name")
         if dn not in cell or dn not in rv2:
             continue
+        cur = curation.get((dn, "DELAYTIME"))
+        if cur and cur[0] == "discard":
+            continue
         if (dn, G(r, "day"), G(r, "pixel"), "DELAYTIME") in flags:
             continue
         t, y = fnum(G(r, "delay time (s)")), fnum(G(r, "ratio"))
         if t and t > 0 and y is not None:
+            if cur and cur[0] == "clean" and cur[1] is not None and t not in cur[1]:
+                continue  # keep only hand-picked points
             grp[(dn, G(r, "pixel"))].append((t, y))
 
     decay_rows = []
@@ -124,10 +153,15 @@ def main():
         dn = G(r, "device_name")
         if dn not in cell:
             continue
+        cur = curation.get((dn, "PULSES"))
+        if cur and cur[0] == "discard":
+            continue
         if (dn, G(r, "day"), G(r, "pixel"), "PULSES") in flags:
             continue
         N, y = fnum(G(r, "number of pulses")), fnum(G(r, "ratio"))
         if N and N > 0 and y is not None:
+            if cur and cur[0] == "clean" and cur[1] is not None and N not in cur[1]:
+                continue
             pg[(dn, G(r, "pixel"))].append((N, y))
 
     pulse_rows = []
