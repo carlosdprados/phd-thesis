@@ -464,3 +464,21 @@ The PULSES descriptors ([`ch4_pulse_descriptors.csv`](ch4_pulse_descriptors.csv)
 **Key honest caveat (now in Ch3 §3.8 limitations):** integration was measured at a **single fixed inter-pulse interval (0.103 s)** and forgetting separately (post-potentiation decay). No experiment varies input *timing*, so Ch4 must **compose** φ(N) and τ — a modelling assumption, not a measured fact. A varied-interval pulse-train experiment is the test.
 
 **Figure:** `fig_potentiation()` in `scripts/ch3_figures.py` → `figures/chapter3/potentiation_grid.pdf` = Fig 3.2 (α, peak ratio, turnover fraction over the grid; n annotated).
+
+## 22. TMPE/triflate cation series — authoritative attribution + the anion-flip (2026-06-04)
+
+Prompted by "are we accounting for Li/Na/K triflates on TMPE?". **Yes** — and it is now made explicit in the chapter + chemistry figure. Device→composition attribution **authoritatively confirmed** from `DATABASE/UPDATED_DEVICES_LIBRARY.csv` column **`Components Group`** (the canonical material decode; not in the PEO-only manifest):
+
+2023-10 batch = a clean **2-host × 3-cation triflate matrix**, all `SY`, 0.3/0.09, Ag, matched 4 V/2 V:
+
+| | Li | Na | K |
+|---|---|---|---|
+| **PEO/triflate** | v247 `SY, PEO, LiTr` (discard, broken) | v248 `…NaTr` | v249 `…KTr` |
+| **TMPE/triflate** | v250 `…TMPE, LiTr` | v251 `…NaTr` | v252 `…KTr` |
+
+Direct refits (simple-exp τ, curation applied):
+- **TMPE/triflate (n=1 each):** Li (v250) τ=3.8 R²=0.93 · Na (v251) τ=5.0 R²=0.99 · K (v252) τ=6.7 R²=0.96 → **Li<Na<K, i.e. K longest** (reverse of the HSAB hypothesis).
+- **TMPE/TFSI (n=2 each, §14):** K 3.5 shortest, Li 6.3 ≈ Na 7.0.
+- PEO/triflate this batch: v248 (Na) weak (maxR 2.7, τ=3.0 unreliable), v249 (K) τ=10.7; Li discarded — too muddy to feature.
+
+**Decisive point (now the spine of the cation honest-negative):** holding the **TMPE host fixed** and swapping only the anion (triflate↔TFSI) **inverts** the cation order — K longest→shortest. So no host/anion-independent cation ordering exists in this archive. Chemistry figure cation panel rebuilt to grouped bars (TMPE host, triflate vs TFSI × Li/Na/K) showing the inversion; chapter cation paragraph + caption updated with the explicit numbers.

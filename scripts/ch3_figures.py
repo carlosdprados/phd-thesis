@@ -255,28 +255,41 @@ def fig_potentiation():
 # Figure 2 — chemistry-tuning landscape (illustrative; values from handout 08 sec 14-15)
 # ----------------------------------------------------------------------------
 def fig_chemistry():
-    # Each entry: label -> (t_half/tau in s, n). Provenance in handout 08 sec 14-15
-    # and the curation registry (PNG-reviewed per-device fits).
-    host = [("PEO/LiTr\n(Ag)", 22.0, 3), ("TMPE/LiTr\n(Ag)", 3.8, 1)]          # sec 15
+    # Values are PNG-reviewed per-device fits (simple-exp tau, s) from handout 08
+    # sec 13-15 and the curation registry; all SY, 0.3/0.09, Ag, matched 4 V/2 V.
+    host = [("PEO/LiTr", 22.0, 3), ("TMPE/LiTr", 3.8, 1)]                       # sec 15 (Ag)
     anion = [("PEO/Tr", 20.0, 3), ("PEO/TFSI", 0.4, 1)]                         # sec 14 (v321)
-    cation = [("Li", 6.3, 2), ("Na", 7.0, 2), ("K", 3.5, 2)]                    # sec 14 TMPE/TFSI
+    # Cation: TMPE host, both anions -> the order inverts with the anion (honest negative).
+    cation_tr = [3.8, 5.0, 6.7]            # TMPE/triflate v250/v251/v252, n=1 each (sec 13)
+    cation_tfsi = [6.3, 7.0, 3.5]          # TMPE/TFSI v333-338, n=2 each (sec 14)
 
-    groups = [("Host\n(Li-triflate)", host, ["#4c72b0", "#dd8452"]),
-              ("Anion\n(PEO host)", anion, ["#4c72b0", "#c44e52"]),
-              ("Cation\n(TMPE/TFSI)", cation, ["#8172b3", "#937860", "#da8bc3"])]
-
-    fig, axes = plt.subplots(1, 3, figsize=(7.4, 2.8), sharey=True)
-    for ax, (title, data, colours) in zip(axes, groups):
+    fig, axes = plt.subplots(1, 3, figsize=(7.6, 2.9), sharey=True)
+    # --- panels 1-2: simple two-bar comparisons ---
+    for ax, (title, data, colours) in zip(
+            axes[:2],
+            [("Host\n(Li-triflate)", host, ["#4c72b0", "#dd8452"]),
+             ("Anion\n(PEO host)", anion, ["#4c72b0", "#c44e52"])]):
         labels = [d[0] for d in data]; vals = [d[1] for d in data]; ns = [d[2] for d in data]
         x = np.arange(len(data))
-        bars = ax.bar(x, vals, color=colours[:len(data)], width=0.65, edgecolor="0.2", linewidth=0.5)
-        ax.set_yscale("log")
-        ax.set_title(title)
+        bars = ax.bar(x, vals, color=colours, width=0.62, edgecolor="0.2", linewidth=0.5)
+        ax.set_yscale("log"); ax.set_title(title)
         ax.set_xticks(x); ax.set_xticklabels(labels, fontsize=8)
         for b, v, n in zip(bars, vals, ns):
             ax.text(b.get_x() + b.get_width() / 2, v * 1.08, f"{v:g}s\n$n{{=}}{n}$",
                     ha="center", va="bottom", fontsize=7.5)
         ax.set_ylim(0.2, 60)
+    # --- panel 3: cation, TMPE host, grouped by anion (shows the order inverting) ---
+    ax = axes[2]
+    cats = ["Li", "Na", "K"]; x = np.arange(3); w = 0.38
+    b1 = ax.bar(x - w / 2, cation_tr, w, color="#55a868", edgecolor="0.2", linewidth=0.5, label="triflate ($n{=}1$)")
+    b2 = ax.bar(x + w / 2, cation_tfsi, w, color="#c44e52", edgecolor="0.2", linewidth=0.5, label="TFSI ($n{=}2$)")
+    ax.set_yscale("log"); ax.set_title("Cation\n(TMPE host)")
+    ax.set_xticks(x); ax.set_xticklabels(cats, fontsize=8)
+    for bars, vals in [(b1, cation_tr), (b2, cation_tfsi)]:
+        for b, v in zip(bars, vals):
+            ax.text(b.get_x() + b.get_width() / 2, v * 1.06, f"{v:g}", ha="center", va="bottom", fontsize=7)
+    ax.set_ylim(0.2, 60)
+    ax.legend(frameon=False, fontsize=6.5, loc="upper center", ncol=1)
     axes[0].set_ylabel("fading-memory time (s)")
     fig.tight_layout()
     p = os.path.join(FIGDIR, "chemistry_landscape.pdf")
