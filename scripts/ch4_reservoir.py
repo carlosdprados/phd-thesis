@@ -42,17 +42,31 @@ def _full(cards):
     return [c for c in cards if c.alpha == c.alpha and c.peak_ratio == c.peak_ratio]
 
 
-def nodes_from(base, N, rng, jitter=0.12):
+def nodes_from(base, N, rng, jitter=0.12, dt=DT, n_in=1, sparsity=0.0):
     """Return per-node (decay, alpha, w) by cycling the given base cards with
-    device-to-device jitter and a random input mask/gain."""
+    device-to-device jitter and a random input mask/gain.
+
+    decay is computed at sample interval `dt` (s). `n_in` is the number of input
+    channels: for n_in==1 the mask `w` is a scalar (single-channel behaviour is
+    byte-identical to before — same RNG draw order), for n_in>1 each node gets a
+    non-negative input-mask vector of length n_in (a fraction `sparsity` of whose
+    entries are zeroed), so the bank mixes several physiological channels."""
     nodes = []
     for i in range(N):
         c = base[i % len(base)]
         tau = max(c.tau * float(np.exp(rng.normal(0, jitter))), 1e-2)
         beta = float(np.clip(c.beta * (1 + rng.normal(0, jitter)), 0.2, 2.0))
         alpha = float(np.clip(c.alpha * (1 + rng.normal(0, jitter)), 0.05, 2.0))
-        w = float(np.exp(rng.normal(0, 0.5)))            # input mask / gain
-        decay = float(np.exp(-((DT / tau) ** beta)))
+        if n_in == 1:
+            w = float(np.exp(rng.normal(0, 0.5)))        # input mask / gain (scalar)
+        else:
+            w = np.exp(rng.normal(0, 0.5, size=n_in))    # per-channel input mask
+            if sparsity > 0:
+                m = rng.random(n_in) >= sparsity
+                if not m.any():
+                    m[rng.integers(n_in)] = True         # keep >=1 live channel
+                w = w * m
+        decay = float(np.exp(-((dt / tau) ** beta)))
         nodes.append((decay, alpha, w))
     return nodes
 
@@ -65,15 +79,26 @@ def make_nodes(cards, N, heterogeneous, rng, jitter=0.12):
 
 
 def run_states(nodes, u):
-    """Drive the bank with input u (T,), return state matrix X (T, N)."""
-    T = len(u); N = len(nodes)
-    X = np.zeros((T, N))
+    """Drive the bank with input u and return the state matrix X (T, N).
+
+    u may be (T,) single-channel or (T, C) multichannel; each node's drive is the
+    compressive write of its (non-negative) input mix:  relu(W_in . u_n) ** alpha.
+    """
+    u = np.asarray(u, float)
+    if u.ndim == 1:
+        u = u[:, None]                                   # (T, 1)
+    T, C = u.shape
+    N = len(nodes)
     decay = np.array([n[0] for n in nodes])
     alpha = np.array([n[1] for n in nodes])
-    w = np.array([n[2] for n in nodes])
+    Win = np.array([np.atleast_1d(n[2]) for n in nodes], float)   # (N, Cw)
+    if Win.shape[1] == 1 and C > 1:
+        Win = np.repeat(Win, C, axis=1)                  # broadcast scalar gain
+    assert Win.shape[1] == C, f"mask has {Win.shape[1]} channels, input has {C}"
+    X = np.zeros((T, N))
     x = np.zeros(N)
     for n in range(T):
-        drive = np.power(np.clip(w * u[n], 0, None), alpha)
+        drive = np.power(np.clip(Win @ u[n], 0, None), alpha)
         x = decay * x + drive
         X[n] = x
     return X

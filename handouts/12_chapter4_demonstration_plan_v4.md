@@ -6,6 +6,8 @@
 **Date:** 2026-06-04
 **Status:** Active planning document. **Supersedes the application structure (§4.4–§4.6) of [`04_chapter4_temporal_computing_plan.md`](04_chapter4_temporal_computing_plan.md)**, which predates the v4 Chapter-3 reframe and still assumes a *comparative* cation fit (≥3 devices/cell). The modelling backbone of handout 04 (§4.3 behavioural model, validation, parameter cards) and the circuit-integration / design-rules sections (§4.7–§4.8) remain valid and are reused. Read alongside [`08_chapter3_4_claims_audit.md`](08_chapter3_4_claims_audit.md) and [`05_chapter4_data_pipeline.md`](05_chapter4_data_pipeline.md).
 
+> **⚠️ UPDATE 2026-06-04 (WESAD downloaded & run — results are in; see new [§13](#13-measured-wesad-results-2026-06-04--honest-narrative-pivot)).** The flagship Demonstration-B claim as written in §2/§6 — *"the heterogeneous reservoir wins the multi-timescale affect task the homogeneous one cannot cover"* — **is NOT supported by the measured WESAD data**, even after rebuilding the task as a memory-demanding *streaming* one (the fair test). What the data DO support: (i) the in-silico device reservoir does real affective computing (Demo A binary **0.894**; Demo B 3-class **~0.76**); (ii) fading **memory** helps the streaming task (**+0.049** vs a memoryless readout; **+0.014–0.020** controlling for dimensionality); (iii) timescale **heterogeneity** is *within noise* on affect (**ΔF1 het−hom = +0.005 ± 0.011**, 7/10 seeds), because the discriminative memory demand is dominated by a single slow (tonic) band the lead composition already serves. **The "heterogeneity is a computational resource" claim therefore moves to the architecture/benchmark level (MC 1.49×), where it is solid.** §2, §6, §7 below are kept for provenance but must be read through §13.
+
 ---
 
 ## 0. Decisions locked (this session)
@@ -131,7 +133,7 @@ The connective tissue between Ch3 and Ch4:
 
 - **Reservoir computing** (04 §4.4) → split into Demonstrations A and B here; remains the flagship.
 - **Multi-timescale filter bank** (04 §4.6) → folded into Demonstration B as the *multi-timescale affective feature extraction* front-end (it is the same idea: parallel τ channels).
-- **Spike coincidence detection** (04 §4.5) → **demote to an optional supporting vignette** or drop, to keep the chapter focused on the two reservoir demonstrations + affective domain. (Open decision below.)
+- **Spike coincidence detection** (04 §4.5) → **cut from the main chapter**; mention only as background if needed, to keep the chapter focused on the two reservoir demonstrations + affective domain.
 
 ---
 
@@ -152,7 +154,62 @@ The connective tissue between Ch3 and Ch4:
    - *Demo-A validation (sweep):* **best total-MC = PEO 0.3/0.09** (the lead, MC 3.44); best NARMA-10 = PEO 0.3/0.045 (NRMSE 0.627), lead a close 2nd (0.669). **Both winners are in the low-PEO row, as Ch3 predicts** — so 0.3/0.09 is validated as the memory-capacity optimum, with 0.3/0.045 competitive on NARMA (its larger dynamic range helps drive).
    - *Caveat:* absolute NARMA NRMSE is high (~0.6–0.8) — a bank of *independent* (non-recurrent, 1T1M) leaky nodes is a weak NARMA reservoir; only the *relative* composition ranking is claimed. Self-test PASSES.
    - **TODO:** single-node *time-multiplexed* (delay-feedback) variant for Demo A; MC(k) + sweep figures; inject measured device-to-device spread; drive-diversity nodes (Demo B).
-3. **`scripts/ch4_wesad.py`** — ✅ **BUILT, awaiting data (2026-06-04).** WESAD loader (chest EDA → resample to 4 Hz → 60 s windows), reservoir encoding (pooled state), **ridge one-hot readout + leave-one-subject-out macro-F1**. Demo A = binary stress/baseline on the lead-composition bank; Demo B = 3-class on the heterogeneous bank + a homogeneous control (ΔF1). Numpy-only. **Synthetic smoke test PASSES** (pipeline runs end-to-end without the dataset). **DOWNLOAD REQUIRED:** WESAD (~2.1 GB) → `data/wesad/WESAD/S*/S*.pkl` (gitignored); UCI id 465. The script prints this if missing. **TODO once data present:** multichannel input (add RESP + wrist BVP/HRV), tune dt/window, report per-class F1; expect Demo B ≥ homogeneous control.
+3. **`scripts/ch4_wesad.py`** — ✅ **DONE ON REAL DATA (2026-06-04).** WESAD present at `data/wesad/WESAD/S2..S17` (15 subjects). Now multichannel (chest **EDA + Resp + Temp + HR-from-ECG**; robust R-peak detection via scipy), per-subject robust scaling (preserves tonic level, LOSO-safe), cached at the scaled-stream level. **Demo A** = window-level binary stress/baseline (EDA, lead bank). **Demo B rebuilt as STREAMING** continuous per-step affect tracking (reservoir runs over the whole session; per-step ridge one-hot; LOSO; causal label smoothing) — the memory-demanding fair test — with **het / hom / instantaneous / memoryless** banks, per-class F1, seed error bars, and a dt sweep. Self-test + synthetic smoke test pass. **Results: see [§13](#13-measured-wesad-results-2026-06-04--honest-narrative-pivot).** Net: multichannel + per-subject scaling lifted Demo A to **0.894**; the streaming reformulation made the task memory-demanding (memory helps) but **Demo B did NOT clear the homogeneous control** (ΔF1 = +0.005 ± 0.011, ns).
 4. ✅ **`scripts/ch4_figures.py` (2026-06-04)** — `figures/chapter4/mc_curve.pdf` (MC(k), heterog. 6.0 vs homog. 4.1) + `composition_sweep.pdf` (MC & NARMA by cell). Demo-A/B figures done.
 5. **Single-node *time-multiplexed* (delay-feedback) Demo-A variant** — optional alternative architecture; not required for the claim.
 6. Draft `chapters/chapter4_temporal.tex` around the two demonstrations once the WESAD numbers are in.
+
+---
+
+## 13. Measured WESAD results (2026-06-04) — honest narrative pivot
+
+WESAD downloaded (15 subjects, S2–S17) → `data/wesad/WESAD/` (gitignored). Labelled material after windowing/streaming: baseline ≈ 17 610 s, stress ≈ 9 965 s, amusement ≈ 5 574 s. All numbers below are **leave-one-subject-out (LOSO)**, in-silico devices (Ch3 parameter cards), linear (ridge) readout only.
+
+### 13.1 Demonstration A — window-level binary stress/baseline (single channel EDA, lead bank)
+
+| Model | LOSO macro-F1 | per-class F1 |
+| --- | --- | --- |
+| Device reservoir (lead PEO 0.3/0.09) | **0.894** | baseline 0.93 · stress 0.88 |
+| Static feature baseline (mean/std/last/slope of EDA) | 0.899 | — |
+
+**Read:** a single composition is a competent node for a single-timescale affect feature (✅ the Demo-A claim). *But* a static baseline matches it → **the 60 s-window task is quasi-static (no fading memory required)**, which is exactly why timescale heterogeneity cannot help it. This motivated rebuilding Demo B as a memory-demanding streaming task.
+
+### 13.2 Demonstration B — streaming 3-class affect tracking (multichannel EDA+Resp+Temp+HR, dt=1 s, 15 s smoothing)
+
+Reservoir runs continuously over each session; the affect class is read out at every step. Means ± SD over 10 random bank seeds (matched input masks across conditions):
+
+| Model | LOSO macro-F1 | increment |
+| --- | --- | --- |
+| Instantaneous input (no memory) | 0.709 | — (static ceiling) |
+| Memoryless 24-node bank (decay = 0) | 0.737 | **+0.028 dimensionality** |
+| Homogeneous bank (memory, single τ) | 0.753 ± 0.009 | **+0.016 memory** |
+| Heterogeneous bank (memory, τ ≈ 3→26 s) | 0.758 ± 0.006 | **+0.005 heterogeneity (ns; 7/10 seeds >0)** |
+
+- **het − instantaneous = +0.049 ± 0.006** (robust across dt 0.5–4 s) — but most of this is dimensionality.
+- **Genuine fading-memory gain = +0.014 to +0.020** (heterogeneous vs a *same-size memoryless* bank) — modest but consistent.
+- **Timescale-heterogeneity gain = +0.005 ± 0.011** — **within noise.** dt sweep: het−hom ∈ [+0.002, +0.007] across dt; positive but never separable from zero.
+
+Per-class (best bank): baseline 0.90 · stress 0.92 · **amusement 0.55** — amusement (short, low-arousal) is the hard class for all models.
+
+### 13.3 Why heterogeneity does not pay off on affect (the honest mechanism)
+
+Affect labels are slowly-varying sustained states; the discriminative memory demand is **dominated by one slow (tonic) band** that the lead composition's τ (~19–26 s) already serves. Heterogeneity only converts into task performance when the target requires memory at **many distinct lags simultaneously** — which the architecture-level **Memory Capacity** benchmark *does* (het 6.12 vs hom 4.10, **1.49×**; broader MC(k)), and NARMA/MC rank the **lead PEO 0.3/0.09** top. So:
+
+- **"Heterogeneity is a computational resource" → keep, but anchor it on the benchmarks (MC/NARMA), where it is solid and task-agnostic.**
+- **On affect → the honest claim is: the devices perform real affective computing (0.89 binary; 0.76 streaming 3-class), fading memory contributes (+0.014–0.020), and composition-timescale *matching* (the Ch3 result) is the design lever; heterogeneity is a generality/robustness hedge, not required when one timescale dominates.**
+
+This *unifies* Ch3 → Ch4: Ch3 shows composition (and drive) **set** the device timescale; Ch4 shows you then **match** that timescale to the task, and that a spread of timescales buys task-agnostic memory breadth (provable on benchmarks) rather than a guaranteed win on any one application.
+
+### 13.4 Figure & artefacts
+
+- `figures/chapter4/wesad_affect.pdf` — (a) Demo A reservoir vs static; (b) Demo B streaming decomposition (inst → +dim → +memory → +heterog) with seed error bars.
+- `figures/chapter4/mc_curve.pdf`, `composition_sweep.pdf` — unchanged architecture-level heterogeneity result.
+- Cache: `data/wesad/_cache_EDA-Resp-Temp-HR_4hz.npz` (scaled streams; gitignored with the dataset).
+
+### 13.5 Scope / caveats to state in the chapter
+
+In-silico devices; linear readout; HR from chest ECG (cleaner than wrist BVP); per-step ridge with 15 s causal smoothing; single dataset (WESAD). The het−hom null is reported as a **negative result with error bars**, not hidden. A matched-amplitude varied-cadence pulse-train experiment (φ⊗λ assumption, §3) remains the key future bench test.
+
+### 13.6 Open decision for the writing pass
+
+Chapter framing options were put to the author; **selected: build the streaming task** (done, above). Remaining call for the draft: present Ch4 as **(benchmarks = where heterogeneity wins) + (WESAD = where the devices do real affect, memory helps, heterogeneity is an honest null)** — the recommended honest structure — before writing `chapters/chapter4_temporal.tex`.
