@@ -40,9 +40,11 @@
 \section{Introduction and Scope}\label{sec:ch4_intro}
 %% ------------------------------------------------------------
 
-% --- DRAFT: expand --- From Chapter 3's tunable fading memory to computation;
-% the timescale-matching thesis; in-silico scope stated up front.
-\Cref{ch:comparative} established that the fading memory of these composites is an engineerable quantity. This chapter asks what that engineered memory is good for, and answers it by treating the measured device dynamics as the elements of a reservoir computer.
+\Cref{ch:poc,ch:comparative} treated the slow, volatile response of these polymer-electrolyte composites first as a phenomenon to be demonstrated and then as a property to be controlled. This chapter treats it as a resource to be exploited. The guiding idea is simple: a device whose conductance carries a fading record of its recent input is, in miniature, a temporal processor, and a collection of such devices is a \emph{reservoir} --- a physical substrate that projects a time-varying input into a high-dimensional state from which simple, linear read-outs can solve temporal tasks.
+
+The chapter rests on a single thesis that connects it to \cref{ch:comparative}: composition and drive \emph{set} the device timescale, and a task \emph{selects} the timescale it needs. The design problem is therefore one of \emph{matching}, and the open question is what a \emph{spread} of timescales --- the cheap, intrinsic heterogeneity of a solution-processed device family --- buys on top of a single well-chosen one. The evidence is organised as three tiers of increasing realism. First, two task-agnostic reservoir benchmarks (memory capacity and \NARMA{}) establish reservoir competence and show, cleanly, that timescale heterogeneity broadens recoverable memory. Second, a benchmark built from real physiological recordings asks the reservoir to reconstruct the multi-lag temporal context of affective signals, where heterogeneity again pays. Third, the downstream affective-classification task itself is reported honestly, including the finding that, once a single slow timescale dominates the discriminative information, heterogeneity is no longer required.
+
+The evidence base is deliberately constrained. Every result is \emph{in silico}: each device node is a compact behavioural model whose parameters are taken directly from the \cref{ch:comparative} fits (\cref{sec:ch4_model}), and every read-out is a single linear regression, so that no claimed computation can be smuggled in through a nonlinear decoder or a hand-tuned dynamical system. No new devices are fabricated. Two demonstrations run throughout: Demonstration~A asks whether a \emph{single} composition suffices for a single-timescale feature, and Demonstration~B asks what a heterogeneous \emph{bank} adds when the target is multi-timescale. The honest answer, assembled across the three tiers, is that the devices perform genuine temporal computing, that fading memory is the active ingredient, and that timescale heterogeneity is a measurable computational resource for memory breadth and a generality hedge --- rather than a guaranteed improvement on every task.
 
 %% ------------------------------------------------------------
 \section[A Measured Behavioural Model]{From Measured Dynamics to a Behavioural Model}\label{sec:ch4_model}
@@ -69,9 +71,11 @@ Two honesty constraints are carried explicitly from \cref{ch:comparative} into e
 \section{Reservoir Computing and the Common Metric Language}\label{sec:ch4_framework}
 %% ------------------------------------------------------------
 
-% --- DRAFT: expand --- Leaky node, spatial multi-node bank, ridge readout;
-% MC(k), NARMA-10, IPC; the single ruler that makes the demonstrations comparable.
-Reservoir computing supplies the framework in which a bank of volatile devices becomes a temporal processor, and a single set of metrics on which every demonstration below is measured.
+\paragraph{The reservoir principle.} Reservoir computing emerged from the observation that a fixed, randomly-parametrised dynamical system --- the \emph{reservoir} --- can perform useful temporal computation provided only that a \emph{linear} read-out is trained on its state, leaving the dynamics themselves untrained \cite{Jaeger2001ESN,Maass2002LSM,LukoseviciusJaeger2009}. Two properties make a physical system a competent reservoir: a \emph{fading memory} of past inputs, so that the state reflects recent history but eventually forgets, and a \emph{nonlinear} response, so that the state mixes inputs in ways a linear read-out can exploit. These are precisely the two properties characterised in \cref{ch:comparative} --- the stretched-exponential depotentiation supplies the fading memory, the compressive potentiation supplies the nonlinearity --- which is what makes a bank of these devices a natural physical reservoir. The same recognition has driven a wave of memristive and organic reservoir demonstrations \cite{Tanaka2019,Du2017,Zhong2021,Cucchi2021}, of which the polymer-electrolyte devices studied here are a low-power, biocompatible instance.
+
+\paragraph{Architecture.} The reservoir used throughout this chapter is a spatial bank of $N$ \emph{independent} device nodes, each a single behavioural model (\cref{sec:ch4_model}) driven by a randomly-masked copy of the input. Independence is a deliberately conservative choice: with no inter-node recurrence, all of the reservoir's richness must come from the spread of intrinsic timescales across compositions, the device-to-device scatter, and the input mask, so any benefit attributed to heterogeneity cannot have been inherited from engineered connectivity. Where a single composition is the subject (Demonstration~A), the same node can equally be deployed as a time-multiplexed, delay-feedback reservoir whose virtual nodes are distributed along a delay line \cite{Appeltant2011}; the two architectures are interchangeable for the present claims, and the spatial bank is used for uniformity.
+
+\paragraph{One ruler.} So that the demonstrations remain comparable, every result is reported on a common set of metrics. The linear \emph{memory capacity} $\mathrm{MC}_k$ and its total \cite{Jaeger2002STM} quantify how much past input is linearly recoverable at each lag, and so visualise timescale coverage directly; \NARMA{} \cite{AtiyaParlos2000} is a standard nonlinear system-identification benchmark; the information-processing-capacity framework \cite{Dambre2012} underlies the separation of linear from nonlinear contributions; and the affective tasks are scored by class-balanced macro-F1. Robustness is probed by injecting the measured device-to-device and cycle-to-cycle spread into the bank.
 
 %% ------------------------------------------------------------
 \section{Benchmark Tier: Memory Capacity and NARMA}\label{sec:ch4_benchmarks}
@@ -101,17 +105,36 @@ The first tier of evidence is deliberately task-agnostic: two standard reservoir
 \section[Affective Computing]{Affective Computing: A Native Timescale Match}\label{sec:ch4_affect}
 %% ------------------------------------------------------------
 
-% --- DRAFT: expand --- Why affect; device-tau window vs affect-signal bands table
-% (phasic EDA / respiration / HRV / tonic SCL); WESAD dataset; slow-signal regime.
-Affective computing recognises human emotional and physiological state from slow peripheral signals, and the device timescale window sits directly on top of them, which makes affect the flagship domain for the device reservoir \autocite{Picard1997,Schmidt2018WESAD}.
+Affective computing --- the recognition of human emotional and physiological state by machines --- was framed by Picard as a route to more natural human--computer interaction, classically from \emph{peripheral} physiological signals that are slow, wearable-friendly, and unobtrusive to acquire \cite{Picard1997}. It is the flagship domain of this chapter, for two reasons that follow directly from \cref{ch:comparative}. First, the device timescale window --- fading-memory times from a few seconds to tens of seconds --- sits natively on top of the bands that carry affective information, so no aggressive time-rescaling is needed to bring signal and substrate into register (\cref{tab:ch4_bands}). Second, affective information is \emph{intrinsically multi-timescale}: a fast phasic electrodermal response, a respiration- and heart-rate-variability rhythm of a few seconds, and a tonic level that drifts over minutes all carry state at once. That structure is the honest, signal-driven motivation for a heterogeneous bank, and it is also the deployment narrative for an organic, flexible, biocompatible, low-power substrate worn on the skin.
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption[Affective signal timescales and device coverage]{Characteristic timescales of the peripheral affective signals used in this chapter, and the composition cells whose fading-memory window covers them. The grid of \cref{ch:comparative} spans the full range, with the lead \PEO{}~0.3 cells serving the slow LF-HRV band.}
+  \label{tab:ch4_bands}
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{lll}
+    \toprule
+    Affective signal & Timescale & Device coverage \\
+    \midrule
+    Phasic EDA (SCR) & $\sim$1--10\,s   & low--mid \PEO{} ($t_{1/2}$ 3--19\,s) \\
+    Respiration      & $\sim$3--5\,s    & mid \PEO{} \\
+    HRV, HF band     & $\sim$2.5--7\,s  & mid \PEO{} \\
+    HRV, LF band     & $\sim$7--25\,s   & \PEO{}~0.3 ($\tau \approx 19$--26\,s) \\
+    Tonic SCL        & minutes          & slowest / drive-boosted \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The experiments that follow use the Wearable Stress and Affect Detection corpus (\WESAD{}) of Schmidt et al.\ \cite{Schmidt2018WESAD}: fifteen subjects wearing a chest sensor that records electrodermal activity, respiration, temperature, and an electrocardiogram, with periods labelled baseline, stress, or amusement. \WESAD{} is used in two complementary ways --- as a source of real physiological streams whose multi-lag temporal context the reservoir must encode (\cref{sec:ch4_physio}), and as a downstream affective-classification task (\cref{sec:ch4_wesad}).
 
 %% ------------------------------------------------------------
 \section{Physiological Temporal-Context Reconstruction}\label{sec:ch4_physio}
 %% ------------------------------------------------------------
 
-The benchmarks of \cref{sec:ch4_benchmarks} prove that a spread of device timescales broadens memory on a \emph{random} input. The flagship domain of this chapter --- affective computing --- supplies a more demanding test on \emph{real} signals. Affective computing recognises human emotional and physiological state from slow peripheral signals \cite{Picard1997}, and the device timescale window of \cref{ch:comparative} (seconds to tens of seconds) sits directly on the bands that carry affective information: phasic electrodermal responses (seconds), respiration and the high-frequency heart-rate-variability band (a few seconds), the low-frequency band (tens of seconds), and the tonic skin-conductance level (minutes). Affect is therefore intrinsically multi-timescale, which is the honest, signal-driven motivation for a heterogeneous bank.
+The benchmarks of \cref{sec:ch4_benchmarks} prove that a spread of device timescales broadens memory on a \emph{random} input. This section puts that property to a more demanding test on the real, intrinsically multi-timescale affective signals introduced in \cref{sec:ch4_affect}, isolating the multi-timescale \emph{encoding} question before turning to final labels (\cref{sec:ch4_wesad}).
 
-This section isolates the multi-timescale \emph{encoding} question before turning to final labels. Using the Wearable Stress and Affect Detection (\WESAD{}) corpus of Schmidt et al.\ \cite{Schmidt2018WESAD} --- fifteen subjects, with chest electrodermal activity, respiration, temperature, and an electrocardiogram-derived heart rate --- the reservoir is run continuously over each session at $\Delta t = \SI{1}{\second}$, and a linear read-out is asked to reconstruct each input channel at delays of $1$, $3$, $8$, $20$ and \SI{45}{\second}. These delays span fast phasic and beat-to-beat context, respiration- and HF-HRV-scale context, and tonic, LF-HRV-scale context. Evaluation is leave-one-subject-out over all fifteen subjects, with $N=48$ nodes per bank.
+The reservoir is run continuously over each \WESAD{} session at $\Delta t = \SI{1}{\second}$ on four chest channels --- electrodermal activity, respiration, temperature, and an electrocardiogram-derived heart rate --- and a linear read-out reconstructs each channel at delays of $1$, $3$, $8$, $20$ and \SI{45}{\second}. These delays span fast phasic and beat-to-beat context, respiration- and HF-HRV-scale context, and tonic, LF-HRV-scale context. Evaluation is leave-one-subject-out over all fifteen subjects, with $N=48$ nodes per bank.
 
 \Cref{tab:ch4_physio} reports the held-out reconstruction quality. A memoryless bank barely improves on instantaneous input ($R^2 = 0.674$ against $0.673$): with no fading memory, the past is simply not available. Memory of a single timescale lifts $R^2$ to $0.74$, and the heterogeneous composition bank reaches the best single-bank score, $0.756$ --- a gain of $+0.084$ over instantaneous input and $+0.012$ over the best same-size homogeneous control. The mechanism is visible in the band-resolved columns: the fast homogeneous bank is best at the fastest context and the slow homogeneous bank at the slowest, but neither covers the whole vector, whereas the heterogeneous bank is the best \emph{single} bank across the full fast-to-slow physiological context (\cref{fig:ch4_physio}). This is the affect-aligned statement of ``heterogeneity is a computational resource'' on real signals, and it is exactly the result that the final-label classifier of \cref{sec:ch4_wesad} cannot expose.
 
@@ -181,29 +204,37 @@ The final tier is the downstream task itself: classifying affective state from t
 \section{Judging the Chapter 3 Findings Against the Application}\label{sec:ch4_designrules}
 %% ------------------------------------------------------------
 
-% --- DRAFT: expand --- The Ch3->Ch4 loop: composition SETS tau, task MATCHES tau;
-% heterogeneity = memory-breadth / generality hedge, not a guaranteed label win;
-% circuit-integration and design rules (handout 04 sec 4.7-4.8).
-The two demonstrations close the loop with \cref{ch:comparative}: composition \emph{sets} the device timescale, the application \emph{selects} which timescale it needs, and a spread of timescales buys memory breadth rather than a guaranteed win on any single label set.
+\Cref{sec:ch4_benchmarks,sec:ch4_physio,sec:ch4_wesad} together close the loop opened in \cref{ch:comparative}. That chapter showed that composition --- and, as a methodological corollary, drive amplitude --- \emph{sets} the fading-memory timescale of these devices. This chapter shows the other half of the design rule: an application \emph{selects} a timescale, or a set of timescales, and performance follows from how well the device family covers them. The composition sweep makes the rule concrete in one direction (\cref{fig:ch4_composition_sweep}): the lead cell is the memory-capacity optimum because its relaxation time best matches a single seconds-scale target, which is the regime of Demonstration~A. The multi-lag results make it concrete in the other (\cref{tab:ch4_physio}): when the target spans bands that no single cell covers, the bank whose timescales are \emph{spread} to match them is the best single choice.
+
+\paragraph{Heterogeneity as a design resource.} The three tiers give a consistent --- and honest --- account of what timescale heterogeneity is worth. Where the task demands memory at many lags at once, namely random-input memory capacity (a $1.49\times$ broadening; \cref{fig:ch4_mc_curve}) and real-physiology context reconstruction ($+0.012$ in held-out $R^2$ over the best homogeneous bank; \cref{tab:ch4_physio}), heterogeneity is a measurable computational resource. Where a single slow timescale already dominates the discriminative information, as in the sustained \WESAD{} affect labels, it is a generality and robustness hedge rather than a source of additional accuracy. Crucially for the materials argument of this thesis, that heterogeneity is \emph{cheap and intrinsic}: it comes for free with a solution-processed device family, through composition spread, device-to-device scatter, and --- as further, illustrative knobs catalogued in \cref{ch:comparative} but not required by the quantitative banks here --- electrolyte chemistry and drive amplitude.
+
+\paragraph{Operating point and integration.} The same parameter cards that drive the simulations also fix the deployment envelope. The devices operate in the sub-kilohertz regime in which affective physiology lives, so the slow response that disqualifies them for fast logic is exactly what suits them to on-skin sensing. The read-out is assumed sub-threshold and state-preserving, which sets a read-voltage and read-disturb budget that any circuit implementation must respect; and the device-to-device scatter that a memory application would treat as a yield problem is, in the reservoir setting, part of the computational substrate. These are the design rules that \cref{ch:comparative} makes available and that an eventual hardware reservoir would inherit.
 
 %% ------------------------------------------------------------
 \section{Limitations and Scope Conditions}\label{sec:ch4_limitations}
 %% ------------------------------------------------------------
 
-% --- DRAFT: expand --- The six honesty boundaries: in-silico; phi-cross-lambda
-% single-cadence assumption; slow (sub-kHz) regime; sub-threshold read; illustrative
-% chemistry nodes (n<=2); linear read-out only. Null reported WITH error bars.
-% Key future bench test: matched-amplitude varied-cadence pulse train.
-The claims of this chapter are bounded by a set of scope conditions that are stated plainly here, the most consequential being that the demonstrations are in-silico simulations driven by measured parameter cards rather than a bench reservoir run.
+The claims of this chapter are bounded by scope conditions that are stated here in full, in keeping with the claim discipline of \cref{ch:comparative}.
+
+\paragraph{In silico.} The demonstrations are simulations. Each node is the measured $\phi \otimes \lambda \otimes f$ behavioural model of \cref{sec:ch4_model}, not a bench reservoir, and every figure caption names the data behind it; the step from a faithful per-device model to a wired hardware reservoir is left to future work.
+
+\paragraph{The composition assumption.} As detailed in \cref{sec:ch4_model}, the write nonlinearity and the fading-memory law were measured separately, at different write amplitudes and a single inter-pulse cadence. Composing them assumes the two regimes are compatible and probably under-estimates the coupling between drive and retention. A single matched-amplitude experiment that sweeps pulse count and inter-pulse interval together would remove the assumption; it is the most important bench experiment this chapter calls for.
+
+\paragraph{Operating regime and read-out.} The model is identified, and valid, only in the slow, sub-kilohertz regime of the measurements; affective signals fall natively in this band, but fast temporal tasks are out of scope. Every read-out is a single ridge regression --- a deliberate constraint, since a nonlinear read-out could solve the tasks by itself and would invalidate the reservoir claim --- and the read is assumed sub-threshold and state-preserving.
+
+\paragraph{Heterogeneity axes.} The quantitative heterogeneous banks span the replicated \PEO{}/\LiTf{} composition grid. The chemistry and drive-amplitude axes of \cref{ch:comparative}, being sample-limited ($n\le 2$ per matched cell), enter only as illustrative additional knobs; Demonstration~B is therefore a principle demonstration of composition heterogeneity, not a powered comparison across chemistries.
+
+\paragraph{A single dataset, and an honest null.} The affective results rest on one corpus (\WESAD{}). The central negative result --- that timescale heterogeneity does not separably improve final-label classification --- is reported with error bars across seeds and sampling intervals rather than omitted, because it is informative: it localises exactly where heterogeneity helps and where it does not.
 
 %% ------------------------------------------------------------
 \section{Conclusions and Bridge to Chapter~5}\label{sec:ch4_conclusions}
 %% ------------------------------------------------------------
 
-% --- DRAFT: expand --- Devices do real temporal computing; heterogeneity is a
-% computational resource where it is measured cleanly (MC/NARMA, physiological
-% context); composition-timescale matching is the design lever; bridge to Conclusions.
-This chapter has shown that a bank of solution-processed polymer-electrolyte memristors, characterised only through three common measurements, performs real temporal computing on standard benchmarks and on real physiological signals.
+This chapter has shown that a bank of solution-processed polymer-electrolyte memristors, characterised through nothing more than the three common measurements of \cref{ch:comparative}, performs genuine temporal computing. Reduced to compact, measured behavioural models and read out by a single linear regression, the devices reach competitive scores on the standard memory-capacity and \NARMA{} reservoir benchmarks, encode the multi-lag temporal context of real physiological signals, and classify affective state from the \WESAD{} corpus at a leave-one-subject-out macro-F1 of $0.894$ on a binary stress task and $0.758$ on a three-class streaming task.
+
+The results resolve into a single design rule that unifies the two experimental chapters. \Cref{ch:comparative} establishes that composition and drive set the device timescale; this chapter establishes that the application selects the timescale, that fading memory is the active computational ingredient, and that a spread of timescales is a measurable resource for memory breadth --- a $1.49\times$ broadening of memory capacity and a consistent gain in physiological-context encoding --- even though it is not required when a single slow timescale already dominates a task. The heterogeneity that \cref{ch:comparative} catalogued as a tuning landscape is, in this light, not an imperfection to be suppressed but the raw material of the computation.
+
+The concluding chapter draws together the contributions of the thesis and its limitations. The most consequential next steps follow directly from the scope conditions above: the matched-amplitude, varied-cadence pulse-train experiment that would convert the composition assumption into measured fact; a powered study of the chemistry and drive-amplitude heterogeneity axes; and a hardware reservoir that replaces the in-silico bank with wired devices, closing the gap between a faithful device model and a physical temporal computer.
 
 
 %% ---- Standalone close (skipped when \include'd from thesis.tex) ----
