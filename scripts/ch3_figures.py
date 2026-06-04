@@ -350,12 +350,60 @@ def fig_protocol():
     print("wrote", p, f"| tau3={p3[1]:.2f}s (R2={r2_3:.2f}) tau6={p6[1]:.2f}s (R2={r2_6:.2f})")
 
 
+def fig_design_space():
+    """Per-device (Ag-only) design space: fading memory t_half vs potentiation
+    dynamic range (peak ratio), coloured by PEO, marked by salt. Shows BOTH the
+    PEO coupling and the genuine device-to-device scatter (the reservoir resource).
+    Reads handouts/ch4_decay_fits.csv + ch4_pulse_descriptors.csv (Li, Ag)."""
+    import collections
+    dec = collections.defaultdict(list); pul = collections.defaultdict(list); meta = {}
+    for r in csv.DictReader(open(os.path.join(OUT, "ch4_decay_fits.csv"))):
+        if r["cation"] != "Li":
+            continue
+        th = fnum(r.get("t_half_s"))
+        if th:
+            dec[r["device_id"]].append(th); meta[r["device_id"]] = (r["peo"], r["salt"])
+    for r in csv.DictReader(open(os.path.join(OUT, "ch4_pulse_descriptors.csv"))):
+        if r["cation"] != "Li":
+            continue
+        pk = fnum(r.get("peak_ratio"))
+        if pk:
+            pul[r["device_id"]].append(pk); meta[r["device_id"]] = (r["peo"], r["salt"])
+    both = sorted(set(dec) & set(pul))
+
+    peo_col = {"0.15": "#6a3d9a", "0.3": "#1f78b4", "0.6": "#33a02c", "1.2": "#e31a1c"}
+    salt_mk = {"0.045": "o", "0.09": "s", "0.18": "^"}
+    fig, ax = plt.subplots(figsize=(5.0, 3.6))
+    for d in both:
+        peo, salt = meta[d]
+        ax.scatter(np.median(pul[d]), np.median(dec[d]),
+                   c=peo_col.get(peo, "0.4"), marker=salt_mk.get(salt, "o"),
+                   s=42, edgecolor="0.2", linewidth=0.4, alpha=0.85)
+    ax.set_xscale("log"); ax.set_yscale("log")
+    ax.set_xlabel("potentiation dynamic range (peak ratio)")
+    ax.set_ylabel("fading-memory time $t_{1/2}$ (s)")
+    ax.set_title("Per-device design space (Ag, Li)")
+    # legends: colour = PEO, marker = salt
+    from matplotlib.lines import Line2D
+    ph = [Line2D([0], [0], marker="o", color="w", markerfacecolor=c, markersize=7,
+                 markeredgecolor="0.2", label=f"PEO {p}") for p, c in peo_col.items()]
+    sh = [Line2D([0], [0], marker=m, color="w", markerfacecolor="0.6", markersize=7,
+                 markeredgecolor="0.2", label=f"salt {s}") for s, m in salt_mk.items()]
+    leg1 = ax.legend(handles=ph, fontsize=7, loc="lower right", title="colour", title_fontsize=7)
+    ax.add_artist(leg1)
+    ax.legend(handles=sh, fontsize=7, loc="upper left", title="shape", title_fontsize=7)
+    fig.tight_layout()
+    p = os.path.join(FIGDIR, "design_space.pdf"); fig.savefig(p); plt.close(fig)
+    print("wrote", p, f"| {len(both)} devices")
+
+
 def main():
     os.makedirs(FIGDIR, exist_ok=True)
     fig_composition()
     fig_potentiation()
     fig_chemistry()
     fig_protocol()
+    fig_design_space()
 
 
 if __name__ == "__main__":
