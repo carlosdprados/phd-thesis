@@ -442,3 +442,12 @@ Captured so far (all PNG-reviewed): 2023-10 batch (v247–v252), old PEO/Tr (v11
 Identified `τ`: PEO0.3 ≈ 24–26 s (β 0.64–0.82) → PEO0.6 ≈ 3–4.6 s → PEO1.2 ≈ 7–10 s. The **lower-PEO → longer-retention** trend holds and v151 (22.4 s, the longest single cell) **extends** it to PEO 0.15 — corroborating, not part of, the replicated grid. Newly filled pulse cell PEO0.3/salt0.18 (v141+v148, n=2): weak, peak ≈ 3.8, no turnover — consistent with the "more dilute SY → weaker potentiation" reading. Chapter 3's stated numbers (2–20 s; PEO0.3 longest ≈19 s; τ≈20–25 s; β 0.6–0.9) are unchanged by the refit.
 
 **New artifacts (single source for figures):** `handouts/ch3_decay_by_cell.csv`, `handouts/ch3_pulses_by_cell.csv` (per-cell medians with n_dev / n_identified).
+
+## 20. Chapter-3 figures generated + HYST median-vs-mean correction (2026-06-04)
+
+**`scripts/ch3_figures.py`** produces the three Ch3 figures into `figures/chapter3/` (composition_heatmaps, chemistry_landscape, protocol_overlay), wired into `chapters/chapter3_comparative.tex` (placeholders replaced; builds standalone + in thesis, exit 0).
+
+- **Composition heatmaps** recompute the HYST window metrics from DATABASE (FILTERED + broken excluded; device-median-of-curve-medians) and read `t½` from `ch3_decay_by_cell.csv`. Each cell annotated with value + n.
+- **HYST aggregation correction.** The on-off-ratio distribution is strongly right-skewed (e.g. PEO0.3/salt0.045: median **3.4**, mean **7.8**, max **40**, n=4 devices). §6.2's "7.8" was the **mean**; the figure and chapter now use the robust **device-median** (3.4) throughout, so a few outlying sweeps don't define a cell. Chapter §3.4 text updated to match (on-off 3.3→2.4 across PEO at salt0.09; largest *area* 0.44 at the low-salt/low-PEO corner; per-sweep skew noted explicitly).
+- **Protocol overlay** = v114 R4 at its two protocols. Reproduced 4.6 s (3 V, R²=0.82, noisy) → 15.5 s (6 V, R²=0.97) with a **single** exponential (the chapter's methodology); the 4-param stretched form is degenerate on the clean 6 V curve. Model-free t½ corroborates (4.5→13.4 s).
+- **Chemistry bars** are illustrative values from §14–§15 / curation (host PEO 22 s n=3 vs TMPE 3.8 s n=1; anion PEO/Tr 20 s n=3 vs PEO/TFSI 0.4 s n=1; cation TMPE/TFSI Li 6.3 / Na 7.0 / K 3.5 s, n=2 each), each bar n-labelled.

@@ -88,16 +88,16 @@ The quantitative core of this chapter is the \SY{}/\PEO{}/\LiTf{} composition gr
 
 \begin{figure}[t]
   \centering
-  \figplaceholder{6.2cm}{Composition heatmaps over the PEO ($0.3,0.6,1.2$) $\times$ salt ($0.045,0.09,0.18$) grid: (a) on--off ratio, (b) normalised loop area, (c) fading-memory $t_{1/2}$. Per-cell median, $n=2$--$4$ devices.}
+  \includegraphics[width=\linewidth]{../figures/chapter3/composition_heatmaps.pdf}
   \caption[Composition control of the memristive dynamics]{Composition control of the steady-state and dynamical response of \SY{}/\PEO{}/\LiTf{} devices. The switching window (a, b) and the fading-memory time (c) both decrease as the \PEO{} mass fraction increases at fixed salt content.}
   \label{fig:ch3_composition_heatmaps}
 \end{figure}
 
-First, the steady-state switching window contracts as the \PEO{} fraction rises. At fixed salt mass fraction \num{0.09}, the mean on--off ratio falls from \(\approx 3.7\) at \PEO{}~\num{0.3} to \(\approx 2.5\) at \PEO{}~\num{1.2}, and the normalised loop area falls correspondingly from \(\approx 0.31\) to \(\approx 0.18\); the activation voltage is, by contrast, essentially flat across the whole grid (\SIrange{2.2}{2.4}{\volt}), indicating that composition tunes how \emph{much} the conductance moves rather than the voltage at which it begins to move. The largest window in the grid occurs at the low-salt, low-\PEO{} corner (\PEO{}~\num{0.3}, salt~\num{0.045}: on--off ratio \(\approx 7.8\), area \(\approx 0.5\)).
+First, the steady-state switching window contracts as the \PEO{} fraction rises. At fixed salt mass fraction \num{0.09}, the median on--off ratio falls from \(\approx 3.3\) at \PEO{}~\num{0.3} to \(\approx 2.4\) at \PEO{}~\num{1.2}, and the normalised loop area falls correspondingly from \(\approx 0.33\) to \(\approx 0.18\); the activation voltage is, by contrast, essentially flat across the whole grid (\SIrange{2.2}{2.4}{\volt}), indicating that composition tunes how \emph{much} the conductance moves rather than the voltage at which it begins to move. The widest window in the grid sits in the low-\PEO{} row, with the largest loop area at the low-salt corner (\PEO{}~\num{0.3}, salt~\num{0.045}: area \(\approx 0.44\)); the per-sweep on--off ratio is strongly right-skewed there (cell median \(\approx 3.4\) but individual sweeps reaching \(\sim 40\)), so robust cell medians rather than means are reported throughout to avoid letting a few outlying sweeps define a cell.
 
 Second, potentiation weakens as the \PEO{} fraction rises. The growth of the conductance ratio with pulse number (measured as the slope on log--log axes) decreases monotonically with \PEO{} content, from \(\approx 1.1\) at \PEO{}~\num{0.3} to \(\approx 0.4\) at \PEO{}~\num{1.2}, and the peak conductance ratio falls over more than two orders of magnitude across the grid (from several hundred-fold at the strongest cells to a few-fold at the weakest). In roughly half of the cells the potentiation \emph{turns over} --- the conductance ratio peaks and then declines by the largest pulse counts ($N\sim\numrange{100}{300}$) --- which sets a practical ceiling on the usable pulse count and is itself a design constraint for \cref{ch:temporal}.
 
-Third, and most important for the rest of the thesis, the fading-memory timescale is composition-tunable over roughly \SIrange{2}{20}{\second}. The longest retention occurs at \PEO{}~\num{0.3} (with \(t_{1/2}\approx\SI{19}{\second}\) at salt~\num{0.09}, and an identified \(\tau\approx\SI{20}{\second}\)); increasing the \PEO{} fraction to \num{0.6} or \num{1.2} shortens the timescale to a few seconds. The same ordering is reproduced by the instrument-side single-exponential time constant computed independently, which provides an internal cross-check on the trend. The device-to-device scatter within each cell is substantial and is not treated here as mere noise: the spread of timescales \emph{across} the grid, together with the within-cell variability, constitutes the heterogeneous bank of fading-memory elements that \cref{ch:temporal} exploits.
+Third, and most important for the rest of the thesis, the fading-memory timescale is composition-tunable over roughly \SIrange{2}{20}{\second}. The longest retention occurs in the low-\PEO{} row (at \PEO{}~\num{0.3}, \(t_{1/2}\approx\SI{19}{\second}\) at salt~\num{0.09}, with an identified \(\tau\approx\SI{25}{\second}\)); increasing the \PEO{} fraction to \num{0.6} or \num{1.2} shortens the timescale to a few seconds. A single curation-salvaged device at the still-lower \PEO{}~\num{0.15} level (\(t_{1/2}\approx\SI{22}{\second}\)) is consistent with this trend, though it lies outside the replicated grid and is not counted toward it. The same ordering is reproduced by the instrument-side single-exponential time constant computed independently, which provides an internal cross-check on the trend. The device-to-device scatter within each cell is substantial and is not treated here as mere noise: the spread of timescales \emph{across} the grid, together with the within-cell variability, constitutes the heterogeneous bank of fading-memory elements that \cref{ch:temporal} exploits.
 
 Taken together, these three observations support a single physical reading: increasing the proportion of the ion-transport phase produces a weaker, faster-relaxing memristive response. This is the quantitative spine of the chapter, and the one result that rests on replicated devices.
 
@@ -109,7 +109,7 @@ Beyond composition, the identity of the electrolyte components shifts the dynami
 
 \begin{figure}[t]
   \centering
-  \figplaceholder{5.4cm}{Fading-memory time constant by chemistry, with $n$ labelled on each bar: host (PEO vs TMPE, Li-triflate); anion (triflate vs TFSI, in PEO); cation (Li/Na/K, in TMPE/TFSI).}
+  \includegraphics[width=\linewidth]{../figures/chapter3/chemistry_landscape.pdf}
   \caption[Chemical-tuning landscape of the fading-memory time]{Illustrative effect of electrolyte chemistry on the fading-memory time constant. Host and anion produce the largest shifts; the cation produces no consistent, host-independent ordering. Sample sizes are small (see text).}
   \label{fig:ch3_chemistry_landscape}
 \end{figure}
@@ -130,7 +130,7 @@ A methodological result underlies, and disciplines, every comparison above. Beca
 
 \begin{figure}[t]
   \centering
-  \figplaceholder{5.2cm}{Depotentiation decay of a single device measured under two drive amplitudes (3\,V and 6\,V write); the higher amplitude yields a $\sim3\times$ longer apparent relaxation time.}
+  \includegraphics[width=0.62\linewidth]{../figures/chapter3/protocol_overlay.pdf}
   \caption[The drive protocol sets the apparent fading-memory time]{The apparent fading-memory time is set in part by the drive protocol. The same device, measured under a larger write/read amplitude, shows a markedly longer apparent relaxation time.}
   \label{fig:ch3_protocol}
 \end{figure}
