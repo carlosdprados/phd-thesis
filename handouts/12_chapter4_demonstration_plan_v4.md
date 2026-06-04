@@ -147,8 +147,8 @@ The connective tissue between Ch3 and Ch4:
 ## 12. Next steps (build order)
 
 1. **`scripts/ch4_model.py`** — ✅ **STARTED (2026-06-04).** `ParameterCard` per composition cell assembled from `ch3_decay_by_cell.csv` + `ch3_pulses_by_cell.csv`; `decay_factor(dt)` (identified Kohlrausch τ/β, else single-exp from t½) and `potentiation_ratio(N)` (power-law to peak + turnover roll-off); `lead_card()` = PEO0.3/0.09; runnable self-test PASSES (9 Li cards). **TODO:** leave-one-dataset-out validation vs raw curves; per-device spread for the variability envelope; pulse-encoding front end.
-2. **`scripts/ch4_reservoir.py`** — single-node time-multiplexed RC (Demo A) + spatial multi-node RC (Demo B); MC/IPC + task harness. **(next)**
-3. **WESAD ingestion** — load, segment, slow-channel feature streams; pulse-encode for the reservoir input layer.
+2. **`scripts/ch4_reservoir.py`** — ✅ **STARTED (2026-06-04).** Spatial multi-node bank model (leaky compressive nodes from the parameter cards) + **linear Memory Capacity** (Jaeger) with ridge readout. First result (random input, N=24, dt=5 s): **heterogeneous bank total MC ≈ 6.0 vs homogeneous ≈ 4.1 → 1.47×**, gain concentrated at short lags — the Demonstration-B claim at architecture level. Runnable self-test PASSES. **TODO:** single-node *time-multiplexed* variant for Demo A; NARMA-10; MC(k) figure; sweep MC vs composition (Demo-A validation); inject measured device spread.
+3. **WESAD ingestion + affective task harness** — load/segment slow channels (EDA phasic+tonic, BVP/HRV, RESP), pulse-encode for the reservoir input; Demo A binary (stress/baseline), Demo B 3-class (baseline/stress/amusement); macro-F1. The labelled-data step (needs the dataset). **(next)**
 4. Composition sweep (Demo A validation) → MC/F1 vs composition figure.
 5. Homogeneous-vs-heterogeneous comparison (Demo B) → MC(k) breadth + task-F1 figure.
 6. Draft `chapters/chapter4_temporal.tex` around the two demonstrations once the simulations produce numbers.

@@ -1,0 +1,134 @@
+#!/usr/bin/env python3
+"""Chapter 4 reservoir simulation — linear Memory Capacity (MC) of a device bank,
+and the homogeneous-vs-heterogeneous comparison that is the crux of the two
+demonstrations (handout 12 sec 5-6).
+
+Run from the repo root:  python3 scripts/ch4_reservoir.py
+Depends on scripts/ch4_model.py (parameter cards from the Ch3 fits).
+
+Model (first-order, behavioural; honest about its assumptions):
+- Each device is a leaky, nonlinearly-driven node. Rate-coded input u_n in [0,1]
+  drives a compressive write (the measured potentiation exponent alpha), and the
+  state leaks with the device's fading memory between samples:
+      x_n^i = decay_i * x_{n-1}^i + (w_i * u_n) ** alpha_i
+  decay_i = exp(-(dt/tau_i)^beta_i) is the measured Kohlrausch retention over the
+  sample interval dt; w_i is a per-device input gain (the reservoir "mask").
+- Nodes are INDEPENDENT (1T1M bank, no inter-node recurrence) -- diversity comes
+  only from the spread of (tau, beta, alpha) across compositions plus device-to-
+  device scatter (jitter) and the input mask. This is deliberately the hard case
+  for a reservoir, so any heterogeneity benefit shown here is conservative.
+
+Memory Capacity (Jaeger): MC_k = corr^2(ridge prediction, u_{n-k}); total MC =
+sum_k MC_k. A spread of timescales should broaden MC(k) over lags and raise total
+MC -- the quantitative statement of "heterogeneity is a computational resource".
+
+NOTE: this is the architecture-level metric (no labelled data). The WESAD
+affective-task harness (Demo A binary / Demo B 3-class) is the next script and
+needs the dataset; it is intentionally not here.
+"""
+import os, sys
+import numpy as np
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from ch4_model import load_cards, lead_card  # noqa: E402
+
+DT = 5.0          # sample interval [s] (affect-signal scale; sets the leak per step)
+WASHOUT = 200
+RIDGE = 1e-6
+
+
+def _full(cards):
+    """Cards usable as nonlinear nodes (need a measured potentiation alpha/peak)."""
+    return [c for c in cards if c.alpha == c.alpha and c.peak_ratio == c.peak_ratio]
+
+
+def make_nodes(cards, N, heterogeneous, rng, jitter=0.12):
+    """Return per-node (decay, alpha, w). Heterogeneous: cycle composition cells;
+    homogeneous: N jittered copies of the lead node (device-to-device scatter only)."""
+    base = _full(cards) if heterogeneous else [lead_card(cards)]
+    nodes = []
+    for i in range(N):
+        c = base[i % len(base)]
+        tau = max(c.tau * float(np.exp(rng.normal(0, jitter))), 1e-2)
+        beta = float(np.clip(c.beta * (1 + rng.normal(0, jitter)), 0.2, 2.0))
+        alpha = float(np.clip(c.alpha * (1 + rng.normal(0, jitter)), 0.05, 2.0))
+        w = float(np.exp(rng.normal(0, 0.5)))            # input mask / gain
+        decay = float(np.exp(-((DT / tau) ** beta)))
+        nodes.append((decay, alpha, w))
+    return nodes
+
+
+def run_states(nodes, u):
+    """Drive the bank with input u (T,), return state matrix X (T, N)."""
+    T = len(u); N = len(nodes)
+    X = np.zeros((T, N))
+    decay = np.array([n[0] for n in nodes])
+    alpha = np.array([n[1] for n in nodes])
+    w = np.array([n[2] for n in nodes])
+    x = np.zeros(N)
+    for n in range(T):
+        drive = np.power(np.clip(w * u[n], 0, None), alpha)
+        x = decay * x + drive
+        X[n] = x
+    return X
+
+
+def _ridge_predict(Xtr, ytr, Xte):
+    A = Xtr.T @ Xtr + RIDGE * np.eye(Xtr.shape[1])
+    W = np.linalg.solve(A, Xtr.T @ ytr)
+    return Xte @ W
+
+
+def memory_capacity(X, u, max_k=30, split=0.5):
+    """MC_k = corr^2(prediction of u_{n-k}, u_{n-k}) on held-out data."""
+    T = X.shape[0]
+    Xb = np.hstack([X, np.ones((T, 1))])              # bias
+    # standardise states (helps conditioning)
+    mu, sd = Xb[:, :-1].mean(0), Xb[:, :-1].std(0) + 1e-9
+    Xb[:, :-1] = (Xb[:, :-1] - mu) / sd
+    mc = []
+    for k in range(1, max_k + 1):
+        # predict u_{n-k} from state at step n; drop the first k (no target) and washout
+        Xa = Xb[WASHOUT + k:]
+        ya = u[WASHOUT: T - k]
+        ntr = int(len(ya) * split)
+        yhat = _ridge_predict(Xa[:ntr], ya[:ntr], Xa[ntr:])
+        yte = ya[ntr:]
+        if yte.std() < 1e-9 or yhat.std() < 1e-9:
+            mc.append(0.0); continue
+        r = np.corrcoef(yhat, yte)[0, 1]
+        mc.append(float(max(r * r, 0.0)))
+    return np.array(mc)
+
+
+def main():
+    cards = load_cards(li_only=True)
+    rng = np.random.default_rng(0)
+    T = 4000
+    u = rng.uniform(0.0, 1.0, T)          # rate-coded random input
+    N = 24                                 # bank size (both conditions equal)
+    max_k = 30
+
+    res = {}
+    for label, het in [("homogeneous (all PEO0.3/0.09)", False),
+                       ("heterogeneous (composition bank)", True)]:
+        nodes = make_nodes(cards, N, het, np.random.default_rng(1))
+        X = run_states(nodes, u)
+        mc = memory_capacity(X, u, max_k=max_k)
+        res[label] = mc
+        decays = sorted({round(n[0], 2) for n in nodes})
+        print(f"{label:36s} | N={N} | total MC={mc.sum():5.2f} | "
+              f"MC@k1={mc[0]:.2f} k5={mc[4]:.2f} k15={mc[14]:.2f} | "
+              f"#distinct decays={len(decays)}")
+
+    het = res["heterogeneous (composition bank)"].sum()
+    hom = res["homogeneous (all PEO0.3/0.09)"].sum()
+    print(f"\nheterogeneous / homogeneous total-MC ratio = {het / max(hom, 1e-9):.2f}")
+    print("(>1 means the composition spread broadens memory across timescales --"
+          " the Demonstration-B claim, here on random input / architecture level.)")
+    assert het > hom, "expected heterogeneous bank to have higher total MC"
+    print("\nself-test: PASS")
+
+
+if __name__ == "__main__":
+    main()
