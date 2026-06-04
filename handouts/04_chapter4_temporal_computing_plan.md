@@ -4,6 +4,8 @@
 
 > **⚠️ Partially superseded (2026-06-04).** The *application structure* (§4.4–§4.6, three co-equal applications, comparative cation fit) predates the v4 Chapter-3 reframe and is **replaced by [`12_chapter4_demonstration_plan_v4.md`](12_chapter4_demonstration_plan_v4.md)**: a two-tier (homogeneous vs heterogeneous) reservoir-computing demonstration for **affective computing**, with composition as the only quantitative axis. The **modelling backbone (§4.3)**, **circuit-integration (§4.7)**, and **design-rules (§4.8)** sections below remain valid and are reused by the v4 plan.
 
+> **Current reading rule:** Do not use this handout to plan Chapter-4 applications or figures. Use it only for the reusable behavioural-model, circuit-integration, and design-rule material, then switch to handout 12 and `scripts/ch4_*.py` for current progress.
+
 **Author:** Carlos David Prado-Socorro  
 **Date:** April 12, 2026  
 **Status:** Planning document for Chapter 4 (5-chapter thesis structure). v3 — rewritten so that every Chapter 3 reference points at the real experimental corpus: a PEO-based triflate comparative series (PEO/LiTr, PEO/NaTr, PEO/KTr at mass fractions 0.3 / 0.09, plus a PEO/LiTr concentration sub-study), characterised through three common dynamical measurements (I–V hysteresis, variable-N potentiation, variable-delay depotentiation). TMPE-based and alkali-TFSI (LiBis / NaBis / KBis) composites are exploratory side evidence and are *not* treated as comparative fitting targets. EPSC, STDP, separated STM/LTM retention and impedance spectroscopy remain Paper 1 / Chapter 2 (SY/Hybrane/LiTf) data and are used only as Li-specific priors and sanity checks. v2 (2026-04-11) introduced the chapter.
@@ -12,11 +14,11 @@
 
 ## Purpose of This Chapter
 
-Chapters 2 and 3 establish *what* the devices are and *why* their dynamical response depends on composition and cation identity. Chapter 4 answers the next question: *what are they good for, and how do we use them?*
+Chapters 2 and 3 establish *what* the devices are and *why* their dynamical response depends most defensibly on composition, with chemistry treated as sample-limited side evidence. Chapter 4 answers the next question: *what are they good for, and how do we use them?*
 
-The answer, argued in detail in the chapter, is that the PEO/triflate polymer-electrolyte family is naturally suited to **temporal computing** — computing that uses the transients of a dynamical system, not its steady state, to represent and classify time-varying signals. The chapter re-purposes the experimental evidence already acquired — a large, comparable dataset of three common dynamical measurements across the PEO/LiTr concentration series and the PEO/LiTr, PEO/NaTr, PEO/KTr fixed-composition set, plus the Chapter 2 Paper 1 Li device as a richer single-exemplar prior — and turns it into compact behavioural models, and then uses those models to demonstrate three application schemes in simulation, without any new fabrication.
+The answer, in the current plan, is that the PEO/triflate polymer-electrolyte family is naturally suited to **reservoir-style temporal computing** — computing that uses the transients of a dynamical system, not its steady state, to represent and classify time-varying signals. The chapter re-purposes the experimental evidence already acquired, turns it into compact behavioural models, and uses those models for architecture-level MC/NARMA benchmarks plus WESAD affective-computing demonstrations, without any new fabrication.
 
-**One-sentence thesis of the chapter:** *Volatile, variable, polymer-electrolyte memristive devices are not flawed non-volatile memories — they are heterogeneous fading-memory primitives, and the abundant common dynamical dataset of Chapter 3 (I–V hysteresis, variable-N potentiation, variable-delay depotentiation across the PEO/triflate corpus) is enough to deliver physical reservoir computing, spike coincidence detection, and multi-timescale transient filtering.*
+**Current one-sentence thesis of the chapter:** *Volatile, variable, polymer-electrolyte memristive devices are not flawed non-volatile memories — they are fading-memory primitives whose composition-tuned timescales can be matched to reservoir-computing tasks; heterogeneity is robustly useful on memory-capacity benchmarks, while WESAD is reported as real affective computing with a modest memory benefit and no separable heterogeneity win.*
 
 What the chapter does *not* claim:
 
@@ -33,7 +35,7 @@ Reframe → Consolidate → Model → Apply → Constrain → Rules
 1. **Reframe** the device family from "weak non-volatile memory" to "heterogeneous temporal primitive".
 2. **Consolidate** the dynamical dataset of Chapter 3 (three common measurements across the PEO/triflate corpus) into a single experimental basis, with the Chapter 2 Paper 1 Li device as a richer single-exemplar prior.
 3. **Model** each PEO/triflate composition–cation combination with a compact, physically motivated behavioural model fitted directly to those three common datasets.
-4. **Apply** the models to three simulated application schemes: reservoir computing (flagship), coincidence detection, and transient filter bank.
+4. **Apply** the models in the active two-tier reservoir plan: MC/NARMA benchmarks plus WESAD affective-computing demonstrations. The old coincidence and standalone filter-bank applications below are historical only.
 5. **Constrain** the schemes by realistic circuit integration (1T1M addressing, current compliance, read/write protocols, variability envelopes).
 6. **Rules:** distil design rules and scope limits — where these devices are genuinely useful, and where they are not.
 
@@ -206,13 +208,13 @@ Supplementary (Chapter 2 Paper 1 SY/Hybrane/LiTf device only; used only as prior
 
 #### 4.4.6 Expected scientific claims
 
-- Composition- and cation-driven heterogeneity across the PEO/triflate corpus increases memory capacity vs. a homogeneous reservoir of the same size
+- Composition-driven heterogeneity across the PEO/LiTr grid increases memory capacity vs. a homogeneous reservoir of the same size; cation nodes are illustrative only if used at all
 - Measured variability *improves* (or at least does not hurt) classification robustness, within a quantified envelope
 - The energy-per-inference figure is competitive at the "temporal edge" scale (sub-kHz signals), with the caveat that the per-event energy estimate is anchored on the Chapter 2 device and extrapolated qualitatively to the PEO/triflate corpus
 
 ---
 
-### 4.5 Application II — Spike Coincidence Detection and Temporal Feature Extraction
+### 4.5 Historical Application II — Spike Coincidence Detection and Temporal Feature Extraction (cut)
 
 #### 4.5.1 Motivation
 
@@ -244,12 +246,12 @@ Supplementary (Chapter 2 Paper 1 SY/Hybrane/LiTf device only; used only as prior
 #### 4.5.5 Expected scientific claims
 
 - The delay-time kernels from Chapter 3 define a tunable coincidence-window bank indexed by composition and cation
-- If the fitted τ_c values across the manifest are sufficiently separated, the PEO/triflate corpus should provide a composition- and cation-controlled span in useful coincidence-window width
+- Historical expectation: if the fitted τ_c values across the manifest are sufficiently separated, the PEO/triflate corpus could provide a composition-controlled span in useful coincidence-window width. This is no longer a main Chapter-4 application.
 - The accessible timing window is to be reported directly from the fitted delay-time constants; no broader timing-range claim is assumed a priori, and none is imported from the Chapter 2 STDP data
 
 ---
 
-### 4.6 Application III — Multi-Timescale Transient Filter Bank
+### 4.6 Historical Application III — Multi-Timescale Transient Filter Bank (folded into reservoir framing)
 
 #### 4.6.1 Motivation
 
@@ -362,7 +364,7 @@ Note: every entry in the table is a qualitative rule of thumb. The *quantitative
 
 ---
 
-## Figures Planned for Chapter 4
+## Historical Figures Planned for Chapter 4
 
 *(Analogous in scope to the Chapter 2 figure reference list in `03_chapter2_figures_needed.md`. Numbering is indicative only.)*
 
@@ -372,13 +374,13 @@ Note: every entry in the table is a qualitative rule of thumb. The *quantitative
 | `fig:ch4_dataset_map` | Visual inventory of the three common dynamical datasets (I–V, N-pulse, delay-time) across the `ch4_device_manifest.csv` devices, organised along the composition axis (PEO/LiTr concentration series) and the cation axis (PEO/{Li,Na,K}Tr at 0.3 / 0.09) | `chapter4_pipeline.py` over `Nanomem_Devices_Library/` |
 | `fig:ch4_model_fits` | Example model fits overlayed on I–V (`Day1_Hyst`), N-pulse potentiation (`Day2_NmbPls`), and delay-time depotentiation (`Day2_DlyTime`) for one device of each composition–cation cell used in the simulations | `chapter4_pipeline.py` |
 | `fig:ch4_param_cards` | Parameter distributions (f_c from I–V, φ_c from N-pulse, λ_c from delay-time) per composition–cation cell | `chapter4_pipeline.py` |
-| `fig:ch4_reservoir_arch` | Schematic of the heterogeneous reservoir architecture with composition- and cation-diverse PEO/triflate banks and linear readout | Original schematic |
+| `fig:ch4_reservoir_arch` | Historical schematic of the heterogeneous reservoir architecture with composition-diverse PEO/triflate banks and linear readout | Original schematic |
 | `fig:ch4_reservoir_bench` | Memory capacity and classification accuracy vs. reservoir size and heterogeneity | Simulation from parameter cards |
 | `fig:ch4_reservoir_variability` | Accuracy vs. injected device-to-device and cycle-to-cycle spread | Simulation from parameter cards |
 | `fig:ch4_coincidence_kernel` | Fitted delay-time depotentiation curves reinterpreted as coincidence kernels K_c(Δt) across the PEO/triflate corpus | From Chapter 3 `Day2_DlyTime` data |
 | `fig:ch4_coincidence_det` | Detection probability vs. Δt for each composition–cation cell under noise | Simulation from parameter cards |
 | `fig:ch4_filterbank_impulse` | Impulse responses h_c(t) for selected cells, reconstructed from (λ_c, φ_c), compared to ideal leaky integrators with the same τ | Simulation from parameter cards |
-| `fig:ch4_filterbank_task` | Onset / burst-detection performance using the selected-channel filter bank | Simulation from parameter cards |
+| `fig:ch4_filterbank_task` | Historical standalone filter-bank task; now folded into heterogeneous-reservoir framing | Simulation from parameter cards |
 | `fig:ch4_1t1m` | 1T1M cell schematic, read/write protocol waveforms, read-disturb budget (qualitative bound from Chapter 2 impedance data) | Original schematic |
 | `fig:ch4_design_rules` | Visual summary of the §4.8.3 design-rules table | Original schematic |
 
@@ -423,7 +425,7 @@ No new fabrication is required. This is a deliberate design choice: it keeps the
 
 - The chapter should read as a *deliberate reinterpretation* of the Chapter 2–3 data, not as a new experimental chapter. The reader should feel that the data were always pointing this way and Chapters 2 and 3 were one step short of saying so.
 - The flagship reservoir computing section (§4.4) carries most of the chapter's scientific weight. It should be the longest and most carefully written section.
-- The coincidence detection (§4.5) and filter bank (§4.6) sections are supporting cases. They are shorter, but each must stand on its own by reporting measurable metrics, not just intuitions.
+- The coincidence detection (§4.5) and standalone filter bank (§4.6) sections are historical only. Do not draft them as main Chapter-4 applications unless handout 12 is explicitly revised.
 - Every simulation figure must name its input dataset in the caption (e.g. "fitted to retention curves of NM_vXXX–NM_vYYY"). This is what separates the chapter from pure theory.
 - The §4.7 circuit-integration section is necessary for credibility. Without it, the chapter can be attacked as "just simulation". With it, the chapter defines a clear, physically implementable route to a real build.
 - The §4.8 design-rules section is the chapter's hand-off to Chapter 5. Write it so that a reader could skip directly from §4.8 to Chapter 5's future-directions list and understand the link immediately.

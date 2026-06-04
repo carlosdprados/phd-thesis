@@ -265,16 +265,16 @@ The following are useful but too detailed for the main flow:
 
 ## Text Edits Checklist
 
-- [ ] Split protocol description by HYST, PULSES, DELAYTIME.
-- [ ] Remove or qualify any statement implying PULSES and DELAYTIME share the same write/read amplitude.
+- [x] Split protocol description by HYST, PULSES, DELAYTIME.
+- [x] Remove or qualify any statement implying PULSES and DELAYTIME share the same write/read amplitude.
 - [ ] Add the raw-to-summary data-provenance schematic/table.
 - [ ] State explicitly how medians are computed: curve/pixel/device/cell aggregation.
-- [ ] State that HYST summaries use robust medians because on-off ratios are right-skewed.
-- [ ] Add a physical-hypothesis paragraph in Discussion.
-- [ ] Strengthen the link between variability and Chapter 4.
+- [x] State that HYST summaries use robust medians because on-off ratios are right-skewed.
+- [x] Add a physical-hypothesis paragraph in Discussion.
+- [x] Strengthen the link between variability and Chapter 4.
 - [ ] Add a short statement that profilometry exists and thickness is a possible confound.
-- [ ] Keep chemistry conclusions explicitly illustrative.
-- [ ] Keep the cation result as an honest negative: no host/anion-independent `Li > Na > K` law.
+- [x] Keep chemistry conclusions explicitly illustrative.
+- [x] Keep the cation result as an honest negative: no host/anion-independent `Li > Na > K` law.
 
 ## Recommended Execution Order
 
@@ -291,4 +291,3 @@ The following are useful but too detailed for the main flow:
 - Whether the heterogeneity plot and design-space plot both fit in the main chapter, or whether one should move to Chapter 4.
 - Whether to do an EIS analysis now or explicitly reserve EIS for supplementary context/future work.
 - Whether to create a formal supplementary information chapter/file or append these materials to an appendix.
-

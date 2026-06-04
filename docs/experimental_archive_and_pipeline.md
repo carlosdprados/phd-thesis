@@ -103,7 +103,7 @@ Types and headline features:
 
 ## 7. Status of the planned Chapter-4 artifacts
 
-As of 2026-06-03, the artifacts that `05` plans **do not yet exist**: `handouts/ch4_device_manifest.csv` and `scripts_general/chapter4_pipeline.py` are absent, and no consolidated HDF5/Parquet containers are produced. The DATABASE CSVs (regenerated May 2025) plus `FILTERED_DEVICES.csv` (June 2025) are the **current canonical source of truth**.
+As of 2026-06-04, the full archival artifacts that `05` originally planned **do not yet exist**: `handouts/ch4_device_manifest.csv` and `scripts_general/chapter4_pipeline.py` are absent, and no consolidated HDF5/Parquet containers are produced. The DATABASE CSVs (regenerated May 2025) plus `FILTERED_DEVICES.csv` (June 2025) remain the **archive-level canonical source of truth**. Separately, the thesis repo now has a current Chapter-4 simulation layer in `scripts/ch4_model.py`, `scripts/ch4_reservoir.py`, `scripts/ch4_wesad.py`, and `scripts/ch4_figures.py`, fed by the curated `handouts/ch3_*.csv` and `handouts/ch4_*.csv` tables; that layer is not the same thing as the missing full archival `chapter4_pipeline.py`.
 
 ## 8. Corrections / open points vs the planning docs
 

@@ -2,7 +2,7 @@
 
 # Chapter 3 — Full Plan: Compositional and Chemical Control of Volatile Polymer-Electrolyte Memristive Dynamics
 
-**Author:** Carlos David Prado-Socorro · **Date:** 2026-06-03 · **Status:** Approved plan (supersedes the Chapter-3 sections of `01`/`00`/`05`, updated to v4 alongside this). Evidence basis: claims audit `08_chapter3_4_claims_audit.md` (§1–§16); rationale/diff: `09_chapter3_revised_plan_PROPOSAL.md`.
+**Author:** Carlos David Prado-Socorro · **Date:** 2026-06-03 · **Status:** Historical approved plan. Chapter 3 has now been drafted in `chapters/chapter3_comparative.tex`, and follow-up work is tracked in `handouts/13_chapter3_improvement_plan.md`. Use this file for original Chapter-3 structure and evidence rationale, not for current progress status. Evidence basis: claims audit `08_chapter3_4_claims_audit.md` (§1–§16); rationale/diff: `09_chapter3_revised_plan_PROPOSAL.md`.
 
 > **One-line thesis of the chapter.** In SY/polymer-electrolyte composites, the **composition** of the ion-transport phase is a *replicated, quantitative* knob on the volatile memristive dynamics (switching window, potentiation, and a fading-memory time constant τ tunable over ≈ 2–20 s); electrolyte **chemistry** (host, anion, cation) shifts those dynamics further but is documented here as an *illustrative, sample-limited* landscape; and the **drive protocol** (potentiation amplitude) is shown to set the apparent timescale, a result that disciplines all cross-device comparison.
 
@@ -72,7 +72,7 @@ Present as trends with sample sizes stated, never as powered laws:
 
 ## 10. Bridge to Chapter 4
 
-The composition τ ladder, device heterogeneity, β-shape diversity, and potentiation/turnover parameters feed the compact behavioural model and the heterogeneous-reservoir / coincidence / filter-bank simulations of Ch4 (`04`/`05`). Ch4 must use a single matched protocol and QA'd per-device fits.
+The composition τ ladder, device heterogeneity, β-shape diversity, and potentiation/turnover parameters feed the compact behavioural model and the active Chapter-4 reservoir simulations (`12`, `scripts/ch4_*.py`). The older heterogeneous-reservoir / coincidence / filter-bank split in `04`/`05` has been superseded: coincidence is cut, and filter-bank logic is folded into the reservoir framing. Ch4 must use matched-protocol, QA'd fits and state the φ⊗λ amplitude-compatibility assumption explicitly.
 
 ---
 

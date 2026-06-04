@@ -7,7 +7,7 @@
 **Group:** Nanotech / Memristive Devices  
 **Supervisor:** Salvador Cardona-Serra (PI: Eugenio Coronado)  
 **Generated:** April 7, 2026  
-**Revision:** v4 — 2026-06-03. After direct, QA'd analysis of the archive (handouts `08_chapter3_4_claims_audit.md` and `10_chapter3_comparative_plan.md`): Chapter 3's **quantitative spine is the PEO/LiTr composition grid** (the only statistically-replicated axis, n=2–4); **host/anion/cation form an illustrative, sample-limited tuning landscape** (n≤2 per matched cell); the **Li>Na>K cation hypothesis is reported as an honest negative** (confounded by drive-protocol amplitude and electrode); and **potentiation amplitude is shown to set the apparent fading-memory τ** (methodological result). Previous: v3 — April 12, 2026. The comparative-chapter chemistry had been re-scoped to match the actual experimental archive. The main Chapter 3 corpus is now explicitly PEO-based triflate composites (PEO/LiTr, PEO/NaTr, PEO/KTr at PEO and salt mass concentrations of 0.3 and 0.09), supplemented by a PEO/LiTr concentration series, and the common comparative measurements are restricted to I–V hysteresis, variable-number-of-pulses potentiation, and variable-delay-time depotentiation. TMPE-based and LiBis/NaBis/KBis (TFSI) devices are retained only as exploratory side systems. EPSC, STDP, separated STM/LTM retention, and impedance spectroscopy remain Chapter 2 (Paper 1) results and are no longer presented as common across the Li/Na/K family. Previous revisions: v2 (2026-04-11) inserted the data-driven temporal computing chapter and switched the framing to volatile, heterogeneous temporal computing primitives.  
+**Revision:** v5 — 2026-06-04. Status and Chapter-4 route updated after the current repo state: Chapter 1 and Chapter 3 are now drafted in LaTeX; Chapter 4 has repo-local model/simulation/figure scripts (`scripts/ch4_model.py`, `scripts/ch4_reservoir.py`, `scripts/ch4_wesad.py`, `scripts/ch4_figures.py`) and generated architecture/WESAD figures, but no `chapters/chapter4_temporal.tex` yet. The active Chapter-4 source of truth is `handouts/12_chapter4_demonstration_plan_v4.md`: two-tier reservoir computing for affective computing plus MC/NARMA benchmarks. Coincidence detection is cut from the main chapter, and the standalone filter-bank idea is folded into the heterogeneous-reservoir framing. Previous: v4 — 2026-06-03. After direct, QA'd analysis of the archive (handouts `08_chapter3_4_claims_audit.md` and `10_chapter3_comparative_plan.md`), Chapter 3's quantitative spine became the PEO/LiTr composition grid; host/anion/cation became an illustrative, sample-limited tuning landscape; the Li>Na>K cation hypothesis became an honest negative; and potentiation amplitude became a methodological timescale control.
 
 ---
 
@@ -15,7 +15,7 @@
 
 **Title (working):** *Organic Memristive Devices Based on Polymer–Electrolyte Composites for Neuromorphic Computing*
 
-**Core thesis:** That a carefully engineered composite of a semiconducting polymer (Super Yellow) and an ion-conducting polyether matrix loaded with a dissociated alkali-metal triflate salt, deposited as a thin film between two electrodes, constitutes a functional two-terminal organic memristive device whose analog, reversible conductance dynamics and fading-memory timescales are tuned by the ionic chemistry of the composite. The proof of concept (Chapter 2) is built on SY/Hybrane/LiTf and exhibits the full range of memristive functionalities — analog multi-state switching, short- and long-term memory, excitatory post-synaptic current, and spike-timing-dependent plasticity — in a single device. The main comparative study (Chapter 3) has its **quantitative spine in the PEO/LiTr composition grid** (the only axis that replicates, n=2–4): switching window, potentiation, and a Kohlrausch fading-memory τ (≈ 2–20 s) all vary systematically with composition. Electrolyte **chemistry — host (PEO/TMPE), anion (triflate/TFSI), cation (Li/Na/K) — is surveyed as an illustrative, sample-limited tuning landscape** (n≤2 per matched cell); the **Li>Na>K cation hypothesis is an honest negative** (confounded by drive-protocol amplitude and electrode), and a methodological result shows **potentiation amplitude sets the apparent τ**. The corpus rests on three common dynamical measurements — I–V hysteresis, variable-number-of-pulses potentiation, and variable-delay-time depotentiation — and the richer synaptic metrics (EPSC, STDP, separated STM/LTM, impedance) are retained only for the Chapter 2 device.
+**Core thesis:** That a carefully engineered composite of a semiconducting polymer (Super Yellow) and an ion-conducting polyether matrix loaded with a dissociated alkali-metal triflate salt, deposited as a thin film between two electrodes, constitutes a functional two-terminal organic memristive device whose analog, reversible conductance dynamics and fading-memory timescales are tunable enough to be used as temporal-computing primitives. The proof of concept (Chapter 2) is built on SY/Hybrane/LiTf and exhibits the full range of memristive functionalities — analog multi-state switching, short- and long-term memory, excitatory post-synaptic current, and spike-timing-dependent plasticity — in a single device. The main comparative study (Chapter 3) has its **quantitative spine in the PEO/LiTr composition grid** (the only axis that replicates, n=2–4): switching window, potentiation, and a Kohlrausch fading-memory τ (≈ 2–20 s) all vary systematically with composition. Electrolyte **chemistry — host (PEO/TMPE), anion (triflate/TFSI), cation (Li/Na/K) — is surveyed as an illustrative, sample-limited tuning landscape** (n≤2 per matched cell); the **Li>Na>K cation hypothesis is an honest negative** (confounded by drive-protocol amplitude and electrode), and a methodological result shows **potentiation amplitude sets the apparent τ**. The corpus rests on three common dynamical measurements — I–V hysteresis, variable-number-of-pulses potentiation, and variable-delay-time depotentiation — and the richer synaptic metrics (EPSC, STDP, separated STM/LTM, impedance) are retained only for the Chapter 2 device. Chapter 4 now uses these measured behavioural ingredients in in-silico reservoir demonstrations: MC/NARMA benchmarks show that heterogeneity broadens memory capacity, while WESAD affective-computing runs show real task performance and a modest fading-memory benefit but no robust heterogeneous-over-homogeneous gain on that particular affect task.
 
 ---
 
@@ -148,11 +148,11 @@ Memory regimes explained by Lewis acid–base chemistry (Chapter 2 SY/Hybrane/Li
 - CF₃SO₃⁻ (triflate): soft Lewis base → weak interaction with Hybrane O → displaced by low voltage (1 V) → STM (fast relaxation 10–15 s)
 - Li⁺: hard Lewis acid → strong coordination with Hybrane O → requires high voltage (3 V) to displace → LTM (slow relaxation >45 s)
 
-The same principle motivates the Chapter 3 PEO/LiTr, PEO/NaTr, PEO/KTr comparative series: replacing Li⁺ by Na⁺ or K⁺ in the same polyether host reduces the cation–oxygen binding strength and is expected to shift the fading-memory timescale accessible through the common delay-time depotentiation measurement. This expectation is tested as a statement about dynamical timescales, not as a claim about EPSC/STDP/separated STM/LTM for Na/K devices.
+The same principle originally motivated the Chapter 3 PEO/LiTr, PEO/NaTr, PEO/KTr comparative series: replacing Li⁺ by Na⁺ or K⁺ in the same polyether host was expected to shift the fading-memory timescale through cation–oxygen coordination strength. The current Chapter 3 result is more disciplined: HSAB remains a qualitative organising idea, but the archive does **not** support a robust, host- and anion-independent Li>Na>K timescale law. Composition is the replicated quantitative control knob; host/anion/cation comparisons are illustrative and n-limited.
 
 ---
 
-## 8. Thesis Narrative Arc (v2 — 5-chapter structure)
+## 8. Thesis Narrative Arc (v5 — current source of truth)
 
 ```text
 Chapter 1: Introduction
@@ -184,11 +184,13 @@ Chapter 4: Data-Driven Temporal Computing
      variable-N potentiation, variable-delay depotentiation — with the
      Chapter 2 SY/Hybrane/LiTf device supplying priors and sanity checks
      (EPSC, STDP, separated STM/LTM, impedance) that are Li-only and
-     are never used to justify quantitative Na/K claims. Three application
-     schemes simulated from those models: heterogeneous physical
-     reservoir computing (flagship), spike coincidence detection, and
-     multi-timescale transient filtering. Circuit-level integration
-     constraints and design rules.)
+     are never used to justify quantitative Na/K claims. Active plan:
+     two-tier reservoir computing for affective computing plus MC/NARMA
+     benchmarks. Heterogeneity is claimed robustly at the architecture
+     benchmark level (broader memory capacity); WESAD is reported honestly
+     as real affective computing with a modest fading-memory benefit and
+     no separable heterogeneity win. Coincidence detection is cut; the
+     filter-bank idea is folded into the heterogeneous-reservoir framing.)
     ↓
 Chapter 5: Conclusions & Outlook
     (Synthesis across the chemistry axis (Ch. 2–3) and the application
@@ -246,22 +248,24 @@ Chapter 5: Conclusions & Outlook
 
 ---
 
-## 10. Status of Written Work (as of 2026-04-12)
+## 10. Status of Written Work (as of 2026-06-04)
 
 | Item | Status | Location |
 | ------ | -------- | ---------- |
-| Memory document (v4) | ✅ Complete | `handouts/00_thesis_overview_memory.md` |
-| Thesis structure — 5 chapters (v4) | ✅ Complete | `handouts/01_thesis_structure.md` |
-| Introduction chapter plan (v2, with temporal computing sections) | ✅ Complete | `handouts/02_introduction_chapter_plan.md` |
+| Memory document (v5) | ✅ Current | `handouts/00_thesis_overview_memory.md` |
+| Thesis structure — 5 chapters (v5) | ✅ Current | `handouts/01_thesis_structure.md` |
+| Introduction chapter plan (v2) | Historical | `handouts/02_introduction_chapter_plan.md` |
 | Chapter 2 figures reference list | ✅ Complete | `handouts/03_chapter2_figures_needed.md` |
 | Chapter 2 (LaTeX, full) | ✅ Complete | `chapters/chapter2_proof_of_concept.tex` |
-| Chapter 4 planning document | ✅ Complete | `handouts/04_chapter4_temporal_computing_plan.md` |
-| Chapter 4 data / pipeline spec | ✅ Complete | `handouts/05_chapter4_data_pipeline.md` |
-| Chapter 3 & 4 claims audit (data-driven, §1–§16) | ✅ Complete | `handouts/08_chapter3_4_claims_audit.md` (+ `ch3_*.csv`, `scripts/ch3_4_dynamics_fits.py`) |
-| Chapter 3 full plan (v4) + proposal/diff | ✅ Complete | `handouts/10_chapter3_comparative_plan.md`, `handouts/09_chapter3_revised_plan_PROPOSAL.md` |
+| Chapter 4 old planning document | Partially superseded | `handouts/04_chapter4_temporal_computing_plan.md` |
+| Chapter 4 data / pipeline spec | Data reference; execution partly superseded | `handouts/05_chapter4_data_pipeline.md` |
+| Chapter 3 & 4 claims audit | Mostly historical ledger; see later sections and handout 12 for Ch4 progress | `handouts/08_chapter3_4_claims_audit.md` (+ `ch3_*.csv`, `scripts/ch3_4_dynamics_fits.py`) |
+| Chapter 3 full plan (v4) + proposal/diff | Historical planning baseline | `handouts/10_chapter3_comparative_plan.md`, `handouts/09_chapter3_revised_plan_PROPOSAL.md` |
+| Chapter 3 improvement plan | ✅ Current Ch3 follow-up list | `handouts/13_chapter3_improvement_plan.md` |
+| Chapter 4 demonstration plan | ✅ Active Ch4 source of truth | `handouts/12_chapter4_demonstration_plan_v4.md` |
 | References database (`references.bib`, with reservoir-computing core added) | ✅ Complete | `bibliography/references.bib` |
-| Chapter 1 (writing) | ⬜ Not started | — |
-| Chapter 3 (plan, v4) | ✅ Complete | `handouts/10_chapter3_comparative_plan.md` |
-| Chapter 3 (writing) | ⬜ Not started | — |
-| Chapter 4 (writing) | ⬜ Not started | — |
-| Chapter 5 (writing) | ⬜ Not started | — |
+| Chapter 1 LaTeX draft | Draft available | `chapters/chapter1_introduction.tex`, `exports/chapter1_introduction.pdf` |
+| Chapter 3 LaTeX draft | Draft available | `chapters/chapter3_comparative.tex`, `exports/chapter3_comparative.pdf` |
+| Chapter 4 modelling/figures | In progress; simulations and figures exist | `scripts/ch4_*.py`, `figures/chapter4/` |
+| Chapter 4 LaTeX chapter | No chapter file yet | — |
+| Chapter 5 LaTeX chapter | No chapter file yet | — |

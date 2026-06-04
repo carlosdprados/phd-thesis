@@ -3,7 +3,7 @@
 # Chapter 1 Reframing Handout After the Chapter 3/4 Evidence Audit
 
 **Date:** 2026-06-03  
-**Scope:** Recommendations only. No Chapter 1 source or figure files have been edited.
+**Scope:** Historical recommendation handout. Several high-priority items have since been implemented in `chapters/chapter1_introduction.tex` and the current Chapter-4 plan has moved to `handouts/12_chapter4_demonstration_plan_v4.md`. Use this file as provenance for why Chapter 1 was reframed, not as a current unchecked task list.
 
 ## Evidence Basis
 
@@ -109,7 +109,7 @@ The key label should be "composition-indexed fading-memory bank" rather than "ca
 
 **Location:** Chapter 1 lines 598-607.
 
-**Current framing:** Objective 4 says the thesis will quantify cation dependence; Objective 6 says the simulations use composition- and cation-driven timescale spread.
+**Former framing now addressed in `chapters/chapter1_introduction.tex`:** Objective 4 said the thesis would quantify cation dependence; Objective 6 said the simulations used composition- and cation-driven timescale spread.
 
 **Problem:** This overstates what the data can carry. It also omits the new methodological result that protocol amplitude affects apparent `tau`.
 
@@ -125,7 +125,7 @@ The key label should be "composition-indexed fading-memory bank" rather than "ca
 
 **Location:** Chapter 1 lines 617-619.
 
-**Current framing:** Chapter 3 is described as a composition and ion-identity-dependence chapter, and Chapter 4 models are said to be extracted per composition and per cation.
+**Former framing now addressed in `chapters/chapter1_introduction.tex`:** Chapter 3 was described as a composition and ion-identity-dependence chapter, and Chapter 4 models were said to be extracted per composition and per cation.
 
 **Problem:** The current Chapter 3 plan says composition is quantitative; host/anion/cation are illustrative. Chapter 4 should not look like it depends on a robust cation axis.
 

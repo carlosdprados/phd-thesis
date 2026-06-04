@@ -4,7 +4,7 @@
 
 **Author:** Carlos David Prado-Socorro  
 **Date:** April 12, 2026  
-**Status:** Specification document. Defines exactly which datasets exist across the PEO/triflate comparative corpus, where they live, which measurement protocols are common across the corpus, and which analysis outputs are required before Chapter 4 writing starts. This document is the contract between the experimental archive and Chapter 4.
+**Status:** Data/protocol reference, partly superseded as an execution plan. This document still defines the experimental evidence base and the three common measurements, but its old Chapter-4 application routing (§4.4–§4.6 of handout 04: reservoir + coincidence + filter bank) has been replaced by `12_chapter4_demonstration_plan_v4.md`. Current repo-local Chapter-4 modelling runs through `scripts/ch4_model.py`, `scripts/ch4_reservoir.py`, `scripts/ch4_wesad.py`, and `scripts/ch4_figures.py`; `chapter4_pipeline.py` and consolidated HDF5/Parquet outputs remain aspirational pipeline targets, not current prerequisites.
 
 **v3 (2026-04-12) — correction of scope.** Earlier revisions described the comparative corpus as an Ag-electrode NM_vXXX series employing LiTFSI / NaTFSI / KTFSI salts in a Hybrane-class / TMPE host. That description was inherited from a stale planning note and does not reflect the real archive. The actual comparative corpus is a PEO-based triflate series: a PEO/LiTr concentration sub-study plus a PEO/LiTr, PEO/NaTr, PEO/KTr fixed-composition set at PEO and salt mass fractions of 0.3 and 0.09. TMPE-based composites and alkali-TFSI (LiBis / NaBis / KBis) devices exist but are *exploratory* and are explicitly excluded from the Chapter 4 manifest. Chapter 2 supplementary measurements (EPSC, STDP, separated STM/LTM, impedance) remain Paper 1 (SY/Hybrane/LiTf) data and are used only as Li-only priors and sanity checks.
 
@@ -15,6 +15,8 @@
 - **New mandatory controls for model identification:** (i) **drive-protocol amplitude sets the apparent τ** (same device v114: 4.6→15.5 s at 3→6 V write) — fit only within **one matched protocol** (the standard 4 V write / 2 V read, 30 pulses, 0.103 s set); (ii) **electrode** Ag vs Au must be matched (exclude Au, §16 of handout 08); (iii) the pipeline `exp decay: tau` is **not robust to outliers** — per-device point-level QA + refit (Kohlrausch τ, β) is required before any τ enters a parameter card (§13/§16).
 - **Manifest focus:** the frozen Ch4 manifest should centre on the **composition grid** (matched protocol + electrode), with chemistry cells included only as labelled illustrative extras. (HDF5 status already corrected in §2.2.)
 
+**v5 (2026-06-04) — Chapter-4 implementation pivot.** The active application plan is now the two-tier reservoir-computing plan in `12_chapter4_demonstration_plan_v4.md`: architecture-level MC/NARMA benchmarks plus WESAD affective-computing demonstrations. Coincidence detection is cut from the main chapter; the multi-timescale filter-bank idea is folded into the heterogeneous-reservoir framing. Real WESAD runs show affective-computing performance and a modest fading-memory benefit, but not a statistically separable heterogeneous-over-homogeneous gain on WESAD; the robust heterogeneity claim is anchored on memory-capacity benchmarks.
+
 ---
 
 ## Purpose
@@ -23,7 +25,7 @@ Chapter 4 is a data-driven chapter: it fits compact behavioural models to measur
 
 1. **What datasets actually exist** across the PEO/triflate comparative corpus.
 2. **Whether those datasets share a common protocol**, so that fitted parameters are comparable across composition and cation cells.
-3. **What the analysis pipeline must produce**, in the form of "parameter cards" per composition–cation cell, to feed the simulations in §4.4–§4.6 of `04_chapter4_temporal_computing_plan.md`.
+3. **What the analysis pipeline must produce**, in the form of parameter cards and fit tables that feed the active reservoir simulations in `scripts/ch4_*.py` and the writing plan in `12_chapter4_demonstration_plan_v4.md`.
 
 This handout fixes all three before writing begins. Every simulation figure in Chapter 4 must be traceable, via this document, back to a specific device generation and a specific measurement folder.
 
@@ -47,7 +49,7 @@ These three datasets are the *only* datasets Chapter 4 is allowed to assume as u
 - **N-pulse → state update φ_c(V_write, t_write, x)** — how the internal state advances per write pulse, including saturation.
 - **Delay-time → fading-memory decay λ_c(Δt)** — how the internal state relaxes between pulses in the absence of drive.
 
-Given these three, the discrete-time dynamical model of §3 is fully identified for each composition–cation cell of the corpus. No additional measurement is required to simulate reservoir computing, coincidence detection or a transient filter bank at the level of claim that Chapter 4 makes.
+Given these three, the discrete-time dynamical model of §3 is sufficiently identified for the current in-silico reservoir demonstrations at the level of claim that Chapter 4 makes. Older references in this handout to coincidence detection or a standalone transient filter bank are historical; those applications are no longer the main Chapter-4 structure.
 
 ---
 
@@ -247,18 +249,18 @@ Every section of the Chapter 4 plan is now grounded in a specific subset of thes
 | §4.2 Dataset consolidation | ✓ | ✓ | ✓ | Inventory |
 | §4.3 Compact behavioural model | ✓ (f_i) | ✓ (φ_i) | ✓ (λ_i) | Model identification |
 | §4.4 Reservoir computing (flagship) | ✓ | ✓ | ✓ | Node update + state read-out + fading memory |
-| §4.5 Coincidence detection | — | ✓ | ✓ | Temporal kernel from delay-time; cumulative update from N-pulse |
-| §4.6 Transient filter bank | — | ✓ | ✓ | Impulse response from N-pulse (onset) + delay-time (decay) |
+| WESAD reservoir demonstrations (handout 12) | ✓ | ✓ | ✓ | In-silico node update, fading memory, and linear readout for affective-computing tasks |
+| Coincidence / standalone filter bank (historical handout 04) | — | ✓ | ✓ | Cut from the main Chapter-4 plan; filter-bank logic is folded into heterogeneous reservoir framing |
 | §4.7 Circuit integration | ✓ | ✓ | ✓ | Read voltage, read-disturb budget, variability envelopes |
 | §4.8 Design rules | ✓ | ✓ | ✓ | Quantified by the parameter cards |
 
-**Note:** the earlier drafts of the Chapter 4 plan claimed (i) that EPSC, STDP and impedance datasets were available across Li/Na/K, and (ii) that the comparative corpus was an Ag-electrode LiTFSI/NaTFSI/KTFSI series in a Hybrane-class host. Both were inherited from stale planning notes. The correct picture is the one captured by the traceability matrix above: the comparative corpus is the PEO/triflate series (concentration + fixed-composition strata); the richer Chapter 2 metrics remain Paper 1 evidence only; TMPE and alkali-TFSI devices are side evidence in Chapter 3 and are out of scope for Chapter 4. The Chapter 4 plan has been updated accordingly.
+**Note:** the earlier drafts of the Chapter 4 plan claimed (i) that EPSC, STDP and impedance datasets were available across Li/Na/K, (ii) that the comparative corpus was an Ag-electrode LiTFSI/NaTFSI/KTFSI series in a Hybrane-class host, and (iii) that coincidence detection plus a standalone transient filter bank would be co-equal applications. Those are stale planning assumptions. The correct picture is: the comparative corpus is the PEO/triflate series; richer Chapter 2 metrics remain Paper 1 evidence only; TMPE and alkali-TFSI devices are side evidence in Chapter 3; and the active Chapter-4 application structure is the two-tier reservoir/WESAD plan in handout 12.
 
 ---
 
 ## 7. Pre-Flight Checklist Before Writing Chapter 4
 
-The following must all be true *before* Chapter 4 writing starts:
+The following was the original full pipeline gate for Chapter 4. It remains the target for a final archival pipeline, but it is no longer a literal blocker for the current in-repo simulation pass, which already uses the curated `handouts/ch3_*.csv` / `handouts/ch4_*.csv` tables and the `scripts/ch4_*.py` harnesses.
 
 - [ ] `handouts/ch4_device_manifest.csv` exists and, for each composition–cation cell in the PEO/triflate corpus, lists ≥ 3 devices that have all three measurement types present
 - [ ] All devices in the manifest have passed the read-disturb sanity check (§3.4)

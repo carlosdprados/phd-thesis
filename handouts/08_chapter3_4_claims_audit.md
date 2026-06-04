@@ -2,7 +2,7 @@
 
 # Chapters 3 & 4 — Claims Audit and Data-Coverage Ledger
 
-**Author:** Carlos David Prado-Socorro · **Started:** 2026-06-03 · **Status:** living document — updated incrementally and committed after each pass.
+**Author:** Carlos David Prado-Socorro · **Started:** 2026-06-03 · **Status:** historical-to-current ledger. Sections through the Chapter-3 refit remain useful provenance, but the active Chapter-4 application source of truth is now `handouts/12_chapter4_demonstration_plan_v4.md`; Chapter-4 scripts and figures exist under `scripts/ch4_*.py` and `figures/chapter4/`. Older references here to coincidence/filter-bank simulations are superseded unless explicitly carried forward by handout 12.
 
 **Purpose.** Decide, from the *actual* experimental archive, **what Chapters 3 and 4 can and cannot defensibly claim** — before writing. Every claim is rated against the data on disk, not against the plan. Companion docs: the forward spec [`05_chapter4_data_pipeline.md`](05_chapter4_data_pipeline.md), the chapter plan [`01_thesis_structure.md`](01_thesis_structure.md), and the as-built archive reference [`../docs/experimental_archive_and_pipeline.md`](../docs/experimental_archive_and_pipeline.md).
 
@@ -78,7 +78,7 @@ Status key: ✅ supported by data · 🟡 limited / preliminary · 🔴 unsuppor
 | C4 | All three common measurements (I–V, N-pulse, delay) exist across the comparative corpus | 3/4 | 🟡 | True only for the Li composition grid; 41/149 overall, thin (n≤2) for Na/K. |
 | C5 | EPSC / STDP / separated STM-LTM / impedance compared across Li/Na/K | 3/4 | 🔴 | Ch2 (Paper 1, SY/Hybrane/LiTf) only. Use as Li-only priors/sanity checks; never propagate to Na/K. (Matches `01`/`05`.) |
 | C6 | Compact behavioural models (read fn, pulse update, decay) identifiable per composition cell | 4 | 🟡 | Per-cell parameters extracted (t½, retention, potentiation exp/peak/turnover; §8.5). Decay τ only ~half-identified at 8 pts; full φ(x) update + read transfer function still to formalise. |
-| C7 | Heterogeneous reservoir / coincidence / filter-bank simulations grounded in measured cells | 4 | ⏳ | Depends on C1/C2/C6; the timescale spread to exploit is composition-driven (per §2), not cation-driven. |
+| C7 | Reservoir simulations grounded in measured cells | 4 | ✅/⏳ | MC/NARMA + WESAD scripts and figures now exist (`scripts/ch4_*.py`, `figures/chapter4/`). Active framing is handout 12: heterogeneity win is robust on MC benchmarks; WESAD shows real affective computing and a modest memory benefit, but no separable heterogeneity win. Coincidence is cut; filter-bank logic is folded into reservoir framing. |
 | C8 | Devices show volatile fading memory (forgetting) and pulse potentiation across the corpus | 2/3/4 | ✅ | Delay slopes negative and pulse slopes positive in every cell tested (§6.3). Robust qualitative behaviour. |
 | C9 | Large device-to-device / cycle variability — usable as heterogeneity for reservoir computing | 3/4 | ✅ | Feature sd ≈ mean across cells (§6); the t½ ladder (≈3–19 s, §8.1) is a concrete heterogeneity resource. |
 | C10 | Potentiation saturates / reverses (turnover) at high N — caps usable pulse count | 3/4 | ✅ | ~half the cells peak then decline by N=1000 (§8.2); sets a safe operating range for Ch4 pulse protocols. |

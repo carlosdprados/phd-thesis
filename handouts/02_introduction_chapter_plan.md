@@ -4,7 +4,9 @@
 
 **Author:** Carlos David Prado-Socorro  
 **Date:** April 12, 2026  
-**Revision:** v3 — thesis-wide chemistry framing updated. The chapter still introduces volatile fading-memory devices and event-driven temporal computing as a first-class application domain (v2), but the forward references to Chapters 3 and 4 now point at the actual experimental corpus: a PEO-based triflate comparative series (PEO/LiTr, PEO/NaTr, PEO/KTr at mass fractions 0.3 / 0.09, plus a PEO/LiTr concentration sub-study) characterised through three common dynamical measurements — I–V hysteresis, variable-N potentiation, and variable-delay depotentiation. The Chapter 2 SY/Hybrane/LiTf device remains the only fully characterised synaptic exemplar. TMPE-based and alkali-TFSI composites are treated as exploratory side evidence. v2 (2026-04-11) introduced volatile / temporal-computing framing and added §1.2.5, §1.2.6, §3.5, §6.3.5, §6.3.6.
+**Revision:** v4 status overlay — current-source warnings added on 2026-06-04. v3 updated the thesis-wide chemistry framing: the chapter introduces volatile fading-memory devices and event-driven temporal computing as a first-class application domain, while the forward references to Chapters 3 and 4 point at the actual experimental corpus: a PEO-based triflate comparative series (PEO/LiTr, PEO/NaTr, PEO/KTr at mass fractions 0.3 / 0.09, plus a PEO/LiTr concentration sub-study) characterised through three common dynamical measurements — I–V hysteresis, variable-N potentiation, and variable-delay depotentiation. The Chapter 2 SY/Hybrane/LiTf device remains the only fully characterised synaptic exemplar. TMPE-based and alkali-TFSI composites are treated as exploratory side evidence. v2 (2026-04-11) introduced volatile / temporal-computing framing and added §1.2.5, §1.2.6, §3.5, §6.3.5, §6.3.6.
+
+**Current status (2026-06-04):** Historical planning document. Chapter 1 is now drafted in `chapters/chapter1_introduction.tex` with figures inserted. Use this handout only for original outline intent; do not copy the objective list or Chapter-4 application bullets below without applying the status notes. For current Chapter 4 framing, use `handouts/12_chapter4_demonstration_plan_v4.md`: MC/NARMA reservoir benchmarks plus WESAD demonstrations. Coincidence detection is cut from the main chapter, and standalone filter-bank language is folded into the heterogeneous-reservoir framing.
 
 ---
 
@@ -17,7 +19,7 @@ Computing limits → Brain-inspired solutions → The memristor (static *and* dy
 The revised flow adds two inflection points:
 
 1. After introducing the memristor, the reader is shown that "memristive device" is a broader concept than "non-volatile weight": it also covers volatile, fading-memory, time-varying elements.
-2. Before stating the thesis objectives, the reader is shown that a device family with tunable fading memory and controlled heterogeneity is the natural substrate for *temporal* computing paradigms such as physical reservoir computing, coincidence detection, and leaky filtering.
+2. Before stating the thesis objectives, the reader is shown that a device family with tunable fading memory and controlled heterogeneity is the natural substrate for *temporal* computing, with physical reservoir computing as the active Chapter-4 route. Coincidence detection and leaky filtering remain useful introductory paradigms, but they are not co-equal Chapter-4 demonstrations in the current thesis plan.
 
 ---
 
@@ -103,13 +105,13 @@ The revised flow adds two inflection points:
 - 3.4.6 Stochastic variability: cycle-to-cycle and device-to-device
 - **3.4.7 Volatility as a computational parameter** *(new)* — retention time reinterpreted as a *design variable*, not a figure of merit to be maximised. A device with τ ≈ 5 s is not a bad RAM; it is a very well-matched leaky integrator for second-scale temporal signals
 - **3.4.8 Variability as heterogeneity rather than only defect** *(new)* — device-to-device spread is a liability for a trained crossbar but an asset for a reservoir: it increases the effective dimensionality of the state space and the richness of the nonlinear projection
-- **3.4.9 Memory timescale as a device-design variable** *(new)* — chemistry-level control over retention (e.g. via cation identity) as an engineering knob for matching device dynamics to application-relevant timescales
+- **3.4.9 Memory timescale as a device-design variable** *(updated status)* — composition is the demonstrated quantitative knob for matching device dynamics to application-relevant timescales; cation identity remains a chemical hypothesis tested in Chapter 3, not an assumed universal ordering.
 
 #### 3.5 Dynamic Computing Paradigms for Volatile Memristors *(new section)*
 
 - **3.5.1 Reservoir computing: nonlinear projection plus fading memory** — a bank of volatile nonlinear nodes projects a temporal input into a high-dimensional state; only a linear readout layer is trained
-- **3.5.2 Coincidence detection and temporal correlation extraction** — volatile devices whose state decays between events naturally compute whether two events arrived within a tunable time window
-- **3.5.3 Multi-timescale filtering and transient preprocessing** — a heterogeneous set of fading-memory devices acts as a bank of leaky filters with different time constants, performing temporal decomposition at the analog front-end
+- **3.5.2 Coincidence detection and temporal correlation extraction** — background paradigm: volatile devices whose state decays between events naturally compute whether two events arrived within a tunable time window. This is no longer a main Chapter-4 demonstration.
+- **3.5.3 Multi-timescale filtering and transient preprocessing** — background paradigm folded into the current reservoir framing: a heterogeneous set of fading-memory devices acts as a bank of leaky filters with different time constants, performing temporal decomposition at the analog front-end.
 - **3.5.4 Metrics for temporal computing** — memory capacity, class separability, robustness to variability, energy per event. These replace retention/endurance/ON-OFF ratio as the relevant figures of merit for this chapter's application target
 
 ---
@@ -198,8 +200,8 @@ The revised flow adds two inflection points:
 - 6.3.2 Salt selection: high charge asymmetry between anion and cation → two mobility regimes → two memory timescales (demonstrated on the Chapter 2 SY/Hybrane/LiTf exemplar)
 - 6.3.3 One-step fabrication: blend processing from single solution
 - 6.3.4 Design freedom: tunable concentration, cation identity, polymer backbone
-- **6.3.5 Cation identity and composition as timescale knobs** — in a polyether host, the Lewis acidity and ionic radius of the cation, together with the polymer and salt mass fractions, control the effective fading-memory constant of the device. This is the *chemical* origin of a *computational* design knob. Chapter 3 realises this idea experimentally with a PEO/LiTr concentration series (composition knob) and a PEO/LiTr, PEO/NaTr, PEO/KTr set at fixed mass fractions 0.3 / 0.09 (cation knob), both characterised through a common dynamical dataset
-- **6.3.6 Mixed populations of devices as a temporal kernel bank** — a small number of chemically distinct compositions, deliberately combined on a single chip, define a bank of temporal kernels with a spread of time constants. The heterogeneity that would be harmful for a trained crossbar becomes the *point* of the design for temporal computing, and it is the principle that Chapter 4 exploits using the dynamical dataset of the PEO/triflate corpus
+- **6.3.5 Composition and chemistry as timescale knobs** — polymer and salt mass fractions provide the demonstrated quantitative control over the effective fading-memory constant. Cation identity is tested as a chemically motivated hypothesis, but Chapter 3 shows that any cation ordering is contingent on the rest of the chemistry rather than a robust host/anion-independent design rule.
+- **6.3.6 Mixed populations of devices as a temporal kernel bank** — a small number of composition-distinct devices, deliberately combined on a single chip or in simulation, define a bank of temporal kernels with a spread of time constants. The heterogeneity that would be harmful for a trained crossbar becomes the *point* of the design for reservoir computing, and it is the principle that Chapter 4 exploits using the dynamical dataset of the PEO/triflate corpus.
 
 ---
 
@@ -211,9 +213,9 @@ The revised flow adds two inflection points:
 - Can such a device exhibit both STM and LTM simultaneously in a single component?
 - What is the physicochemical origin of the memory regimes?
 - How do polymer-to-semiconductor and salt-to-semiconductor mass fractions, within a common polyether host, affect the dynamical response of the device?
-- How does the identity of the mobile cation (Li⁺, Na⁺, K⁺), at fixed host chemistry and fixed mass fractions, shift the measurable fading-memory timescale?
+- Does the identity of the mobile cation (Li⁺, Na⁺, K⁺), at fixed host chemistry and fixed mass fractions, produce a robust fading-memory ordering, or is any trend contingent on anion, host, and device variability?
 - **Can volatile organic memristors be exploited as temporal computing primitives rather than static memories?**
-- **Can composition and cation identity be used as design knobs for application-level timescale matching?**
+- **Can composition, and more cautiously chemistry, be used as design knobs for application-level timescale matching?**
 - **Can measured variability improve computational richness in heterogeneous networks rather than degrade it?**
 
 #### 7.2 Thesis Objectives
@@ -222,14 +224,14 @@ The revised flow adds two inflection points:
 2. Demonstrate full synaptic functionality — analog switching, EPSC, separated STM/LTM, STDP, and impedance response — in that single exemplar device (Chapter 2)
 3. Provide a mechanistic explanation of memory regimes in terms of ionic migration and Lewis acid–base chemistry (Chapter 2)
 4. Build a PEO/triflate polymer-electrolyte comparative corpus and characterise it through three common dynamical measurements: I–V hysteresis, variable-N potentiation, and variable-delay depotentiation (Chapter 3)
-5. Using that common dataset, quantify (a) the composition dependence of the dynamics in a PEO/LiTr concentration series and (b) the cation dependence in a PEO/LiTr, PEO/NaTr, PEO/KTr set at fixed PEO and salt mass fractions of 0.3 and 0.09 (Chapter 3)
+5. Using that common dataset, quantify (a) the composition dependence of the dynamics in a PEO/LiTr concentration series and (b) whether cation identity in a PEO/LiTr, PEO/NaTr, PEO/KTr set at fixed PEO and salt mass fractions of 0.3 and 0.09 produces a robust trend. The current Chapter 3 answer is composition yes, cation no as a host/anion-independent rule (Chapter 3)
 6. Treat TMPE-based and alkali-TFSI (LiBis/NaBis/KBis) composites transparently as exploratory side evidence with a clearly limited dataset, not as parallel main platforms (Chapter 3)
 7. **Build compact data-driven models from the three common dynamical measurements of the Chapter 3 corpus, using the Chapter 2 Paper 1 device only as a source of priors and sanity checks (EPSC, STDP, separated STM/LTM, impedance)** — Chapter 4
-8. **Demonstrate application-level temporal computing schemes — heterogeneous reservoir computing, spike coincidence detection, and multi-timescale transient filtering — from those models, without further fabrication** — Chapter 4
+8. **Demonstrate application-level temporal computing from those models without further fabrication, using heterogeneous reservoir computing as the main route: MC/NARMA benchmarks plus WESAD affective-computing demonstrations** — Chapter 4
 
 #### 7.3 Thesis Outline
 
-Brief paragraph-level description of what each of the five chapters covers and how they connect. Emphasise that Chapter 2 is a single-device proof of concept with the richest synaptic dataset of the thesis; Chapter 3 is the main multi-device comparative experimental chapter, built on the three common dynamical measurements of the PEO/triflate corpus; Chapter 4 is data-driven and builds compact models and simulated applications from those same three measurements, with Chapter 2 supplying priors; Chapter 5 is synthesis.
+Brief paragraph-level description of what each of the five chapters covers and how they connect. Emphasise that Chapter 2 is a single-device proof of concept with the richest synaptic dataset of the thesis; Chapter 3 is the main multi-device comparative experimental chapter, built on the three common dynamical measurements of the PEO/triflate corpus; Chapter 4 is data-driven and builds compact models and reservoir-computing demonstrations from those same three measurements, with Chapter 2 supplying priors; Chapter 5 is synthesis.
 
 ---
 
@@ -239,6 +241,6 @@ Brief paragraph-level description of what each of the five chapters covers and h
 - Each section transition should be a logical step, not a jump: the reader should feel they could have predicted the next section before reading it.
 - The revised structure has two funnels in parallel: a *materials* funnel (device chemistry) and an *applications* funnel (temporal computing). They converge at §7 into a unified thesis objective list.
 - Every major claim about limitations of prior art should be substantiated with specific citations.
-- Figures to include: von Neumann architecture diagram; neuron/synapse schematic; memristor circuit symbol and characteristic I–V pinched hysteresis loop; timeline of organic memristor development; HSAB periodic table excerpt; device schematic for this thesis; **a "static weight vs. fading-memory" conceptual schematic contrasting a trained crossbar with a reservoir**; **a "composition- and cation-driven timescale ladder" schematic showing how PEO/triflate composition knobs and Li/Na/K cation substitution are expected to map onto a spread of fading-memory time constants, to be made quantitative by the Chapter 3 delay-time fits**.
-- Keep the tone definitive and active: "we demonstrate", "the results show", "this establishes" — not "it seems", "might be", "could potentially".
+- Figures included in the drafted Chapter 1: von Neumann architecture diagram; neuron/synapse schematic; memristor theory and mechanism figures; organic-memristor timeline; polymer-electrolyte chemistry; LEC models; composite architecture/timescale ladder; and the static-weight vs fading-memory contrast. The timescale-ladder framing should now be read as composition-led, with cation ordering treated as a tested hypothesis rather than an assumed result.
+- Keep the tone active where the data support it: "we demonstrate" and "the results show" for established claims, and explicit limitation language for sample-limited chemistry comparisons and Chapter-4 WESAD heterogeneity results.
 - The "why some useful computing elements should forget" subsection (§1.2.6) is load-bearing: it is the first place where the reader is given permission to stop treating volatility as a defect. Write it carefully.
