@@ -451,3 +451,16 @@ Identified `τ`: PEO0.3 ≈ 24–26 s (β 0.64–0.82) → PEO0.6 ≈ 3–4.6 s 
 - **HYST aggregation correction.** The on-off-ratio distribution is strongly right-skewed (e.g. PEO0.3/salt0.045: median **3.4**, mean **7.8**, max **40**, n=4 devices). §6.2's "7.8" was the **mean**; the figure and chapter now use the robust **device-median** (3.4) throughout, so a few outlying sweeps don't define a cell. Chapter §3.4 text updated to match (on-off 3.3→2.4 across PEO at salt0.09; largest *area* 0.44 at the low-salt/low-PEO corner; per-sweep skew noted explicitly).
 - **Protocol overlay** = v114 R4 at its two protocols. Reproduced 4.6 s (3 V, R²=0.82, noisy) → 15.5 s (6 V, R²=0.97) with a **single** exponential (the chapter's methodology); the 4-param stretched form is degenerate on the clean 6 V curve. Model-free t½ corroborates (4.5→13.4 s).
 - **Chemistry bars** are illustrative values from §14–§15 / curation (host PEO 22 s n=3 vs TMPE 3.8 s n=1; anion PEO/Tr 20 s n=3 vs PEO/TFSI 0.4 s n=1; cation TMPE/TFSI Li 6.3 / Na 7.0 / K 3.5 s, n=2 each), each bar n-labelled.
+
+## 21. Pulse (number-of-pulses) study — application-relevant findings + Fig 3.2 (2026-06-04)
+
+The PULSES descriptors ([`ch4_pulse_descriptors.csv`](ch4_pulse_descriptors.csv), per-cell in [`ch3_pulses_by_cell.csv`](ch3_pulses_by_cell.csv)) give the **input-integration / write transfer function** that Ch4 needs. Two *separate, sensical* composition axes emerge (verified per-device, not just cell medians):
+
+- **PEO sets potentiation strength.** Growth exponent α (log–log slope) falls with PEO — cleanest at salt0.045 where per-device values are tight: PEO0.3 [1.06,1.23,1.02,1.16]≈1.1 → PEO0.6 ≈0.5 → PEO1.2 [0.33,0.33,0.28]≈0.31. Peak ratio (usable dynamic range) maximal at the low-PEO/low-salt corner (≈480× at PEO0.3/0.045), few-fold at high PEO. *Noisier at salt0.18*; the PEO0.3/salt0.18 cell (α≈0.18) is the sparse n=2 curation-salvaged cell (v141/v148) and is not leaned on.
+- **Salt sets the turnover ceiling.** Device-consistent: **salt0.045 → all cells turn over by N≈100–300** (turnover 3/4, 3/3, 2/3); **salt0.18 → none turn over, growth sustained to N≈1000** (0/2, 1/3, 0/3); salt0.09 mixed (transition). More salt = more chargeable states before saturation.
+
+**Application reading (Ch4):** composition gives a tunable, predominantly **compressive** and (low-salt) **non-monotone** integration of the pulse train — the nonlinear input encoding a reservoir uses. Memory time and α co-vary with PEO (not orthogonal knobs); salt independently sets dynamic range/turnover.
+
+**Key honest caveat (now in Ch3 §3.8 limitations):** integration was measured at a **single fixed inter-pulse interval (0.103 s)** and forgetting separately (post-potentiation decay). No experiment varies input *timing*, so Ch4 must **compose** φ(N) and τ — a modelling assumption, not a measured fact. A varied-interval pulse-train experiment is the test.
+
+**Figure:** `fig_potentiation()` in `scripts/ch3_figures.py` → `figures/chapter3/potentiation_grid.pdf` = Fig 3.2 (α, peak ratio, turnover fraction over the grid; n annotated).

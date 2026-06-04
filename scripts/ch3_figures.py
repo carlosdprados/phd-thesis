@@ -188,6 +188,70 @@ def fig_composition():
 
 
 # ----------------------------------------------------------------------------
+# Figure 1b — potentiation (pulse-integration) control over the composition grid
+# ----------------------------------------------------------------------------
+def fig_potentiation():
+    """Per-cell growth exponent, peak dynamic range, and turnover fraction from
+    handouts/ch3_pulses_by_cell.csv (Li composition grid)."""
+    alpha = {}; peak = {}; turn = {}; ndev = {}
+    for r in csv.DictReader(open(os.path.join(OUT, "ch3_pulses_by_cell.csv"))):
+        if r["cation"] != "Li":
+            continue
+        key = (r["peo"], r["salt"])
+        ndev[key] = int(r["n_dev"])
+        if r["growth_exp_med"]:
+            alpha[key] = float(r["growth_exp_med"])
+        if r["peak_ratio_med"]:
+            peak[key] = float(r["peak_ratio_med"])
+        turn[key] = float(r["turnover_pct"])
+
+    def grid(d):
+        M = np.full((len(PEO_LEVELS), len(SALT_LEVELS)), np.nan)
+        N = np.zeros_like(M)
+        for i, peo in enumerate(PEO_LEVELS):
+            for j, salt in enumerate(SALT_LEVELS):
+                if (peo, salt) in d:
+                    M[i, j] = d[(peo, salt)]
+                N[i, j] = ndev.get((peo, salt), 0)
+        return M, N
+
+    Ma, Na = grid(alpha); Mp, Np = grid(peak); Mt, Nt = grid(turn)
+    panels = [
+        (Ma, Na, r"(a) growth exponent $\alpha$", "viridis", "{:.2f}", False),
+        (Mp, Np, "(b) peak ratio (dynamic range)", "magma", "{:.0f}", True),
+        (Mt, Nt, "(c) turnover fraction (\\%)", "cividis", "{:.0f}", False),
+    ]
+    fig, axes = plt.subplots(1, 3, figsize=(7.4, 2.7))
+    for ax, (M, N, title, cmap, fmt, islog) in zip(axes, panels):
+        Mm = np.ma.masked_invalid(M)
+        if islog:
+            vmin = np.nanmin(M[np.isfinite(M)]); vmax = np.nanmax(M[np.isfinite(M)])
+            im = ax.imshow(Mm, cmap=cmap, norm=LogNorm(vmin=max(vmin, 1), vmax=vmax), aspect="auto")
+        else:
+            im = ax.imshow(Mm, cmap=cmap, aspect="auto")
+        ax.set_title(title)
+        ax.set_xticks(range(len(SALT_LEVELS))); ax.set_xticklabels(SALT_LEVELS)
+        ax.set_yticks(range(len(PEO_LEVELS))); ax.set_yticklabels(PEO_LEVELS)
+        ax.set_xlabel("salt mass fraction")
+        if ax is axes[0]:
+            ax.set_ylabel("PEO mass fraction")
+        for i in range(len(PEO_LEVELS)):
+            for j in range(len(SALT_LEVELS)):
+                if np.isfinite(M[i, j]):
+                    norm = (M[i, j] - np.nanmin(M)) / (np.nanmax(M) - np.nanmin(M) + 1e-12)
+                    tc = "white" if norm < 0.5 else "black"
+                    ax.text(j, i, fmt.format(M[i, j]) + f"\n$n{{=}}{int(N[i, j])}$",
+                            ha="center", va="center", color=tc, fontsize=7.5)
+                else:
+                    ax.text(j, i, "--", ha="center", va="center", color="0.5", fontsize=8)
+        fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+    fig.tight_layout()
+    p = os.path.join(FIGDIR, "potentiation_grid.pdf")
+    fig.savefig(p); plt.close(fig)
+    print("wrote", p)
+
+
+# ----------------------------------------------------------------------------
 # Figure 2 — chemistry-tuning landscape (illustrative; values from handout 08 sec 14-15)
 # ----------------------------------------------------------------------------
 def fig_chemistry():
@@ -276,6 +340,7 @@ def fig_protocol():
 def main():
     os.makedirs(FIGDIR, exist_ok=True)
     fig_composition()
+    fig_potentiation()
     fig_chemistry()
     fig_protocol()
 
