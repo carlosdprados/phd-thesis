@@ -4,13 +4,13 @@
 
 PhD thesis repository of **Carlos David Prado-Socorro** at the Institute of Molecular Science (ICMol), Universitat de Valencia.
 
-[Read the current thesis draft](exports/thesis.pdf) | [Introduction](exports/chapter1_introduction.pdf) | [Proof-of-concept chapter](exports/chapter2_proof_of_concept.pdf)
+[Read the current thesis draft](exports/thesis.pdf) | [Introduction](exports/chapter1_introduction.pdf) | [Proof-of-concept chapter](exports/chapter2_proof_of_concept.pdf) | [Comparative chapter](exports/chapter3_comparative.pdf)
 
 ## Thesis In Brief
 
 This thesis studies solution-processed organic memristive devices whose electrical response is shaped by mobile ions inside a polymer composite. These devices do not merely store a static resistance value: their conductance carries a decaying record of recent electrical activity.
 
-The central idea is to use that **fading memory** as a computational resource. By changing the polymer-electrolyte composition and the alkali-metal cation, the device dynamics can be tuned across different timescales. A family of such devices could provide the heterogeneous temporal responses needed for event-driven and neuromorphic computing.
+The central idea is to use that **fading memory** as a computational resource. The current experimental result is strongest for polymer-electrolyte **composition**: in the replicated `PEO/LiOTf` grid, composition tunes the switching window, pulse integration, and fading-memory time. Host, anion, and cation chemistry are retained as an illustrative, sample-limited tuning landscape rather than as a powered `Li > Na > K` law.
 
 <p align="center">
   <img src="figures/chapter1/ch1_fig14_composite_architecture_timescale_ladder.png" alt="Two-terminal polymer-electrolyte composite memristor and its chemically tunable fading-memory timescale" width="100%">
@@ -31,18 +31,18 @@ This thesis focuses on the second route. A device that gradually forgets is not 
   <img src="figures/chapter1/ch1_fig2_paradigms_responses.png" alt="Classical, in-memory, and event-driven temporal computing paradigms" width="100%">
 </p>
 
-## Research Hypothesis
+## Research Finding
 
-The memory timescale is linked to ion transport inside the polymer electrolyte. Ether oxygens in the host coordinate alkali-metal cations. The cation identity changes the coordination strength and therefore the expected relaxation dynamics:
+The working physical hypothesis was that memory timescale is linked to ion transport inside the polymer electrolyte. Ether oxygens in the host coordinate alkali-metal cations, so cation identity was expected to change the relaxation dynamics:
 
 - `Li+`: stronger coordination and longer fading-memory timescales
 - `Na+`: intermediate behaviour
 - `K+`: weaker coordination and shorter fading-memory timescales
 
-Composition provides an additional tuning knob through the polymer-host and salt ratios.
+The current Chapter 3 draft keeps that HSAB argument as qualitative framing, but the archive does **not** support a robust host- and anion-independent `Li > Na > K` ordering. The defensible quantitative result is the composition dependence in the `PEO/LiOTf` grid; chemistry beyond that is explicitly sample-limited.
 
 <p align="center">
-  <img src="figures/chapter1/ch1_fig12_polymer_electrolyte_chemistry.png" alt="Polyether coordination chemistry, ion-transport modes, and the expected lithium-sodium-potassium timescale ordering" width="100%">
+  <img src="figures/chapter1/ch1_fig12_polymer_electrolyte_chemistry.png" alt="Polyether coordination chemistry, ion-transport modes, and the cation-timescale hypothesis tested in Chapter 3" width="100%">
 </p>
 
 ## Thesis Roadmap
@@ -51,8 +51,8 @@ Composition provides an additional tuning knob through the polymer-host and salt
 | --- | --- | --- |
 | 1. Introduction | Computing bottlenecks, synaptic inspiration, memristors, organic materials, and the polymer-electrolyte strategy | Draft available |
 | 2. Proof of concept | A fully characterised `SY/Hybrane/LiOTf` two-terminal device with analogue switching, short- and long-term retention, EPSC-like response, and STDP | Draft available |
-| 3. Comparative study | How **composition** (the `PEO/LiOTf` grid) tunes the volatile dynamics — switching, potentiation, and a fading-memory time constant — and how electrolyte **chemistry** (host, anion, cation) shifts them further; the `Li/Na/K` cation effect is examined critically | Planned |
-| 4. Temporal computing | Data-driven models and simulations for heterogeneous reservoirs, coincidence detection, and transient filter banks | Planned |
+| 3. Comparative study | How **composition** (the `PEO/LiOTf` grid) tunes volatile dynamics — switching, potentiation, and fading memory — and how electrolyte **chemistry** shifts them further as sample-limited side evidence | Draft available |
+| 4. Temporal computing | Data-driven reservoir simulations from Chapter 3 parameter cards: memory-capacity/NARMA benchmarks plus WESAD affective-computing demonstrations; coincidence detection is cut and filter-bank logic is folded into the reservoir framing | Modelling and figures in progress |
 | 5. Conclusions | Contributions, limitations, and future directions | Planned |
 
 The proof-of-concept chapter expands the published work:
