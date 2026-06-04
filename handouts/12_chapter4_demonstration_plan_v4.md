@@ -6,7 +6,7 @@
 **Date:** 2026-06-04
 **Status:** Active planning document. **Supersedes the application structure (§4.4–§4.6) of [`04_chapter4_temporal_computing_plan.md`](04_chapter4_temporal_computing_plan.md)**, which predates the v4 Chapter-3 reframe and still assumes a *comparative* cation fit (≥3 devices/cell). The modelling backbone of handout 04 (§4.3 behavioural model, validation, parameter cards) and the circuit-integration / design-rules sections (§4.7–§4.8) remain valid and are reused. Read alongside [`08_chapter3_4_claims_audit.md`](08_chapter3_4_claims_audit.md) and [`05_chapter4_data_pipeline.md`](05_chapter4_data_pipeline.md).
 
-> **⚠️ UPDATE 2026-06-04 (WESAD downloaded & run — results are in; see new [§13](#13-measured-wesad-results-2026-06-04--honest-narrative-pivot)).** The flagship Demonstration-B claim as written in §2/§6 — *"the heterogeneous reservoir wins the multi-timescale affect task the homogeneous one cannot cover"* — **is NOT supported by the measured WESAD data**, even after rebuilding the task as a memory-demanding *streaming* one (the fair test). What the data DO support: (i) the in-silico device reservoir does real affective computing (Demo A binary **0.894**; Demo B 3-class **~0.76**); (ii) fading **memory** helps the streaming task (**+0.049** vs a memoryless readout; **+0.014–0.020** controlling for dimensionality); (iii) timescale **heterogeneity** is *within noise* on affect (**ΔF1 het−hom = +0.005 ± 0.011**, 7/10 seeds), because the discriminative memory demand is dominated by a single slow (tonic) band the lead composition already serves. **The "heterogeneity is a computational resource" claim therefore moves to the architecture/benchmark level (MC 1.49×), where it is solid.** §2, §6, §7 below are kept for provenance but must be read through §13.
+> **⚠️ UPDATE 2026-06-04 (WESAD downloaded & run — results are in; see new [§13](#13-measured-wesad-results-2026-06-04--honest-narrative-pivot) and [§14](#14-physiological-temporal-context-reconstruction-2026-06-04--affect-aligned-heterogeneity-benchmark)).** The flagship Demonstration-B claim as written in §2/§6 — *"the heterogeneous reservoir wins the multi-timescale affect task the homogeneous one cannot cover"* — **is NOT supported by the measured WESAD label-classification data**, even after rebuilding the task as a memory-demanding *streaming* one (the fair test). What the data DO support: (i) the in-silico device reservoir does real affective computing (Demo A binary **0.894**; Demo B 3-class **~0.76**); (ii) fading **memory** helps the streaming task (**+0.049** vs instantaneous; **+0.014–0.020** controlling for dimensionality); (iii) timescale **heterogeneity** is *within noise* on WESAD labels (**ΔF1 het−hom = +0.005 ± 0.011**, 7/10 seeds), because the discriminative label memory demand is dominated by a single slow (tonic) band the lead composition already serves. **The "heterogeneity is a computational resource" claim is therefore anchored on two measured benchmarks:** architecture-level MC (**1.49×**) and the new WESAD physiological temporal-context reconstruction (**R² 0.756 vs 0.744 best homogeneous, N=48**), while final affect labels are reported as a real downstream task with an honest heterogeneity null. §2, §6, §7 below are kept for provenance but must be read through §13–§14.
 
 ---
 
@@ -155,9 +155,10 @@ The connective tissue between Ch3 and Ch4:
    - *Caveat:* absolute NARMA NRMSE is high (~0.6–0.8) — a bank of *independent* (non-recurrent, 1T1M) leaky nodes is a weak NARMA reservoir; only the *relative* composition ranking is claimed. Self-test PASSES.
    - **TODO:** single-node *time-multiplexed* (delay-feedback) variant for Demo A; MC(k) + sweep figures; inject measured device-to-device spread; drive-diversity nodes (Demo B).
 3. **`scripts/ch4_wesad.py`** — ✅ **DONE ON REAL DATA (2026-06-04).** WESAD present at `data/wesad/WESAD/S2..S17` (15 subjects). Now multichannel (chest **EDA + Resp + Temp + HR-from-ECG**; robust R-peak detection via scipy), per-subject robust scaling (preserves tonic level, LOSO-safe), cached at the scaled-stream level. **Demo A** = window-level binary stress/baseline (EDA, lead bank). **Demo B rebuilt as STREAMING** continuous per-step affect tracking (reservoir runs over the whole session; per-step ridge one-hot; LOSO; causal label smoothing) — the memory-demanding fair test — with **het / hom / instantaneous / memoryless** banks, per-class F1, seed error bars, and a dt sweep. Self-test + synthetic smoke test pass. **Results: see [§13](#13-measured-wesad-results-2026-06-04--honest-narrative-pivot).** Net: multichannel + per-subject scaling lifted Demo A to **0.894**; the streaming reformulation made the task memory-demanding (memory helps) but **Demo B did NOT clear the homogeneous control** (ΔF1 = +0.005 ± 0.011, ns).
-4. ✅ **`scripts/ch4_figures.py` (2026-06-04)** — `figures/chapter4/mc_curve.pdf` (MC(k), heterog. 6.0 vs homog. 4.1) + `composition_sweep.pdf` (MC & NARMA by cell). Demo-A/B figures done.
-5. **Single-node *time-multiplexed* (delay-feedback) Demo-A variant** — optional alternative architecture; not required for the claim.
-6. Draft `chapters/chapter4_temporal.tex` around the two demonstrations once the WESAD numbers are in.
+4. ✅ **`scripts/ch4_physio_context.py` (2026-06-04)** — **NEW affect-aligned heterogeneity benchmark.** Uses real WESAD EDA/Resp/Temp/HR streams, but the target is multi-lag physiological context reconstruction rather than final affect labels: reconstruct each channel at 1, 3, 8, 20 and 45 s delays from the reservoir state (LOSO, linear ridge, N=48). Results: instantaneous R² **0.673**, memoryless **0.674**, homogeneous fast **0.741**, homogeneous slow **0.744**, heterogeneous **0.756 ± 0.002**. Heterogeneity gain over the best homogeneous control = **+0.012 R²**; memory gain over instantaneous = **+0.084 R²**. Outputs: `handouts/ch4_physio_context_results.csv`, `figures/chapter4/physio_context_reconstruction.pdf`. See [§14](#14-physiological-temporal-context-reconstruction-2026-06-04--affect-aligned-heterogeneity-benchmark).
+5. ✅ **`scripts/ch4_figures.py` (2026-06-04)** — `figures/chapter4/mc_curve.pdf` (MC(k), heterog. 6.0 vs homog. 4.1) + `composition_sweep.pdf` (MC & NARMA by cell). Demo-A/B figures done. The physiology-context figure is generated by `scripts/ch4_physio_context.py`.
+6. **Single-node *time-multiplexed* (delay-feedback) Demo-A variant** — optional alternative architecture; not required for the claim.
+7. Draft `chapters/chapter4_temporal.tex` around the three-level evidence structure: MC/NARMA → physiological-context reconstruction → WESAD label task.
 
 ---
 
@@ -195,15 +196,16 @@ Per-class (best bank): baseline 0.90 · stress 0.92 · **amusement 0.55** — am
 
 Affect labels are slowly-varying sustained states; the discriminative memory demand is **dominated by one slow (tonic) band** that the lead composition's τ (~19–26 s) already serves. Heterogeneity only converts into task performance when the target requires memory at **many distinct lags simultaneously** — which the architecture-level **Memory Capacity** benchmark *does* (het 6.12 vs hom 4.10, **1.49×**; broader MC(k)), and NARMA/MC rank the **lead PEO 0.3/0.09** top. So:
 
-- **"Heterogeneity is a computational resource" → keep, but anchor it on the benchmarks (MC/NARMA), where it is solid and task-agnostic.**
+- **"Heterogeneity is a computational resource" → keep, but anchor it on the benchmarks where it is measured cleanly: MC/NARMA (task-agnostic) and physiological temporal-context reconstruction (affect-aligned).**
 - **On affect → the honest claim is: the devices perform real affective computing (0.89 binary; 0.76 streaming 3-class), fading memory contributes (+0.014–0.020), and composition-timescale *matching* (the Ch3 result) is the design lever; heterogeneity is a generality/robustness hedge, not required when one timescale dominates.**
 
-This *unifies* Ch3 → Ch4: Ch3 shows composition (and drive) **set** the device timescale; Ch4 shows you then **match** that timescale to the task, and that a spread of timescales buys task-agnostic memory breadth (provable on benchmarks) rather than a guaranteed win on any one application.
+This *unifies* Ch3 → Ch4: Ch3 shows composition (and drive) **set** the device timescale; Ch4 shows you then **match** that timescale to the task, and that a spread of timescales buys memory breadth on both random-input benchmarks and real physiological histories, rather than a guaranteed win on any one final label set.
 
 ### 13.4 Figure & artefacts
 
 - `figures/chapter4/wesad_affect.pdf` — (a) Demo A reservoir vs static; (b) Demo B streaming decomposition (inst → +dim → +memory → +heterog) with seed error bars.
 - `figures/chapter4/mc_curve.pdf`, `composition_sweep.pdf` — unchanged architecture-level heterogeneity result.
+- `figures/chapter4/physio_context_reconstruction.pdf`, `handouts/ch4_physio_context_results.csv` — real-WESAD physiological temporal-context reconstruction result.
 - Cache: `data/wesad/_cache_EDA-Resp-Temp-HR_4hz.npz` (scaled streams; gitignored with the dataset).
 
 ### 13.5 Scope / caveats to state in the chapter
@@ -213,3 +215,29 @@ In-silico devices; linear readout; HR from chest ECG (cleaner than wrist BVP); p
 ### 13.6 Open decision for the writing pass
 
 Chapter framing options were put to the author; **selected: build the streaming task** (done, above). Remaining call for the draft: present Ch4 as **(benchmarks = where heterogeneity wins) + (WESAD = where the devices do real affect, memory helps, heterogeneity is an honest null)** — the recommended honest structure — before writing `chapters/chapter4_temporal.tex`.
+
+---
+
+## 14. Physiological temporal-context reconstruction (2026-06-04) — affect-aligned heterogeneity benchmark
+
+**Why this benchmark was added.** The WESAD label task is a fair downstream affective-computing test, but the labels are sustained states; once the slow tonic context is available, additional timescale diversity has little separable effect. The new benchmark keeps the **real WESAD physiology** but changes the target to the thing heterogeneity is supposed to provide: simultaneous access to fast, medium and slow physiological history.
+
+**Task.** Input streams are chest **EDA + Resp + Temp + ECG-derived HR**, sampled at `dt=1 s` after the existing WESAD preprocessing. The reservoir runs continuously over each subject. A linear ridge readout reconstructs each input channel at delays of **1, 3, 8, 20 and 45 s**. These delays map to fast phasic / beat-to-beat context, respiration/HF-HRV-scale context, and tonic/LF-HRV-scale context. Evaluation is leave-one-subject-out over the 15 WESAD subjects, restricted to baseline/stress/amusement periods.
+
+**Controls.** Same-size 48-node banks:
+
+| Model | Held-out mean R² | fast 1–3 s | mid 8 s | slow 20–45 s |
+| --- | ---: | ---: | ---: | ---: |
+| Instantaneous input | 0.673 | 0.715 | 0.670 | 0.632 |
+| Memoryless bank | 0.674 ± 0.000 | 0.721 | 0.667 | 0.630 |
+| Homogeneous fast bank | 0.741 ± 0.003 | **0.815** | 0.735 | 0.669 |
+| Homogeneous slow bank | 0.744 ± 0.002 | 0.787 | 0.724 | **0.711** |
+| **Heterogeneous composition bank** | **0.756 ± 0.002** | **0.815** | **0.737** | 0.708 |
+
+**Read.** The heterogeneous bank is not magic: the fast homogeneous bank is best at the fastest context and the slow homogeneous bank is best at the slowest context. The point is that the heterogeneous bank gives the best **single bank** across the whole physiological context vector. Its gain over instantaneous input is **+0.084 R²**; its gain over the best homogeneous same-size control is **+0.012 R²**. This is the affect-aligned result that the WESAD final-label classifier could not expose.
+
+**Drafting use.** This should sit between MC/NARMA and the WESAD label classifier:
+
+1. MC/NARMA: task-agnostic proof that timescale spread broadens memory.
+2. Physiological context reconstruction: real affective streams; heterogeneity improves multi-lag physiological encoding.
+3. WESAD labels: downstream affective classification; devices work and memory helps, but heterogeneity is not required because one slow timescale dominates the labels.

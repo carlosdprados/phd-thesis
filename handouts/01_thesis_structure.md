@@ -43,7 +43,7 @@ Key content:
 
 ### Chapter 4 — Data-Driven Temporal Computing with Volatile Polymer-Electrolyte Memristors
 
-*Translates the experimental datasets of Chapters 2 and 3 into application-level functionality using compact, experimentally grounded behavioural models. Uses only datasets already acquired — no additional fabrication is required. The active plan is not the old three-application structure; it is a focused reservoir-computing chapter with architecture-level benchmarks and WESAD affective-computing demonstrations.*
+*Translates the experimental datasets of Chapters 2 and 3 into application-level functionality using compact, experimentally grounded behavioural models. Uses only datasets already acquired — no additional fabrication is required. The active plan is not the old three-application structure; it is a focused reservoir-computing chapter with architecture-level benchmarks, a WESAD physiological temporal-context reconstruction benchmark, and WESAD affective-computing demonstrations.*
 
 Scope: ~35–45 pages  
 Key content:
@@ -52,7 +52,8 @@ Key content:
 - Consolidation of the evidence base, with the **common comparative basis restricted to the three abundant dynamical measurements from Chapter 3**: I–V hysteresis, variable-N potentiation, and variable-delay depotentiation. Chapter 2 EPSC/STDP/separated STM-LTM/impedance remain Li-only priors and sanity checks.
 - Extraction of compact behavioural models from the current tables and scripts: `handouts/ch3_decay_by_cell.csv`, `handouts/ch3_pulses_by_cell.csv`, `handouts/ch4_decay_fits.csv`, `handouts/ch4_pulse_descriptors.csv`, `scripts/ch4_model.py`.
 - **Architecture benchmarks:** memory-capacity and NARMA-style tests from `scripts/ch4_reservoir.py` / `scripts/ch4_figures.py`, where heterogeneous composition banks broaden memory capacity relative to homogeneous banks.
-- **Affective-computing demonstrations:** WESAD simulations from `scripts/ch4_wesad.py`. Current result: the device reservoir performs real affective computing and fading memory helps modestly, but heterogeneity is not separable from a homogeneous control on WESAD; this negative result is reported honestly.
+- **Affect-aligned heterogeneity benchmark:** WESAD physiological temporal-context reconstruction from `scripts/ch4_physio_context.py`, where the heterogeneous bank improves multi-lag EDA/Resp/Temp/HR reconstruction relative to same-size homogeneous controls.
+- **Affective-computing demonstrations:** WESAD label simulations from `scripts/ch4_wesad.py`. Current result: the device reservoir performs real affective computing and fading memory helps modestly, but heterogeneity is not separable from a homogeneous control on final WESAD labels; this negative result is reported honestly.
 - Circuit-integration constraints and design rules from the still-valid parts of handout 04 (§4.7–§4.8).
 - **Cut from the main plan:** spike coincidence detection. **Folded into the reservoir plan:** standalone multi-timescale filter bank.
 
@@ -89,7 +90,7 @@ The five-chapter structure follows a logical and defensible scientific narrative
 
 3. **Chapter 3** takes the validated concept to a polymer-electrolyte platform. Its **quantitative spine is the PEO/LiTr composition grid** — the only axis that replicates (n=2–4 across a 3×3 grid). Electrolyte **chemistry — host (PEO/TMPE), anion (triflate/TFSI), cation (Li/Na/K) — is an illustrative, sample-limited tuning landscape** (n≤2 per matched cell), with the **Li>Na>K hypothesis reported as an honest negative** (confounded by drive-protocol amplitude and electrode). A **methodological result** shows that potentiation amplitude sets the apparent fading-memory timescale. Anchored in the three common dynamical measurements; no overreach into EPSC / STDP / impedance.
 
-4. **Chapter 4** converts those physical properties into application-level design rules. It uses only existing datasets plus compact data-driven simulations, which makes it fully achievable without further fabrication. It provides the link from the device chemistry of Chapters 2–3 to circuit-level temporal computing through reservoir computing: MC/NARMA benchmarks establish the architecture-level heterogeneity benefit, while WESAD tests whether that benefit translates to a real slow physiological task. Every quantitative application-level claim traces back to the three common dynamical measurements of Chapter 3; the Chapter 2 Paper 1 device provides priors and sanity checks only.
+4. **Chapter 4** converts those physical properties into application-level design rules. It uses only existing datasets plus compact data-driven simulations, which makes it fully achievable without further fabrication. It provides the link from the device chemistry of Chapters 2–3 to circuit-level temporal computing through reservoir computing: MC/NARMA benchmarks establish the architecture-level heterogeneity benefit, WESAD physiological temporal-context reconstruction tests that benefit on real affective streams, and WESAD label classification tests whether it survives as a downstream task-performance gain. Every quantitative application-level claim traces back to the three common dynamical measurements of Chapter 3; the Chapter 2 Paper 1 device provides priors and sanity checks only.
 
 5. **Chapter 5** synthesises the whole, places it in context, and opens the scientific conversation to the next generation of researchers in the field.
 
@@ -97,7 +98,7 @@ The logical arc is now:
 
 - **Chapter 2** proves the platform exists on a single, fully characterised SY/Hybrane/LiTf device.
 - **Chapter 3** quantifies how **composition** (the PEO/LiTr grid — the replicated result) tunes the dynamics, and surveys how electrolyte **chemistry** (host/anion/cation) shifts them further (illustrative, n-limited), through the three common measurements.
-- **Chapter 4** shows how those different dynamical behaviours can be *used* for reservoir-style temporal computing, and reports both positive benchmark results and the honest WESAD heterogeneity null.
+- **Chapter 4** shows how those different dynamical behaviours can be *used* for reservoir-style temporal computing, and reports positive heterogeneity results on MC/NARMA and physiological-context reconstruction alongside the honest WESAD label-classification heterogeneity null.
 - **Chapter 5** generalises and looks forward.
 
 This structure satisfies the requirements of a monograph-style PhD thesis: coherent, sequential, and building cumulatively toward a defensible original contribution that is no longer vulnerable to the standard objection *"your device is not a good non-volatile memory"*.
@@ -116,7 +117,7 @@ This single decision propagates across all five chapters:
 | Ch. 1 | Introduce event-driven / temporal computing alongside crossbar computing. Add a subsection on "why some useful computing elements should forget". |
 | Ch. 2 | No change in content, but language around STM / LTM avoids apologising for short retention — retention is a feature, not a defect. |
 | Ch. 3 | Lead with the **composition grid** as the quantitative result; present host/anion/cation as an n-explicit *tuning landscape*, not retention rankings. Variability → heterogeneity resource. Report the Li>Na>K cation hypothesis as an honest negative + the protocol-amplitude confound. |
-| Ch. 4 | Focused reservoir-computing chapter grounded in the three common dynamical measurements: MC/NARMA benchmarks plus WESAD affective-computing demonstrations. Coincidence detection is cut; filter-bank logic is folded into heterogeneous reservoirs. |
+| Ch. 4 | Focused reservoir-computing chapter grounded in the three common dynamical measurements: MC/NARMA benchmarks, WESAD physiological-context reconstruction, and WESAD affective-computing demonstrations. Coincidence detection is cut; filter-bank logic is folded into heterogeneous reservoirs. |
 | Ch. 5 | Benchmarks drawn from neuromorphic / reservoir / event-driven hardware, not from DRAM/SRAM/ReRAM. |
 
 ---

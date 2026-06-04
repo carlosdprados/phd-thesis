@@ -52,7 +52,7 @@ The current Chapter 3 draft keeps that HSAB argument as qualitative framing, but
 | 1. Introduction | Computing bottlenecks, synaptic inspiration, memristors, organic materials, and the polymer-electrolyte strategy | Draft available |
 | 2. Proof of concept | A fully characterised `SY/Hybrane/LiOTf` two-terminal device with analogue switching, short- and long-term retention, EPSC-like response, and STDP | Draft available |
 | 3. Comparative study | How **composition** (the `PEO/LiOTf` grid) tunes volatile dynamics — switching, potentiation, and fading memory — and how electrolyte **chemistry** shifts them further as sample-limited side evidence | Draft available |
-| 4. Temporal computing | Data-driven reservoir simulations from Chapter 3 parameter cards: memory-capacity/NARMA benchmarks plus WESAD affective-computing demonstrations; coincidence detection is cut and filter-bank logic is folded into the reservoir framing | Modelling and figures in progress |
+| 4. Temporal computing | Data-driven reservoir simulations from Chapter 3 parameter cards: memory-capacity/NARMA benchmarks, WESAD physiological temporal-context reconstruction, and WESAD affective-computing demonstrations; coincidence detection is cut and filter-bank logic is folded into the reservoir framing | Modelling and figures in progress |
 | 5. Conclusions | Contributions, limitations, and future directions | Planned |
 
 The proof-of-concept chapter expands the published work:
