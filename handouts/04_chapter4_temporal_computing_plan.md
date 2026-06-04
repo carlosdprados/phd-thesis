@@ -2,6 +2,8 @@
 
 # Chapter 4 — Data-Driven Temporal Computing with Volatile Ion-Mediated Polymeric Memristors: Detailed Outline
 
+> **⚠️ Partially superseded (2026-06-04).** The *application structure* (§4.4–§4.6, three co-equal applications, comparative cation fit) predates the v4 Chapter-3 reframe and is **replaced by [`12_chapter4_demonstration_plan_v4.md`](12_chapter4_demonstration_plan_v4.md)**: a two-tier (homogeneous vs heterogeneous) reservoir-computing demonstration for **affective computing**, with composition as the only quantitative axis. The **modelling backbone (§4.3)**, **circuit-integration (§4.7)**, and **design-rules (§4.8)** sections below remain valid and are reused by the v4 plan.
+
 **Author:** Carlos David Prado-Socorro  
 **Date:** April 12, 2026  
 **Status:** Planning document for Chapter 4 (5-chapter thesis structure). v3 — rewritten so that every Chapter 3 reference points at the real experimental corpus: a PEO-based triflate comparative series (PEO/LiTr, PEO/NaTr, PEO/KTr at mass fractions 0.3 / 0.09, plus a PEO/LiTr concentration sub-study), characterised through three common dynamical measurements (I–V hysteresis, variable-N potentiation, variable-delay depotentiation). TMPE-based and alkali-TFSI (LiBis / NaBis / KBis) composites are exploratory side evidence and are *not* treated as comparative fitting targets. EPSC, STDP, separated STM/LTM retention and impedance spectroscopy remain Paper 1 / Chapter 2 (SY/Hybrane/LiTf) data and are used only as Li-specific priors and sanity checks. v2 (2026-04-11) introduced the chapter.
