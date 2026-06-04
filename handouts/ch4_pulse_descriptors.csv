@@ -1,13 +1,17 @@
 device_id,pixel,cation,peo,salt,stratum,onset_N,peak_ratio,N_peak,turnover,growth_exp,n
 NM_v114,L3,Li,0.3,0.09,B_cation,64.0,176.39,1024.0,0,0.894,11
 NM_v140,R4,Li,0.3,0.09,B_cation,30.0,123.46,300.0,1,0.913,7
+NM_v141,R4,Li,0.3,0.18,A_concentration,1000.0,3.62,1000.0,0,0.185,7
 NM_v142,R4,Li,0.6,0.09,A_concentration,3.0,76.43,300.0,1,0.722,7
 NM_v143,R4,Li,0.6,0.18,A_concentration,3.0,76.9,1000.0,0,0.595,7
 NM_v145,R4,Li,1.2,0.18,A_concentration,100.0,8.01,1000.0,0,0.368,7
 NM_v146,R3,Li,0.3,0.09,B_cation,30.0,101.61,1000.0,0,0.824,7
 NM_v147,R3,Li,0.3,0.045,A_concentration,30.0,454.22,1000.0,0,1.06,7
+NM_v148,R3,Li,0.3,0.18,A_concentration,1000.0,4.04,1000.0,0,0.183,7
+NM_v150,R3,Li,0.15,0.045,A_concentration,nan,1.41,100.0,1,0.064,7
 NM_v152,R3,Li,0.6,0.09,A_concentration,10.0,278.13,300.0,1,1.096,7
 NM_v153,R3,Li,0.6,0.045,A_concentration,30.0,4.16,100.0,1,0.31,7
+NM_v154,R3,Li,0.6,0.18,A_concentration,10.0,47.68,300.0,1,0.73,7
 NM_v155,R3,Li,1.2,0.09,A_concentration,30.0,7.33,1000.0,0,0.383,7
 NM_v156,R3,Li,1.2,0.045,A_concentration,30.0,5.99,1000.0,0,0.328,7
 NM_v157,R5,Li,1.2,0.18,A_concentration,30.0,4.92,1000.0,0,0.319,7

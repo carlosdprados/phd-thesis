@@ -424,3 +424,21 @@ Scanned every claim-relevant delay curve (64 device·day·pixel groups) with a s
 Captured so far (all PNG-reviewed): 2023-10 batch (v247–v252), old PEO/Tr (v114/115/116), TFSI batches (v321–v326, v333–v338), and the §17 rescue candidates (v148/v149/v151). Verified applied: v248's decay now refits on its 6 cleaned points; discarded curves are dropped.
 
 **Maintenance rule:** when a new device is PNG-reviewed, add a registry row and re-run the script — the per-cell τ/β and potentiation summaries update automatically. Note: for weak-signal devices (e.g. v248, max ratio ≈2.7) the model-free `t_half` and the exp-`τ` can diverge (≈24 s vs ≈3 s) — a further reason those n=1 cells are illustrative only.
+
+## 19. Broadened composition refit — full PEO/LiTr/Ag population + v151 (2026-06-04)
+
+**Change.** `scripts/ch3_4_dynamics_fits.py` previously built its composition `cell` map from `manifest_candidate==1` only. It now includes **all** PEO/LiTr/Ag devices (chemistry-landscape cells still come from manifest candidates), so the curation-salvaged low-concentration row enters the spine. Data-availability + FILTERED + curation `discard` + the quality screen filter the rest downstream, so broadening is safe — in practice the only new contributor is **v151** (the bulk of non-candidates, v092–103 / v164–175, carry no DELAYTIME/PULSES data; v247 is a curation `discard`).
+
+**New honesty gate.** A reported stretched-`τ` now also requires **n ≥ 6** points (keeps ≥ 2 dof on the 4-parameter fit). v151's curated 5-point decay therefore contributes the **model-free `t½` only**, not an over-fitted `τ`. (The `clean`-curve floor for *entering* the fit was lowered 6 → 5 so v151's 5 hand-picked points are admitted at all.)
+
+**Result — composition spine now spans 4 PEO levels (Li, Ag, 4 V/2 V), `t½` median:**
+
+| salt \ PEO | 0.15 | 0.3 | 0.6 | 1.2 |
+|---|---|---|---|---|
+| 0.045 | — | 15.8 (n=4) | 3.3 (n=3) | 2.7 (n=3) |
+| 0.09  | — | 19.2 (n=8) | 3.5 (n=3) | 6.0 (n=3) |
+| 0.18  | 22.4 (n=1, v151) | — | 5.5 (n=2) | 9.0 (n=3) |
+
+Identified `τ`: PEO0.3 ≈ 24–26 s (β 0.64–0.82) → PEO0.6 ≈ 3–4.6 s → PEO1.2 ≈ 7–10 s. The **lower-PEO → longer-retention** trend holds and v151 (22.4 s, the longest single cell) **extends** it to PEO 0.15 — corroborating, not part of, the replicated grid. Newly filled pulse cell PEO0.3/salt0.18 (v141+v148, n=2): weak, peak ≈ 3.8, no turnover — consistent with the "more dilute SY → weaker potentiation" reading. Chapter 3's stated numbers (2–20 s; PEO0.3 longest ≈19 s; τ≈20–25 s; β 0.6–0.9) are unchanged by the refit.
+
+**New artifacts (single source for figures):** `handouts/ch3_decay_by_cell.csv`, `handouts/ch3_pulses_by_cell.csv` (per-cell medians with n_dev / n_identified).
