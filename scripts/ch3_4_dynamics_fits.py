@@ -76,7 +76,12 @@ def main():
     for r in man:
         is_cand = r["manifest_candidate"] == "1"
         is_peo_litr_ag = (r["host"] == "PEO" and r["cation"] == "Li" and r["electrode"] == "Ag")
-        if is_cand or is_peo_litr_ag:
+        # Electrode is a confound (audit sec 16): the composition spine and every
+        # per-cell summary must be Ag-only. The manifest wrongly flags some Au
+        # PEO/Li devices (v265/266/268/269/270) as candidates, so the bare is_cand
+        # branch would leak Au devices (two at t_half ~ 87 s) into the 0.3/0.09
+        # cell. Require Ag here; Au devices are held separate, not modelled.
+        if (is_cand and r["electrode"] == "Ag") or is_peo_litr_ag:
             cell[r["device_id"]] = (r["cation"], r["peo_mass_fraction"], r["salt_mass_fraction"], r["stratum"])
 
     flags = set()

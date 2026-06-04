@@ -482,3 +482,20 @@ Direct refits (simple-exp τ, curation applied):
 - PEO/triflate this batch: v248 (Na) weak (maxR 2.7, τ=3.0 unreliable), v249 (K) τ=10.7; Li discarded — too muddy to feature.
 
 **Decisive point (now the spine of the cation honest-negative):** holding the **TMPE host fixed** and swapping only the anion (triflate↔TFSI) **inverts** the cation order — K longest→shortest. So no host/anion-independent cation ordering exists in this archive. Chemistry figure cation panel rebuilt to grouped bars (TMPE host, triflate vs TFSI × Li/Na/K) showing the inversion; chapter cation paragraph + caption updated with the explicit numbers.
+
+## 23. Two data-integrity fixes from the handout-13 critical pass (2026-06-04)
+
+**(a) Protocol mislabel (handout 13 #1) — FIXED.** Composition **PULSES = 3 V/1.5 V** (32/32), **DELAYTIME = 4 V/2 V** (30/32; v114 = 3 V/6 V overlay), confirmed from `DEVICES_*_PIXEL_INFO.csv`. Chapter wrongly said "common 4 V/2 V" and "30-pulse potentiation". Added **Table 3.1**; fixed §3.2/§3.4 prose; sharpened limitation #4 + Ch4 caveat (φ at 3 V vs λ at 4 V → composition assumes amplitude-compatibility the v114 result shows is only approximate).
+
+**(b) Au-electrode contamination of the 0.3/0.09 cell — FIXED.** The manifest flags Au PEO/Li devices **v265/266/268/269/270** as `manifest_candidate=1`; `scripts/ch3_4_dynamics_fits.py` pulled them into the composition `cell` via the `is_cand` branch, contaminating the **PEO 0.3/0.09** cell (two Au devices at t½≈87 s). Fix: require `electrode==Ag` for the composition spine. Effect — **headline robust**, counts corrected:
+
+| 0.3/0.09 | before (with Au) | after (Ag-only) |
+|---|---|---|
+| delay n_dev | 8 | **3** |
+| t½ median | 19.2 s | **19.2 s** (unchanged) |
+| retention@60 s | 0.41 | **0.28** |
+| identified τ | 24.8 (n5) | **23.9 (n2)** |
+| pulse n_dev | 9 | **4** |
+| pulse α / peak | 0.75 / 102 | **0.90 / 150** |
+
+t½≈19 s and τ≈24 s (chapter's cited numbers) are unchanged; the "2–4 devices/cell" claim is now literally true (was 8). Chapter prose quotes only the salt-0.045 row for α (Au were all 0.3/0.09), so prose is unaffected; figures + Ch4 parameter cards regenerated (MC ratio 1.47→1.49, robust).
