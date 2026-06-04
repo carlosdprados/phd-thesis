@@ -135,19 +135,19 @@ The connective tissue between Ch3 and Ch4:
 
 ---
 
-## 11. Open decisions
+## 11. Decisions — LOCKED (2026-06-04)
 
-1. **Coincidence detection (04 §4.5):** keep as a short supporting vignette, or cut for focus?
-2. **Affective task granularity:** binary stress-vs-baseline (cleanest, class-balanced-ish) for Demo A and 3-class (baseline/stress/amusement) for Demo B — confirm.
-3. **Single dataset (WESAD) or WESAD + one cross-dataset robustness check (DEAP)?**
-4. **Drive-diversity as a heterogeneity axis in Demo B:** include (uses the Ch3 protocol result) or keep Demo B to composition+chemistry only?
+1. **Coincidence detection (04 §4.5): CUT.** Chapter focuses on the two reservoir demonstrations + affective domain. (May return as a one-line mention only.)
+2. **Affective task granularity:** Demo A = **binary** stress-vs-baseline; Demo B = **3-class** baseline/stress/amusement.
+3. **Datasets:** **WESAD primary** for the thesis; DEAP an *optional* cross-dataset robustness check, not required.
+4. **Drive-amplitude diversity: INCLUDE** as a third heterogeneity axis in Demo B (cheap, already-measured via the Ch3 protocol result; strengthens "organic gives many heterogeneity knobs").
 
 ---
 
 ## 12. Next steps (build order)
 
-1. **`scripts/ch4_model.py`** — assemble parameter cards from the `ch3_*_by_cell.csv` artifacts (+ per-device fits); implement the discrete-time φ⊗λ⊗f model; leave-one-out validation.
-2. **`scripts/ch4_reservoir.py`** — single-node time-multiplexed RC (Demo A) + spatial multi-node RC (Demo B); MC/IPC + task harness.
+1. **`scripts/ch4_model.py`** — ✅ **STARTED (2026-06-04).** `ParameterCard` per composition cell assembled from `ch3_decay_by_cell.csv` + `ch3_pulses_by_cell.csv`; `decay_factor(dt)` (identified Kohlrausch τ/β, else single-exp from t½) and `potentiation_ratio(N)` (power-law to peak + turnover roll-off); `lead_card()` = PEO0.3/0.09; runnable self-test PASSES (9 Li cards). **TODO:** leave-one-dataset-out validation vs raw curves; per-device spread for the variability envelope; pulse-encoding front end.
+2. **`scripts/ch4_reservoir.py`** — single-node time-multiplexed RC (Demo A) + spatial multi-node RC (Demo B); MC/IPC + task harness. **(next)**
 3. **WESAD ingestion** — load, segment, slow-channel feature streams; pulse-encode for the reservoir input layer.
 4. Composition sweep (Demo A validation) → MC/F1 vs composition figure.
 5. Homogeneous-vs-heterogeneous comparison (Demo B) → MC(k) breadth + task-F1 figure.
