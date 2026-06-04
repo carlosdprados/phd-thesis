@@ -5,6 +5,10 @@
 **Date:** 2026-06-04  
 **Purpose:** Convert the Chapter 3 audit into an actionable plan for strengthening the chapter as a thesis chapter and as a possible future publication basis.
 
+> **Progress (2026-06-04, critically verified):**
+> - **#1 protocol correction — DONE & VERIFIED.** Confirmed from `DEVICES_*_PIXEL_INFO.csv`: composition PULSES are **3 V/1.5 V** (32/32), DELAYTIME **4 V/2 V** (30/32; v114 is the 3 V/6 V overlay). Added **Table 3.1** (per-measurement protocols), fixed the §3.2 prose and the §3.4 "common 4 V/2 V" claim, and **sharpened limitation #4 + the Ch4 caveat** to the real point: φ (3 V) and λ (4 V) are at *different write amplitudes*, so the Ch4 composition assumes a compatibility the protocol result shows is only approximate. Builds clean (chapter + thesis).
+> - Remaining items triaged below; figures (#3–#5) and prose (#6–#7) next, supplementary (#8–#11) deferred as genuinely supplementary.
+
 ## Executive Direction
 
 Chapter 3 already has the correct central structure: the replicated `SY/PEO/LiTr/Ag` composition grid is the quantitative spine; host, anion and cation comparisons are an illustrative chemistry landscape; and the drive-protocol result is a methodological warning and design rule.

@@ -58,7 +58,7 @@ Per-device, composition-indexed behavioural model (full spec: handout 04 §4.3):
 **Parameter cards** = one (φ_c, λ_c, f_c, spread) per composition cell. These are the sole inputs to every simulation. Validation: leave-one-dataset-out (handout 04 §4.3.3).
 
 **Honesty constraints baked into the model:**
-- φ⊗λ **composition assumption**: integration measured at one fixed inter-pulse cadence (0.103 s), forgetting measured separately (Ch3 §3.8). The model composes them; a varied-cadence experiment is the test (flagged, not done).
+- φ⊗λ **composition assumption** (sharpened 2026-06-04): PULSES (φ) were measured at **3 V write / 1.5 V read**, DELAYTIME (λ) at **4 V write / 2 V read** — *different write amplitudes*, not just measured separately. Since drive amplitude co-sets the timescale (v114 4.6→15.5 s), composing a 3 V potentiation shape with a 4 V decay assumes regime-compatibility; this likely **under-estimates** the true drive↔retention coupling. Inter-pulse cadence is effectively common (0.104/0.103 s). The clean test is one matched-amplitude pulse-train experiment sweeping N and interval (flagged, not done). See Ch3 Table 3.1 + §3.8.
 - **Read perturbation**: the suprathreshold read perturbs state. Demonstrations assume a **sub-threshold read** (as in the Ch2 PoC device) or model the per-read perturbation explicitly; stated as scope.
 - **Linear readout only** (ridge regression). Any nonlinear readout defeats the RC claim (handout 04 rule).
 
