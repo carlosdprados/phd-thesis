@@ -67,7 +67,7 @@ The proof-of-concept chapter expands the published work:
 | [`chapters/`](chapters) | Standalone chapter sources and shared thesis formatting |
 | [`figures/`](figures) | Figures used throughout the thesis |
 | [`bibliography/`](bibliography) | Shared BibLaTeX database |
-| [`exports/`](exports) | Committed PDF snapshots and plain-text chapter exports |
+| [`exports/`](exports) | Committed PDF snapshots |
 | [`handouts/`](handouts) | Planning documents, outlines, and working notes |
 | [`docs/`](docs) | Reference docs about the experimental archive and analysis pipeline (data and code live in the sibling `Nanomem_Devices_Library/`) |
 
