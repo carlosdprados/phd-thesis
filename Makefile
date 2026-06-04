@@ -17,16 +17,17 @@ EXPORTS        := exports
 CHAPTER1_SRC := chapter1_introduction.tex
 CHAPTER2_SRC := chapter2_proof_of_concept.tex
 CHAPTER3_SRC := chapter3_comparative.tex
+CHAPTER4_SRC := chapter4_temporal.tex
 THESIS_SRC   := thesis.tex
 
 LATEXMK       := latexmk -pdf
 THESIS_TEXINPUTS := TEXINPUTS=./$(CHAPTER_DIR):
 
-.PHONY: all thesis chapter1 chapter2 chapter3 \
-        thesis-clean chapter1-clean chapter2-clean chapter3-clean clean \
+.PHONY: all thesis chapter1 chapter2 chapter3 chapter4 \
+        thesis-clean chapter1-clean chapter2-clean chapter3-clean chapter4-clean clean \
         export exports
 
-all: chapter1 chapter2 chapter3 thesis
+all: chapter1 chapter2 chapter3 chapter4 thesis
 
 chapter1:
 	cd $(CHAPTER_DIR) && $(LATEXMK) -outdir=../$(BUILD_CHAPTERS) $(CHAPTER1_SRC)
@@ -36,6 +37,9 @@ chapter2:
 
 chapter3:
 	cd $(CHAPTER_DIR) && $(LATEXMK) -outdir=../$(BUILD_CHAPTERS) $(CHAPTER3_SRC)
+
+chapter4:
+	cd $(CHAPTER_DIR) && $(LATEXMK) -outdir=../$(BUILD_CHAPTERS) $(CHAPTER4_SRC)
 
 thesis:
 	$(THESIS_TEXINPUTS) $(LATEXMK) -outdir=$(BUILD_THESIS) $(THESIS_SRC)
@@ -49,10 +53,13 @@ chapter2-clean:
 chapter3-clean:
 	cd $(CHAPTER_DIR) && latexmk -C -outdir=../$(BUILD_CHAPTERS) $(CHAPTER3_SRC)
 
+chapter4-clean:
+	cd $(CHAPTER_DIR) && latexmk -C -outdir=../$(BUILD_CHAPTERS) $(CHAPTER4_SRC)
+
 thesis-clean:
 	$(THESIS_TEXINPUTS) latexmk -C -outdir=$(BUILD_THESIS) $(THESIS_SRC)
 
-clean: chapter1-clean chapter2-clean chapter3-clean thesis-clean
+clean: chapter1-clean chapter2-clean chapter3-clean chapter4-clean thesis-clean
 
 ## Snapshot cleanly rebuilt PDFs into exports/ (tracked in git).
 ## Separate recursive invocations enforce ordering, including under make -j.
@@ -63,6 +70,7 @@ exports:
 	cp $(BUILD_CHAPTERS)/chapter1_introduction.pdf $(EXPORTS)/
 	cp $(BUILD_CHAPTERS)/chapter2_proof_of_concept.pdf $(EXPORTS)/
 	cp $(BUILD_CHAPTERS)/chapter3_comparative.pdf $(EXPORTS)/
+	cp $(BUILD_CHAPTERS)/chapter4_temporal.pdf $(EXPORTS)/
 	cp $(BUILD_THESIS)/thesis.pdf $(EXPORTS)/
 
 export: exports

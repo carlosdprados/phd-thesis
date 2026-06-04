@@ -1,0 +1,165 @@
+%% ============================================================
+%%  Chapter 4 — Data-Driven Temporal Computing with
+%%              Polymer-Electrolyte Memristor Reservoirs
+%%
+%%  Author : Carlos David Prado-Socorro
+%%  Date   : June 2026
+%%  Institution : ICMol, Universitat de València
+%%
+%%  Compile with: latexmk -pdf  (standalone) or via thesis.tex
+%%  Plan + evidence: handouts/12_chapter4_demonstration_plan_v4.md,
+%%                   handouts/05_chapter4_data_pipeline.md,
+%%                   handouts/04_chapter4_temporal_computing_plan.md
+%%  Figures: scripts/ch4_figures.py, scripts/ch4_physio_context.py
+%% ============================================================
+
+%% ---- Standalone preamble (skipped when \include'd from thesis.tex) ----
+\ifdefined\thesismode\else
+  \documentclass[12pt, twoside]{report}
+  \usepackage{thesis-format}
+  \addbibresource{../bibliography/references.bib}
+  \begin{document}
+  \setcounter{chapter}{3}     % This is Chapter 4 when built standalone
+\fi
+
+%% --- Shared macros (\providecommand: harmless if an earlier chapter declared them) ---
+\providecommand{\SY}{\textit{Super Yellow}}
+\providecommand{\PEO}{PEO}
+\providecommand{\LiTf}{LiOTf}
+\providecommand{\NaTf}{NaOTf}
+\providecommand{\KTf}{KOTf}
+\providecommand{\twoterminal}{two-terminal}
+\providecommand{\WESAD}{\textsc{wesad}}
+\providecommand{\NARMA}{NARMA-10}
+
+%% ============================================================
+\chapter{Data-Driven Temporal Computing with Polymer-Electrolyte Memristor Reservoirs}\label{ch:temporal}
+%% ============================================================
+
+%% ------------------------------------------------------------
+\section{Introduction and Scope}\label{sec:ch4_intro}
+%% ------------------------------------------------------------
+
+% --- DRAFT: expand --- From Chapter 3's tunable fading memory to computation;
+% the timescale-matching thesis; in-silico scope stated up front.
+\Cref{ch:comparative} established that the fading memory of these composites is an engineerable quantity. This chapter asks what that engineered memory is good for, and answers it by treating the measured device dynamics as the elements of a reservoir computer.
+
+%% ------------------------------------------------------------
+\section{From Measured Dynamics to a Behavioural Model}\label{sec:ch4_model}
+%% ------------------------------------------------------------
+
+% --- DRAFT: expand --- Parameter cards: write nonlinearity phi (PULSES),
+% fading memory lambda (Kohlrausch tau/beta, DELAYTIME), read transfer f (HYST);
+% honesty constraints (phi-cross-lambda amplitude assumption, sub-threshold read,
+% linear readout); leave-one-dataset-out validation.
+Every simulation in this chapter is driven by a compact, composition-indexed behavioural model fitted to the three common Chapter~3 measurements, so that no figure bypasses the measured data.
+
+%% ------------------------------------------------------------
+\section{Reservoir Computing and the Common Metric Language}\label{sec:ch4_framework}
+%% ------------------------------------------------------------
+
+% --- DRAFT: expand --- Leaky node, spatial multi-node bank, ridge readout;
+% MC(k), NARMA-10, IPC; the single ruler that makes the demonstrations comparable.
+Reservoir computing supplies the framework in which a bank of volatile devices becomes a temporal processor, and a single set of metrics on which every demonstration below is measured.
+
+%% ------------------------------------------------------------
+\section{Benchmark Tier: Memory Capacity and NARMA}\label{sec:ch4_benchmarks}
+%% ------------------------------------------------------------
+
+% --- DRAFT: expand --- Task-agnostic proof: MC + NARMA-10 + composition sweep.
+% Heterogeneity broadens MC 1.49x (6.12 vs 4.10); lead PEO 0.3/0.09 validated as
+% the memory-capacity optimum, 0.3/0.045 competitive on NARMA.
+The first, task-agnostic tier establishes reservoir capability rigorously and isolates the contribution of timescale heterogeneity on standard benchmarks (\cref{fig:ch4_mc_curve,fig:ch4_composition_sweep}).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.66\linewidth]{../figures/chapter4/mc_curve.pdf}
+  \caption[Memory capacity versus delay: heterogeneity broadens memory]{Linear memory capacity $\mathrm{MC}_k$ as a function of delay $k$ for a homogeneous bank (all \PEO{} 0.3/0.09 nodes) versus a heterogeneous composition bank ($\tau\approx 3$--$26$\,s). The heterogeneous bank broadens recoverable memory across lags, raising total memory capacity from $4.10$ to $6.12$ (a $1.49\times$ increase), with the gain concentrated at short-to-intermediate lags. $N=24$ leaky nodes, random uniform input, linear (ridge) read-out; in-silico devices built from the Chapter~3 parameter cards.}
+  \label{fig:ch4_mc_curve}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{../figures/chapter4/composition_sweep.pdf}
+  \caption[Memory capacity and NARMA across the composition grid]{(a)~Total linear memory capacity and (b)~\NARMA{} reconstruction error (NRMSE, lower is better) for single-composition reservoirs across the \PEO{}/\LiTf{} grid. The lead cell \PEO{}~0.3/0.09 (orange) attains the highest memory capacity; the neighbouring 0.3/0.045 cell is marginally better on \NARMA{}. Both optima fall in the low-\PEO{} row anticipated by \cref{ch:comparative}. Only the \emph{relative} composition ranking is claimed: absolute \NARMA{} NRMSE is high because a bank of independent, non-recurrent leaky nodes is a weak \NARMA{} reservoir.}
+  \label{fig:ch4_composition_sweep}
+\end{figure}
+
+%% ------------------------------------------------------------
+\section{Affective Computing: A Native Timescale Match}\label{sec:ch4_affect}
+%% ------------------------------------------------------------
+
+% --- DRAFT: expand --- Why affect; device-tau window vs affect-signal bands table
+% (phasic EDA / respiration / HRV / tonic SCL); WESAD dataset; slow-signal regime.
+Affective computing recognises human emotional and physiological state from slow peripheral signals, and the device timescale window sits directly on top of them, which makes affect the flagship domain for the device reservoir \autocite{Picard1997,Schmidt2018WESAD}.
+
+%% ------------------------------------------------------------
+\section{Physiological Temporal-Context Reconstruction}\label{sec:ch4_physio}
+%% ------------------------------------------------------------
+
+% --- DRAFT: expand --- Affect-aligned heterogeneity benchmark on real WESAD
+% physiology: reconstruct EDA/Resp/Temp/HR at 1,3,8,20,45 s lags; het R2 0.756 vs
+% best homogeneous 0.744 vs instantaneous 0.673; N=48 LOSO.
+Between the task-agnostic benchmarks and the final affect labels sits a benchmark that keeps the real \WESAD{} physiology but targets exactly what heterogeneity is meant to supply: simultaneous access to fast, medium and slow physiological history (\cref{fig:ch4_physio}).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.82\linewidth]{../figures/chapter4/physio_context_reconstruction.pdf}
+  \caption[Physiological temporal-context reconstruction on WESAD]{Multi-lag physiological context reconstruction on real \WESAD{} streams (chest EDA, respiration, temperature, and ECG-derived heart rate). A linear read-out reconstructs each channel at delays of $1$, $3$, $8$, $20$ and $45$\,s from the reservoir state (leave-one-subject-out, $N=48$). The heterogeneous composition bank gives the best single-bank held-out $R^2$ ($0.756$) across the full fast-to-slow context vector, ahead of the best same-size homogeneous control ($0.744$) and well ahead of instantaneous input ($0.673$). Fast and slow homogeneous banks each win only their own band.}
+  \label{fig:ch4_physio}
+\end{figure}
+
+%% ------------------------------------------------------------
+\section{WESAD Affective Classification}\label{sec:ch4_wesad}
+%% ------------------------------------------------------------
+
+% --- DRAFT: expand --- Downstream task. Demo A binary 0.894 (matches static ->
+% quasi-static window); Demo B streaming 3-class 0.758, honest heterogeneity null
+% (+0.005 +/- 0.011), memory helps (+0.014-0.020); mechanism = one slow tonic band.
+The downstream affective-classification task shows the devices doing real affective computing, and reports the heterogeneity contribution honestly --- as a measured null on final labels (\cref{fig:ch4_wesad}).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{../figures/chapter4/wesad_affect.pdf}
+  \caption[WESAD affective computing with device reservoirs]{Affective computing with in-silico device reservoirs (leave-one-subject-out, linear read-out). (a)~Demonstration A, window-level binary stress-versus-baseline from EDA: the single lead composition matches a static feature baseline, i.e.\ the $60$\,s-window task is quasi-static and requires no fading memory. (b)~Demonstration B, streaming three-class affect tracking (baseline/stress/amusement) decomposed as instantaneous $\rightarrow$ $+$dimensionality $\rightarrow$ $+$fading memory $\rightarrow$ $+$timescale heterogeneity. Fading memory contributes a small but consistent gain; the timescale-heterogeneity increment ($+0.005\pm0.011$) is within seed noise. Error bars are $\pm 1$\,SD over $10$ bank seeds.}
+  \label{fig:ch4_wesad}
+\end{figure}
+
+%% ------------------------------------------------------------
+\section{Judging the Chapter 3 Findings Against the Application}\label{sec:ch4_designrules}
+%% ------------------------------------------------------------
+
+% --- DRAFT: expand --- The Ch3->Ch4 loop: composition SETS tau, task MATCHES tau;
+% heterogeneity = memory-breadth / generality hedge, not a guaranteed label win;
+% circuit-integration and design rules (handout 04 sec 4.7-4.8).
+The two demonstrations close the loop with \cref{ch:comparative}: composition \emph{sets} the device timescale, the application \emph{selects} which timescale it needs, and a spread of timescales buys memory breadth rather than a guaranteed win on any single label set.
+
+%% ------------------------------------------------------------
+\section{Limitations and Scope Conditions}\label{sec:ch4_limitations}
+%% ------------------------------------------------------------
+
+% --- DRAFT: expand --- The six honesty boundaries: in-silico; phi-cross-lambda
+% single-cadence assumption; slow (sub-kHz) regime; sub-threshold read; illustrative
+% chemistry nodes (n<=2); linear read-out only. Null reported WITH error bars.
+% Key future bench test: matched-amplitude varied-cadence pulse train.
+The claims of this chapter are bounded by a set of scope conditions that are stated plainly here, the most consequential being that the demonstrations are in-silico simulations driven by measured parameter cards rather than a bench reservoir run.
+
+%% ------------------------------------------------------------
+\section{Conclusions and Bridge to Chapter~5}\label{sec:ch4_conclusions}
+%% ------------------------------------------------------------
+
+% --- DRAFT: expand --- Devices do real temporal computing; heterogeneity is a
+% computational resource where it is measured cleanly (MC/NARMA, physiological
+% context); composition-timescale matching is the design lever; bridge to Conclusions.
+This chapter has shown that a bank of solution-processed polymer-electrolyte memristors, characterised only through three common measurements, performs real temporal computing on standard benchmarks and on real physiological signals.
+
+
+%% ---- Standalone close (skipped when \include'd from thesis.tex) ----
+%% A unified bibliography is printed from thesis.tex in the thesis build,
+%% so the per-chapter \printbibliography runs only in standalone mode.
+\ifdefined\thesismode
+  \endinput
+\fi
+
+\printbibliography[heading=bibintoc, title={References}]
+\end{document}
