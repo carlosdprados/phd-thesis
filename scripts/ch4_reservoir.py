@@ -42,10 +42,9 @@ def _full(cards):
     return [c for c in cards if c.alpha == c.alpha and c.peak_ratio == c.peak_ratio]
 
 
-def make_nodes(cards, N, heterogeneous, rng, jitter=0.12):
-    """Return per-node (decay, alpha, w). Heterogeneous: cycle composition cells;
-    homogeneous: N jittered copies of the lead node (device-to-device scatter only)."""
-    base = _full(cards) if heterogeneous else [lead_card(cards)]
+def nodes_from(base, N, rng, jitter=0.12):
+    """Return per-node (decay, alpha, w) by cycling the given base cards with
+    device-to-device jitter and a random input mask/gain."""
     nodes = []
     for i in range(N):
         c = base[i % len(base)]
@@ -56,6 +55,13 @@ def make_nodes(cards, N, heterogeneous, rng, jitter=0.12):
         decay = float(np.exp(-((DT / tau) ** beta)))
         nodes.append((decay, alpha, w))
     return nodes
+
+
+def make_nodes(cards, N, heterogeneous, rng, jitter=0.12):
+    """Heterogeneous: cycle all composition cells; homogeneous: N jittered copies
+    of the lead node (device-to-device scatter only)."""
+    base = _full(cards) if heterogeneous else [lead_card(cards)]
+    return nodes_from(base, N, rng, jitter)
 
 
 def run_states(nodes, u):
@@ -101,6 +107,53 @@ def memory_capacity(X, u, max_k=30, split=0.5):
     return np.array(mc)
 
 
+def narma10(u):
+    """Standard NARMA-10 benchmark target driven by input u in [0, 0.5]."""
+    y = np.zeros_like(u)
+    for t in range(len(u) - 1):
+        ui9 = u[t - 9] if t >= 9 else 0.0
+        s = np.sum(y[max(0, t - 9):t + 1])
+        y[t + 1] = 0.3 * y[t] + 0.05 * y[t] * s + 1.5 * ui9 * u[t] + 0.1
+    return y
+
+
+def task_nrmse(X, target, split=0.5):
+    """Ridge readout from reservoir state to target; return test NRMSE."""
+    T = X.shape[0]
+    Xb = np.hstack([X, np.ones((T, 1))])
+    mu, sd = Xb[:, :-1].mean(0), Xb[:, :-1].std(0) + 1e-9
+    Xb[:, :-1] = (Xb[:, :-1] - mu) / sd
+    Xa, ya = Xb[WASHOUT:], target[WASHOUT:]
+    ntr = int(len(ya) * split)
+    yhat = _ridge_predict(Xa[:ntr], ya[:ntr], Xa[ntr:])
+    yte = ya[ntr:]
+    return float(np.sqrt(np.mean((yhat - yte) ** 2) / (yte.var() + 1e-12)))
+
+
+def composition_sweep(cards, N=16, max_k=30):
+    """Per-composition single-cell bank: total MC + NARMA-10 NRMSE. Validates the
+    Demonstration-A 'winner' claim by ranking compositions on the same tasks."""
+    rng = np.random.default_rng(0)
+    u_mc = rng.uniform(0.0, 1.0, 4000)
+    u_na = rng.uniform(0.0, 0.5, 4000)
+    y_na = narma10(u_na)
+    rows = []
+    for c in sorted(_full(cards), key=lambda z: (float(z.peo), float(z.salt))):
+        nodes = nodes_from([c], N, np.random.default_rng(7))
+        mc = memory_capacity(run_states(nodes, u_mc), u_mc, max_k=max_k).sum()
+        nrmse = task_nrmse(run_states(nodes, u_na), y_na)
+        rows.append((c, mc, nrmse))
+    print(f"\nComposition sweep (single-cell bank, N={N}) -- Demonstration-A validation")
+    print(f"{'cell':22s} {'totalMC':>8} {'NARMA-NRMSE':>12}")
+    for c, mc, nrmse in sorted(rows, key=lambda r: r[2]):   # rank by NARMA (lower=better)
+        flag = "  <- lead" if (c.peo == "0.3" and c.salt == "0.09") else ""
+        print(f"{c.cell:22s} {mc:8.2f} {nrmse:12.3f}{flag}")
+    best_mc = max(rows, key=lambda r: r[1])[0]
+    best_na = min(rows, key=lambda r: r[2])[0]
+    print(f"best total-MC: {best_mc.cell} | best NARMA: {best_na.cell}")
+    return rows
+
+
 def main():
     cards = load_cards(li_only=True)
     rng = np.random.default_rng(0)
@@ -127,6 +180,8 @@ def main():
     print("(>1 means the composition spread broadens memory across timescales --"
           " the Demonstration-B claim, here on random input / architecture level.)")
     assert het > hom, "expected heterogeneous bank to have higher total MC"
+
+    composition_sweep(cards)
     print("\nself-test: PASS")
 
 
