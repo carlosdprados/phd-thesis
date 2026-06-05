@@ -39,9 +39,19 @@ import os
 
 import numpy as np
 from scipy.optimize import curve_fit
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 DB = "../Nanomem_Devices_Library/DATABASE"
 OUT = "handouts"
+FIGDIR = "figures/chapter3"
+
+plt.rcParams.update({
+    "font.family": "serif", "font.size": 9, "axes.titlesize": 9,
+    "axes.labelsize": 9, "figure.dpi": 150, "savefig.bbox": "tight",
+})
+AG_C, AU_C = "#1f4e79", "#b8860b"  # silver-blue, gold
 
 
 def L(f):
@@ -232,6 +242,71 @@ def delaytime_fits(restrict=None):
     return rows
 
 
+def raw_decays(dns):
+    """Per-device delay-time curves (t, ratio) at 2.0 V read, FILTERED applied."""
+    grp = collections.defaultdict(list)
+    for r in L("DEVICES_DELAYTIME_CURVE_INFO.csv"):
+        dn = r["device_name"]
+        if dn not in dns or dn not in RV2:
+            continue
+        if (dn, r["day"], r["pixel"], "DELAYTIME") in FLAGS:
+            continue
+        t, y = fnum(r.get("delay time (s)")), fnum(r.get("ratio"))
+        if t and t > 0 and y is not None:
+            grp[(dn, r["pixel"])].append((t, y))
+    return grp
+
+
+def make_figure(hyst, pul, decay_all):
+    """Electrode contrast at the lead 0.3/0.09 cell: retention up, window down
+    (and cation-flat), potentiation down, for inert Au vs active Ag."""
+    fig, ax = plt.subplots(1, 3, figsize=(9.2, 3.0))
+
+    # (a) PEO/Li/OTf fading-memory decays, Ag vs Au (clean curves only)
+    for el, col in [("Ag", AG_C), ("Au", AU_C)]:
+        dns = set(d for d in cell_devs(el, "PEO/Li/OTf")
+                  if d in decay_all and decay_all[d]["clean"])
+        lab = True
+        for (dn, px), pts in raw_decays(dns).items():
+            pts = sorted(set(pts))
+            t = np.array([p[0] for p in pts]); y = np.array([p[1] for p in pts])
+            y0 = y[t == 1][0] if (t == 1).any() else y[0]
+            ax[0].semilogx(t, y / y0, "-o", ms=3, lw=1.1, color=col, alpha=0.85,
+                           label=(el if lab else None)); lab = False
+    ax[0].axhline(0.5, ls=":", c="0.6", lw=0.8)
+    ax[0].set_xlabel("delay (s)"); ax[0].set_ylabel("norm. enhancement")
+    ax[0].set_title("(a) fading memory (PEO/Li)"); ax[0].legend(frameon=False, fontsize=8)
+
+    # (b) switching window across chemistry, Ag vs Au (cation series flat on Au)
+    cells_b = ["PEO/Li/OTf", "TMPE/Li/OTf", "TMPE/Na/OTf", "TMPE/K/OTf"]
+    labs = ["PEO/Li", "TMPE/Li", "TMPE/Na", "TMPE/K"]
+    x = np.arange(len(cells_b)); w = 0.38
+    for k, (el, col) in enumerate([("Ag", AG_C), ("Au", AU_C)]):
+        vals = [med([med([t[0] for t in hyst.get(dn, [])]) for dn in cell_devs(el, ce) if dn in hyst])
+                for ce in cells_b]
+        ax[1].bar(x + (k - 0.5) * w, vals, w, color=col, label=el)
+    ax[1].set_xticks(x); ax[1].set_xticklabels(labs, rotation=30, ha="right")
+    ax[1].set_ylabel("on-off ratio"); ax[1].set_title("(b) switching window")
+    ax[1].legend(frameon=False, fontsize=8)
+
+    # (c) potentiation peak ratio, Ag vs Au (log)
+    cells_c = ["PEO/Li/OTf", "TMPE/Li/OTf"]
+    labs_c = ["PEO/Li", "TMPE/Li"]
+    x = np.arange(len(cells_c))
+    for k, (el, col) in enumerate([("Ag", AG_C), ("Au", AU_C)]):
+        vals = [med([med([t[0] for t in pul.get(dn, [])]) for dn in cell_devs(el, ce) if dn in pul])
+                for ce in cells_c]
+        ax[2].bar(x + (k - 0.5) * w, vals, w, color=col, label=el)
+    ax[2].set_yscale("log"); ax[2].set_xticks(x); ax[2].set_xticklabels(labs_c)
+    ax[2].set_ylabel("potentiation peak ratio"); ax[2].set_title("(c) potentiation")
+    ax[2].legend(frameon=False, fontsize=8)
+
+    fig.tight_layout()
+    os.makedirs(FIGDIR, exist_ok=True)
+    fig.savefig(os.path.join(FIGDIR, "electrode_contrast.pdf"))
+    print(f"\nwrote {FIGDIR}/electrode_contrast.pdf")
+
+
 def cell_devs(electr, chemstr):
     return [dn for dn in ORIG if is_sy(dn) and electrode(dn) == electr and chem(dn) == chemstr
             and comp(dn)[0] in ("0.3", "") and comp(dn)[1] in ("0.09", "")]
@@ -293,6 +368,8 @@ def main():
             print(f"  {dn}: n={r['n']} t_half={r['t_half']:6.1f}s tau={r['tau']:6.1f} "
                   f"beta={r['beta']:.2f} R2={r['r2']:.2f} clean={r['clean']}")
     print("\nReference (Ag, from ch3_decay_by_cell.csv): PEO/Li 0.3/0.09 t_half_med ~ 19.2 s (n=3).")
+
+    make_figure(hyst, pul, decay_all)
 
 
 if __name__ == "__main__":
