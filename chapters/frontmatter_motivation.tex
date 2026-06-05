@@ -1,0 +1,84 @@
+%% ============================================================
+%%  Front matter — Motivation, Objectives and Structure
+%%
+%%  Author      : Carlos David Prado-Socorro
+%%  Institution : ICMol, Universitat de València
+%%
+%%  Thesis-level roadmap placed before Chapter 1. It states the
+%%  problem, the device idea, the evidence hierarchy, and the
+%%  five-chapter structure. Compiles standalone or \include'd
+%%  from thesis.tex (guarded by \thesismode, as the chapters are).
+%% ============================================================
+
+%% ---- Standalone preamble (skipped when \include'd from thesis.tex) ----
+\ifdefined\thesismode\else
+  \documentclass[12pt, twoside]{report}
+  \usepackage{thesis-format}
+  \addbibresource{../bibliography/references.bib}
+  \begin{document}
+\fi
+
+%% ============================================================
+\chapter*{Motivation, Objectives and Structure of the Thesis}
+\addcontentsline{toc}{chapter}{Motivation, Objectives and Structure of the Thesis}
+\label{sec:scope_objectives}
+%% ============================================================
+
+\markboth{Motivation, Objectives and Structure}{Motivation, Objectives and Structure}
+
+The cost of computing is increasingly the cost of \emph{moving data}, not the cost of arithmetic. In a conventional computer, the processor and the memory are physically separate, and every operation requires operands to be fetched across the channel that joins them. On modern hardware, a single off-chip memory access can cost three to four orders of magnitude more energy than the arithmetic it feeds, and the workloads that now dominate---large machine-learning models and continuous streams from physiological and environmental sensors---are precisely those that demand enormous numbers of such accesses. As classical transistor scaling no longer hides this imbalance, the energy and latency of data movement have become the limiting factor of digital computing. This thesis is motivated by that limit, and by one of the physical strategies proposed to relax it: building computation out of devices whose own internal dynamics carry and transform information, so that signalling, memory, and processing share a single physical substrate, as they do in the biological synapse.
+
+The device idea pursued here is the \emph{volatile organic memristive device}: a simple two-terminal element, made from an ion-containing polymer composite, whose conductance retains a decaying record of its recent electrical history. Rather than treating this volatility as a defect to be engineered away (as it would be for a non-volatile memory cell), the thesis treats the fading-memory timescale as the functional resource. A device that forgets at a controlled rate is a physical \emph{leaky integrator}, and a collection of such devices with different timescales is a substrate for \emph{temporal} (reservoir-style) computing on time-varying signals. The central claim of the work is that the chemistry of the polymer composite---above all its composition---provides a handle on that timescale, and that the resulting dynamics can be put to computational use.
+
+The thesis builds this argument on a deliberately graded evidence hierarchy, and it is important to state that hierarchy plainly at the outset:
+
+\begin{itemize}
+  \item \textbf{A fully characterised exemplar (Chapter~2).} A single proof-of-concept Super~Yellow/Hybrane/lithium-triflate device is characterised with the complete synaptic measurement suite---current--voltage hysteresis, potentiation and depression, excitatory post-synaptic current, separated short- and long-term retention, and spike-timing-dependent plasticity---and given a mechanistic interpretation in terms of cation--anion mobility asymmetry.
+  \item \textbf{A replicated composition spine with a sample-limited chemical landscape (Chapter~3).} A poly(ethylene oxide)-based corpus is built under a common protocol. Its quantitative spine is a \emph{replicated} composition series; host, anion, and cation substitutions are reported as an explicitly sample-limited chemical-tuning landscape, not as powered material laws. In particular, the \ce{Li+}\,>\,\ce{Na+}\,>\,\ce{K+} cation ordering is treated as a hypothesis to be tested, not assumed.
+  \item \textbf{An in-silico temporal-computing demonstration from measured dynamics (Chapter~4).} Compact behavioural models extracted from the Chapter~3 measurements are used in reservoir-computing simulations, with heterogeneity claimed only where the simulations support it and negative controls (including the affective-label null on real physiological streams) reported explicitly.
+\end{itemize}
+
+\section*{Open Questions and Objectives}
+\label{subsec:open_questions}
+
+The work is organised around three groups of questions, each answered by a stage of the evidence hierarchy.
+
+\emph{First, realising and understanding an exemplar.} Can a fully reversible two-terminal organic memristive device be made from a solution-processed polymer-electrolyte composite using standard organic-electronic fabrication, and can a single such device support the full set of synaptic functions---analogue switching, distinguishable short- and long-term memory, an excitatory post-synaptic current response, and spike-timing-dependent plasticity? And can the coexistence of fast and slow memory components be explained by the cation--anion mobility asymmetry of the composite?
+
+\emph{Second, composition and ion identity.} Within a common host and a common alkali-metal triflate family, how do the device dynamics depend on composition when the polymer-to-semiconductor and salt-to-semiconductor mass fractions are varied around a reference formulation? And, with composition fixed, does changing the cation along the \ce{Li+}, \ce{Na+}, \ce{K+} series shift the measured fading-memory timescale in the way the coordination chemistry suggests?
+
+\emph{Third, utility for temporal computing.} Can the volatile response of these devices be exploited for temporal computation? Can composition supply task-matched fading-memory timescales, while sample-limited chemistry and device-to-device spread populate a heterogeneous bank? And can measured variability contribute to computation rather than merely degrade it?
+
+These questions translate into six ordered objectives:
+
+\begin{enumerate}
+  \item \label{subsec:objectives} Design, fabricate, and characterise a proof-of-concept two-terminal organic memristive device based on a Super~Yellow/Hybrane/lithium-triflate composite, processed from a single solution onto a standard ITO/composite/Ag stack, and demonstrate the basic memristive and synaptic functionality in a single platform.
+  \item Provide a mechanistic account of the device's two memory regimes in terms of the displacement of mobile triflate anions and lithium cations within the oxygen-rich ion-conducting host, supported by hard--soft acid--base reasoning on the cation--oxygen interaction.
+  \item Build a comparative experimental corpus on a poly(ethylene oxide)-based platform loaded with alkali-metal triflate salts, fabricated under a common protocol, and characterise it through three common dynamical measurements: I--V hysteresis, variable-number-of-pulses potentiation, and variable-delay depotentiation.
+  \item Quantify the composition dependence through a replicated PEO/lithium-triflate concentration series, and report host, anion, and cation substitutions as an explicitly sample-limited chemical-tuning landscape on the same three measurements.
+  \item Construct experimentally grounded behavioural models from those measurements, centred on composition-indexed fading-memory times, nonlinear pulse-update rules, device-to-device variability envelopes, and read-transfer behaviour.
+  \item Demonstrate, in simulation, temporal-computing functionality from these models in a focused reservoir-computing framework: memory-capacity and NARMA benchmarks, WESAD physiological-context reconstruction, and WESAD affective-computing tasks, with heterogeneity claimed where supported and negative controls reported explicitly.
+\end{enumerate}
+
+\section*{Structure of the Thesis}
+\label{subsec:outline}
+
+The thesis is organised in five chapters that follow this objective list.
+
+\paragraph{Chapter~1 --- Introduction.} Provides the conceptual and materials background, moving from the limits of conventional computing, through the biological synapse and the memristor, to the polymer-electrolyte composite adopted as the device strategy for the rest of the thesis.
+
+\paragraph{Chapter~2 --- Proof of Concept.} Reports the Super~Yellow/Hybrane/lithium-triflate device. It is the only device in the thesis for which the complete synaptic suite is treated as primary evidence, and it isolates the cation--host coordination chemistry that the comparative work then tests. The chapter is built on Prado-Socorro et al.~\cite{PradoSocorro2022}.
+
+\paragraph{Chapter~3 --- Compositional and Chemical Control.} Reformulates the proof-of-concept architecture on a PEO host loaded with alkali-metal triflates. Its quantitative spine is the replicated PEO/lithium-triflate composition grid; host, anion, and cation substitutions are reported as an illustrative, sample-limited chemical-tuning landscape rather than a powered Li/Na/K law. All claims rely on the same three common measurements.
+
+\paragraph{Chapter~4 --- Data-Driven Temporal Computing.} Turns the experimental measurements into temporal-computing functionality. Compact behavioural models extracted from the Chapter~3 dynamics drive reservoir-computing simulations: memory-capacity and NARMA-style benchmarks, WESAD physiological-context reconstruction, and WESAD affective-computing demonstrations, with heterogeneity claimed where supported and nulls reported honestly.
+
+\paragraph{Chapter~5 --- Conclusions and Outlook.} Brings together the device-chemistry axis and the application axis, benchmarks the work against temporal, reservoir, and event-driven neuromorphic hardware, and states the limitations of the evidence base.
+
+%% ---- Standalone close (skipped when \include'd from thesis.tex) ----
+\ifdefined\thesismode
+  \endinput
+\fi
+
+\printbibliography[heading=bibintoc, title={References}]
+\end{document}
