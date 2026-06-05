@@ -83,6 +83,24 @@ SAMPLES = {
              "PEO", "Li", "film", "ambient2h"),
 }
 
+# XRD .xy patterns (2theta, counts) for panel (c) of the combined figure; the
+# full XRD analysis lives in scripts/ch3_xrd.py + handouts/17_xrd_assessment.md.
+XRD_FILES = {
+    "v126": f"{Q3}/2022-09-28_NM_v126_(XRD,IRATR,PEO,LiTr)/Day1_XRD/BB-5-65-1.xy",
+    "v129": f"{Q3}/2022-09-28_NM_v129_(XRD,IRATR,TMPE,LiTr)/Day1_XRD/BB-5-65-4.xy",
+}
+XRD_BLANK = (f"{Q3}/2022-09-28_NM_v126_(XRD,IRATR,PEO,LiTr)/Day1_XRD/"
+             "ITO_Test/BB-5-80-3min_ITO.xy")
+
+
+def load_xy(path):
+    """Load a 2-col XRD .xy (2theta, counts), ascending in 2theta."""
+    d = np.loadtxt(path)
+    x, y = d[:, 0], d[:, 1]
+    o = np.argsort(x)
+    return x[o], y[o]
+
+
 # diagnostic band windows (cm^-1) for triflate / polyether / water
 BANDS = {
     "dCF3_sym":   (745, 775),    # delta_s(CF3): free~752 / CIP~757 / aggregate~762
@@ -273,11 +291,14 @@ def make_figures(spectra):
     print("wrote", p2)
 
     # ===== Figure 4 (CHAPTER): combined chemistry-axis corroboration =====
-    # Left  : triflate nu_s(SO3) ion-association band, all host x cation (no
-    #         cation-resolved shift -> 'cation not a clean lever').
-    # Right : PEO vs TMPE C-O-C/crystallinity contrast (film pair), rubber-band
-    #         baselined over a wide window so the multiplet structure is honest.
-    fig, (axL, axR) = plt.subplots(1, 2, figsize=(9.4, 4.2))
+    # (a) ATR triflate nu_s(SO3) ion-association, all host x cation -> no
+    #     cation-resolved shift ('cation not a clean lever').
+    # (b) ATR C-O-C envelope, PEO vs TMPE (Li, film) -> PEO retains LOCAL
+    #     conformational order; TMPE amorphous.
+    # (c) XRD, PEO/Li vs TMPE/Li vs ITO blank -> films are X-ray AMORPHOUS
+    #     (substrate ITO peaks only): no long-range PEO crystallites, no salt
+    #     phase. Disciplines (b): local order, not bulk crystallinity.
+    fig, (axL, axM, axR) = plt.subplots(1, 3, figsize=(13.2, 4.1))
 
     order = [("v126", "PEO/Li"), ("v127", "PEO/Na"), ("v128", "PEO/K"),
              ("v129", "TMPE/Li"), ("v130", "TMPE/Na"), ("v131", "TMPE/K")]
@@ -300,10 +321,10 @@ def make_figures(spectra):
     axL.set_ylim(0, 1.12)
     axL.set_xlabel(r"wavenumber (cm$^{-1}$)")
     axL.set_ylabel(r"normalised $\nu_s$(SO$_3$) absorbance")
-    axL.set_title(r"(a) Triflate ion-association band")
+    axL.set_title(r"(a) ATR: triflate ion-association band")
     axL.legend(fontsize=6.5, frameon=False, ncol=2)
 
-    for dev, lab, c in [("v126", "PEO/Li (semicryst.)", "#1f77b4"),
+    for dev, lab, c in [("v126", "PEO/Li (locally ordered)", "#1f77b4"),
                         ("v129", "TMPE/Li (amorphous)", "#d62728")]:
         if dev not in spectra:
             continue
@@ -312,17 +333,45 @@ def make_figures(spectra):
         xx, aa = x[m], a[m]
         aa = aa - rubberband(xx, aa)
         aa = aa / np.nanmax(aa)
-        axR.plot(xx, aa, color=c, lw=1.2, label=lab)
-    # PEO crystalline marker bands
+        axM.plot(xx, aa, color=c, lw=1.2, label=lab)
     for ref in (843, 947, 962, 1060, 1116, 1145, 1242, 1280):
-        axR.axvline(ref, color="0.85", ls=":", lw=0.6, zorder=0)
-    axR.set_xlim(1300, 820)
-    axR.set_xlabel(r"wavenumber (cm$^{-1}$)")
-    axR.set_ylabel("normalised absorbance")
-    axR.set_title("(b) Host C-O-C / crystallinity (Li, film)")
-    axR.legend(fontsize=7, frameon=False)
+        axM.axvline(ref, color="0.85", ls=":", lw=0.6, zorder=0)
+    axM.set_xlim(1300, 820)
+    axM.set_xlabel(r"wavenumber (cm$^{-1}$)")
+    axM.set_ylabel("normalised absorbance")
+    axM.set_title("(b) ATR: host C-O-C local order (Li, film)")
+    axM.legend(fontsize=7, frameon=False)
 
-    fig.suptitle("IR-ATR corroboration of the chemistry axis "
+    # (c) XRD panel
+    xrd = {"v126": ("PEO/Li", "#1f77b4"), "v129": ("TMPE/Li", "#d62728")}
+    off = 0.0
+    for dev, (lab, c) in xrd.items():
+        path = XRD_FILES.get(dev)
+        if not path or not os.path.exists(path):
+            continue
+        x, y = load_xy(path)
+        norm = np.sum(y[(x >= 29.8) & (x <= 30.8)]) / 100.0
+        m = (x >= 10) & (x <= 40)
+        axR.plot(x[m], y[m] / norm + off, color=c, lw=0.8, label=lab)
+        off += 1.6
+    xb, yb = load_xy(XRD_BLANK)
+    normb = np.sum(yb[(xb >= 29.8) & (xb <= 30.8)]) / 100.0
+    mb = (xb >= 10) & (xb <= 40)
+    axR.plot(xb[mb], yb[mb] / normb + off, color="0.35", lw=0.8, label="ITO blank")
+    for pk in (21.5, 30.6, 35.5):
+        axR.axvline(pk, color="0.6", ls="-", lw=0.5, zorder=0)
+    for pk in (19.1, 23.3):
+        axR.axvline(pk, color="#1f77b4", ls=":", lw=0.8, zorder=0)
+    axR.text(30.6, off + 1.7, "ITO", fontsize=6.5, color="0.4", ha="center")
+    axR.text(20.0, off + 1.7, "PEO\n(exp.)", fontsize=6, color="#1f77b4", ha="center")
+    axR.set_xlim(10, 40)
+    axR.set_yticks([])
+    axR.set_xlabel(r"$2\theta$ (deg, Cu-K$\alpha$)")
+    axR.set_ylabel("intensity (ITO-norm., offset)")
+    axR.set_title("(c) XRD: films are X-ray amorphous")
+    axR.legend(fontsize=7, frameon=False, loc="upper left")
+
+    fig.suptitle("Microscopic corroboration of the chemistry axis: ATR + XRD "
                  "(SY blend, 0.3/0.09, n=1 per chemistry)", fontsize=9.5)
     fig.tight_layout(rect=(0, 0, 1, 0.95))
     p4 = os.path.join(FIGDIR, "iratr_chemistry.pdf")

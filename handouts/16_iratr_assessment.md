@@ -52,8 +52,10 @@ cation**. → Microscopically consistent with the chapter's honest conclusion th
 
 **(3) Host structural contrast (supporting, weaker).** In the **film pair** (v126 PEO vs
 v129 TMPE, Li) the C–O–C envelope (1040–1170) is a **resolved multiplet** for linear PEO
-(local maxima ~1122 & 1139 cm⁻¹ — semicrystalline signature) but a **single broad band**
-for hyperbranched TMPE (~1138 — amorphous). This is the expected crystalline-vs-amorphous
+(local maxima ~1122 & 1139 cm⁻¹ — *local conformational* order) but a **single broad band**
+for hyperbranched TMPE (~1138 — amorphous). **CORRECTED (see handout 17 / XRD):** read this as
+*local/conformational* order, NOT "semicrystalline" — XRD shows the composite is X-ray
+amorphous (no bulk PEO crystallites). Chapter wording updated accordingly. This is the expected crystalline-vs-amorphous
 host difference and plausibly underlies the host effect on relaxation (amorphous TMPE →
 higher segmental mobility → faster ionic relaxation → ~6× shorter t₁/₂, as measured §3.5).
 **Caveats:** the contrast is subtle and partly confounded by the overlapping ν_s(SO₃) band,
