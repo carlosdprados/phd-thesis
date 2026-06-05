@@ -2,8 +2,15 @@
 
 **Date:** 2026-06-05
 **Script:** `scripts/ch3_iratr.py` · **Band table:** `handouts/ch3_iratr_bands.csv`
-**Figures:** `figures/chapter3/iratr_fingerprint.pdf`, `…/iratr_triflate_nsSO3.pdf`,
+**Chapter figure:** `figures/chapter3/iratr_chemistry.pdf` (combined, used in §3.5).
+**Exploratory figures:** `…/iratr_fingerprint.pdf`, `…/iratr_triflate_nsSO3.pdf`,
 `…/iratr_host_crystallinity.pdf`
+
+**STATUS (2026-06-05): integrated.** Folded into §3.5 (chemistry landscape) per the
+recommendation below — intro sentence + one combined figure `fig:ch3_iratr`; the
+ν_s(SO₃)/cation-null added to the cation paragraph, the PEO/TMPE crystallinity contrast to
+the host paragraph, and a corroboration clause to the §3.7 mechanistic discussion. Humidity
+set excluded. Chapter builds clean.
 
 ## 1. What the data is
 

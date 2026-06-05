@@ -272,6 +272,64 @@ def make_figures(spectra):
     plt.close(fig)
     print("wrote", p2)
 
+    # ===== Figure 4 (CHAPTER): combined chemistry-axis corroboration =====
+    # Left  : triflate nu_s(SO3) ion-association band, all host x cation (no
+    #         cation-resolved shift -> 'cation not a clean lever').
+    # Right : PEO vs TMPE C-O-C/crystallinity contrast (film pair), rubber-band
+    #         baselined over a wide window so the multiplet structure is honest.
+    fig, (axL, axR) = plt.subplots(1, 2, figsize=(9.4, 4.2))
+
+    order = [("v126", "PEO/Li"), ("v127", "PEO/Na"), ("v128", "PEO/K"),
+             ("v129", "TMPE/Li"), ("v130", "TMPE/Na"), ("v131", "TMPE/K")]
+    colors = plt.cm.viridis(np.linspace(0, 0.88, len(order)))
+    for (dev, lab), c in zip(order, colors):
+        if dev not in spectra:
+            continue
+        x, a, t, *_ = spectra[dev]
+        m = (x >= 1005) & (x <= 1060)
+        xx, aa = x[m], a[m]
+        base = np.interp(xx, [xx[0], xx[-1]], [aa[0], aa[-1]])
+        aa = aa - base
+        aa = aa / np.nanmax(aa)
+        axL.plot(xx, aa, color=c, lw=1.3, label=lab)
+    for ref, txt in [(1032, "free"), (1042, "CIP"), (1052, "aggr.")]:
+        axL.axvline(ref, color="0.75", ls=":", lw=0.8)
+        axL.text(ref, 1.01, txt, rotation=90, fontsize=6, va="bottom",
+                 ha="center", color="0.45")
+    axL.set_xlim(1060, 1005)
+    axL.set_ylim(0, 1.12)
+    axL.set_xlabel(r"wavenumber (cm$^{-1}$)")
+    axL.set_ylabel(r"normalised $\nu_s$(SO$_3$) absorbance")
+    axL.set_title(r"(a) Triflate ion-association band")
+    axL.legend(fontsize=6.5, frameon=False, ncol=2)
+
+    for dev, lab, c in [("v126", "PEO/Li (semicryst.)", "#1f77b4"),
+                        ("v129", "TMPE/Li (amorphous)", "#d62728")]:
+        if dev not in spectra:
+            continue
+        x, a, t, *_ = spectra[dev]
+        m = (x >= 820) & (x <= 1300)
+        xx, aa = x[m], a[m]
+        aa = aa - rubberband(xx, aa)
+        aa = aa / np.nanmax(aa)
+        axR.plot(xx, aa, color=c, lw=1.2, label=lab)
+    # PEO crystalline marker bands
+    for ref in (843, 947, 962, 1060, 1116, 1145, 1242, 1280):
+        axR.axvline(ref, color="0.85", ls=":", lw=0.6, zorder=0)
+    axR.set_xlim(1300, 820)
+    axR.set_xlabel(r"wavenumber (cm$^{-1}$)")
+    axR.set_ylabel("normalised absorbance")
+    axR.set_title("(b) Host C-O-C / crystallinity (Li, film)")
+    axR.legend(fontsize=7, frameon=False)
+
+    fig.suptitle("IR-ATR corroboration of the chemistry axis "
+                 "(SY blend, 0.3/0.09, n=1 per chemistry)", fontsize=9.5)
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    p4 = os.path.join(FIGDIR, "iratr_chemistry.pdf")
+    fig.savefig(p4)
+    plt.close(fig)
+    print("wrote", p4)
+
     # ===== Figure 3: host structural contrast, PEO vs TMPE (Li, triflate) =====
     # Diagnostic: the C-O-C stretching envelope (1040-1170) is a resolved
     # multiplet in semicrystalline linear PEO and a single broad band in the
