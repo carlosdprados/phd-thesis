@@ -115,10 +115,15 @@ def _ridge_fit(F, Y, lam=RIDGE):
     return np.linalg.solve(Fb.T @ Fb + lam * np.eye(Fb.shape[1]), Fb.T @ Y)
 
 
-def loso_regression(feats):
-    """LOSO multi-output ridge regression; returns per-target R2 and NRMSE."""
+def loso_regression(feats, per_subject=False):
+    """LOSO multi-output ridge regression; returns per-target R2 and NRMSE.
+
+    If `per_subject`, also returns {sid: mean held-out R2 over targets} computed on
+    each subject's own block, for the paired het-vs-homogeneous significance test.
+    """
     sids = list(feats)
     y_true, y_pred = [], []
+    persub = {}
     for sid in sids:
         Ftr = np.vstack([feats[k][0] for k in sids if k != sid])
         Ytr = np.vstack([feats[k][1] for k in sids if k != sid])
@@ -134,6 +139,10 @@ def loso_regression(feats):
         pred = (Fb @ Wfit) * y_sd + y_mu
         y_true.append(Yte)
         y_pred.append(pred)
+        if per_subject:
+            ss_r = np.sum((Yte - pred) ** 2, axis=0)
+            ss_t = np.sum((Yte - Yte.mean(axis=0)) ** 2, axis=0) + 1e-12
+            persub[sid] = float(np.mean(1.0 - ss_r / ss_t))
 
     Y = np.vstack(y_true)
     P = np.vstack(y_pred)
@@ -141,6 +150,8 @@ def loso_regression(feats):
     ss_tot = np.sum((Y - Y.mean(axis=0)) ** 2, axis=0) + 1e-12
     r2 = 1.0 - ss_res / ss_tot
     nrmse = np.sqrt(np.mean((Y - P) ** 2, axis=0) / (Y.var(axis=0) + 1e-12))
+    if per_subject:
+        return r2, nrmse, persub
     return r2, nrmse
 
 
@@ -236,6 +247,63 @@ def print_summary(rows):
           f"{means['heterogeneous'] - means['instantaneous']:+.3f} R2")
     print(f"  heterogeneity gain over best homogeneous: "
           f"{means['heterogeneous'] - best_hom:+.3f} R2")
+
+
+def paired_significance(raw, cards, n_nodes=N_NODES, seeds=SEEDS):
+    """Paired het-vs-best-homogeneous test across subjects on overall R2.
+
+    For each subject, average its held-out R2 over seeds (so the comparison is not
+    a single lucky bank draw), then a Wilcoxon signed-rank over the 15 subjects of
+    (heterogeneous - homogeneous_slow). This stress-tests the POSITIVE heterogeneity
+    result exactly as the WESAD-label null is stress-tested."""
+    def persubject_over_seeds(condition):
+        acc = {}
+        for seed in seeds:
+            _, _, ps = _evaluate_persubject(raw, cards, condition, seed, n_nodes)
+            for sid, v in ps.items():
+                acc.setdefault(sid, []).append(v)
+        return {sid: float(np.mean(v)) for sid, v in acc.items()}
+
+    het = persubject_over_seeds("heterogeneous")
+    hom = persubject_over_seeds("homogeneous_slow")
+    sids = sorted(het)
+    a = np.array([het[s] for s in sids])
+    b = np.array([hom[s] for s in sids])
+    d = a - b
+    try:
+        from scipy.stats import wilcoxon
+        p = float(wilcoxon(a, b).pvalue) if np.ptp(d) > 0 else 1.0
+    except Exception:
+        p = float("nan")
+    print("\nPaired het - homogeneous(slow) over subjects (mean R2 per subject, "
+          f"averaged over {len(list(seeds))} seeds):")
+    print(f"  n={len(sids)} subjects | mean diff = {d.mean():+.4f} | "
+          f"{int((d>0).sum())}/{len(d)} subjects positive | Wilcoxon p={p:.2e}")
+    return dict(mean=float(d.mean()), n=len(sids),
+                n_pos=int((d > 0).sum()), p=p)
+
+
+def _evaluate_persubject(raw, cards, condition, seed, n_nodes):
+    full = _full(cards)
+    fast = min(full, key=lambda c: c.tau)
+    slow = lead_card(cards)
+    rng = np.random.default_rng(0 if seed is None else seed)
+    C = len(W.CHANNELS)
+    if condition == "instantaneous":
+        nodes = None
+    elif condition == "memoryless":
+        nodes = nodes_from(full, n_nodes, rng, dt=DT, n_in=C, sparsity=0.4)
+        nodes = [(0.0, alpha, w) for _, alpha, w in nodes]
+    elif condition == "homogeneous_fast":
+        nodes = nodes_from([fast], n_nodes, rng, dt=DT, n_in=C, sparsity=0.4)
+    elif condition == "homogeneous_slow":
+        nodes = nodes_from([slow], n_nodes, rng, dt=DT, n_in=C, sparsity=0.4)
+    elif condition == "heterogeneous":
+        nodes = nodes_from(full, n_nodes, rng, dt=DT, n_in=C, sparsity=0.4)
+    else:
+        raise ValueError(condition)
+    feats, _ = feature_dict(raw, nodes)
+    return loso_regression(feats, per_subject=True)
 
 
 def make_figure(rows, path=FIG_PATH):
@@ -340,6 +408,7 @@ def run_benchmark():
     write_results(rows)
     rows = load_results()
     print_summary(rows)
+    paired_significance(raw, cards)
     make_figure(rows)
 
 

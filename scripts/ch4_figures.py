@@ -18,7 +18,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from ch4_reservoir import (load_cards, make_nodes, run_states, memory_capacity,
-                           nodes_from, _full, narma10, task_nrmse, DT)  # noqa: E402
+                           nodes_from, _full, narma10, task_nrmse,
+                           mc_curve_seeded, composition_sweep, paired_stats,
+                           DT)  # noqa: E402
 
 FIGDIR = "figures/chapter4"
 plt.rcParams.update({"font.family": "serif", "font.size": 9, "figure.dpi": 150,
@@ -26,49 +28,48 @@ plt.rcParams.update({"font.family": "serif", "font.size": 9, "figure.dpi": 150,
 
 
 def fig_mc_curve(cards, N=24, max_k=30):
-    u = np.random.default_rng(0).uniform(0, 1, 4000)
-    out = {}
-    for label, het in [("homogeneous (all PEO0.3/0.09)", False),
-                       ("heterogeneous (composition bank)", True)]:
-        nodes = make_nodes(cards, N, het, np.random.default_rng(1))
-        out[label] = memory_capacity(run_states(nodes, u), u, max_k=max_k)
+    hom_m, hom_sd, hom_tot = mc_curve_seeded(cards, False, N, max_k)
+    het_m, het_sd, het_tot = mc_curve_seeded(cards, True, N, max_k)
+    st = paired_stats(het_tot, hom_tot)
     k = np.arange(1, max_k + 1)
     fig, ax = plt.subplots(figsize=(4.6, 3.2))
-    ax.plot(k, out["homogeneous (all PEO0.3/0.09)"], "o-", ms=3, color="#4c72b0",
-            label=f"homogeneous (MC={out['homogeneous (all PEO0.3/0.09)'].sum():.1f})")
-    ax.plot(k, out["heterogeneous (composition bank)"], "s-", ms=3, color="#c44e52",
-            label=f"heterogeneous (MC={out['heterogeneous (composition bank)'].sum():.1f})")
+    ax.plot(k, hom_m, "o-", ms=3, color="#4c72b0",
+            label=f"homogeneous (MC$={hom_tot.mean():.1f}\\pm{hom_tot.std(ddof=1):.1f}$)")
+    ax.fill_between(k, hom_m - hom_sd, hom_m + hom_sd, color="#4c72b0", alpha=0.18)
+    ax.plot(k, het_m, "s-", ms=3, color="#c44e52",
+            label=f"heterogeneous (MC$={het_tot.mean():.1f}\\pm{het_tot.std(ddof=1):.1f}$)")
+    ax.fill_between(k, het_m - het_sd, het_m + het_sd, color="#c44e52", alpha=0.18)
     ax.set_xlabel(f"delay $k$ (lags of $\\Delta t={DT:g}$ s)")
     ax.set_ylabel("memory capacity MC$_k$")
     ax.set_title(f"Memory capacity vs lag (N={N} nodes)")
-    ax.legend(frameon=False, fontsize=8)
+    ax.legend(frameon=False, fontsize=8, title=f"Wilcoxon $p={st['p']:.1e}$",
+              title_fontsize=7)
     fig.tight_layout()
     p = os.path.join(FIGDIR, "mc_curve.pdf"); fig.savefig(p); plt.close(fig)
-    print("wrote", p)
+    print(f"wrote {p}  (hom {hom_tot.mean():.2f}, het {het_tot.mean():.2f}, "
+          f"ratio {het_tot.mean()/hom_tot.mean():.2f}, p={st['p']:.1e})")
 
 
 def fig_composition_sweep(cards, N=16, max_k=30):
-    rng = np.random.default_rng(0)
-    u_mc = rng.uniform(0, 1, 4000); u_na = rng.uniform(0, 0.5, 4000); y_na = narma10(u_na)
-    rows = []
-    for c in sorted(_full(cards), key=lambda z: (float(z.peo), float(z.salt))):
-        nodes = nodes_from([c], N, np.random.default_rng(7))
-        mc = memory_capacity(run_states(nodes, u_mc), u_mc, max_k=max_k).sum()
-        nrmse = task_nrmse(run_states(nodes, u_na), y_na)
-        rows.append((f"{c.peo}/{c.salt}", mc, nrmse,
-                     c.peo == "0.3" and c.salt == "0.09"))
-    labels = [r[0] for r in rows]; mcs = [r[1] for r in rows]; nrs = [r[2] for r in rows]
+    rows0 = composition_sweep(cards, N=N, max_k=max_k)   # (card, mc, mc_sd, nrmse, nrmse_sd)
+    rows0 = sorted(rows0, key=lambda r: (float(r[0].peo), float(r[0].salt)))
+    rows = [(f"{c.peo}/{c.salt}", mc, mcsd, nr, nrsd, c.peo == "0.3" and c.salt == "0.09")
+            for c, mc, mcsd, nr, nrsd in rows0]
+    labels = [r[0] for r in rows]
+    mcs = [r[1] for r in rows]; mcsd = [r[2] for r in rows]
+    nrs = [r[3] for r in rows]; nrsd = [r[4] for r in rows]
     x = np.arange(len(rows))
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.4, 3.0))
-    cols = ["#dd8452" if r[3] else "#4c72b0" for r in rows]
-    a1.bar(x, mcs, color=cols, edgecolor="0.2", linewidth=0.5)
+    cols = ["#dd8452" if r[5] else "#4c72b0" for r in rows]
+    ek = dict(ecolor="0.3", capsize=2, error_kw={"lw": 0.8})
+    a1.bar(x, mcs, yerr=mcsd, color=cols, edgecolor="0.2", linewidth=0.5, **ek)
     a1.set_xticks(x); a1.set_xticklabels(labels, rotation=45, ha="right", fontsize=7)
     a1.set_ylabel("total memory capacity"); a1.set_title("(a) MC by composition")
-    a2.bar(x, nrs, color=cols, edgecolor="0.2", linewidth=0.5)
+    a2.bar(x, nrs, yerr=nrsd, color=cols, edgecolor="0.2", linewidth=0.5, **ek)
     a2.set_xticks(x); a2.set_xticklabels(labels, rotation=45, ha="right", fontsize=7)
     a2.set_ylabel("NARMA-10 NRMSE (lower better)"); a2.set_title("(b) NARMA-10 by composition")
-    fig.text(0.5, -0.04, "PEO / salt mass fraction (orange = lead cell 0.3/0.09)",
-             ha="center", fontsize=8)
+    fig.text(0.5, -0.04, "PEO / salt mass fraction (orange = lead cell 0.3/0.09); "
+             "error bars $\\pm 1$ SD over 10 seeds", ha="center", fontsize=8)
     fig.tight_layout()
     p = os.path.join(FIGDIR, "composition_sweep.pdf"); fig.savefig(p); plt.close(fig)
     print("wrote", p)

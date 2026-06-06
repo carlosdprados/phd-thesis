@@ -35,6 +35,7 @@ from ch4_model import load_cards, lead_card  # noqa: E402
 DT = 5.0          # sample interval [s] (affect-signal scale; sets the leak per step)
 WASHOUT = 200
 RIDGE = 1e-6
+SEEDS = range(10)  # seeds for the error-bar statistics (banks + input draws)
 
 
 def _full(cards):
@@ -155,56 +156,88 @@ def task_nrmse(X, target, split=0.5):
     return float(np.sqrt(np.mean((yhat - yte) ** 2) / (yte.var() + 1e-12)))
 
 
-def composition_sweep(cards, N=16, max_k=30):
-    """Per-composition single-cell bank: total MC + NARMA-10 NRMSE. Validates the
-    Demonstration-A 'winner' claim by ranking compositions on the same tasks."""
-    rng = np.random.default_rng(0)
-    u_mc = rng.uniform(0.0, 1.0, 4000)
-    u_na = rng.uniform(0.0, 0.5, 4000)
-    y_na = narma10(u_na)
+def paired_stats(a, b):
+    """Paired difference a-b over matched seeds: mean, SD, fraction>0, and a
+    Wilcoxon signed-rank two-sided p-value (paired, distribution-free)."""
+    a, b = np.asarray(a, float), np.asarray(b, float)
+    d = a - b
+    try:
+        from scipy.stats import wilcoxon
+        p = float(wilcoxon(a, b).pvalue) if np.ptp(d) > 0 else 1.0
+    except Exception:
+        p = float("nan")
+    return dict(mean=float(d.mean()), sd=float(d.std(ddof=1)),
+               frac_pos=float(np.mean(d > 0)), p=p, n=len(d))
+
+
+def mc_curve_seeded(cards, het, N=24, max_k=30, seeds=SEEDS):
+    """Seed-averaged MC(k). Each seed draws a fresh random input AND a fresh
+    jittered bank, so the spread reflects both the input and device-scatter
+    stochasticity. Returns (mean MC_k, SD MC_k, per-seed total-MC array)."""
+    mcs = []
+    for s in seeds:
+        u = np.random.default_rng(1000 + s).uniform(0.0, 1.0, 4000)
+        nodes = make_nodes(cards, N, het, np.random.default_rng(s))
+        mcs.append(memory_capacity(run_states(nodes, u), u, max_k=max_k))
+    M = np.array(mcs)                                  # (S, max_k)
+    return M.mean(0), M.std(0, ddof=1), M.sum(1)
+
+
+def composition_sweep(cards, N=16, max_k=30, seeds=SEEDS):
+    """Per-composition single-cell bank: total MC + NARMA-10 NRMSE, seed-averaged
+    (mean +/- SD over `seeds`). Validates the Demonstration-A 'winner' claim by
+    ranking compositions on the same tasks with error bars."""
     rows = []
     for c in sorted(_full(cards), key=lambda z: (float(z.peo), float(z.salt))):
-        nodes = nodes_from([c], N, np.random.default_rng(7))
-        mc = memory_capacity(run_states(nodes, u_mc), u_mc, max_k=max_k).sum()
-        nrmse = task_nrmse(run_states(nodes, u_na), y_na)
-        rows.append((c, mc, nrmse))
-    print(f"\nComposition sweep (single-cell bank, N={N}) -- Demonstration-A validation")
-    print(f"{'cell':22s} {'totalMC':>8} {'NARMA-NRMSE':>12}")
-    for c, mc, nrmse in sorted(rows, key=lambda r: r[2]):   # rank by NARMA (lower=better)
+        mc_s, nr_s = [], []
+        for s in seeds:
+            rng = np.random.default_rng(2000 + s)
+            u_mc = rng.uniform(0.0, 1.0, 4000)
+            u_na = rng.uniform(0.0, 0.5, 4000)
+            y_na = narma10(u_na)
+            nodes = nodes_from([c], N, np.random.default_rng(s))
+            mc_s.append(memory_capacity(run_states(nodes, u_mc), u_mc, max_k=max_k).sum())
+            nr_s.append(task_nrmse(run_states(nodes, u_na), y_na))
+        rows.append((c, float(np.mean(mc_s)), float(np.std(mc_s, ddof=1)),
+                     float(np.mean(nr_s)), float(np.std(nr_s, ddof=1))))
+    print(f"\nComposition sweep (single-cell bank, N={N}, {len(list(seeds))} seeds)"
+          f" -- Demonstration-A validation")
+    print(f"{'cell':22s} {'totalMC':>14} {'NARMA-NRMSE':>16}")
+    for c, mc, mcsd, nr, nrsd in sorted(rows, key=lambda r: r[3]):  # rank by NARMA
         flag = "  <- lead" if (c.peo == "0.3" and c.salt == "0.09") else ""
-        print(f"{c.cell:22s} {mc:8.2f} {nrmse:12.3f}{flag}")
+        print(f"{c.cell:22s} {mc:6.2f}+/-{mcsd:4.2f}  {nr:6.3f}+/-{nrsd:5.3f}{flag}")
     best_mc = max(rows, key=lambda r: r[1])[0]
-    best_na = min(rows, key=lambda r: r[2])[0]
+    best_na = min(rows, key=lambda r: r[3])[0]
     print(f"best total-MC: {best_mc.cell} | best NARMA: {best_na.cell}")
     return rows
 
 
 def main():
     cards = load_cards(li_only=True)
-    rng = np.random.default_rng(0)
-    T = 4000
-    u = rng.uniform(0.0, 1.0, T)          # rate-coded random input
     N = 24                                 # bank size (both conditions equal)
     max_k = 30
 
-    res = {}
-    for label, het in [("homogeneous (all PEO0.3/0.09)", False),
-                       ("heterogeneous (composition bank)", True)]:
-        nodes = make_nodes(cards, N, het, np.random.default_rng(1))
-        X = run_states(nodes, u)
-        mc = memory_capacity(X, u, max_k=max_k)
-        res[label] = mc
-        decays = sorted({round(n[0], 2) for n in nodes})
-        print(f"{label:36s} | N={N} | total MC={mc.sum():5.2f} | "
-              f"MC@k1={mc[0]:.2f} k5={mc[4]:.2f} k15={mc[14]:.2f} | "
-              f"#distinct decays={len(decays)}")
+    hom_mean, hom_sd, hom_tot = mc_curve_seeded(cards, False, N, max_k)
+    het_mean, het_sd, het_tot = mc_curve_seeded(cards, True, N, max_k)
+    print(f"{'homogeneous (all PEO0.3/0.09)':36s} | N={N} | "
+          f"total MC={hom_tot.mean():5.2f}+/-{hom_tot.std(ddof=1):.2f} | "
+          f"MC@k1={hom_mean[0]:.2f} k5={hom_mean[4]:.2f} k15={hom_mean[14]:.2f}")
+    print(f"{'heterogeneous (composition bank)':36s} | N={N} | "
+          f"total MC={het_tot.mean():5.2f}+/-{het_tot.std(ddof=1):.2f} | "
+          f"MC@k1={het_mean[0]:.2f} k5={het_mean[4]:.2f} k15={het_mean[14]:.2f}")
 
-    het = res["heterogeneous (composition bank)"].sum()
-    hom = res["homogeneous (all PEO0.3/0.09)"].sum()
-    print(f"\nheterogeneous / homogeneous total-MC ratio = {het / max(hom, 1e-9):.2f}")
-    print("(>1 means the composition spread broadens memory across timescales --"
-          " the Demonstration-B claim, here on random input / architecture level.)")
-    assert het > hom, "expected heterogeneous bank to have higher total MC"
+    # paired het-vs-hom over matched seeds (the heterogeneity benefit, with stats)
+    ratios = het_tot / np.clip(hom_tot, 1e-9, None)
+    st = paired_stats(het_tot, hom_tot)
+    print(f"\nheterogeneous / homogeneous total-MC ratio = "
+          f"{ratios.mean():.2f}+/-{ratios.std(ddof=1):.2f} "
+          f"(per-seed mean over {st['n']} seeds)")
+    print(f"paired total-MC gain (het-hom) = {st['mean']:+.2f}+/-{st['sd']:.2f}, "
+          f"{int(st['frac_pos']*st['n'])}/{st['n']} seeds positive, "
+          f"Wilcoxon p={st['p']:.1e}")
+    print("(>1 / p<0.05 means the composition spread broadens memory across"
+          " timescales -- the Demonstration-B claim, on random input.)")
+    assert het_tot.mean() > hom_tot.mean(), "expected heterogeneous bank to have higher total MC"
 
     composition_sweep(cards)
     print("\nself-test: PASS")
