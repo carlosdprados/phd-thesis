@@ -75,6 +75,70 @@ def fig_composition_sweep(cards, N=16, max_k=30):
     print("wrote", p)
 
 
+def fig_tau_coverage(cards):
+    """The Ch3->Ch4 bridge as a picture: each composition cell placed at its
+    measured fading-memory time tau on a log time axis, overlaid on the
+    characteristic timescale bands of the peripheral affective signals. Shows at a
+    glance which cells cover which channels, and where the composition grid leaves
+    a gap (the tonic, minutes band) -- the visual statement of 'the application
+    selects the timescale, the device family must cover it'."""
+    from ch4_model import lead_card
+    full = sorted(_full(cards), key=lambda z: z.tau)
+    lead = lead_card(cards)
+
+    # affective signal bands (s): (name, lo, hi)  -- cf. Table 4.1
+    bands = [
+        ("Phasic EDA (SCR)", 1.0, 10.0, "#dd8452"),
+        ("Respiration",      3.0, 5.0,  "#55a868"),
+        ("HRV (HF)",         2.5, 7.0,  "#8172b3"),
+        ("HRV (LF)",         7.0, 25.0, "#4c72b0"),
+        ("Tonic SCL",        60.0, 300.0, "#c44e52"),
+    ]
+
+    fig, ax = plt.subplots(figsize=(6.4, 3.4))
+    # band tracks (upper region)
+    y0 = len(bands)
+    for i, (name, lo, hi, col) in enumerate(bands):
+        y = y0 - i
+        ax.barh(y, hi - lo, left=lo, height=0.6, color=col, alpha=0.5,
+                edgecolor=col, linewidth=0.8)
+        ax.text(lo * 0.85, y, name, ha="right", va="center", fontsize=7.6)
+
+    # composition-cell tau markers (lower track), labelled with staggered offsets
+    ytick = 0.0
+    for j, c in enumerate(full):
+        is_lead = (c.peo == "0.3" and c.salt == "0.09")
+        col = "#dd8452" if is_lead else "#333333"
+        ax.plot([c.tau, c.tau], [0.4, y0 + 0.4], color=col,
+                lw=1.4 if is_lead else 0.6, alpha=0.55 if is_lead else 0.25,
+                zorder=0)
+        ax.plot(c.tau, ytick, "o", ms=7 if is_lead else 5, color=col, zorder=3)
+        dy = -11 if (j % 2 == 0) else -21      # stagger to avoid label overlap
+        ax.annotate(f"{c.peo}/{c.salt}", (c.tau, ytick), xytext=(0, dy),
+                    textcoords="offset points", ha="center", fontsize=6.4,
+                    color=col, fontweight="bold" if is_lead else "normal")
+    ax.text(full[0].tau * 0.55, ytick, "composition\ncells ($\\tau$)",
+            ha="right", va="center", fontsize=7.6)
+
+    ax.set_xscale("log")
+    ax.set_xlim(0.8, 400)
+    ax.set_ylim(-1.1, y0 + 1.0)
+    ax.set_yticks([])
+    ax.set_xlabel("characteristic timescale (s)")
+    ax.set_title("Device fading-memory times vs affective-signal bands", fontsize=9.5)
+    # mark the uncovered tonic gap (annotation sits in the band region, not on labels)
+    gap_lo = max(c.tau for c in full) * 1.05
+    ax.axvspan(gap_lo, 60, color="0.85", alpha=0.35, zorder=-1)
+    ax.text(np.sqrt(gap_lo * 60), y0 - 1.4, "grid gap\n(drive-boost /\nfuture work)",
+            ha="center", va="center", fontsize=6.2, color="0.45", style="italic")
+    for s in ("top", "right", "left"):
+        ax.spines[s].set_visible(False)
+    fig.tight_layout()
+    p = os.path.join(FIGDIR, "tau_coverage.pdf"); fig.savefig(p); plt.close(fig)
+    print(f"wrote {p}  (cells tau {full[0].tau:.1f}-{full[-1].tau:.1f}s; "
+          f"lead {lead.tau:.1f}s)")
+
+
 def fig_wesad(cards, seeds=range(5)):
     """WESAD affective computing (needs the dataset). Two honest panels:
     (a) Demo A window-level binary stress/baseline: reservoir vs static baseline
@@ -165,6 +229,7 @@ def fig_wesad(cards, seeds=range(5)):
 def main():
     os.makedirs(FIGDIR, exist_ok=True)
     cards = load_cards(li_only=True)
+    fig_tau_coverage(cards)
     fig_mc_curve(cards)
     fig_composition_sweep(cards)
     fig_wesad(cards)
