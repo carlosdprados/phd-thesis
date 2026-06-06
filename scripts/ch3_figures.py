@@ -397,8 +397,190 @@ def fig_design_space():
     print("wrote", p, f"| {len(both)} devices")
 
 
+# ----------------------------------------------------------------------------
+# Figure 0 — representative raw curves (HYST / PULSES / DELAYTIME)
+# ----------------------------------------------------------------------------
+# Grounds every summary metric in what the measurements actually look like.
+# Exemplar devices are chosen to sit near their cell medians (not cherry-picked
+# extremes); all are SY/PEO/LiTr/Ag from the replicated composition spine.
+def _stretched(t, A, tau, beta, C):
+    return A * np.exp(-((t / tau) ** beta)) + C
+
+
+def fig_representative():
+    flags = filtered_flags()
+
+    # ---- panel (a): HYST I-V loops, wide (low-PEO) vs narrow (high-PEO) ----
+    def hyst_curve(dev):
+        """Return (V, I) of the curve whose on-off ratio is nearest this device's
+        median, excluding FILTERED/broken curves."""
+        ratios = {}
+        for r in load("DEVICES_HYST_CURVE_INFO.csv"):
+            if g(r, "device_name") != dev:
+                continue
+            if (dev, g(r, "day"), g(r, "pixel"), "HYST") in flags:
+                continue
+            if g(r, "is broken").lower() in ("true", "1"):
+                continue
+            rr = fnum(g(r, "on-off ratio"))
+            if rr is not None and np.isfinite(rr):
+                ratios[(g(r, "day"), g(r, "pixel"), g(r, "curve"))] = rr
+        if not ratios:
+            return None, None, None
+        target = np.median(list(ratios.values()))
+        key = min(ratios, key=lambda k: abs(ratios[k] - target))
+        pts = []
+        for r in load("DEVICES_HYST_ALL_DATAPOINTS.csv"):
+            if (g(r, "device_name"), g(r, "day"), g(r, "pixel"), g(r, "curve")) == (dev,) + key:
+                v, i, n = fnum(g(r, "voltage (V)")), fnum(g(r, "current (uA)")), fnum(g(r, "curve data point"))
+                if v is not None and i is not None and n is not None:
+                    pts.append((n, v, i))
+        pts.sort()
+        return (np.array([p[1] for p in pts]), np.array([p[2] for p in pts]), ratios[key])
+
+    # ---- panel (b): PULSES potentiation, three qualitative shapes ----
+    def pulse_curve(dev):
+        pts = []
+        for r in load("DEVICES_PULSES_CURVE_INFO.csv"):
+            if g(r, "device_name") != dev:
+                continue
+            if (dev, g(r, "day"), g(r, "pixel"), "PULSES") in flags:
+                continue
+            N, y = fnum(g(r, "number of pulses")), fnum(g(r, "ratio"))
+            if N and N > 0 and y is not None:
+                pts.append((N, y))
+        pts = sorted(set(pts))
+        return np.array([p[0] for p in pts]), np.array([p[1] for p in pts])
+
+    # ---- panel (c): DELAYTIME decay with stretched-exp overlay + t_half ----
+    def decay_curve(dev):
+        pts = []
+        for r in load("DEVICES_DELAYTIME_CURVE_INFO.csv"):
+            if g(r, "device_name") != dev:
+                continue
+            if (dev, g(r, "day"), g(r, "pixel"), "DELAYTIME") in flags:
+                continue
+            t, y = fnum(g(r, "delay time (s)")), fnum(g(r, "ratio"))
+            if t and t > 0 and y is not None:
+                pts.append((t, y))
+        pts = sorted(set(pts))
+        return np.array([p[0] for p in pts]), np.array([p[1] for p in pts])
+
+    fig, axes = plt.subplots(1, 3, figsize=(7.6, 2.7))
+
+    # (a) HYST: each loop normalised to its own peak current, so the comparison
+    # is the loop *openness* (switching window), not absolute conductance --- the
+    # high-PEO device carries more current but opens a narrower window.
+    ax = axes[0]
+    for dev, lab, col in [("NM_v146", "PEO 0.3: wider window", "#1f78b4"),
+                          ("NM_v144", "PEO 1.2: narrower", "#e31a1c")]:
+        V, I, rr = hyst_curve(dev)
+        if V is not None and np.nanmax(np.abs(I)) > 0:
+            ax.plot(V, I / np.nanmax(I), color=col, lw=1.0, label=lab)
+    ax.set_xlabel("voltage (V)"); ax.set_ylabel("current / peak current")
+    ax.set_title("(a) hysteresis loop (norm., salt 0.09)")
+    ax.legend(frameon=False, fontsize=7, loc="upper left")
+
+    # (b) PULSES
+    ax = axes[1]
+    for dev, lab, col, mk in [("NM_v241", "0.3/0.09: strong, $\\alpha{\\approx}0.9$", "#1f78b4", "o"),
+                              ("NM_v244", "0.3/0.045: turnover", "#33a02c", "^"),
+                              ("NM_v155", "1.2/0.09: compressive, $\\alpha{\\approx}0.4$", "#e31a1c", "s")]:
+        N, y = pulse_curve(dev)
+        if len(N):
+            ax.plot(N, y, color=col, lw=1.0, marker=mk, ms=3.5, label=lab)
+    ax.set_xscale("log"); ax.set_yscale("log")
+    ax.set_xlabel("number of pulses $N$"); ax.set_ylabel("conductance ratio")
+    ax.set_title("(b) pulse potentiation")
+    ax.legend(frameon=False, fontsize=6.3, loc="lower right")
+
+    # (c) DELAYTIME
+    ax = axes[2]
+    for dev, lab, col, mk in [("NM_v146", "PEO 0.3: $t_{1/2}{\\approx}22$ s", "#1f78b4", "o"),
+                              ("NM_v144", "PEO 1.2: $t_{1/2}{\\approx}6$ s", "#e31a1c", "s")]:
+        t, y = decay_curve(dev)
+        if len(t) < 4:
+            continue
+        y0 = y / y[0]
+        ax.scatter(t, y0, s=18, color=col, marker=mk, zorder=3)
+        try:
+            p, _ = curve_fit(_stretched, t, y0, p0=[max(y0.max() - y0.min(), 1e-3),
+                             float(np.median(t)), 0.7, max(y0.min(), 0.0)],
+                             bounds=([0, 1e-2, 0.1, 0], [np.inf, 1e5, 2.0, np.inf]), maxfev=40000)
+            tt = np.logspace(np.log10(t.min()), np.log10(t.max()), 200)
+            ax.plot(tt, _stretched(tt, *p), color=col, lw=1.1, label=lab)
+            # mark half-enhancement time
+            thalf = p[1] * (np.log(p[0] / (0.5 - p[3]))) ** (1.0 / p[2]) if (0.5 - p[3]) > 0 else np.nan
+        except Exception:
+            ax.plot(t, y0, color=col, lw=1.0, label=lab)
+        ax.axhline(0.5, color="0.7", lw=0.6, ls=":")
+    ax.set_xscale("log")
+    ax.set_xlabel("delay time (s)"); ax.set_ylabel("normalised enhancement")
+    ax.set_title("(c) fading-memory decay")
+    ax.legend(frameon=False, fontsize=6.6, loc="upper right")
+
+    fig.tight_layout()
+    p = os.path.join(FIGDIR, "representative_curves.pdf")
+    fig.savefig(p); plt.close(fig)
+    print("wrote", p)
+
+
+# ----------------------------------------------------------------------------
+# Figure 1c — heterogeneity: per-device spread of t_half and alpha by PEO
+# ----------------------------------------------------------------------------
+# Shows the within-cell device-to-device scatter that the cell-median heatmaps
+# average away, and that Chapter 4 exploits as reservoir heterogeneity.
+def fig_heterogeneity():
+    import collections as _c
+
+    def dev_medians(path, col, want_cols=("peo",)):
+        d = _c.defaultdict(list); meta = {}
+        for r in csv.DictReader(open(os.path.join(OUT, path))):
+            if r["cation"] != "Li":
+                continue
+            v = fnum(r.get(col))
+            if v is not None and np.isfinite(v):
+                d[r["device_id"]].append(v)
+                meta[r["device_id"]] = tuple(r[w] for w in want_cols)
+        return {k: (np.median(v), meta[k]) for k, v in d.items()}
+
+    th = dev_medians("ch4_decay_fits.csv", "t_half_s")
+    al = dev_medians("ch4_pulse_descriptors.csv", "growth_exp")
+
+    peo_order = ["0.3", "0.6", "1.2"]
+    peo_col = {"0.3": "#1f78b4", "0.6": "#33a02c", "1.2": "#e31a1c"}
+
+    def swarm(ax, data, ylabel, logy=False):
+        rng = np.random.default_rng(0)
+        for xi, peo in enumerate(peo_order):
+            vals = [v for v, (p,) in data.values() if p == peo]
+            if not vals:
+                continue
+            jit = rng.uniform(-0.13, 0.13, size=len(vals))
+            ax.scatter(np.full(len(vals), xi) + jit, vals, s=34, color=peo_col[peo],
+                       edgecolor="0.2", linewidth=0.4, alpha=0.85, zorder=3)
+            ax.scatter([xi], [np.median(vals)], marker="_", s=900, color="0.15",
+                       linewidth=1.8, zorder=4)
+        ax.set_xticks(range(len(peo_order))); ax.set_xticklabels(peo_order)
+        ax.set_xlabel("PEO mass fraction"); ax.set_ylabel(ylabel)
+        if logy:
+            ax.set_yscale("log")
+
+    fig, axes = plt.subplots(1, 2, figsize=(6.4, 2.9))
+    swarm(axes[0], th, "fading-memory time $t_{1/2}$ (s)", logy=True)
+    axes[0].set_title("(a) retention spread")
+    swarm(axes[1], al, r"growth exponent $\alpha$")
+    axes[1].set_title("(b) potentiation-strength spread")
+    fig.tight_layout()
+    p = os.path.join(FIGDIR, "heterogeneity.pdf")
+    fig.savefig(p); plt.close(fig)
+    print("wrote", p)
+
+
 def main():
     os.makedirs(FIGDIR, exist_ok=True)
+    fig_representative()
+    fig_heterogeneity()
     fig_composition()
     fig_potentiation()
     fig_chemistry()
