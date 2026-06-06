@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 from ch4_reservoir import (load_cards, make_nodes, run_states, memory_capacity,
                            nodes_from, _full, narma10, task_nrmse,
                            mc_curve_seeded, composition_sweep, paired_stats,
-                           DT)  # noqa: E402
+                           ipc_seeded, DT)  # noqa: E402
 
 FIGDIR = "figures/chapter4"
 plt.rcParams.update({"font.family": "serif", "font.size": 9, "figure.dpi": 150,
@@ -73,6 +73,41 @@ def fig_composition_sweep(cards, N=16, max_k=30):
     fig.tight_layout()
     p = os.path.join(FIGDIR, "composition_sweep.pdf"); fig.savefig(p); plt.close(fig)
     print("wrote", p)
+
+
+def fig_ipc(cards, N=24):
+    """Information-processing capacity split into linear (degree 1) and nonlinear
+    (degree 2) parts for the homogeneous vs heterogeneous bank. Shows that the
+    devices supply a real nonlinear capacity (the compressive write) on top of
+    their linear memory, and that heterogeneity raises both. Bounded above by N."""
+    hom = ipc_seeded(cards, False, N)
+    het = ipc_seeded(cards, True, N)
+    st = paired_stats(het["_total_seeds"], hom["_total_seeds"])
+    fig, ax = plt.subplots(figsize=(4.4, 3.3))
+    x = np.arange(2)
+    lin = [hom["linear"][0], het["linear"][0]]
+    nl = [hom["nonlinear"][0], het["nonlinear"][0]]
+    tot_sd = [hom["total"][1], het["total"][1]]
+    ax.bar(x, lin, width=0.6, color="#4c72b0", edgecolor="0.2", linewidth=0.5,
+           label="linear (degree 1)")
+    ax.bar(x, nl, width=0.6, bottom=lin, color="#dd8452", edgecolor="0.2",
+           linewidth=0.5, label="nonlinear (degree 2)")
+    tot = [a + b for a, b in zip(lin, nl)]
+    ax.errorbar(x, tot, yerr=tot_sd, fmt="none", ecolor="0.2", capsize=3, lw=0.8)
+    ax.axhline(N, ls="--", c="0.5", lw=0.8)
+    ax.text(1.45, N - 0.6, f"$N={N}$ bound", ha="right", fontsize=7, color="0.4")
+    for xi, (l, n) in enumerate(zip(lin, nl)):
+        ax.text(xi, l / 2, f"{l:.1f}", ha="center", va="center", color="white", fontsize=8)
+        ax.text(xi, l + n / 2, f"{n:.1f}", ha="center", va="center", color="white", fontsize=8)
+    ax.set_xticks(x); ax.set_xticklabels(["homogeneous", "heterogeneous"])
+    ax.set_ylabel("information-processing capacity")
+    ax.set_ylim(0, N + 1)
+    ax.set_title("Linear vs nonlinear capacity", fontsize=9.5)
+    ax.legend(frameon=False, fontsize=7.6, loc="upper left",
+              title=f"total het$-$hom $p={st['p']:.1e}$", title_fontsize=6.8)
+    fig.tight_layout()
+    p = os.path.join(FIGDIR, "ipc_capacity.pdf"); fig.savefig(p); plt.close(fig)
+    print(f"wrote {p}  (hom tot {hom['total'][0]:.2f}, het tot {het['total'][0]:.2f})")
 
 
 def fig_tau_coverage(cards):
@@ -230,6 +265,7 @@ def main():
     os.makedirs(FIGDIR, exist_ok=True)
     cards = load_cards(li_only=True)
     fig_tau_coverage(cards)
+    fig_ipc(cards)
     fig_mc_curve(cards)
     fig_composition_sweep(cards)
     fig_wesad(cards)

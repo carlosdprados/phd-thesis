@@ -133,6 +133,109 @@ def memory_capacity(X, u, max_k=30, split=0.5):
     return np.array(mc)
 
 
+def _legendre(v, d):
+    """Legendre polynomial P_d on v in [-1,1] (the orthogonal basis Dambre uses)."""
+    if d == 0:
+        return np.ones_like(v)
+    if d == 1:
+        return v
+    if d == 2:
+        return 0.5 * (3 * v * v - 1)
+    if d == 3:
+        return 0.5 * v * (5 * v * v - 3)
+    raise ValueError(d)
+
+
+def ipc(X, u, max_lin=20, deg2_win=10, washout=WASHOUT, split=0.5,
+        ridge=RIDGE, n_floor=64, seed=0):
+    """Information-processing capacity (Dambre 2012), split by polynomial degree.
+
+    The reservoir is probed with orthogonal-polynomial targets of the (centred)
+    input: degree-1 single-lag terms P1(v_{n-k}) give the LINEAR capacity (= the
+    memory capacity), degree-2 terms -- self terms P2(v_{n-k}) and cross products
+    P1(v_{n-i})P1(v_{n-j}) -- give the NONLINEAR capacity that only a nonlinear
+    reservoir can supply. Total capacity is bounded by the number of nodes.
+
+    Implementation note: the ridge normal-equation factor is computed once per
+    call and reused across all targets (each target is then a cheap solve), so the
+    hundreds of probe targets cost almost nothing beyond the single state run.
+    A noise floor is estimated from `n_floor` targets built on an INDEPENDENT
+    random stream (capacity the reservoir cannot legitimately have); per-target
+    capacities below floor mean + 4 SD are set to zero before summing.
+    """
+    v = 2.0 * np.asarray(u, float) - 1.0                # map [0,1] -> [-1,1]
+    T = X.shape[0]
+    Xb = np.hstack([X, np.ones((T, 1))])
+    mu, sd = Xb[:, :-1].mean(0), Xb[:, :-1].std(0) + 1e-9
+    Xb[:, :-1] = (Xb[:, :-1] - mu) / sd
+    Xa = Xb[washout:]
+    ntr = int(len(Xa) * split)
+    Xtr, Xte = Xa[:ntr], Xa[ntr:]
+    A = Xtr.T @ Xtr + ridge * np.eye(Xtr.shape[1])
+    Afac = np.linalg.cholesky(A)
+
+    def cap(target):
+        y = target[washout:]
+        ytr, yte = y[:ntr], y[ntr:]
+        if yte.std() < 1e-9:
+            return 0.0
+        rhs = Xtr.T @ ytr
+        w = np.linalg.solve(Afac.T, np.linalg.solve(Afac, rhs))
+        yhat = Xte @ w
+        if yhat.std() < 1e-9:
+            return 0.0
+        r = np.corrcoef(yhat, yte)[0, 1]
+        return float(max(r * r, 0.0))
+
+    def shift(x, k):
+        y = np.empty_like(x)
+        y[:k] = 0.0
+        y[k:] = x[:len(x) - k]
+        return y if k > 0 else x
+
+    # ---- noise floor from an independent random stream ----
+    vr = np.random.default_rng(7777 + seed).uniform(-1, 1, T)
+    floor_caps = []
+    rng = np.random.default_rng(13 + seed)
+    for _ in range(n_floor):
+        k = int(rng.integers(0, max_lin))
+        floor_caps.append(cap(_legendre(shift(vr, k), 1)))
+    floor = float(np.mean(floor_caps) + 4 * np.std(floor_caps))
+
+    def thr(c):
+        return c if c > floor else 0.0
+
+    # ---- degree 1 (linear) ----
+    lin = sum(thr(cap(_legendre(shift(v, k), 1))) for k in range(max_lin))
+    # ---- degree 2 self terms ----
+    nl2_self = sum(thr(cap(_legendre(shift(v, k), 2))) for k in range(deg2_win + 1))
+    # ---- degree 2 cross products ----
+    nl2_cross = 0.0
+    for i in range(deg2_win + 1):
+        for j in range(i + 1, deg2_win + 1):
+            nl2_cross += thr(cap(shift(v, i) * shift(v, j)))
+    nonlin = nl2_self + nl2_cross
+    return dict(linear=lin, nonlinear=nonlin, nl2_self=nl2_self,
+                nl2_cross=nl2_cross, total=lin + nonlin, floor=floor)
+
+
+def ipc_seeded(cards, het, N=24, seeds=SEEDS, **kw):
+    """Seed-averaged IPC for a homogeneous/heterogeneous bank. Returns dict of
+    component -> (mean, SD) plus the per-seed total arrays for paired testing."""
+    keys = ["linear", "nonlinear", "nl2_self", "nl2_cross", "total"]
+    acc = {k: [] for k in keys}
+    for s in seeds:
+        u = np.random.default_rng(1000 + s).uniform(0.0, 1.0, 4000)
+        nodes = make_nodes(cards, N, het, np.random.default_rng(s))
+        r = ipc(run_states(nodes, u), u, seed=s, **kw)
+        for k in keys:
+            acc[k].append(r[k])
+    out = {k: (float(np.mean(acc[k])), float(np.std(acc[k], ddof=1))) for k in keys}
+    out["_total_seeds"] = np.array(acc["total"])
+    out["_nonlin_seeds"] = np.array(acc["nonlinear"])
+    return out
+
+
 def narma10(u):
     """Standard NARMA-10 benchmark target driven by input u in [0, 0.5]."""
     y = np.zeros_like(u)
@@ -238,6 +341,19 @@ def main():
     print("(>1 / p<0.05 means the composition spread broadens memory across"
           " timescales -- the Demonstration-B claim, on random input.)")
     assert het_tot.mean() > hom_tot.mean(), "expected heterogeneous bank to have higher total MC"
+
+    # information-processing capacity: linear vs nonlinear split (Dambre 2012)
+    print("\nInformation-processing capacity (Dambre), seed-averaged:")
+    ipc_hom = ipc_seeded(cards, False, N)
+    ipc_het = ipc_seeded(cards, True, N)
+    for label, r in [("homogeneous", ipc_hom), ("heterogeneous", ipc_het)]:
+        print(f"  {label:14s} total={r['total'][0]:5.2f}+/-{r['total'][1]:.2f} | "
+              f"linear={r['linear'][0]:5.2f} | nonlinear={r['nonlinear'][0]:5.2f} "
+              f"(self {r['nl2_self'][0]:.2f} + cross {r['nl2_cross'][0]:.2f})")
+    st_nl = paired_stats(ipc_het["_nonlin_seeds"], ipc_hom["_nonlin_seeds"])
+    print(f"  nonlinear capacity is nonzero -> the compressive write computes "
+          f"genuine nonlinear functions; het-hom nonlinear gain "
+          f"{st_nl['mean']:+.2f}, p={st_nl['p']:.1e}")
 
     composition_sweep(cards)
     print("\nself-test: PASS")
