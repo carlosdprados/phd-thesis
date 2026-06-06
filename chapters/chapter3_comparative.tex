@@ -80,16 +80,17 @@ Two design axes are varied. The \emph{composition} axis varies the mass fraction
   \centering
   \caption[Electrical measurement protocols]{The three common measurements use distinct drive protocols (modern \SY{}/\PEO{}/\LiTf{}/Ag corpus). Crucially, potentiation and depotentiation differ in write amplitude, so the chapter never pools them and Chapter~4 composes them only as an explicit assumption.}
   \label{tab:ch3_protocols}
-  \begin{tabular}{llll}
+  {\small\setlength{\tabcolsep}{4pt}%
+  \begin{tabular}{@{}lll p{2.6cm}@{}}
     \toprule
     Measurement & Write & Read & Pulse train \\
     \midrule
-    Hysteresis (HYST)        & triangular sweep        & ---            & ---                                   \\
-    Potentiation (PULSES)    & \SI{3}{\volt}           & \SI{1.5}{\volt} & variable $N\le\num{1000}$, \SI{0.104}{\second} \\
-    Depotentiation (DELAYTIME) & \SI{4}{\volt}         & \SI{2}{\volt}  & \num{30} pulses, \SI{0.103}{\second}  \\
-    Protocol overlay (v114)  & \SI{3}{\volt}, \SI{6}{\volt} & \SI{1.5}{\volt}, \SI{3}{\volt} & \num{30} pulses          \\
+    Hysteresis (HYST)          & triangular sweep            & ---                            & ---                                   \\
+    Potentiation (PULSES)      & \SI{3}{\volt}               & \SI{1.5}{\volt}                & variable $N\le\num{1000}$, \SI{0.104}{\second} \\
+    Depotentiation (DELAYTIME) & \SI{4}{\volt}               & \SI{2}{\volt}                  & \num{30} pulses, \SI{0.103}{\second}  \\
+    Protocol overlay (v114)    & \SI{3}{\volt}, \SI{6}{\volt} & \SI{1.5}{\volt}, \SI{3}{\volt} & \num{30} pulses                       \\
     \bottomrule
-  \end{tabular}
+  \end{tabular}}
 \end{table}
 
 %% ------------------------------------------------------------
