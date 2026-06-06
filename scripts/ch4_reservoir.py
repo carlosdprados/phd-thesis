@@ -273,14 +273,15 @@ def paired_stats(a, b):
                frac_pos=float(np.mean(d > 0)), p=p, n=len(d))
 
 
-def mc_curve_seeded(cards, het, N=24, max_k=30, seeds=SEEDS):
+def mc_curve_seeded(cards, het, N=24, max_k=30, seeds=SEEDS, jitter=0.12):
     """Seed-averaged MC(k). Each seed draws a fresh random input AND a fresh
     jittered bank, so the spread reflects both the input and device-scatter
-    stochasticity. Returns (mean MC_k, SD MC_k, per-seed total-MC array)."""
+    stochasticity. `jitter` is the device-to-device scatter magnitude.
+    Returns (mean MC_k, SD MC_k, per-seed total-MC array)."""
     mcs = []
     for s in seeds:
         u = np.random.default_rng(1000 + s).uniform(0.0, 1.0, 4000)
-        nodes = make_nodes(cards, N, het, np.random.default_rng(s))
+        nodes = make_nodes(cards, N, het, np.random.default_rng(s), jitter=jitter)
         mcs.append(memory_capacity(run_states(nodes, u), u, max_k=max_k))
     M = np.array(mcs)                                  # (S, max_k)
     return M.mean(0), M.std(0, ddof=1), M.sum(1)

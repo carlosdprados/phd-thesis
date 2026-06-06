@@ -75,6 +75,33 @@ def fig_composition_sweep(cards, N=16, max_k=30):
     print("wrote", p)
 
 
+def fig_robustness(cards, N=24, jitters=(0.0, 0.06, 0.12, 0.20, 0.30, 0.40)):
+    """Total memory capacity versus injected device-to-device scatter (jitter), for
+    the homogeneous and heterogeneous banks. Substantiates the claim that scatter
+    is part of the computational substrate, not a yield problem: the heterogeneous
+    bank keeps its advantage across the whole realistic spread, and modest scatter
+    does not degrade -- and slightly aids -- recoverable memory."""
+    fig, ax = plt.subplots(figsize=(4.6, 3.2))
+    for het, col, mk, lab in [(False, "#4c72b0", "o", "homogeneous"),
+                              (True, "#c44e52", "s", "heterogeneous")]:
+        means, sds = [], []
+        for j in jitters:
+            _, _, tot = mc_curve_seeded(cards, het, N, jitter=j)
+            means.append(tot.mean()); sds.append(tot.std(ddof=1))
+        means, sds = np.array(means), np.array(sds)
+        ax.plot(jitters, means, mk + "-", ms=4, color=col, label=lab)
+        ax.fill_between(jitters, means - sds, means + sds, color=col, alpha=0.18)
+    ax.axvline(0.12, ls=":", c="0.5", lw=0.9)
+    ax.text(0.125, ax.get_ylim()[0] + 0.3, "measured\nscatter", fontsize=6.6, color="0.45")
+    ax.set_xlabel("injected device-to-device scatter (jitter)")
+    ax.set_ylabel("total memory capacity")
+    ax.set_title(f"Robustness to device scatter (N={N})", fontsize=9.5)
+    ax.legend(frameon=False, fontsize=8)
+    fig.tight_layout()
+    p = os.path.join(FIGDIR, "robustness.pdf"); fig.savefig(p); plt.close(fig)
+    print(f"wrote {p}")
+
+
 def fig_ipc(cards, N=24):
     """Information-processing capacity split into linear (degree 1) and nonlinear
     (degree 2) parts for the homogeneous vs heterogeneous bank. Shows that the
@@ -266,6 +293,7 @@ def main():
     cards = load_cards(li_only=True)
     fig_tau_coverage(cards)
     fig_ipc(cards)
+    fig_robustness(cards)
     fig_mc_curve(cards)
     fig_composition_sweep(cards)
     fig_wesad(cards)
