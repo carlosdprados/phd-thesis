@@ -241,3 +241,42 @@ Chapter framing options were put to the author; **selected: build the streaming 
 1. MC/NARMA: task-agnostic proof that timescale spread broadens memory.
 2. Physiological context reconstruction: real affective streams; heterogeneity improves multi-lag physiological encoding.
 3. WESAD labels: downstream affective classification; devices work and memory helps, but heterogeneity is not required because one slow timescale dominates the labels.
+
+---
+
+## 15. Hardening pass (2026-06-06) — statistics, IPC, and three new figures
+
+A review pass on the drafted chapter added the rigour and figures below. All numbers are reproducible from `scripts/ch4_reservoir.py`, `ch4_physio_context.py`, `ch4_figures.py`.
+
+### 15.1 Symmetric statistical rigour (the positive results now tested like the null)
+
+The original draft stress-tested the *null* (het−hom on WESAD labels) but reported the *positive* results bare. Fixed:
+
+- **Memory capacity** is now seed-averaged over 10 random input/bank seeds: homogeneous **4.2 ± 0.4**, heterogeneous **6.4 ± 0.3**, ratio **1.54 ± 0.10**, **10/10 seeds positive, paired Wilcoxon p = 0.002** (the floor at n=10). Was a single-seed 1.49×.
+- **Composition sweep** reports mean ± SD per cell (10 seeds). Ranking unchanged: lead PEO0.3/0.09 best MC (3.98 ± 0.19), PEO0.3/0.045 best NARMA (0.587 ± 0.019), lead close 2nd.
+- **Physiological context reconstruction** gains a **per-subject paired test**: het vs best-homogeneous over the 15 subjects → **15/15 positive, Wilcoxon p < 1e-4** (per-subject mean diff +0.0138; pooled +0.012).
+
+### 15.2 IPC computed (Dambre was cited but never used)
+
+`ipc()` in `ch4_reservoir.py`: Legendre-degree decomposition, ridge factor reused across all probe targets, noise floor from an independent stream. Result (N=24, 10 seeds):
+
+| Bank | total | linear (deg 1) | nonlinear (deg 2) |
+| --- | ---: | ---: | ---: |
+| homogeneous | 7.1 | 4.5 | 2.7 |
+| heterogeneous | 11.6 | 7.1 | 4.5 |
+
+Nonzero nonlinear capacity = the compressive write does genuine nonlinear work (the 2nd RC prerequisite). Nonlinearity is per-node **self** terms; cross-lag products ≈ 0 — the honest signature of an independent, non-recurrent bank. het−hom total p = 0.002. → `figures/chapter4/ipc_capacity.pdf`, `fig:ch4_ipc`.
+
+### 15.3 Three new figures
+
+1. **`tau_coverage.pdf`** (`fig:ch4_tau_coverage`) — the Ch3→Ch4 bridge as a picture: each composition cell at its measured τ on a log time axis overlaid on the affective bands; shows coverage of phasic/respiration/HRV and the honest **tonic-minutes gap** (drive-knob/future). Placed in §4.5.
+2. **`ipc_capacity.pdf`** — see §15.2. Placed in §4.4.
+3. **`robustness.pdf`** (`fig:ch4_robustness`) — total MC vs injected device-to-device scatter (jitter). Het holds its lead across the realistic range; the **zero-scatter limit (identical nodes) is nearly memory-less** → scatter is a computational resource, not a yield defect. Placed in §4.9.
+
+### 15.4 Text changes
+
+- **External calibration** added: original WESAD baselines (3-class chest acc 76.5% / macro-F1 ≈0.72; binary stress ≈93%) cited so 0.894/0.758 are read against the literature.
+- **NARMA reframed**: competence rests on MC + IPC; NARMA is explicitly a composition-*ranking* instrument (its absolute error is high because independent non-recurrent nodes are weak NARMA reservoirs). §4.4 retitled "Benchmark Tier: Capacity and System Identification".
+- **Amusement F1 0.55** explained as an elicitation/data limit (shortest, lowest-arousal condition: 5.6 vs 17.6/10.0 ks), not a memory-horizon failure.
+- §4.8 retitled "Design Rule: Matching Timescale to Task".
+- φ⊗λ caveat consolidated (model section points to the canonical Limitations statement).
