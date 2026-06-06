@@ -2,155 +2,152 @@
 
 # Bridge Chapter — Implementation Plan (standalone, new Chapter 3)
 
-**Date:** 2026-06-06
-**Decision (user, 2026-06-06):** Build the Hybrane→PEO material pivot as a **standalone short chapter**, inserted between the current Ch2 and Ch3. Companion assessment: `21_bridge_chapter_hybrane_peo_assessment.md`.
+**Date:** 2026-06-06 · **Rev 2** (reassessed after author corrections on the degradation mechanism, the notes as primary source, and full renaming approval).
+**Decision (user):** Build the Hybrane→PEO material pivot as a **standalone short chapter**, inserted between current Ch2 and Ch3. Companion assessment: `21_bridge_chapter_hybrane_peo_assessment.md`. Reproducible evidence: `scripts/bridge_hybrane_peo_reproducibility.py` → `handouts/bridge_hybrane_peo_summary.csv`.
 **Working title:** *Reproducibility, Degradation, and the Device-Provenance Infrastructure* (alt: *From Hybrane to PEO: A Reproducibility-Driven Materials Pivot*).
-**Target length:** 12–18 pp. Methods + negative-result chapter, **not** a lab diary.
+**Length:** 12–18 pp. Methods + negative-result chapter, **not** a lab diary.
 
 ---
 
-## 0. Headline guidance (read first)
+## 0. What changed in Rev 2 (author corrections, now verified)
 
-The chapter must be built on **what the data actually supports**, which is *not* exactly the remembered narrative. I re-derived this directly from the regenerated DATABASE (May 2025) via `scripts/bridge_hybrane_peo_reproducibility.py` → `handouts/bridge_hybrane_peo_summary.csv`:
-
-- **SOLID — the spine of the chapter.** On the silver corpus, after the red-flag exclusion list and dropping broken/saturated pixels, PEO is both *more reproducible* and *stronger* than Hybrane:
-  - normalized hysteresis area: Hybrane median **0.21, CV 0.54** → PEO median **0.39, CV 0.34**;
-  - on–off ratio: Hybrane **1.93** → PEO **4.33**.
-  - This is the defensible, quantitative justification for the switch: PEO gives a wider switching window with lower device-to-device scatter.
-- **SUPPORTING (small n).** Within-device aging: of Hybrane devices tracked ≥3 days, **78 % lose normalized area over days post-fabrication** (median slope −0.015 /day, n=9). PEO has *no* device tracked ≥3 days — multi-day aging campaigns were concentrated on Hybrane, which is itself part of the story.
-- **HONEST NULL — do not claim.** The remembered "normalized area vs **calendar date** declines across 2021" trend does **not** reproduce in this DATABASE slice: Hybrane early-day area vs calendar time is flat (Pearson r=+0.04, p=0.91; Spearman ρ=+0.36, p=0.28, n=11). Only 20 of 81 silver Hybrane devices have clean HYST in the regenerated tables, so the slice is small and the original timeline was likely made live on a larger/raw slice.
-
-**Consequence for framing:** lead with the *Hybrane-vs-PEO reproducibility/window contrast* (solid) + *within-device aging* (supporting). The calendar-time degradation timeline may be shown **only** if it can be reproduced from the contemporaneous primary record (`Common/2021-12-29_EVO.pptx`, `Common/2021-12-03_gold&degr.pptx`); otherwise present it as the contemporaneous diagnostic that *motivated* the campaign, explicitly flagged as not re-derivable from the final DATABASE slice. Never assert a clean monthly decline as a result.
+1. **The degradation is BATCH-over-CALENDAR-TIME, caused by the physical Hybrane reagent stock aging** — *not* individual devices aging after fabrication. The within-device-aging framing of Rev 1 is **dropped** (the >100-day evolution study on v061/v064 exists but is secondary, not the spine).
+2. **The real campaign record is in the free-text notes** (`Fabrication Notes`, `Characterization Notes`), not the Y/N columns. I read all 116 Hybrane device notes; they are extraordinarily detailed and are the chapter's primary qualitative source.
+3. **Full renaming approved** — renumber chapters and rename `.tex`/Makefile targets freely.
 
 ---
 
-## 1. Source-of-truth inventory (every claim must point here)
+## 1. The reproducible quantitative signal (verified against the DATABASE)
 
-All paths relative to the sibling data root `Nanomem_Devices_Library/` unless noted.
+The degradation **does** reproduce — but as a **device-health / conductivity collapse**, not as a "smaller normalized loop area" on survivors. From `scripts/bridge_hybrane_peo_reproducibility.py` on SY/Hy/LiTr/Ag:
 
-| Element | Source of truth | Notes |
-|---|---|---|
-| Material/era decode | `DATABASE/UPDATED_DEVICES_LIBRARY.csv` — `Components Group`, `Used Metal`, `Date` | 353 devices; Hybrane corpus = 116 (SY/Hy/LiTr ×105), span **2021-02 → 2022-05**, 98 in 2021 |
-| Per-device fabrication provenance | `DATABASE/DEVICES_LIBRARY.csv` — 88 columns | the library that *is* the infrastructure story |
-| HYST metrics | `DATABASE/DEVICES_HYST_PIXEL_INFO.csv` — `normalized area mean`, `on-off ratio mean`, `day` | day = days since fabrication |
-| Curation / red-flags | `DATABASE/FILTERED_DEVICES.csv` | exclusion list (~230 rows), hand-flagged in device_cleaner; possibly incomplete |
-| Confound campaign (codified) | library columns 75–80 (see §2) | the campaign survives *as data*, not anecdote |
-| Confound campaign (contemporaneous analysis) | `Common/` artifacts (see §2) | primary records for figures/timeline |
-| Pipeline as-built | repo `docs/experimental_archive_and_pipeline.md` (13.7 kB) | canonical shareable description; chapter methods draw from it |
-| Verified statistics | `scripts/bridge_hybrane_peo_reproducibility.py` + `handouts/bridge_hybrane_peo_summary.csv` | reproducible; re-run before drafting numbers |
+| Period | devices | fraction broken/saturated | median current @ maxV |
+|---|---|---|---|
+| Feb–Apr 2021 (pre-inflection) | 23 | **0.58** | **4.6 µA** |
+| May–Dec 2021 (decline) | 37 | **1.00** | **946 µA** |
+| monthly Jul 2021 / Feb 2022 peaks | — | 1.00 | **3 500 / 13 388 µA** |
 
----
+- The healthy early device = *low-current (~µA), multi-level, high-area* hysteresis. The degraded device = *high-conductivity short* (current up **100–1000×**), flagged broken/saturated. This is exactly the notes' transition from *"old low-current high-area multi-level behaviour"* to *"high-conductivity, undesirable"* / *"short-circuits"*.
+- **Why "smaller area" and "high conductivity" are the same thing:** a near-ohmic high-current device has a thin/closed loop ⇒ small normalized area and lost multi-level steps. So the author's remembered "less area / less multi-stage analog behaviour" = the conductivity collapse measured here.
+- **Why normalized-area-alone misses it:** only ~20 of 81 Hybrane/Ag devices survive as non-saturated; the degraded majority are flagged out, so an area-vs-date regression on survivors is flat/positive (r=+0.36, n.s.). **Use the health-collapse metric (Q2), not survivor area, for the quantitative timeline.**
 
-## 2. The confound-elimination campaign is codified in the data
+### Honest caveats the chapter must carry
+- **Deliberate-stress confound.** The mid-2021 corpus is enriched in *intentionally* stressed/control devices (no-Hybrane, no-salt, air exposure, baby-chamber transport, old-SY). So the 100%-bad rate conflates natural stock-aging with designed stress. Pure calendar/stock effect is **not** cleanly isolable from the DATABASE alone — which is precisely why the team spent ~18 months and ultimately switched hosts.
+- **Attribution is a retrospective synthesis.** The contemporaneous notes entertain *multiple* material suspects — Hybrane stock, *old Super Yellow bond degradation*, changing *ITO substrate* lots — not just Hybrane. The clean "it was the Hybrane batch" conclusion is the author's synthesis; the chapter should present the elimination + pragmatic host switch, and locate any definitive attribution in the contemporaneous decks (`EVO.pptx`, `gold&degr.pptx`).
+- **Date source.** `UPDATED_DEVICES_LIBRARY.csv` coarsens `Date` to month — use `DEVICES_LIBRARY.csv` for true fabrication dates in any timeline.
 
-These are real, queryable variables in `DEVICES_LIBRARY.csv` (counts on the 116 Hybrane devices) — this is what lets the chapter present a *methods-of-elimination table* rather than a story:
-
-- **Light Incidence after Fabrication** — Y=98 / N=18 (deliberate light vs dark)
-- **Storage in Glovebox after Fabrication** — Y=93 / N=23 (deliberate degradation vs protected)
-- **Measurements in Glove Box** — Y=63 / N=34 (measurement atmosphere)
-- **Storage Inside Baby Chamber after Fabrication** — N for all Hybrane (the "baby chamber" cylinder variable was introduced/used on later, non-Hybrane devices — verify before attributing it to the Hybrane crisis)
-- **Old SY Used** — Y=37 / N=28 / blank=51 (semiconductor lot aging)
-- **Used Dark Vials** — Y=6 (light during solution prep)
-- **Substrate Type** — uniform `ITO3-16` across the Hybrane set; the substrate-difference study lives in `Common/2021-11-24_Substrates-Differences` + `Substrates-Differences25112021.xlsx`
-
-Contemporaneous analysis artifacts in `Common/` (primary record for figures and the "we systematically eliminated causes" narrative):
-
-- `2021-12-29_EVO.pptx` — device **evolution over time** (the likely origin of the area-vs-date timeline)
-- `2021-12-03_gold&degr.pptx` — gold electrode & **degradation**
-- `2021-11-24_Substrates-Differences/`, `Subtrates-Differences.docx/.pptx` — substrate study
-- `Zona muerta/` — "dead-zone" study; `v140ish_ConcVar/`, `ConcVar_Hyst_Preview2.odp` — concentration variation; `Efecto-Copa.ods` — "cup effect"
-
-**Action:** open the `.pptx/.ods` artifacts (or ask the user) to recover (a) which confounds were tested and their verdicts, (b) whether the EVO timeline is the area-vs-date figure, and (c) the deliberate-degradation result. Build the elimination table from these + the library columns.
+### The Hybrane→PEO contrast (the SOLID spine — unchanged)
+On valid devices: normalized area median **0.21→0.39**, device-to-device **CV 0.54→0.34**, on-off **1.9→4.3**. PEO restored a *wider, more reproducible* window. This is the evidence-based justification for the switch and rests on replicated valid devices.
 
 ---
 
-## 3. The infrastructure to credit (the ~18 months made visible)
+## 2. The campaign as documented in the notes (primary qualitative source)
 
-Pitch as the methodological backbone consumed by **both** later chapters, not biography. Accurate, from memory + verification:
+The Characterization/Fabrication notes trace the whole investigation. Anchor dates/quotes for the chapter narrative:
 
-- **DEVICES_LIBRARY** — 88-column per-device fabrication provenance schema (composition, spin/anneal, evaporation rates, storage/measurement atmosphere, operator-who-did-what, free-text notes). Born *because* the crisis demanded pinning every fabrication variable. `UPDATED_DEVICES_LIBRARY.csv` adds convenience categoricals (`Components Group`, `Used Metal`, mass ratios).
-- **project_feature_extraction** — raw Keithley `D1_*.txt` → `DATABASE/DEVICES_<TYPE>_{DEVICE,PIXEL,CURVE}_INFO.csv` + `ALL_DATAPOINTS.csv` for HYST/PULSES/DELAYTIME/EIS/VCONST/profilometry. ~6 months of programming.
-- **project_device_cleaner** — Streamlit curation app → `FILTERED_DEVICES.csv` red-flag exclusion list; the visual per-device review that Ch3 §3.3 already relies on (the "curation registry").
-- **scripts_general/visualization_tools** — hyst/nyquist/bode/chemvar/temporal viewers; the timeline viewers behind the contemporaneous degradation diagnosis.
+- **Inflection — NM_v026–031 (2021-04-22):** *"First devices that changed electrical behaviour … could be evaporation rate … the metal used for evaporation, and possible chemical degradation of substances."* Note explicitly says hypotheses were still open **as of 2022-01-31** → documents ~9+ months of investigation.
+- **Systematic confound crossing (each is a real batch):**
+  - light vs dark (v015–019, vt001–006, v041–044, v053–056);
+  - storage/measurement atmosphere: glovebox vs air vs vacuum (v015–019, v088–099);
+  - **baby-chamber transport matrix** — NM_v083–087 (2021-12-02), full 5-way: baby-chamber yes/no × measured in/out glovebox (on Au); and v038–040;
+  - **substrate lot/colour** — v079–082 (purple "old year-long"/blue/golden/cyan ITO bands); the substrate-difference study (`Common/2021-11-24_Substrates-Differences`);
+  - **old vs new Super Yellow** (v045–048): *"more viscous … maybe because of bonds degradation in the old one"* — the SY co-suspect;
+  - old vs new cyclohexanone (v079, v091); evaporation rate & Ag holder (v045–048, v106–113); annealing regime, spin-coat technique, drying.
+- **Independent corroboration — NM_v067 (2021-10-21):** *"Lorenzo has the same problems with devices. Maybe the culprit is the different ITO substrates we are getting now."* → a *systemic/material* cause across people, not one operator's technique.
+- **>100-day evolution study — v061/v064 (2021-10):** *"measured for more than 100 days, assessing evolution"* (secondary; the within-device aging dataset).
+- **Recovery attempts — v106–113 (2022-03→05):** reverted to *"year-ago"* Ag holder / annealing trying to recover the *"old, multiple-level, low-current, high-area"* behaviour vs the new *"high-conductivity, undesirable"* one — never reproducibly restored. Direct evidence that the good behaviour was a *past* state the team was chasing.
+- **PEO already entering — v083 (2021-12):** *"Environment was dirty (PEO particles in the atmosphere)"* — dates the host transition.
+
+**Action:** open `Common/2021-12-29_EVO.pptx` and `Common/2021-12-03_gold&degr.pptx` (the contemporaneous evolution/degradation decks) to recover (a) the original area-vs-date timeline figure and its metric, and (b) any explicit Hybrane-stock conclusion. These are the source for the timeline figure (F2). The author confirmed multi-day measurement data exists for devices with `DayX` folders.
+
+---
+
+## 3. Infrastructure to credit (the ~18 months, made visible)
+
+Frame as the methodological backbone consumed by **both** later chapters, not biography (≤2 pp):
+
+- **DEVICES_LIBRARY** — the 88-column per-device fabrication-provenance schema *exists because* the crisis forced pinning every variable (storage atmosphere, light, baby-chamber, SY lot, cyclohexanone lot, operator, evaporation profile, free-text notes). It is the instrument that made the diagnosis possible.
+- **project_feature_extraction** (~6 mo) — raw Keithley → `DATABASE/DEVICES_<TYPE>_{DEVICE,PIXEL,CURVE}_INFO.csv`; the `is_broken`/`is_saturated` flags used for the Q2 health metric come from here.
+- **project_device_cleaner** — Streamlit curation → `FILTERED_DEVICES.csv` (the per-device visual review that Ch3 already relies on).
+- **scripts_general/visualization_tools** — the timeline/`chemvar` viewers behind the contemporaneous degradation diagnosis.
 - **project_graphmaker** — thesis-figure generator.
+- Canonical as-built description already in repo: `docs/experimental_archive_and_pipeline.md`.
 
-Framing line for the chapter: *"The diagnosis required instrumentation that did not exist; building it is itself a contribution, and it is the same instrumentation that produces every quantitative result in Chapters 4 and 5."*
+Framing line: *"The diagnosis required instrumentation that did not exist; building it is itself a contribution — and it is the same instrumentation that produces every quantitative result in the comparative and temporal-computing chapters that follow."*
 
 ---
 
 ## 4. Proposed chapter structure (sections → evidence)
 
-1. **Introduction — the reproducibility problem.** State the puzzle: the Ch2 proof-of-concept (SY/Hybrane/LiOTf) was validated, but as the campaign scaled, the hysteresis response became harder to reproduce (smaller loop area, weaker analog multi-stage behaviour). Frame as a scientific question, not a confession.
-2. **Was it us or the material? A controlled elimination.** Compact **methods-of-elimination table** (one row per tested cause: light, measurement/storage atmosphere, substrate lot, SY lot/age, solution prep, deliberate degradation) → test → verdict. Built from library columns §2 + `Common/` artifacts. This is where the provenance library is *motivated*.
-3. **The verdict: the host, not the procedure.** Two evidential legs:
-   - within-device aging (78 % negative area-vs-day slopes, Hybrane; n=9) — supporting;
-   - the Hybrane→PEO contrast (window 0.21→0.39, CV 0.54→0.34, on-off 1.9→4.3) — the decisive, replicated leg.
-   Conclusion: an evidence-based switch to PEO for a wider, more reproducible window.
-4. **The infrastructure that made the diagnosis possible** (§3) — library, feature_extraction, device_cleaner/curation, visualization. Methods-foundation framing; forward-points to Ch4/Ch5 reliance.
-5. **Reconciliation with Chapter 2 + bridge to the comparative study.** Explicitly partition the claims (see §5 below) and hand off to the PEO composition grid.
+1. **The reproducibility problem.** Scientific question, not confession: the Ch2 proof-of-concept was validated, but as the campaign scaled the memristive hysteresis became progressively harder to obtain — successive batches collapsed toward high-conductivity, low-area behaviour. Anchor on the v026 inflection.
+2. **Was it us or the materials? A controlled elimination.** Compact **methods-of-elimination table** (one row per tested cause from §2 → test → verdict). This is where the provenance library is *motivated*. Include the Lorenzo cross-person corroboration.
+3. **The quantitative degradation signal.** The health-collapse timeline (F1/F2): fraction broken/saturated → 1.0 and current ↑100–1000× across 2021 batches. State the deliberate-stress and attribution caveats (§1) plainly.
+4. **The resolution: switch to PEO.** The Hybrane→PEO contrast (F3): wider, more reproducible window (CV 0.54→0.34). Evidence-based pivot, not arbitrary.
+5. **The infrastructure that made the diagnosis possible** (§3) — methods-foundation framing; forward-points to the comparative + temporal chapters.
+6. **Reconciliation with Chapter 2 + bridge to the comparative study** (§6 below).
 
 ---
 
-## 5. Mandatory reconciliation with Chapter 2 (do in the same pass)
+## 5. Figures (all reproducible; new folder `figures/chapter3_bridge/`)
 
-Current Ch2 §2.7 (`chapters/chapter2_proof_of_concept.tex:437`) attributes *enhanced stability* to "the Hybrane matrix" (≈300 h shelf, <15–20 % variability). Left unqualified this contradicts the bridge chapter. Fix by partitioning, not retraction:
+- **F1 — device-health collapse**: by month (2021–2022), fraction broken/saturated (bar) + median current on log axis (line). From the Q2 block of the audit script (extend to emit PDF).
+- **F2 — the contemporaneous timeline** (the author's remembered figure): area/analog-metric vs fabrication date — **re-digitized/reproduced from `Common/2021-12-29_EVO.pptx`** (or recomputed from raw via feature_extraction). Show as the diagnostic that drove the switch; caption the deliberate-stress caveat.
+- **F3 — Hybrane vs PEO contrast**: per-device normalized-area & on-off distributions (box/strip), PEO higher median + tighter spread. From Q1.
+- **T1 — methods-of-elimination table** (§2).
+- **F4 (optional) — provenance schema / pipeline flow**: adapt `docs/experimental_archive_and_pipeline.md`.
 
-- The **published proof-of-concept device** was stable on the validated ~2-week ambient-shelf scale — keep that claim, it stands.
-- The **broader campaign** exposed device-to-device irreproducibility and within-device aging of the *Hybrane composite as a fabrication platform* — a *different* metric (batch reproducibility / aging) from the single-device shelf retention reported in Ch2.
-- Add one or two sentences to Ch2 §2.7 (or its summary) flagging that batch-scale reproducibility is revisited in the new Ch3, so the reader meets the tension on the author's terms.
-
----
-
-## 6. Figures (candidates; all reproducible)
-
-- **F1 — Hybrane vs PEO contrast** (the headline): paired panels of per-device normalized-area and on-off distributions (box/strip), showing PEO's higher median + tighter spread. From `bridge_hybrane_peo_reproducibility.py` (extend to emit a PDF).
-- **F2 — within-device aging**: normalized area vs day post-fabrication for Hybrane devices with ≥3 days, with per-device regression lines (78 % negative).
-- **F3 — the elimination table** (table, not figure) — from §2.
-- **F4 — the provenance schema** — a schematic/annotated excerpt of the 88-column library + the raw→DATABASE→curated pipeline flow (can adapt `docs/experimental_archive_and_pipeline.md`).
-- **F5 (conditional) — the EVO timeline**: area (or analog-behaviour metric) vs calendar date — **only if** reproducible from `Common/2021-12-29_EVO.pptx` primary data; otherwise cite as the contemporaneous diagnostic.
-
-Extend `scripts/bridge_hybrane_peo_reproducibility.py` (or a new `scripts/bridge_figures.py`) to render F1–F2 as PDFs into `figures/chapter3_bridge/`. Keep the current Ch3 figures under their existing folder; the new chapter gets its own.
+Extend `scripts/bridge_hybrane_peo_reproducibility.py` (or add `scripts/bridge_figures.py`) to render F1/F3 PDFs.
 
 ---
 
-## 7. Renumbering mechanics (accurate)
+## 6. Mandatory reconciliation with Chapter 2 (same pass)
 
-- LaTeX cross-references in the `.tex` sources use **labels** (`\cref{ch:poc}`, `ch:comparative`, `ch:temporal`), so inserting a chapter **auto-renumbers within the build** — no manual edit of in-text references.
-- Concrete edits:
-  - new file `chapters/chapter3_bridge.tex` (mirror the `\ifdefined\thesismode` standalone guard used by the others);
-  - add `\include{chapters/chapter3_bridge}` in `thesis.tex` between lines 53–54 (after chapter2, before chapter3_comparative);
-  - **rename for clarity (optional but recommended):** `chapter3_comparative.tex`→`chapter4_comparative.tex`, `chapter4_temporal.tex`→`chapter5_temporal.tex`, and update the four `\include` lines + `Makefile` targets. (Filenames are cosmetic; labels carry the refs.)
-  - give the new chapter a label e.g. `\label{ch:bridge}`; update the Ch2 summary forward-pointer and Ch(now 4) intro back-pointer to `\cref{ch:bridge}`.
-- **Documentation renumber (the real cost):** update `handouts/01_thesis_structure.md`, `handouts/00_thesis_overview_memory.md`, and memory `thesis_structure.md` from a 5-chapter to a 6-chapter plan (Intro · PoC · **Bridge** · Comparative · Temporal · Conclusions). Search handouts/memory for "Chapter 3"/"Chapter 4" references that assume the old numbering.
+Ch2 §2.7 (`chapters/chapter2_proof_of_concept.tex:437`) attributes *enhanced stability* to "the Hybrane matrix." Partition, don't retract:
+- the **published proof-of-concept device** was genuinely stable on the validated ~2-week shelf scale — keep;
+- the **batch-scale reproducibility of the Hybrane platform** collapsed over the following year (a *different* metric) — revisited in the new chapter;
+- add 1–2 sentences to Ch2 §2.7/summary flagging that batch reproducibility is revisited in the new Ch3, so the reader meets the tension on the author's terms.
 
 ---
 
-## 8. Risks / things to verify before drafting
+## 7. Renumbering & renaming mechanics (author approved full rename)
 
-- [ ] **Calendar-trend claim:** do NOT assert it. Recover the EVO timeline from `Common/2021-12-29_EVO.pptx`; if it can't be reproduced, frame as contemporaneous-diagnostic-only.
-- [ ] **Baby chamber:** all Hybrane devices are `Storage Inside Baby Chamber = N`. Confirm with the user whether baby-chamber experiments belong to the Hybrane crisis (likely later/PEO). If not, mention it as a transport-degradation control in the campaign narrative but don't attribute it to the Hybrane verdict.
-- [ ] **Small clean-HYST n (20/81 Hybrane):** state sample sizes explicitly; consider whether more Hybrane HYST can be recovered by re-running feature_extraction on skipped 2021-Q1 folders (pipeline scope = year ≥2021 + requires `_(...)` descriptor; some early devices skipped).
-- [ ] **PEO aging blank:** PEO has no ≥3-day device — so "PEO ages less" is *not* shown, only "PEO starts wider and more uniform." Phrase accordingly.
-- [ ] **Don't deflate Ch2:** the partition in §5 is load-bearing.
-- [ ] **Length discipline:** elimination campaign = one table + 2–3 paragraphs, not a per-batch narrative.
+LaTeX cross-refs use labels (`ch:poc`, `ch:comparative`, `ch:temporal`), so numbers auto-update; the work is filenames + docs.
+
+- New file `chapters/chapter3_bridge.tex` with label `\label{ch:bridge}` and the `\ifdefined\thesismode` standalone guard.
+- Rename: `chapter3_comparative.tex`→`chapter4_comparative.tex`; `chapter4_temporal.tex`→`chapter5_temporal.tex` (conclusions follow if/when added).
+- `thesis.tex`: insert `\include{chapters/chapter3_bridge}` after chapter2 (line ~53) and update the renamed includes.
+- `Makefile`: update chapter targets/paths.
+- Figures: new chapter under `figures/chapter3_bridge/`; existing Ch3 figures stay put (the comparative chapter keeps its folder even as it becomes Ch4 — or rename for tidiness in the same commit).
+- Update Ch2 summary forward-pointer and comparative-chapter back-pointer to `\cref{ch:bridge}`.
+- **Docs/memory renumber:** `handouts/01_thesis_structure.md`, `handouts/00_thesis_overview_memory.md`, and memory `thesis_structure.md` from 5- to 6-chapter plan (Intro · PoC · **Bridge** · Comparative · Temporal · Conclusions). Grep handouts/memory for "Chapter 3/4" assumptions.
+- Build the full thesis after renaming to confirm numbering/refs resolve.
+
+---
+
+## 8. Risks / verify before drafting
+
+- [ ] **Do not over-claim attribution.** Present multi-suspect elimination + pragmatic host switch; reserve a definitive "Hybrane stock" verdict for what `EVO.pptx`/`gold&degr.pptx` actually concluded.
+- [ ] **Carry the deliberate-stress caveat** wherever the 2021 health-collapse numbers appear.
+- [ ] **Timeline figure (F2) provenance:** confirm `EVO.pptx` holds the area-vs-date figure and that its data is recoverable; else reconstruct from raw `DayX` folders via feature_extraction (real task, uncertain yield).
+- [ ] **Don't deflate Ch2** — the §6 partition is load-bearing.
+- [ ] **Length discipline** — elimination = one table + 2–3 paragraphs; infrastructure ≤2 pp.
 
 ---
 
 ## 9. Execution order (each step = a commit)
 
-1. ✅ Evidence audit script + summary (`scripts/bridge_hybrane_peo_reproducibility.py`) — done.
-2. Recover the confound-campaign verdicts + EVO timeline from `Common/` artifacts (read the `.pptx/.ods` or ask the user); write findings into this handout.
-3. Extend the script to emit F1–F2 PDFs into `figures/chapter3_bridge/`.
-4. Draft `chapters/chapter3_bridge.tex` (sections §4), citing only §0-verified numbers.
-5. Reconcile Ch2 §2.7 (§5) and fix forward/back pointers.
-6. Renumber files + `thesis.tex` + `Makefile` (§7); build the full thesis to confirm numbering/refs.
+1. ✅ Evidence audit (reframed) — `scripts/bridge_hybrane_peo_reproducibility.py` + summary.
+2. Open `Common/2021-12-29_EVO.pptx` + `2021-12-03_gold&degr.pptx`; record the original timeline metric/figure and any stock conclusion into this handout.
+3. Add F1/F3 PDF rendering; attempt F2 reconstruction.
+4. Draft `chapters/chapter3_bridge.tex` (§4), citing only verified numbers (§1) + note quotes (§2).
+5. Reconcile Ch2 §2.7 (§6); fix forward/back pointers.
+6. Rename files + `thesis.tex` + `Makefile` (§7); build full thesis.
 7. Update structure handouts + memory (§7).
 
 ---
 
 ## 10. Open questions for the user
 
-1. **EVO timeline:** does `Common/2021-12-29_EVO.pptx` contain the "normalized area vs date" figure you remember, and is its underlying data available to reproduce? (Decides whether F5/the calendar story is shown as a result or as motivation only.)
-2. **Baby chamber:** was the baby-chamber (transport-degradation) experiment part of the *Hybrane* crisis or a later PEO/TMPE-era control? (Library says Hybrane = all N.)
-3. **Scope of "infrastructure" section:** keep it tight (1–2 pp, methods-foundation framing) — confirm you don't want a full software/architecture treatment that would tip the chapter toward an engineering report.
-4. **Filename renaming:** OK to rename `chapter3_comparative.tex`→`chapter4_comparative.tex` etc. for clarity, or keep filenames and let only the printed numbers shift?
+1. **EVO deck:** does `Common/2021-12-29_EVO.pptx` contain the area-vs-date timeline you remember, with recoverable underlying data — or should the timeline (F2) be reconstructed from the raw `DayX` folders via feature_extraction?
+2. **Attribution strength:** how firmly should the chapter conclude it was specifically the *Hybrane stock* vs presenting an honest "multiple material suspects, reproducibility unrecoverable, switched host" — given the notes also implicate old SY and ITO lots?
+3. **Conclusions chapter:** the current plan has no Ch5/6 conclusions file yet — should the rename reserve `chapter6_conclusions.tex`, or keep 5 numbered chapters for now?
