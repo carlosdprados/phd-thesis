@@ -1,25 +1,13 @@
-question,corpus,n_devices,narea_median,narea_cv,onoff_median,mannwhitney_U,mannwhitney_p,spearman_rho,spearman_p,frac_broken_saturated
-Q1_window_matched3V,Hybrane,10.0,0.264,0.379,2.447,,,,,
-Q1_window_matched3V,PEO,19.0,0.416,0.407,4.907,,,,,
-Q1_window_matched3V_test,Hy_vs_PEO,,,,,43.0,0.0181,,,
-Q2_area_decline,ALL (confounded),77.0,,,,,,-0.324,0.004,
-Q2_area_decline,~1.2V stratum,76.0,,,,,,-0.308,0.0068,
-Q2_area_decline,~3V stratum,64.0,,,,,,-0.122,0.3351,
-Q3_nonsurviving,on-off ratio mean @ ~1.2V,76.0,,,,,,-0.172,0.138,
-Q3_nonsurviving,on-off ratio mean @ ~3V,64.0,,,,,,-0.175,0.166,
-Q3_nonsurviving,mean conductance at max v (uS) @ ~1.2V,76.0,,,,,,0.106,0.363,
-Q3_nonsurviving,mean conductance at max v (uS) @ ~3V,64.0,,,,,,0.228,0.069,
-Q4_health,2021-02,4.0,,,,,,,,0.364
-Q4_health,2021-03,7.0,,,,,,,,0.677
-Q4_health,2021-04,12.0,,,,,,,,0.384
-Q4_health,2021-05,5.0,,,,,,,,1.0
-Q4_health,2021-06,12.0,,,,,,,,1.0
-Q4_health,2021-07,4.0,,,,,,,,1.0
-Q4_health,2021-08,4.0,,,,,,,,1.0
-Q4_health,2021-10,6.0,,,,,,,,1.0
-Q4_health,2021-11,6.0,,,,,,,,1.0
-Q4_health,2022-01,4.0,,,,,,,,1.0
-Q4_health,2022-02,3.0,,,,,,,,1.0
-Q4_health,2022-03,2.0,,,,,,,,0.818
-Q4_health,2022-04,2.0,,,,,,,,0.65
-Q4_health,2022-05,6.0,,,,,,,,0.917
+block,feature,n,rho,p,family,rho_drop_tail,p_drop_tail,narea_median,onoff_median,mannwhitney_p
+C1_pixels_vs_date,number_pixels_measured,65.0,-0.8,1.22e-15,,,,,,
+degradation_panel,current at max v (uA),64.0,0.447,0.0002,conductivity,0.55,0.0,,,
+degradation_panel,area (V*uA),64.0,0.572,0.0,conductivity,0.686,0.0,,,
+degradation_panel,current difference at on-off (uA),64.0,0.513,0.0,conductivity,0.631,0.0,,,
+degradation_panel,percent change in max v current (%),64.0,-0.27,0.0311,potentiation,-0.329,0.0104,,,
+degradation_panel,normalized area,64.0,-0.29,0.02,window,-0.177,0.1766,,,
+degradation_panel,on-off ratio,64.0,-0.262,0.0363,window,-0.155,0.2382,,,
+degradation_panel,is saturated,64.0,0.268,0.0325,health,0.148,0.2581,,,
+degradation_panel,is broken,64.0,-0.399,0.0011,health,-0.593,0.0,,,
+resolution_matched3V,Hybrane,10.0,,,,,,0.264,2.447,
+resolution_matched3V,PEO,19.0,,,,,,0.416,4.907,
+resolution_matched3V,Hy_vs_PEO_MWU,,,,,,,,,0.0181
