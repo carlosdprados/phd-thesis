@@ -3,42 +3,37 @@
 bridge_hybrane_peo_reproducibility.py
 
 Evidence audit for the proposed standalone "bridge" chapter (Hybrane -> PEO).
-Tests, against the regenerated DATABASE (May 2025), exactly which parts of the
-reproducibility-crisis narrative are quantitatively supported and how.
+Establishes, against the regenerated DATABASE (May 2025), only the claims that
+survive a protocol confound that dominates ionic memristors.
 
-CORRECTED FRAMING (per author, 2026-06-06):
-  The degradation is a BATCH-over-CALENDAR-TIME collapse attributed to the
-  physical Hybrane reagent stock aging -- NOT individual devices aging after
-  fabrication. The signal in the DATABASE is therefore a *device-health /
-  conductivity collapse* across successive batches, not a "smaller normalized
-  loop area" on surviving devices (shorted devices are flagged out, so the
-  area metric alone misses it).
+THE CONFOUND (author, 2026-06-06): hysteresis is a 0 -> +X -> 0 loop. A larger
+sweep amplitude X drives more ionic redistribution, so the device is "more
+excited" and conducts more (and shows a different loop area) even when read back
+at the same voltage. The Hybrane corpus was swept mostly at ~1.2 V, PEO mostly
+at ~2-3 V, and the Hybrane sweep grew from ~1.2 V (early 2021) to ~3 V (later).
+Therefore EVERY feature-vs-time or Hybrane-vs-PEO comparison must be done WITHIN
+a matched sweep-amplitude stratum (binned from 'max voltage (V)'). Reading at a
+fixed voltage from raw does NOT fix this, because the device *state* at that read
+still depends on X -- so the earlier fixed-1V reconstruction was dropped.
 
-Three questions, all on the silver-electrode corpus:
+What survives stratification (the chapter's quantitative spine):
+  Q1  PEO has a wider switching window than Hybrane at MATCHED ~3 V
+      (normalized area, on-off; Mann-Whitney).            <- resolution, holds
+  Q2  Within Hybrane, normalized area at fixed ~1.2 V sweep DECLINES over the
+      campaign (Spearman vs fabrication date).            <- degradation, holds
 
-  Q1  Device-to-device reproducibility & switching-window strength,
-      Hybrane (SY/Hy/LiTr) vs PEO (SY/PEO/LiTr), on valid (non-broken,
-      non-saturated) devices.                                  <- SOLID
-  Q2  Hybrane device-health collapse over calendar time: fraction of pixels
-      flagged broken/saturated, and median current, by month.  <- THE SIGNAL
-  Q3  Why the normalized-area metric alone does NOT show a clean decline.
+What does NOT survive (report honestly as confounded / inconclusive):
+  Q3  on-off-vs-time and conductance-vs-time within strata; PEO-vs-Hybrane CV.
 
-CAVEAT carried into the chapter: the mid-2021 Hybrane corpus is enriched in
-*deliberately stressed* controls (no-Hybrane, no-salt, air exposure, old-SY,
-baby-chamber transport), so natural stock-aging is not cleanly separable from
-intentional stress experiments in the DATABASE alone. The qualitative campaign
-narrative lives in the Fabrication/Characterization Notes (see handout 22).
+Qualitative only (carry the deliberate-stress caveat):
+  Q4  device-health collapse (fraction broken/saturated rises to ~1.0).
 
-Source of truth:
-  - material decode & TRUE dates : DATABASE/DEVICES_LIBRARY.csv ('Date' is full
-    date here; UPDATED_DEVICES_LIBRARY.csv coarsens Date to month -- do not use
-    it for the timeline).
-  - components/metal             : DATABASE/UPDATED_DEVICES_LIBRARY.csv
-  - HYST metrics                 : DATABASE/DEVICES_HYST_PIXEL_INFO.csv
-  - red-flag exclusion           : DATABASE/FILTERED_DEVICES.csv
+Source of truth: DATABASE/{DEVICES_LIBRARY.csv (TRUE dates), UPDATED_DEVICES_LIBRARY.csv
+(components/metal), DEVICES_HYST_PIXEL_INFO.csv}. v061/v064 multi-day stability is a
+Hybrane *positive* -> Chapter-2 SI, not here (only their fresh-day points enter Q2).
 
-Run from the repo root:  python scripts/bridge_hybrane_peo_reproducibility.py
-Writes a tidy summary to handouts/bridge_hybrane_peo_summary.csv
+Run from repo root:  python scripts/bridge_hybrane_peo_reproducibility.py
+Writes handouts/bridge_hybrane_peo_summary.csv
 """
 import os
 import numpy as np
@@ -51,138 +46,113 @@ OUT = "handouts/bridge_hybrane_peo_summary.csv"
 
 def load():
     libo = pd.read_csv(os.path.join(DB, "DEVICES_LIBRARY.csv"))
-    libo["Date"] = pd.to_datetime(libo["Date"], errors="coerce")  # TRUE dates
+    libo["Date"] = pd.to_datetime(libo["Date"], errors="coerce")
     up = pd.read_csv(os.path.join(DB, "UPDATED_DEVICES_LIBRARY.csv"))
     lib = libo[["device_name", "Date"]].merge(
         up[["device_name", "Components Group", "Used Metal"]], on="device_name", how="left")
-    hyst = pd.read_csv(os.path.join(DB, "DEVICES_HYST_PIXEL_INFO.csv"))
-    filt = pd.read_csv(os.path.join(DB, "FILTERED_DEVICES.csv"))
-    bad = set(zip(filt["device_name"], filt["day"], filt["pixel"]))
-    return lib, hyst, bad
+    m = pd.read_csv(os.path.join(DB, "DEVICES_HYST_PIXEL_INFO.csv"))
+    m = m.merge(lib, on="device_name", how="inner")
+    # sweep-amplitude stratum from the per-pixel max voltage
+    v = m["max voltage (V)"]
+    m["vbin"] = np.where(v < 1.6, "~1.2V", np.where(v < 2.6, "~2V", "~3V"))
+    return m
 
 
-def corpus(lib, hyst, group):
-    devs = lib[(lib["Components Group"] == group) & (lib["Used Metal"] == "Ag")]
-    return devs, hyst.merge(devs[["device_name", "Date"]], on="device_name", how="inner")
+def corpus(m, group):
+    return m[(m["Components Group"] == group) & (m["Used Metal"] == "Ag")]
+
+
+def valid(df):
+    return df[(df["is broken"] != "Y") & (df["is saturated"] != "Y")]
+
+
+def dev_median(df, col):
+    return df.groupby("device_name")[col].median().dropna()
+
+
+def freshest(df, col):
+    g = df.dropna(subset=["Date", col])
+    fd = g.groupby("device_name")["day"].transform("min")
+    return (g[g["day"] == fd].groupby("device_name")
+            .agg(date=("Date", "first"), y=(col, "median")).dropna())
 
 
 def main():
-    lib, hyst, bad = load()
+    m = load()
+    H = corpus(m, "SY, Hy, LiTr")
+    P = corpus(m, "SY, PEO, LiTr")
     rows = []
 
-    # ---- Q1: reproducibility & window on VALID devices --------------------
+    # ---- Q1: matched-amplitude window contrast (resolution) --------------
     print("=" * 72)
-    print("Q1  Device-to-device reproducibility & window (Ag, valid devices)")
+    print("Q1  PEO vs Hybrane switching window at MATCHED ~3 V (valid devices)")
     print("=" * 72)
-    for label, group in [("Hybrane SY/Hy/LiTr", "SY, Hy, LiTr"),
-                         ("PEO SY/PEO/LiTr", "SY, PEO, LiTr")]:
-        devs, m = corpus(lib, hyst, group)
-        v = m[(m["is broken"] != "Y") & (m["is saturated"] != "Y")]
-        v = v[~v.set_index(["device_name", "day", "pixel"]).index.isin(bad)]
-        narea = v.groupby("device_name")["normalized area mean"].median().dropna()
-        onoff = v.groupby("device_name")["on-off ratio mean"].median().dropna()
-        print(f"\n{label}: library Ag={devs['device_name'].nunique()}, valid-HYST devices={len(narea)}")
-        print(f"  normalized area : median={narea.median():.3f}  CV={narea.std()/narea.mean():.2f}")
-        print(f"  on-off ratio    : median={onoff.median():.2f}  CV={onoff.std()/onoff.mean():.2f}")
-        rows.append(dict(question="Q1_reproducibility", corpus=label, n_devices=len(narea),
-                         narea_median=round(float(narea.median()), 3),
-                         narea_cv=round(float(narea.std()/narea.mean()), 3),
-                         onoff_median=round(float(onoff.median()), 3),
-                         onoff_cv=round(float(onoff.std()/onoff.mean()), 3)))
+    out = {}
+    for label, d in [("Hybrane", H), ("PEO", P)]:
+        v = valid(d[d["vbin"] == "~3V"])
+        na = dev_median(v, "normalized area mean")
+        oo = dev_median(v, "on-off ratio mean")
+        out[label] = na
+        cv = na.std() / na.mean() if len(na) > 1 else float("nan")
+        print(f"  {label:8s}: n={len(na):2d} dev | narea median={na.median():.3f} CV={cv:.2f} "
+              f"| on-off median={oo.median():.2f}")
+        rows.append(dict(question="Q1_window_matched3V", corpus=label, n_devices=len(na),
+                         narea_median=round(float(na.median()), 3), narea_cv=round(float(cv), 3),
+                         onoff_median=round(float(oo.median()), 3)))
+    u, p = stats.mannwhitneyu(out["Hybrane"], out["PEO"], alternative="two-sided")
+    print(f"  Mann-Whitney normalized area (Hy vs PEO): U={u:.0f}, p={p:.4f}  "
+          f"-> PEO wider window {'(significant)' if p < 0.05 else '(n.s.)'}")
+    print("  NOTE: at matched 3 V the CVs are comparable -> the pooled 'PEO more")
+    print("        reproducible (CV 0.54->0.34)' claim was a protocol artifact; dropped.")
+    rows.append(dict(question="Q1_window_matched3V_test", corpus="Hy_vs_PEO",
+                     mannwhitney_U=float(u), mannwhitney_p=round(float(p), 4)))
 
-    # ---- Q2: Hybrane device-health collapse over calendar time -----------
+    # ---- Q2: within-Hybrane area decline, stratified --------------------
     print("\n" + "=" * 72)
-    print("Q2  Hybrane device-health collapse over calendar time (THE signal)")
+    print("Q2  Within-Hybrane normalized area vs fabrication date, by sweep bin")
     print("=" * 72)
-    _, m = corpus(lib, hyst, "SY, Hy, LiTr")
-    m = m.copy()
-    m["bad"] = (m["is broken"] == "Y") | (m["is saturated"] == "Y")
-    m["ym"] = m["Date"].dt.to_period("M")
-    g = m.groupby("ym").agg(devices=("device_name", "nunique"), pixels=("pixel", "size"),
-                            frac_bad=("bad", "mean"),
-                            current_uA_med=("mean current at max v (uA)", "median"))
+    for tag, df in [("ALL (confounded)", H), ("~1.2V stratum", H[H["vbin"] == "~1.2V"]),
+                    ("~3V stratum", H[H["vbin"] == "~3V"])]:
+        d = freshest(df, "normalized area mean")
+        x = (d["date"] - d["date"].min()).dt.days.values.astype(float)
+        rho, pv = stats.spearmanr(x, d["y"].values)
+        flag = "  <- survives" if (tag == "~1.2V stratum" and pv < 0.05) else ""
+        print(f"  {tag:18s}: n={len(d):2d}  Spearman rho={rho:+.3f}  p={pv:.4f}{flag}")
+        rows.append(dict(question="Q2_area_decline", corpus=tag, n_devices=len(d),
+                         spearman_rho=round(float(rho), 3), spearman_p=round(float(pv), 4)))
+
+    # ---- Q3: confounded / non-surviving trends (honest negatives) -------
+    print("\n" + "=" * 72)
+    print("Q3  Trends that do NOT survive stratification (reported as confounded)")
+    print("=" * 72)
+    for col in ["on-off ratio mean", "mean conductance at max v (uS)"]:
+        line = []
+        for b in ["~1.2V", "~3V"]:
+            d = freshest(H[H["vbin"] == b], col)
+            x = (d["date"] - d["date"].min()).dt.days.values.astype(float)
+            rho, pv = stats.spearmanr(x, d["y"].values)
+            line.append(f"{b}: rho={rho:+.3f} p={pv:.3f} (n={len(d)})")
+            rows.append(dict(question="Q3_nonsurviving", corpus=f"{col} @ {b}", n_devices=len(d),
+                             spearman_rho=round(float(rho), 3), spearman_p=round(float(pv), 3)))
+        print(f"  {col:32s}: " + " | ".join(line))
+
+    # ---- Q4: device-health collapse (qualitative) -----------------------
+    print("\n" + "=" * 72)
+    print("Q4  Hybrane device-health collapse over time (qualitative; stress-confounded)")
+    print("=" * 72)
+    h = H.copy()
+    h["bad"] = (h["is broken"] == "Y") | (h["is saturated"] == "Y")
+    g = h.groupby(h["Date"].dt.to_period("M")).agg(devices=("device_name", "nunique"),
+                                                    frac_bad=("bad", "mean"))
     print(g.to_string(float_format=lambda x: f"{x:.2f}"))
-    pre = m[m["Date"] < "2021-05-01"]
-    post = m[(m["Date"] >= "2021-05-01") & (m["Date"] < "2022-01-01")]
-    print(f"\n  Pre-inflection (<=Apr 2021): {pre['device_name'].nunique()} dev, "
-          f"frac_bad={pre['bad'].mean():.2f}, median current={pre['mean current at max v (uA)'].median():.2f} uA")
-    print(f"  Mid-decline (May-Dec 2021):  {post['device_name'].nunique()} dev, "
-          f"frac_bad={post['bad'].mean():.2f}, median current={post['mean current at max v (uA)'].median():.2f} uA")
-    print("  NOTE: mid-2021 corpus includes deliberately-stressed controls; "
-          "natural stock-aging is not cleanly separable here (see handout 22).")
+    print("  CAVEAT: mid-2021 corpus enriched in deliberately-stressed controls; "
+          "use as narrative, not as a clean stock-aging rate.")
     for ym, r in g.iterrows():
-        rows.append(dict(question="Q2_health_collapse", corpus=str(ym), n_devices=int(r["devices"]),
-                         frac_broken_saturated=round(float(r["frac_bad"]), 3),
-                         current_uA_median=round(float(r["current_uA_med"]), 2)))
-
-    # ---- Q3: why normalized-area alone does not show the decline ---------
-    print("\n" + "=" * 72)
-    print("Q3  Normalized-area-only trend is NOT a clean decline (explained)")
-    print("=" * 72)
-    v = m[(m["is broken"] != "Y") & (m["is saturated"] != "Y")].dropna(subset=["normalized area mean"])
-    fd = v.groupby("device_name")["day"].transform("min")
-    dev = (v[v["day"] == fd].groupby("device_name")
-           .agg(date=("Date", "first"), narea=("normalized area mean", "median")).dropna().sort_values("date"))
-    x = (dev["date"] - dev["date"].min()).dt.days.values.astype(float)
-    y = dev["narea"].values
-    r, p = stats.pearsonr(x, y)
-    print(f"\nValid-device freshest-day normalized area vs date: n={len(dev)}, Pearson r={r:+.3f} (p={p:.3f}).")
-    print("Only ~20 Hybrane/Ag devices survive as non-saturated; the degraded majority")
-    print("become high-conductivity shorts (Q2) and are flagged out, so the area metric")
-    print("on survivors does NOT trend down. The reproducible degradation metric is Q2,")
-    print("and the batch-by-batch timeline figure should be sourced from the contemporaneous")
-    print("record (Common/2021-12-29_EVO.pptx, 2021-12-03_gold&degr.pptx) -- see handout 22.")
-    rows.append(dict(question="Q3_area_only_trend", corpus="Hybrane valid freshest-day",
-                     n_devices=len(dev), pearson_r=round(float(r), 3), pearson_p=round(float(p), 3)))
-
-    # ---- Q4: sweep-range-independent conductivity rise (raw reconstruction) ----
-    print("\n" + "=" * 72)
-    print("Q4  Conductance @ fixed |V|=1.0 V from raw (removes sweep-range confound)")
-    print("=" * 72)
-    rows += q4_fixed_voltage(lib)
+        rows.append(dict(question="Q4_health", corpus=str(ym), n_devices=int(r["devices"]),
+                         frac_broken_saturated=round(float(r["frac_bad"]), 3)))
 
     pd.DataFrame(rows).to_csv(OUT, index=False)
     print(f"\nSummary written to {OUT}")
-
-
-def q4_fixed_voltage(lib, vtarget=1.0, vband=0.06, recovery_cutoff="2022-03-01"):
-    """Reconstruct conductance at a fixed voltage from the raw 165 MB datapoint
-    table, so the conductivity-vs-time trend is independent of the sweep range
-    (the processed 'current at max v' is confounded by a 1.2 V -> 3 V sweep
-    change mid-campaign). Streams the file in chunks."""
-    hyset = set(lib[(lib["Components Group"] == "SY, Hy, LiTr") & (lib["Used Metal"] == "Ag")]["device_name"])
-    date = dict(zip(lib["device_name"], lib["Date"]))
-    cols = ["device_name", "day", "pixel", "curve", "voltage (V)", "conductance (uS)"]
-    keep = []
-    for ch in pd.read_csv(os.path.join(DB, "DEVICES_HYST_ALL_DATAPOINTS.csv"), usecols=cols, chunksize=500_000):
-        ch = ch[ch["device_name"].isin(hyset)]
-        ch = ch[ch["voltage (V)"].abs().sub(vtarget).abs() < vband]
-        ch = ch[np.isfinite(ch["conductance (uS)"])]
-        if len(ch):
-            keep.append(ch)
-    d = pd.concat(keep, ignore_index=True)
-    d["date"] = d["device_name"].map(date)
-    fd = d.groupby("device_name")["day"].transform("min")
-    dev = (d[d["day"] == fd].groupby("device_name")
-           .agg(date=("date", "first"), G1V=("conductance (uS)", "median")).dropna().sort_values("date"))
-    core = dev[dev["date"] < recovery_cutoff]
-    recov = dev[dev["date"] >= recovery_cutoff]
-    x = (core["date"] - core["date"].min()).dt.days.values.astype(float)
-    y = core["G1V"].values
-    rho, p = stats.spearmanr(x, y)
-    r, pr = stats.pearsonr(x, np.log10(y))
-    per_month = 10 ** (np.polyfit(x, np.log10(y), 1)[0] * 30)
-    print(f"\nCORE campaign (< {recovery_cutoff}), conductance @ |V|={vtarget} V, n={len(core)} devices:")
-    print(f"  Spearman(G,date) rho={rho:+.3f} (p={p:.2e})")
-    print(f"  Pearson(log10 G,date) r={r:+.3f} (p={pr:.2e})  ->  {per_month:.2f}x per month")
-    print(f"  median G@1V: {core['G1V'].iloc[:6].median():.2f} uS (first ~6) -> {core['G1V'].iloc[-6:].median():.1f} uS (last ~6)")
-    print(f"  2022 recovery batch EXCLUDED (reverted conditions, notes v104-113): "
-          f"n={len(recov)}, median G@1V={recov['G1V'].median():.3f} uS")
-    return [dict(question="Q4_fixed_V_conductance", corpus=f"Hybrane core (<{recovery_cutoff})",
-                 n_devices=len(core), spearman_rho=round(float(rho), 3), spearman_p=float(f"{p:.2e}"),
-                 log_pearson_r=round(float(r), 3), fold_per_month=round(float(per_month), 2),
-                 G1V_first_uS=round(float(core['G1V'].iloc[:6].median()), 2),
-                 G1V_last_uS=round(float(core['G1V'].iloc[-6:].median()), 1))]
 
 
 if __name__ == "__main__":
