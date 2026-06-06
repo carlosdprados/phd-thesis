@@ -1,0 +1,5 @@
+question,corpus,n_devices,narea_median,narea_cv,onoff_median,onoff_cv,aging_slope_median_per_day,frac_negative,pearson_r,pearson_p,spearman_rho,spearman_p
+Q1_reproducibility,Hybrane SY/Hy/LiTr,20,0.206,0.538,1.926,0.386,,,,,,
+Q1_reproducibility,PEO SY/PEO/LiTr,20,0.387,0.344,4.329,0.452,,,,,,
+Q2_within_device_aging,Hybrane SY/Hy/LiTr,9,,,,,-0.0146,0.78,,,,
+Q3_calendar_trend,Hybrane early-day,11,,,,,,,0.041,0.905,0.358,0.28
