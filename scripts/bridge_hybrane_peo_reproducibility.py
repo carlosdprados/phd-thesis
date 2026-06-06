@@ -135,8 +135,54 @@ def main():
     rows.append(dict(question="Q3_area_only_trend", corpus="Hybrane valid freshest-day",
                      n_devices=len(dev), pearson_r=round(float(r), 3), pearson_p=round(float(p), 3)))
 
+    # ---- Q4: sweep-range-independent conductivity rise (raw reconstruction) ----
+    print("\n" + "=" * 72)
+    print("Q4  Conductance @ fixed |V|=1.0 V from raw (removes sweep-range confound)")
+    print("=" * 72)
+    rows += q4_fixed_voltage(lib)
+
     pd.DataFrame(rows).to_csv(OUT, index=False)
     print(f"\nSummary written to {OUT}")
+
+
+def q4_fixed_voltage(lib, vtarget=1.0, vband=0.06, recovery_cutoff="2022-03-01"):
+    """Reconstruct conductance at a fixed voltage from the raw 165 MB datapoint
+    table, so the conductivity-vs-time trend is independent of the sweep range
+    (the processed 'current at max v' is confounded by a 1.2 V -> 3 V sweep
+    change mid-campaign). Streams the file in chunks."""
+    hyset = set(lib[(lib["Components Group"] == "SY, Hy, LiTr") & (lib["Used Metal"] == "Ag")]["device_name"])
+    date = dict(zip(lib["device_name"], lib["Date"]))
+    cols = ["device_name", "day", "pixel", "curve", "voltage (V)", "conductance (uS)"]
+    keep = []
+    for ch in pd.read_csv(os.path.join(DB, "DEVICES_HYST_ALL_DATAPOINTS.csv"), usecols=cols, chunksize=500_000):
+        ch = ch[ch["device_name"].isin(hyset)]
+        ch = ch[ch["voltage (V)"].abs().sub(vtarget).abs() < vband]
+        ch = ch[np.isfinite(ch["conductance (uS)"])]
+        if len(ch):
+            keep.append(ch)
+    d = pd.concat(keep, ignore_index=True)
+    d["date"] = d["device_name"].map(date)
+    fd = d.groupby("device_name")["day"].transform("min")
+    dev = (d[d["day"] == fd].groupby("device_name")
+           .agg(date=("date", "first"), G1V=("conductance (uS)", "median")).dropna().sort_values("date"))
+    core = dev[dev["date"] < recovery_cutoff]
+    recov = dev[dev["date"] >= recovery_cutoff]
+    x = (core["date"] - core["date"].min()).dt.days.values.astype(float)
+    y = core["G1V"].values
+    rho, p = stats.spearmanr(x, y)
+    r, pr = stats.pearsonr(x, np.log10(y))
+    per_month = 10 ** (np.polyfit(x, np.log10(y), 1)[0] * 30)
+    print(f"\nCORE campaign (< {recovery_cutoff}), conductance @ |V|={vtarget} V, n={len(core)} devices:")
+    print(f"  Spearman(G,date) rho={rho:+.3f} (p={p:.2e})")
+    print(f"  Pearson(log10 G,date) r={r:+.3f} (p={pr:.2e})  ->  {per_month:.2f}x per month")
+    print(f"  median G@1V: {core['G1V'].iloc[:6].median():.2f} uS (first ~6) -> {core['G1V'].iloc[-6:].median():.1f} uS (last ~6)")
+    print(f"  2022 recovery batch EXCLUDED (reverted conditions, notes v104-113): "
+          f"n={len(recov)}, median G@1V={recov['G1V'].median():.3f} uS")
+    return [dict(question="Q4_fixed_V_conductance", corpus=f"Hybrane core (<{recovery_cutoff})",
+                 n_devices=len(core), spearman_rho=round(float(rho), 3), spearman_p=float(f"{p:.2e}"),
+                 log_pearson_r=round(float(r), 3), fold_per_month=round(float(per_month), 2),
+                 G1V_first_uS=round(float(core['G1V'].iloc[:6].median()), 2),
+                 G1V_last_uS=round(float(core['G1V'].iloc[-6:].median()), 1))]
 
 
 if __name__ == "__main__":
