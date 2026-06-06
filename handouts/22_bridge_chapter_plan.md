@@ -2,7 +2,7 @@
 
 # Bridge Chapter — Implementation Plan (standalone, new Chapter 3)
 
-**Date:** 2026-06-06 · **Rev 4** (everything re-done WITHIN matched sweep-amplitude strata; two Rev-3 claims dropped as protocol-confounded; v061/v064 stability moved to Ch2 SI).
+**Date:** 2026-06-06 · **Rev 5** (mature methodology honoring the procedure: per-device weighting + standard-protocol corpus + amplitude match + recovery-tail sensitivity; degradation re-established on a controlled multi-feature panel; mirrors `project_feature_explorer`).
 **Decision (user):** Build the Hybrane→PEO material pivot as a **standalone short chapter**, inserted between current Ch2 and Ch3. Companion assessment: `21_bridge_chapter_hybrane_peo_assessment.md`. Reproducible evidence: `scripts/bridge_hybrane_peo_reproducibility.py` → `handouts/bridge_hybrane_peo_summary.csv`.
 **Working title:** *Reproducibility, Degradation, and the Device-Provenance Infrastructure* (alt: *From Hybrane to PEO: A Reproducibility-Driven Materials Pivot*).
 **Length:** 12–18 pp. Methods + negative-result chapter, **not** a lab diary.
@@ -11,7 +11,9 @@
 
 ## 0. What changed (author corrections, now verified)
 
-Rev 2 → Rev 3 incorporates the second round of author answers:
+**Rev 5 (mature methodology).** Per the author's procedural points, the degradation analysis now enforces four controls (see §1A), mirroring the interactive tool `Nanomem_Devices_Library/project_feature_explorer`. Net effect: the conductivity-rise + potentiation-loss degradation **re-establishes robustly** once the standard-protocol corpus is isolated and per-device weighting is used (it had looked confounded in Rev 4 because the wrong, pixel-pooled, all-corpus metric was used). The normalized-area/on-off decline is real but tail-driven; `broken %` is *not* a valid degradation metric. Earlier rev history retained below for traceability.
+
+Standing author corrections (Rev 2–4):
 
 1. **The degradation is BATCH-over-CALENDAR-TIME, caused by the physical Hybrane reagent stock aging** — *not* individual devices aging after fabrication.
 2. **v061/v064 is NOT degradation evidence — it is the OPPOSITE, and moves to Ch2 SI.** That >100-day study (raw in their `DayX` folders) shows Hybrane *devices* hold their characteristics for weeks — a *positive* of Hybrane-made devices. The **multi-day stability figure belongs in the Ch2 proof-of-concept SI** (author). In the bridge chapter, v061/v064 contribute **only their fresh-day data points** to the feature-vs-fabrication-date scatter (per author's point 3), not their aging curve.
@@ -22,26 +24,39 @@ Rev 2 → Rev 3 incorporates the second round of author answers:
 
 ---
 
-## 1. The reproducible quantitative signal — AFTER protocol stratification (`scripts/bridge_hybrane_peo_reproducibility.py`)
+## 1. The reproducible quantitative signal (`scripts/bridge_hybrane_peo_reproducibility.py`)
 
-**The dominant confound (author).** Hysteresis is a 0→+X→0 loop; a larger sweep amplitude X drives more ionic redistribution, so the device conducts more and shows a different loop area even when read at the same voltage. Amplitude is confounded with **both** date (Hybrane swept ~1.2 V early-2021 → ~3 V later) **and** material (Hybrane mostly ~1.2 V; PEO mostly ~2–3 V). So **every comparison must be made within a matched sweep-amplitude stratum** (binned from `max voltage (V)`). Reading at a fixed voltage from raw does *not* fix this — the *state* at the read still depends on X — so the Rev-3 fixed-1V reconstruction was removed.
+### 1A. Four controls the analysis MUST enforce (each verified to matter)
 
-**What survives stratification — the chapter's quantitative spine (only these two):**
+1. **Per-device weighting (mandatory).** `number_pixels_measured` collapses 16 → 2 over the campaign and is strongly anti-correlated with date (**Spearman ρ=−0.80, p≈1×10⁻¹⁵**). Pixel-pooled statistics are therefore biased toward early devices. Reduce every feature to **one value per device** (median over its freshest-day curves) *before* any test. NB: the `DEVICE_INFO` `saturated/broken pixel %` columns are unpopulated/constant — compute health from curve-level `is_saturated`/`is_broken`.
+2. **Standard-protocol corpus only** (n=69): SY/Hy/LiTr/Ag, anneal **75 °C**, no 2nd stage, Hy **0.3**, LiTr **0.09**. Excludes the invasive experiments — above all the **150 °C high-temperature batch that PARTIALLY RECOVERED devices a year in** (author), plus composition variants — which would otherwise contaminate the feature-vs-date story.
+3. **Sweep-amplitude match.** A 0→+X→0 loop excites the device more at larger X, so it conducts more even when read at the same voltage; amplitude is confounded with date *and* material. Confine within-Hybrane trends to a **tightly matched ~1.2 V band** (the standard corpus sweeps at discrete 0.6/1.0/1.2/2.6/3.0 V; 1.0–1.45 V is the matched low-V probe). Draw the Hybrane↔PEO contrast at matched ~3 V.
+4. **Recovery-tail sensitivity.** Report every trend with and without the last months (≥2022-03), the deliberately-reverted recovery batches.
 
-1. **Resolution — PEO has a wider window than Hybrane at matched ~3 V** (valid devices): normalized area **0.26 (Hy, n=10) → 0.42 (PEO, n=19)**, Mann-Whitney **p=0.018**; on-off **2.45→4.91**. Real, not a protocol artifact.
-2. **Degradation — within Hybrane, normalized area at fixed ~1.2 V sweep declines over the campaign**: Spearman **ρ=−0.31, p=0.007 (n=76)**. (At ~3 V the trend is absent, ρ=−0.12, p=0.34 — plausibly the heavy excitation swamps the intrinsic window difference; the gentle 1.2 V sweep is the sensitive probe.)
+### 1B. Degradation panel — standard corpus, matched ~1.2 V, per-device (Spearman vs date)
 
-**What did NOT survive — must be dropped or reported as confounded:**
+| Feature (family) | all dates | drop recovery tail | verdict |
+|---|---|---|---|
+| current at max V (conductivity) | ρ=+0.45, p=0.0002 | ρ=+0.55, p<0.0001 | **robust ↑** |
+| raw area V·µA (conductivity) | ρ=+0.57, p<0.0001 | ρ=+0.69, p<0.0001 | **robust ↑** |
+| current diff at on-off (conductivity) | ρ=+0.51, p<0.0001 | ρ=+0.63, p<0.0001 | **robust ↑** |
+| % change in max-V current (potentiation) | ρ=−0.27, p=0.031 | ρ=−0.33, p=0.010 | **robust ↓** |
+| normalized area (window) | ρ=−0.29, p=0.020 | ρ=−0.18, p=0.18 | real but **tail-driven** |
+| on-off ratio (window) | ρ=−0.26, p=0.036 | ρ=−0.16, p=0.24 | real but **tail-driven** |
+| `is saturated` (health) | ρ=+0.27, p=0.033 | ρ=+0.15, p=0.26 | weak/tail-driven |
+| `is broken` (health) | ρ=−0.40, p=0.001 | ρ=−0.59, p<0.0001 | **NOT a degradation metric** |
 
-- **Conductivity rise over time** — within strata ρ=+0.11 (1.2 V, p=0.36) / +0.23 (3 V, p=0.07). The Rev-3 "~90× rise" was substantially the amplitude change. **Do not claim material conductivity increase.**
-- **On-off-ratio decline over time** — within strata p=0.14 / 0.17 (n.s.).
-- **"PEO more reproducible" (CV 0.54→0.34)** — at matched 3 V the CVs are equal (Hy 0.38, PEO 0.41). The CV gap was the amplitude pooling. **Drop the reproducibility claim;** keep only the window-*magnitude* claim (#1).
+**Reading (the mature story):** as the Hybrane stock aged, the composite drifted toward **more ohmic conduction** — absolute current and hysteresis-current rise within tightly matched amplitude (so this is material, not the sweep change), strengthening when the recovery tail is dropped — *and simultaneously lost its ability to potentiate* (% change in max-V current falls; successive sweeps no longer build up conductance). The **normalized switching window** (normalized area, on-off) shrinks too but that significance is carried by the recovery-tail devices, so report it as supporting, not headline. **`is broken` decreases** over time — it tracks early electrode-contact/handling problems that the team fixed (the notes are full of them), so it is *not* a Hybrane-degradation indicator; the right health metric is `is saturated` (fails-to-potentiate), which rises. This corrects the initial expectation that "broken %" worsened.
 
-**Qualitative only (carry the stress caveat):** device-health collapse — fraction broken/saturated rises ~0.4 → 1.0 across mid-2021. But the mid-2021 corpus is enriched in *deliberately-stressed* controls (no-Hybrane, no-salt, air exposure), so this is narrative support, not a clean stock-aging rate.
+Why Rev 4 wrongly called conductivity confounded: it used a single-point `conductance at max V` on the *all-corpus, pixel-pooled* data. On the **standard corpus, per-device, with integrated loop metrics**, the conductivity rise is unambiguous and amplitude-matched.
 
-**Net:** the honest quantitative basis is **modest but real** — (1) PEO's wider window at matched protocol, and (2) the 1.2 V window decline within Hybrane — plus the overwhelming qualitative campaign record (§2). The mechanism narrative ("composite went ohmic / lost multi-level range") is consistent with the notes and the 1.2 V area decline, but the *magnitude* metrics (conductivity, on-off) are protocol-confounded and must not be quantified as degradation.
+### 1C. Resolution — PEO vs Hybrane at matched ~3 V (valid devices)
 
-**Attribution (firm per author): the Hybrane stock.** SY eliminated (old/new SY no significant change; new SY kept being purchased); the colleague's one-off ITO remark was not borne out. Use `DEVICES_LIBRARY.csv` for true dates (`UPDATED_…` coarsens to month).
+Normalized area **0.26 (Hy, n=10) → 0.42 (PEO, n=19)**, Mann-Whitney **p=0.018**; on-off **2.45→4.91**. PEO restored a wider window — evidence-based pivot. **No reproducibility-CV claim** (CVs equal at matched 3 V — that earlier gap was amplitude pooling).
+
+### 1D. Attribution & data notes
+
+**Hybrane stock (firm):** SY eliminated (old/new SY no significant change; new SY kept being bought); the colleague's one-off ITO guess was not borne out. Use `DEVICES_LIBRARY.csv` for true dates (`UPDATED_…` coarsens to month). The mechanism — drift to ohmic conduction + loss of potentiation — matches the notes' *"old low-current, high-area, multi-level"* → *"high-conductivity, undesirable"* transition.
 
 ---
 
@@ -71,7 +86,8 @@ The Characterization/Fabrication notes trace the whole investigation. Anchor dat
 Frame as the methodological backbone consumed by **both** later chapters, not biography (≤2 pp):
 
 - **DEVICES_LIBRARY** — the 88-column per-device fabrication-provenance schema *exists because* the crisis forced pinning every variable (storage atmosphere, light, baby-chamber, SY lot, cyclohexanone lot, operator, evaporation profile, free-text notes). It is the instrument that made the diagnosis possible.
-- **project_feature_extraction** (~6 mo) — raw Keithley → `DATABASE/DEVICES_<TYPE>_{DEVICE,PIXEL,CURVE}_INFO.csv`; the `is_broken`/`is_saturated` flags used for the Q2 health metric come from here.
+- **project_feature_extraction** (~6 mo) — raw Keithley → `DATABASE/DEVICES_<TYPE>_{DEVICE,PIXEL,CURVE}_INFO.csv`; the curve-level `is_broken`/`is_saturated` flags and every feature in the §1B panel come from here.
+- **project_feature_explorer** — Dash app that joins library metadata (Date, Components Group, metal, annealing, mass ratios, notes) onto any feature table for interactive feature-vs-date / batch-vs-batch exploration; **this is the tool with which the author originally identified the degradation trends**, and the §1 controls reproduce its slicing programmatically.
 - **project_device_cleaner** — Streamlit curation → `FILTERED_DEVICES.csv` (the per-device visual review that Ch3 already relies on).
 - **scripts_general/visualization_tools** — the timeline/`chemvar` viewers behind the contemporaneous degradation diagnosis.
 - **project_graphmaker** — thesis-figure generator.
@@ -85,7 +101,7 @@ Framing line: *"The diagnosis required instrumentation that did not exist; build
 
 1. **The reproducibility problem.** Scientific question, not confession: the Ch2 proof-of-concept was validated, but as the campaign scaled the memristive hysteresis became progressively harder to obtain — successive batches collapsed toward high-conductivity, low-area behaviour. Anchor on the v026 inflection.
 2. **Was it us or the materials? A controlled elimination.** Compact **methods-of-elimination table** (one row per tested cause from §2 → test → verdict). This is where the provenance library is *motivated*. Include the Lorenzo cross-person corroboration.
-3. **The quantitative degradation signal.** Lead with the **only surviving quantitative metric**: normalized-area decline at fixed ~1.2 V sweep (ρ=−0.31, p=0.007). Present the protocol-confound explicitly as a *methodological result* of the chapter (amplitude sets the response in these ionic devices) — it both disciplines this analysis and connects to the comparative chapter's protocol message. Health-collapse as qualitative support (stress caveat). Conductivity/on-off trends explicitly flagged as protocol-confounded, not claimed.
+3. **The quantitative degradation signal.** Open with the four controls (§1A) as the chapter's *methodological backbone* — per-device weighting (pixels/device fell 16→2), standard-protocol corpus, amplitude match, tail sensitivity — then present the §1B panel: **conductivity rises** (current/area, robust, amplitude-matched) and **potentiation falls** (% change in max-V current, robust) as the headline; normalized-window shrinkage as tail-driven support; explicitly note that **`broken %` is not a degradation metric** (it tracks handling, and improved). Mechanism: drift toward ohmic conduction with loss of pulse-to-pulse build-up.
 4. **The resolution: switch to PEO.** The Hybrane→PEO contrast at **matched ~3 V** (F3): wider window, normalized area 0.26→0.42 (p=0.018), on-off 2.45→4.91. Evidence-based pivot. **No reproducibility-CV claim** (confounded). Attribution: Hybrane stock (SY eliminated).
 5. **The infrastructure that made the diagnosis possible** (§3) — methods-foundation framing; forward-points to the comparative + temporal chapters.
 6. **Reconciliation with Chapter 2 + bridge to the comparative study** (§6 below).
@@ -94,9 +110,9 @@ Framing line: *"The diagnosis required instrumentation that did not exist; build
 
 ## 5. Figures (all reproducible; new folder `figures/chapter3_bridge/`)
 
-- **F1 — degradation timeline (headline)**: normalized area vs fabrication date, **coloured by sweep-amplitude stratum**, showing the significant decline within the ~1.2 V points (ρ=−0.31) and the flat ~3 V points — i.e. the figure *also visualises the protocol confound*. Fresh-day points include v061/v064. From audit Q2.
-- **F2 — device-health collapse** (qualitative): fraction broken/saturated by month → 1.0. From Q4; caption the deliberate-stress caveat.
-- **F3 — Hybrane vs PEO at matched ~3 V**: per-device normalized-area & on-off distributions (box/strip) within the 3 V stratum only, PEO higher (p=0.018). From Q1.
+- **F1 — degradation panel (headline)**: per-device features vs fabrication date on the standard corpus, matched ~1.2 V — (a) current/raw-area RISE (conductivity, log axis); (b) % change in max-V current FALLS (potentiation). Mark the recovery-tail devices distinctly (excluded from the fit). Fresh-day points include v061/v064. From §1B.
+- **F2 — per-device weighting & confound visual**: `number_pixels_measured` vs date (ρ=−0.80) and a small sweep-amplitude×date panel — makes the methodology (why per-device + amplitude match) legible to the jury.
+- **F3 — Hybrane vs PEO at matched ~3 V**: per-device normalized-area & on-off distributions (box/strip), PEO higher (p=0.018). From §1C.
 - **T1 — methods-of-elimination table** (§2).
 - **F4 (optional) — provenance schema / pipeline flow**: adapt `docs/experimental_archive_and_pipeline.md`.
 - **[Ch2 SI, not here] — v061/v064 multi-day stability** curve.
