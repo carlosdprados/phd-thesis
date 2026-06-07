@@ -8,12 +8,70 @@ This appendix gathers the detailed experimental information and supporting evide
 
 \section{Materials and Fabrication Detail}\label{app:ch2_materials_fabrication}
 
-Detailed component descriptions, solution preparation, substrate cleaning, spin-coating optimisation, and electrode-deposition notes are reported here to keep the main proof-of-concept chapter focused on the device evidence.
+\subsection{Component Notes}
+
+The semiconducting component is \SY{}, the trivial name for the high-molecular-weight PPV copolymer sold as PDY-132 by Merck. The formal copolymer name is:
+\begin{quote}
+  \small\raggedright
+  poly[\{2,5-di(3$'$,7$'$-dimethyloctyloxy)-1,4-phenylenevinylene\}-\textit{co}-{}\\
+  \{3-(4$'$-(3$''$,7$''$-dimethyloctyloxy)phenyl)-1,4-phenylenevinylene\}-\textit{co}-{}\\
+  \{3-(3$'$-(3$'$,7$'$-dimethyloctyloxy)phenyl)-1,4-phenylenevinylene\}].
+\end{quote}
+The conjugated phenylene-vinylene backbone supplies electronic transport, while the branched alkoxy side chains support solubility and reduce crystallisation-driven phase separation in blends~\cite{PradoSocorro2022,Zhang2015}. In ion-containing \SY{}/\Hybrane{} systems, related LEC devices have shown electroluminescence lifetimes exceeding \SI{1600}{\hour}, supporting the chemical compatibility of this formulation family~\cite{Mardegan2021}.
+
+\Hybrane{} is a hyperbranched polyester-amide produced by Polymer Factory (Sweden)~\cite{Froehling2004}. The hyperbranched architecture creates an irregular, amorphous macromolecule rich in ether and ester oxygens. These oxygen atoms provide hard Lewis-base coordination sites for alkali-metal cations. Because ion motion is coupled to polymer segmental motion, transport in this class of host follows the polymer-electrolyte picture described in \cref{subsec:ion_conducting_polymers}, including non-Arrhenius temperature dependence near the glass-transition regime~\cite{Armand1989,WilliamsLandelFerry1955}.
+
+\LiTf{} is a polymer-electrolyte salt widely used in batteries and LECs~\cite{Pei1995,Wagberg2008}. Its processing role is to dissolve with \SY{} and \Hybrane{} in cyclohexanone without visible phase separation at the selected ratio. Its mechanistic role is to provide a small, hard \ce{Li+} cation (\SIrange{0.59}{0.76}{\angstrom} for four- to six-fold oxygen coordination~\cite{Shannon1976}) and a charge-delocalised triflate anion. The resulting cation/anion asymmetry is the chemical basis for the STM/LTM interpretation in \cref{subsec:lewis}.
+
+\subsection{Solution Preparation and Film Deposition}
+
+The three stock solutions were prepared separately in cyclohexanone at \SI{15}{\milli\gram\per\milli\litre} (\SY{}), \SI{10}{\milli\gram\per\milli\litre} (\Hybrane{}), and \SI{5}{\milli\gram\per\milli\litre} (\LiTf{}). The \SY{} solution was stirred at \SI{50}{\celsius} overnight. The solutions were then mixed to give the final mass ratio \SY{}:\Hybrane{}:\LiTf{} = 1:0.30:0.09, corresponding to final concentrations of \SI{8.72}{\milli\gram\per\milli\litre}, \SI{2.62}{\milli\gram\per\milli\litre}, and \SI{0.78}{\milli\gram\per\milli\litre}, respectively. Solution handling was performed under dry nitrogen to limit moisture uptake.
+
+ITO-patterned glass substrates were ultrasonicated successively in aqueous Mucasol detergent solution, deionised water, and 2-propanol, each for \SI{15}{\minute}. After drying under nitrogen, substrates were transferred immediately into a nitrogen glovebox (oxygen and water below \SI{1}{ppm}). The active layer was spin-coated at \SI{2000}{\rpm} for \SI{60}{\second}, then annealed at \SI{75}{\celsius} for \SI{3}{\hour}. The anneal removes residual cyclohexanone, allows chain relaxation, and stabilises the mixed polymer-electrolyte morphology.
+
+The top Ag electrode was thermally evaporated in the glovebox through a shadow mask defining the \SI{0.0825}{\square\centi\metre} junction. Ag was deposited at \SIrange{0.1}{0.5}{\nano\metre\per\second} to a total thickness of \SI{100}{\nano\metre}, monitored by quartz crystal microbalance. The slow initial rate was used to limit metal penetration into the soft polymer layer, which would otherwise risk filamentary shorts~\cite{Hung1997}.
 
 \section{Electrical Protocol Detail}\label{app:ch2_electrical_protocols}
 
-This section collects the read--write--wait protocol, the full EPSC trace, the STDP waveform details, and the retention-fit parameter table used to support \cref{sec:elec_char}.
+Electrical measurements used a Keithley 2450 SourceMeter connected to a custom probe station and controlled through Keithley TestScript Builder. Unless noted otherwise, measurements were carried out under nitrogen, with voltage applied to the Ag top electrode relative to the grounded ITO bottom electrode.
+
+\subsection{Read--Write--Wait Measurement}\label{app:ch2_read_write_wait}
+
+The variable-pulse and variable-delay measurements use a common read--write--wait sequence. First, a low reading pulse, \(V_{\mathrm{read}}=\SI{0.5}{\volt}\), establishes the initial conductance \(G_0\). This voltage is below the independently determined ionic-redistribution threshold of approximately \SI{0.7}{\volt}~\cite{PradoSocorro2022}. Second, a train of \(N_{\mathrm{pulses}}\) write pulses of duration \SI{0.1}{\second} perturbs the ionic configuration. Third, after a waiting time \(t_{\mathrm{wait}}\) under open-circuit conditions, a second read pulse measures \(G_f\). The reported response is \(\Delta G=(G_f/G_0)\times100\%\). Between experiments, the device was reset by shorting the junction for \SI{300}{\second}, and \(G_0\) was checked before the next measurement.
+
+\subsection{Extended Synaptic Protocols}\label{app:ch2_extended_protocols}
+
+The EPSC experiment defines states operationally by their signed current response under a common \SI{+1}{\volt} read-out bias. The device is first held at \SI{+1}{\volt} for \SI{1}{\second} to define \(S_0\). Two \SI{+2}{\volt}, \SI{50}{\milli\second} pulses generate excited states \(S_1\) and \(S_2\), and two \SI{-2.5}{\volt}, \SI{50}{\milli\second} pulses generate inhibitory states \(S_3\) and \(S_4\). The signed ratios \(R_n=I_{S_n}/I_{S_0}\) are reported in \cref{subsec:epsc}.
+
+For STDP, pre- and postsynaptic spikes are emulated by triangular voltage waveforms applied to the two-terminal device. The experimentally applied voltage is the algebraic sum
+\begin{equation}
+  V(t) = V_{\mathrm{pre}}(t) + V_{\mathrm{post}}(t+\Delta t),
+\end{equation}
+with \(\Delta t=t_{\mathrm{post}}-t_{\mathrm{pre}}\). Each spike waveform has maximum amplitude \(V_{sp}=\SI{1.55}{\volt}\) and duration \SI{1.2}{\second}; \(\Delta t\) was varied from \SI{-600}{\milli\second} to \SI{+600}{\milli\second}. Negative \(\Delta t\) produces potentiation and positive \(\Delta t\) produces depression under the sign convention used in \cref{subsec:stdp}.
+
+\subsection{Retention-Fit Parameters}\label{app:ch2_retention_fits}
+
+\Cref{tab:ch2_retention_fit_parameters} lists the standard-exponential fit parameters reported for the proof-of-concept retention traces. The fits use \(G_f/G_0=R_\infty+A\exp(-t_{\mathrm{wait}}/\tau)\), with \(\beta=1\) fixed.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Published standard-exponential fit parameters for the Chapter 2 retention traces. No free stretch exponent, confidence interval, or goodness-of-fit statistic was reported for these proof-of-concept fits.}
+  \label{tab:ch2_retention_fit_parameters}
+  \begin{tabular}{llll}
+    \toprule
+    Condition & \(\tau\) (s) & \(R_\infty\) & \(A\) \\
+    \midrule
+    \SI{1}{\volt}, 10 pulses (STM) & 2.57 & 1.01 & 0.374 \\
+    \SI{1}{\volt}, 50 pulses (STM) & 3.01 & 1.01 & 0.91 \\
+    \SI{3}{\volt}, 10 pulses (LTM) & 4.73 & 1.05 & 3.30 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 \section{Morphology and Stability Support}\label{app:ch2_morphology_stability}
 
-This section collects the profilometry, AFM, and ambient shelf-stability support for the fabrication and stability claims in \cref{sec:device_fab,sec:stability}.
+The spin speed was selected from an optimisation over \SIrange{500}{3000}{\rpm}~\cite{PradoSocorro2022}. Low speeds produced films that were too thick and less uniform; high speeds made the film thin enough that substrate roughness became a larger fraction of the total thickness. The \SI{2000}{\rpm} condition used for the main device produced an active-layer thickness of \SI{209}{\nano\metre}, measured by contact profilometry across a masked step edge with an Ambios XP-1 profilometer.
+
+Surface topography was characterised by tapping-mode AFM using a Bruker Dimension Icon instrument, a silicon probe with resonant frequency \SI{300}{\kilo\hertz} and force constant \SI{40}{\newton\per\metre}, and a scan rate of \SI{0.6}{\hertz}. The AFM images showed smooth films with RMS roughness of \SIrange{1}{3}{\nano\metre} over the investigated spin-speed range~\cite{PradoSocorro2022}. The absence of large phase-separated features supports the reading of the active layer as a homogeneous polymer-electrolyte composite at the scale relevant to the vertical junction.
+
+Ambient shelf stability was assessed over approximately two weeks (\(\sim\)\SI{300}{\hour}) on unencapsulated devices stored in air at room temperature~\cite{PradoSocorro2022}. The monitored quantities were baseline conductance \(G_0\), maximum conductance change \(\Delta G_{\mathrm{max}}\), and STM retention time \(\tau_S\). All three remained within \SI{20}{\percent} of their initial values over the measurement window. This is a shelf/calendar stability result, not a cycling-endurance measurement.
