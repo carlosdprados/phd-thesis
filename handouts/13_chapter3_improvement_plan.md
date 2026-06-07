@@ -10,7 +10,8 @@
 > - **#5 design-space scatter + #4 heterogeneity — DONE (combined).** `fig:ch3_design_space` (Fig in Discussion): per-device $t_{1/2}$ vs peak ratio, colour=PEO, shape=salt. Framed *honestly* — PEO sets the broad region (paired operating point), with large within-composition scatter shown, not averaged. Per-device coupling is only **moderate** (corr≈0.4), so it is presented as "paired region + heterogeneity", not a deterministic law.
 > - **#6 physical hypothesis — DONE.** Hedged "working mechanistic picture" paragraph in Discussion (PEO dilutes SY percolation + eases ionic relaxation → window/potentiation/retention move together; salt = chargeable-state budget → turnover; host/anion = coordination/barrier distribution). Explicitly not a microscopic proof.
 > - **#7 protocol design rule — largely DONE** via Table 3.1 + sharpened limitation #4.
-> - Remaining: **#2** provenance schematic, **#3** representative raw curves (needs raw-curve pull), **#8** attrition table, **#9** profilometry (VERIFY numbers first), **#10** EIS SI note, **#11** archive→SI. All presentation/SI; none affects a headline number.
+> - 2026-06-07: **#2 provenance schematic/table** and the explicit curve→pixel/device→cell aggregation description are now in the Chapter 4 methods. Representative raw curves are already in the main chapter through `fig:ch3_representative`.
+> - Remaining: **#8** attrition table, **#10** EIS SI note, **#11** archive→SI. All presentation/SI; none affects a headline number.
 
 ## Executive Direction
 
@@ -250,7 +251,7 @@ The following are useful but too detailed for the main flow:
 2. **Existing:** potentiation grid: `alpha`, peak ratio, turnover.
 3. **Existing:** chemistry landscape bars.
 4. **Existing:** protocol overlay.
-5. **Add:** representative raw/fit curves for HYST, PULSES, DELAYTIME.
+5. **Existing:** representative raw/fit curves for HYST, PULSES, DELAYTIME.
 6. **Add:** heterogeneity/swarm plot across composition cells.
 7. **Add if space allows:** design-space scatter linking `t_{1/2}` with `alpha`, peak ratio, or turnover.
 
@@ -267,12 +268,12 @@ The following are useful but too detailed for the main flow:
 
 - [x] Split protocol description by HYST, PULSES, DELAYTIME.
 - [x] Remove or qualify any statement implying PULSES and DELAYTIME share the same write/read amplitude.
-- [ ] Add the raw-to-summary data-provenance schematic/table.
-- [ ] State explicitly how medians are computed: curve/pixel/device/cell aggregation.
+- [x] Add the raw-to-summary data-provenance schematic/table.
+- [x] State explicitly how medians are computed: curve/pixel/device/cell aggregation.
 - [x] State that HYST summaries use robust medians because on-off ratios are right-skewed.
 - [x] Add a physical-hypothesis paragraph in Discussion.
 - [x] Strengthen the link between variability and Chapter 4.
-- [ ] Add a short statement that profilometry exists and thickness is a possible confound.
+- [x] Add a short statement that profilometry exists and thickness is a possible confound.
 - [x] Keep chemistry conclusions explicitly illustrative.
 - [x] Keep the cation result as an honest negative: no host/anion-independent `Li > Na > K` law.
 
