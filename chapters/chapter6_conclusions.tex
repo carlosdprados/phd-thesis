@@ -4,9 +4,13 @@
 %%  Author      : Carlos David Prado-Socorro
 %%  Institution : ICMol, Universitat de València
 %%
-%%  Stub reserved during the 6-chapter renumber (bridge chapter
-%%  inserted as Chapter 3). Compiles standalone or \include'd
-%%  from thesis.tex (guarded by \thesismode, as the chapters are).
+%%  Closing chapter. Synthesises the device-chemistry axis
+%%  (\cref{ch:poc}, \cref{ch:bridge}, \cref{ch:comparative}) and
+%%  the application axis (\cref{ch:temporal}); benchmarks against
+%%  temporal / reservoir / event-driven neuromorphic hardware;
+%%  states the limitations of the evidence base and the forward
+%%  programme. Compiles standalone or \include'd from thesis.tex
+%%  (guarded by \thesismode, as the chapters are).
 %% ============================================================
 
 %% ---- Standalone preamble (skipped when \include'd from thesis.tex) ----
@@ -18,17 +22,109 @@
   \setcounter{chapter}{5}     % This is Chapter 6 when built standalone
 \fi
 
+%% --- Shared macros (\providecommand: harmless if earlier chapters declared them) ---
+\providecommand{\SY}{\textit{Super Yellow}}
+\providecommand{\Hybrane}{\textit{Hybrane}}
+\providecommand{\PEO}{PEO}
+\providecommand{\TMPE}{TMPE}
+\providecommand{\LiTf}{LiOTf}
+\providecommand{\ITO}{ITO}
+\providecommand{\STM}{short-term memory}
+\providecommand{\LTM}{long-term memory}
+\providecommand{\STDP}{STDP}
+\providecommand{\NARMA}{NARMA}
+\providecommand{\WESAD}{WESAD}
+\providecommand{\twoterminal}{two-terminal}
+
 %% ============================================================
 \chapter{Conclusions and Outlook}\label{ch:conclusions}
 %% ============================================================
 
-% TODO: draft the closing chapter. It should bring together the device-chemistry
-% axis (\cref{ch:poc}, \cref{ch:bridge}, \cref{ch:comparative}) and the
-% application axis (\cref{ch:temporal}), benchmark the work against temporal,
-% reservoir, and event-driven neuromorphic hardware, and state the limitations
-% of the evidence base.
+This thesis set out to answer whether the volatility of an organic polymer-electrolyte memristive device --- the very property that disqualifies it as a non-volatile memory --- can be turned into a computational resource. The preceding chapters answered that question along two interlocking axes: a \emph{device-chemistry} axis that built, salvaged, and then deliberately engineered the volatile dynamics of these composites (\cref{ch:poc,ch:bridge,ch:comparative}), and an \emph{application} axis that put those dynamics to work as temporal-computing primitives (\cref{ch:temporal}). This chapter draws the two together. It states the contributions in the graded evidence hierarchy under which they were made, returns to the three groups of questions set out in the front-matter roadmap, benchmarks the work against the right reference class --- temporal, reservoir, and event-driven neuromorphic hardware, not digital memory --- sets out the limitations of the evidence base plainly, and lays out the experimental programme that follows from them.
 
-\noindent\emph{Chapter under construction.}
+%% ------------------------------------------------------------
+\section{Summary of Contributions}\label{sec:concl_contributions}
+%% ------------------------------------------------------------
+
+The central thesis is a single design rule, assembled cumulatively across the chapters: \emph{the chemistry of the composite --- above all its composition --- sets the fading-memory timescale of the device, and a heterogeneous bank of such timescales is the raw material of temporal computing.} The contributions that establish it fall into four layers, each held to a different and explicitly stated standard of evidence.
+
+\paragraph{A fully characterised synaptic exemplar (\cref{ch:poc}).} A reversible \twoterminal{} organic memristive device --- a solution-processed \SY{}/\Hybrane{}/\LiTf{} composite on an \ITO{}/composite/Ag stack --- was shown to support the complete synaptic measurement suite in a single platform: analogue I--V hysteresis (a \SI{140}{\percent} conductance increase from the first to the second sweep at \SI{1}{\volt}), reversible potentiation and depression exceeding \SI{200}{\percent} at an energy cost of order \SI{50}{\nano\joule} per event, two distinguishable retention regimes (an \STM{} regime, $\tau_S \approx \SIrange{2.5}{3}{\second}$, and an \LTM{} regime, $\tau_L \approx \SI{4.7}{\second}$, both Kohlrausch-stretched), a four-state excitatory post-synaptic current read-out, and an anti-Hebbian \STDP{} window with a biologically realistic time constant of \SIrange{85}{90}{\milli\second}. The two memory regimes were given a mechanistic account in terms of the mobility asymmetry between the weakly coordinated triflate anion and the strongly coordinated lithium cation within the oxygen-rich host, framed by hard--soft acid--base reasoning. This is the one device in the thesis for which the full suite is treated as primary evidence, and it remains validated by independent peer review~\cite{PradoSocorro2022}.
+
+\paragraph{A reproducibility diagnosis and a provenance methodology (\cref{ch:bridge}).} The scaling of that exemplar into a fabrication programme exposed a reproducibility crisis: successive batches of nominally identical \Hybrane{} devices drifted from low-current, high-area, multi-level behaviour toward a high-conductivity response with no usable switching window. Under four mandatory controls --- per-device weighting, a standard-protocol corpus, sweep-amplitude matching, and recovery-tail sensitivity --- the collapse was established as a quantitative, multi-feature signal anchored to a documented behavioural inflection (on--off ratio falling from \num{2.44} to \num{1.21}, normalized hysteresis area from \num{0.235} to \num{0.027}, and potentiation flipping from $+\SI{17.9}{\percent}$ to $-\SI{2.1}{\percent}$ at \SI{3}{\volt}), with an accompanying drift toward ohmic conduction at a matched \SI{1.2}{\volt}. Crucially, the failure was localised to the fabrication line over calendar time, not to finished devices --- \Hybrane{} \emph{devices} hold their characteristics over weeks --- and attributed to aging of the \Hybrane{} reagent stock (with \SY{} eliminated), under a moisture-driven hydrolytic-aging hypothesis supported by an annealing-recovery test. The crisis was resolved by switching to a poly(ethylene oxide) host, which both opened a wider window (normalized area \num{0.26}~$\to$~\num{0.42} at matched \SI{3}{\volt}) and, decisively, sustained a usable switching window across roughly two and a half years with no stock-driven collapse. The lasting dividend was methodological: a fabrication-provenance standard, a normalized characterization procedure, an automated feature pipeline, and trend-discovery tooling --- the same apparatus that produced every quantitative result in the chapters that followed.
+
+\paragraph{Compositional and chemical control of the dynamics (\cref{ch:comparative}).} On the \PEO{} platform, the volatile dynamics were shown to be controllable through a hierarchy of levers, established through the three common dynamical measurements (I--V hysteresis, variable-number-of-pulses potentiation, variable-delay depotentiation). The strongest and only \emph{replicated} lever is composition: across the \SY{}/\PEO{}/\LiTf{}/Ag grid the fading-memory time is tunable over roughly \SIrange{2}{20}{\second}, with the switching window and potentiation strength moving in concert (more ion-transport polymer yields a weaker, faster-relaxing device). Electrolyte chemistry --- host (\PEO{} vs \TMPE{}) and anion (triflate vs TFSI) --- extends the range further but is reported only illustratively; the cation, which the \cref{ch:poc} mechanism had nominated as the controlling variable, proved the weakest and least legible lever, and the \ce{Li+}>\ce{Na+}>\ce{K+} ordering is reported as an honest negative (``not demonstrated in this archive''), confounded with host, anion, and drive protocol at the available power. Two further results frame how the dynamics must be read: a \emph{methodological} one --- the drive amplitude co-sets the apparent timescale, so cross-device comparison demands a matched protocol --- and a \emph{microscopic} one --- equilibrium impedance falls along the composition axis and tracks the fading-memory time, with ATR, XRD, and UV-Vis localising the host effect to short-range ether order in an X-ray-amorphous, salt-dissolved film while leaving the \SY{} optical gap unshifted. The device-to-device spread is reframed throughout as a \emph{resource}: the per-device design space couples fading memory and input nonlinearity through the \PEO{} fraction, so a substrate must be assembled from a \emph{bank} of compositions rather than tuned to a single optimum.
+
+\paragraph{A temporal-computing demonstration from measured dynamics (\cref{ch:temporal}).} Finally, compact behavioural models ($\phi \otimes \lambda \otimes f$) fitted to the \cref{ch:comparative} measurements, read out by a single linear regression, were shown in simulation to perform genuine temporal computing. On the task-agnostic benchmark tier the device banks are competent reservoirs: a heterogeneous composition bank raises the total linear memory capacity from \num{4.2} to \num{6.4} (a factor of $1.54 \pm 0.10$; Wilcoxon $p=0.002$ over ten seeds) and the total information-processing capacity from \num{7.1} to \num{11.6}, with a nonzero nonlinear capacity in even the homogeneous bank confirming that the compressive write supplies real nonlinear computation. On real physiological streams the heterogeneous bank improves multi-lag temporal-context reconstruction, and on the \WESAD{} affective corpus the reservoir classifies stress at a leave-one-subject-out macro-F1 of \num{0.894} (binary) and \num{0.758} (three-class streaming). The chapter is equally disciplined about where heterogeneity does \emph{not} help: timescale diversity does not separably improve final-label classification when a single slow timescale already dominates the task, and that null is reported with error bars rather than omitted. The unifying design rule emerges here: composition and drive set the device timescale, the application selects it, fading memory is the active ingredient, and a spread of timescales is a measurable resource for memory breadth.
+
+%% ------------------------------------------------------------
+\section{Answers to the Thesis Questions}\label{sec:concl_questions}
+%% ------------------------------------------------------------
+
+The front-matter roadmap posed three groups of questions. Each can now be answered, with the qualifications the evidence demands.
+
+\paragraph{First --- realising and understanding an exemplar.} \emph{Can a fully reversible \twoterminal{} organic memristive device be made from a solution-processed polymer-electrolyte composite, supporting the full set of synaptic functions, and can its two memory regimes be explained by cation--anion mobility asymmetry?} Yes, on both counts, for the \cref{ch:poc} exemplar: the device is fabricated by solution processing and thermal evaporation alone and demonstrates analogue switching, distinguishable \STM{}/\LTM{}, an EPSC response, and \STDP{}; the two-timescale retention is consistently accounted for by the differential displacement and relaxation of the mobile triflate anion and lithium cation. The mechanistic account is a coherent and well-supported \emph{hypothesis} on the strength of a single fully characterised device, not a law established across a population.
+
+\paragraph{Second --- composition as the quantitative lever, with chemistry as a sample-limited landscape.} \emph{How do the dynamics depend on composition, and does moving the cation along the \ce{Li+}, \ce{Na+}, \ce{K+} series shift the timescale as coordination chemistry suggests?} The composition dependence is real, replicated, and monotone: the \PEO{}/\LiTf{} ratio tunes the fading-memory time over roughly an order of magnitude, with window and potentiation strength tracking it. The cation question is answered in the negative-as-tested: no robust \ce{Li+}>\ce{Na+}>\ce{K+} ordering survives the available power and the protocol/electrode confounds, so coordination chemistry is retained as a qualitative organising idea but explicitly not advanced as a transferable quantitative law. Reporting this as a null --- rather than presuming the ordering the \cref{ch:poc} mechanism would predict --- is itself one of the more important outcomes of the comparative chapter.
+
+\paragraph{Third --- utility for temporal computing.} \emph{Can the volatile response be exploited for temporal computation; can composition supply task-matched timescales while chemistry and device spread populate a heterogeneous bank; and can variability contribute to computation rather than merely degrade it?} Yes, within the in-silico scope of \cref{ch:temporal}: composition supplies a family of fading-memory times that natively overlap the bands of peripheral affective signals, the heterogeneous bank measurably broadens memory and information-processing capacity, and device-to-device variability is shown to be a contributor to memory breadth rather than only a defect. The honest boundary on this answer is that heterogeneity is a resource \emph{where the task needs timescale breadth}; for a single-timescale task the lead composition alone is optimal, and on the downstream \WESAD{} label task the heterogeneity advantage is not separable. The affirmative answer is therefore specific and bounded, not universal.
+
+%% ------------------------------------------------------------
+\section{Benchmarking Against the Right Reference Class}\label{sec:concl_benchmark}
+%% ------------------------------------------------------------
+
+A device that forgets in seconds is a poor non-volatile memory and should not be measured against one. The framing decision that runs through the thesis --- volatile, heterogeneous temporal elements rather than defective memory cells --- carries a corresponding choice of benchmark: not the retention, endurance, and bit-density figures of DRAM, SRAM, or crossbar ReRAM, but the metrics and substrates of temporal and event-driven neuromorphic computing~\cite{Roy2019,IndiveriLiu2015,Tanaka2019}.
+
+\paragraph{Against physical reservoirs.} Physical reservoir computing has been demonstrated in dynamic memristors~\cite{Du2017,Zhong2021}, organic electrochemical devices~\cite{Cucchi2021}, and delay-coupled single nodes~\cite{Appeltant2011}, and is unified by the requirement of fading memory plus nonlinearity on a single substrate~\cite{Tanaka2019,Maass2002LSM}. The devices of this thesis meet that requirement on their own measured terms: they exhibit certified fading memory and a genuine, IPC-resolved nonlinear capacity, and they do so in the slow, sub-kilohertz band where many physiological and environmental signals natively live --- a regime in which fast inorganic reservoirs must artificially slow their input but in which these composites operate without time-rescaling. The distinctive contribution relative to that literature is not a record benchmark score but the \emph{chemical programmability of the timescale}: where most physical reservoirs offer a fixed intrinsic dynamic, here the fading-memory time is a composition knob spanning \SIrange{2}{20}{\second}, so a heterogeneous bank can be \emph{designed} rather than merely tolerated. The measured $1.54\times$ memory-capacity broadening quantifies what that programmability buys.
+
+\paragraph{Against organic neuromorphic devices.} Within organic electronics the dominant device narrative has pursued the opposite goal --- linear, symmetric, \emph{non-volatile} conductance updates for in-memory weight storage, as in the electrochemical ENODe family~\cite{VanDeBurgt2017,VanDeBurgt2018,Fuller2019}. Measured as a weight memory, the present devices are inferior on every axis those works optimise. Measured as temporal elements they occupy a complementary niche: the controlled forgetting that the ENODe programme suppresses is exactly the resource exploited here. The thesis thus contributes a worked example of the alternative organic-neuromorphic design target --- ion-relaxation timescales as compute, not retention to be maximised --- alongside the ionic/electrolyte-gating line of organic neuromorphics~\cite{Gkoupidenis2017,Cucchi2021}.
+
+\paragraph{Honest placement.} Two caveats keep this benchmarking sober. First, the application-level scores are in silico: they establish that the \emph{measured dynamics} are computationally sufficient, not that a wired array reaches them. Second, the reservoir architecture used is deliberately the hard case --- a bank of independent, non-recurrent nodes --- so the absolute \NARMA{} errors are high and the capacities sit well below the node-count bound; a recurrent or delay-feedback topology would raise them. The claim is therefore one of \emph{demonstrated sufficiency of the device physics under conservative assumptions}, which is the appropriate claim for a thesis whose evidence base is a measured archive rather than a fabricated reservoir chip.
+
+%% ------------------------------------------------------------
+\section{Limitations of the Evidence Base}\label{sec:concl_limitations}
+%% ------------------------------------------------------------
+
+The contributions above are bounded by limitations that the body chapters state in place and that are gathered here so that the reader leaves with an accurate map of what is and is not established.
+
+\begin{enumerate}
+  \item \textbf{The rich synaptic suite is single-device.} EPSC, separated \STM{}/\LTM{} retention, \STDP{}, and impedance-as-primary-evidence exist only for the \cref{ch:poc} \Hybrane{} device. They function as lithium-device priors and sanity checks in the later chapters and were not lifted to comparative status across the \PEO{} family.
+
+  \item \textbf{Only composition is replicated.} The quantitative spine is the \SY{}/\PEO{}/\LiTf{}/Ag composition grid. The host, anion, and cation comparisons rest on one or two screened devices per matched cell and are illustrative; the electrode contrast (active silver vs inert gold) is likewise illustrative and partly confounded with fabrication generation. No powered material law --- in particular no \ce{Li+}>\ce{Na+}>\ce{K+} ordering --- is claimed.
+
+  \item \textbf{Protocol-specific timescales.} Because the drive amplitude co-sets the apparent fading-memory time, absolute retention values are protocol-specific, and the supra-threshold read used in the comparative corpus differs from the sub-threshold read of the proof-of-concept device.
+
+  \item \textbf{The composition assumption behind the models.} Pulse integration and forgetting were characterised \emph{separately}, at different write amplitudes (potentiation at \SI{3}{\volt}, decay at \SI{4}{\volt}) and a single inter-pulse cadence. Composing them in the behavioural models assumes the two regimes are compatible; this is an explicit modelling assumption, not a measured fact, and it is the most consequential gap for \cref{ch:temporal}.
+
+  \item \textbf{The application results are in silico and single-corpus.} Every temporal-computing claim is a simulation of measured device models read out by linear regression; no wired reservoir was built. The affective results rest on a single corpus (\WESAD{}), and the central heterogeneity-versus-label result is a reported null.
+
+  \item \textbf{Material stability remains open.} Devices were characterised unencapsulated on a $\sim$\SI{300}{\hour} ambient shelf scale; cycling endurance, read-disturb under continuous pulsing, and long-run drift under encapsulation were not systematically studied, and device ageing was not modelled in the comparative corpus.
+\end{enumerate}
+
+%% ------------------------------------------------------------
+\section{Outlook and Future Directions}\label{sec:concl_outlook}
+%% ------------------------------------------------------------
+
+The limitations map directly onto a forward programme, ordered here from the most immediate experimental closures to the longer-horizon device and application goals.
+
+\paragraph{Close the composition assumption.} The single most valuable bench experiment is a matched-amplitude pulse train that sweeps pulse count \emph{and} inter-pulse interval together, on one composition, electrode, and read protocol. It would convert the integration-and-forgetting composition assumption of \cref{ch:comparative,ch:temporal} from a modelling premise into measured fact, and is the precondition for trusting the behavioural models beyond their present scope.
+
+\paragraph{Power the chemistry landscape.} A dedicated cation series in a single host and anion, at a fixed protocol and electrode, with a sub-threshold read and at least three replicates per cell, would convert the illustrative host/anion/cation landscape into a powered comparison and settle the \ce{Li+}>\ce{Na+}>\ce{K+} question that this thesis could only report as a null. A chemistry- and bias-resolved impedance study, and a generation-controlled silver-versus-gold electrode split, would do the same for the microscopic and electrode levers.
+
+\paragraph{Confirm the degradation chemistry.} The moisture-driven hydrolytic-aging hypothesis for the \Hybrane{} stock (\cref{ch:bridge}) remains open, and may never fully close because it concerns a consumable that no longer exists in its aged state; FTIR, GPC, Karl-Fischer/TGA, and EIS on retained aged-versus-fresh stock are the experiments that would confirm or refute it, and the lesson --- pin and archive reagent provenance --- is already embedded in the methodology.
+
+\paragraph{Engineer the host and salt for finer timescale control.} Chemical tailoring of the polyether host and the salt is the natural route to extending the accessible fading-memory window --- in particular toward the minutes-scale tonic band that composition alone does not reach --- and to decoupling the memory time from the input nonlinearity that composition currently couples.
+
+\paragraph{Stabilise for long-run inference.} Encapsulation strategies and a systematic ageing, endurance, and read-disturb study are required before air-stable, continuously operating temporal inference is credible, and would also remove the uncontrolled ageing variable from the comparative corpus.
+
+\paragraph{Build the hardware reservoir.} The decisive step beyond this thesis is to replace the in-silico bank with wired, composition-diverse \PEO{}/\LiTf{} devices and an on-chip linear read-out, integrated toward a 1T1M-style array. A task-matched physical reservoir on an affective stream would close the gap between a faithful device model and a physical temporal computer, and would test the heterogeneity-as-resource claim in hardware rather than in simulation.
+
+\paragraph{Toward nervetronic interfaces.} Finally, the combination of solution processability, mechanical flexibility, biocompatible chemistry, and native operation in the seconds-to-tens-of-seconds band points to wearable, skin-conformal sensing-and-inference at the edge, where the device's controlled forgetting is matched to the timescales of the physiological signals it would process.
+
+%% ------------------------------------------------------------
+\section{Closing Remarks}\label{sec:concl_closing}
+%% ------------------------------------------------------------
+
+The thesis began from a reframing: that a memristive device which forgets at a controlled rate should not be judged as a failed memory but used as a temporal element. Following that reframing through has required building a device and understanding its mechanism (\cref{ch:poc}), confronting and surviving a reproducibility crisis that forced a measurement methodology into existence (\cref{ch:bridge}), establishing composition as the quantitative handle on the volatile dynamics while reporting the chemistry as the sample-limited landscape it honestly is (\cref{ch:comparative}), and demonstrating that the measured dynamics are computationally sufficient for real temporal tasks (\cref{ch:temporal}). What ties these together is a single, evidence-graded claim: the chemistry of a polymer-electrolyte composite is a design knob on its fading-memory timescale, and a heterogeneous bank of such timescales is a resource for computing on time. The device is no longer vulnerable to the standard objection that it makes a poor non-volatile memory, because being a good non-volatile memory was never the point. The remaining work --- a matched-amplitude protocol, a powered chemistry series, and above all a hardware reservoir --- is the work of turning a measured sufficiency into a built temporal computer, and it is left, with its methodology in hand, to what comes next.
 
 %% ---- Standalone close (skipped when \include'd from thesis.tex) ----
 \ifdefined\thesismode
