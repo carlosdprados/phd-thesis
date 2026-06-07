@@ -33,22 +33,33 @@ Standing author corrections (Rev 2–4):
 3. **Sweep-amplitude match.** A 0→+X→0 loop excites the device more at larger X, so it conducts more even when read at the same voltage; amplitude is confounded with date *and* material. Confine within-Hybrane trends to a **tightly matched ~1.2 V band** (the standard corpus sweeps at discrete 0.6/1.0/1.2/2.6/3.0 V; 1.0–1.45 V is the matched low-V probe). Draw the Hybrane↔PEO contrast at matched ~3 V.
 4. **Recovery-tail sensitivity.** Report every trend with and without the last months (≥2022-03), the deliberately-reverted recovery batches.
 
-### 1B. Degradation panel — standard corpus, matched ~1.2 V, per-device (Spearman vs date)
+### 1B. Read each feature at the amplitude where it is *expressed*
 
-| Feature (family) | all dates | drop recovery tail | verdict |
+A subtle but decisive point: **window features (on-off ratio, normalized area) only open up at high sweep amplitude.** At ~1.2 V they sit near unity for *every* device (early or late) and cannot show a collapse; they must be read in the **~3 V stratum**. Conductivity features are read in the matched **~1.2 V** band. And because the notes place a behavioural **inflection at NM_v026 (2021-04-22)**, the window collapse is a step there — tested as **early (≤Apr 2021) vs later** (Mann-Whitney), which is more faithful and more powerful than a whole-campaign correlation.
+
+**HEADLINE — switching-window collapse at ~3 V (standard corpus, per-device, pre/post inflection):**
+
+| Feature | early (≤Apr 2021) | later | Mann-Whitney |
 |---|---|---|---|
-| current at max V (conductivity) | ρ=+0.45, p=0.0002 | ρ=+0.55, p<0.0001 | **robust ↑** |
-| raw area V·µA (conductivity) | ρ=+0.57, p<0.0001 | ρ=+0.69, p<0.0001 | **robust ↑** |
-| current diff at on-off (conductivity) | ρ=+0.51, p<0.0001 | ρ=+0.63, p<0.0001 | **robust ↑** |
-| % change in max-V current (potentiation) | ρ=−0.27, p=0.031 | ρ=−0.33, p=0.010 | **robust ↓** |
-| normalized area (window) | ρ=−0.29, p=0.020 | ρ=−0.18, p=0.18 | real but **tail-driven** |
-| on-off ratio (window) | ρ=−0.26, p=0.036 | ρ=−0.16, p=0.24 | real but **tail-driven** |
-| `is saturated` (health) | ρ=+0.27, p=0.033 | ρ=+0.15, p=0.26 | weak/tail-driven |
-| `is broken` (health) | ρ=−0.40, p=0.001 | ρ=−0.59, p<0.0001 | **NOT a degradation metric** |
+| on-off ratio | **2.44** (n=10) | **1.21** (n=42) | **p=0.0019** |
+| normalized area | **0.235** | **0.027** | **p=0.0005** (~9×) |
+| % change in max-V current (potentiation) | **+17.9 %** | **−2.1 %** | **p=0.013** |
 
-**Reading (the mature story):** as the Hybrane stock aged, the composite drifted toward **more ohmic conduction** — absolute current and hysteresis-current rise within tightly matched amplitude (so this is material, not the sweep change), strengthening when the recovery tail is dropped — *and simultaneously lost its ability to potentiate* (% change in max-V current falls; successive sweeps no longer build up conductance). The **normalized switching window** (normalized area, on-off) shrinks too but that significance is carried by the recovery-tail devices, so report it as supporting, not headline. **`is broken` decreases** over time — it tracks early electrode-contact/handling problems that the team fixed (the notes are full of them), so it is *not* a Hybrane-degradation indicator; the right health metric is `is saturated` (fails-to-potentiate), which rises. This corrects the initial expectation that "broken %" worsened.
+on-off → ~1.2 *and* normalized area → ~0.03 *and* potentiation flipping positive→negative are the **same functional event**: the device loses its switching window and therefore its potentiation capability (the author's point — no on-off ratio ⇒ no potentiation ⇒ ruined device). This matches the recollection of "~2.5 early → 1–1.7 later" and is anchored to the documented inflection. (Pixel-info cross-check: on-off 2.33→1.26.)
 
-Why Rev 4 wrongly called conductivity confounded: it used a single-point `conductance at max V` on the *all-corpus, pixel-pooled* data. On the **standard corpus, per-device, with integrated loop metrics**, the conductivity rise is unambiguous and amplitude-matched.
+**MECHANISM — ohmic drift at matched ~1.2 V (per-device Spearman vs date; strengthens dropping the recovery tail):**
+
+| Feature | all dates | drop recovery tail |
+|---|---|---|
+| current at max V | ρ=+0.45, p=0.0002 | ρ=+0.55, p<0.0001 |
+| raw area V·µA | ρ=+0.57, p<0.0001 | ρ=+0.69, p<0.0001 |
+| current diff at on-off | ρ=+0.51, p<0.0001 | ρ=+0.63, p<0.0001 |
+
+Absolute current rises within tightly matched amplitude (so it is material aging, not the sweep change): the composite drifts toward more ohmic conduction. Window collapse (relative hysteresis →0) + ohmic drift (absolute current ↑) are two faces of the same degradation.
+
+**Health flags:** `is broken` *decreases* over time (ρ=−0.40, p=0.001) — it tracks early electrode-contact/handling problems the team fixed (the notes are full of them), so it is **not** a Hybrane-degradation metric; the right one is `is saturated` (fails-to-potentiate), which rises (ρ=+0.27, p=0.03). This corrects the initial expectation that "broken %" worsened.
+
+Two earlier mis-calls now fixed: Rev 4 called conductivity "confounded" because it used a single-point `conductance at max V` on all-corpus pooled pixels; Rev 5 called the window decline "tail-driven" because it read window features at 1.2 V with a whole-campaign correlation. Read at the expressing amplitude with the pre/post-inflection contrast, **both the window collapse and the ohmic drift are strong and significant.**
 
 ### 1C. Resolution — PEO vs Hybrane at matched ~3 V (valid devices)
 
