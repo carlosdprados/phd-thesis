@@ -4,7 +4,7 @@
 
 PhD thesis repository of **Carlos David Prado-Socorro** at the Institute of Molecular Science (ICMol), Universitat de Valencia.
 
-[Read the current thesis draft](exports/thesis.pdf) | [Introduction](exports/chapter1_introduction.pdf) | [Proof-of-concept chapter](exports/chapter2_proof_of_concept.pdf) | [Comparative chapter](exports/chapter3_comparative.pdf) | [Temporal-computing chapter](exports/chapter4_temporal.pdf)
+[Read the current thesis draft](exports/thesis.pdf) | [Introduction](exports/chapter1_introduction.pdf) | [Proof-of-concept chapter](exports/chapter2_proof_of_concept.pdf) | [Bridge chapter](exports/chapter3_bridge.pdf) | [Comparative chapter](exports/chapter4_comparative.pdf) | [Temporal-computing chapter](exports/chapter5_temporal.pdf) | [Conclusions](exports/chapter6_conclusions.pdf)
 
 ## Thesis In Brief
 
@@ -39,10 +39,10 @@ The working physical hypothesis was that memory timescale is linked to ion trans
 - `Na+`: intermediate behaviour
 - `K+`: weaker coordination and shorter fading-memory timescales
 
-The current Chapter 3 draft keeps that HSAB argument as qualitative framing, but the archive does **not** support a robust host- and anion-independent `Li > Na > K` ordering. The defensible quantitative result is the composition dependence in the `PEO/LiOTf` grid; chemistry beyond that is explicitly sample-limited.
+The comparative chapter keeps that HSAB argument as qualitative framing, but the archive does **not** support a robust host- and anion-independent `Li > Na > K` ordering. The defensible quantitative result is the composition dependence in the `PEO/LiOTf` grid; chemistry beyond that is explicitly sample-limited.
 
 <p align="center">
-  <img src="figures/chapter1/ch1_fig12_polymer_electrolyte_chemistry.png" alt="Polyether coordination chemistry, ion-transport modes, and the cation-timescale hypothesis tested in Chapter 3" width="100%">
+  <img src="figures/chapter1/ch1_fig12_polymer_electrolyte_chemistry.png" alt="Polyether coordination chemistry, ion-transport modes, and the cation-timescale hypothesis tested in the comparative chapter" width="100%">
 </p>
 
 ## Thesis Roadmap
@@ -51,9 +51,10 @@ The current Chapter 3 draft keeps that HSAB argument as qualitative framing, but
 | --- | --- | --- |
 | 1. Introduction | Computing bottlenecks, synaptic inspiration, memristors, organic materials, and the polymer-electrolyte strategy | Draft available |
 | 2. Proof of concept | A fully characterised `SY/Hybrane/LiOTf` two-terminal device with analogue switching, short- and long-term retention, EPSC-like response, and STDP | Draft available |
-| 3. Comparative study | How **composition** (the `PEO/LiOTf` grid) tunes volatile dynamics — switching, potentiation, and fading memory — and how electrolyte **chemistry** shifts them further as sample-limited side evidence | Draft available |
-| 4. Temporal computing | Data-driven reservoir simulations from Chapter 3 parameter cards: memory-capacity/NARMA benchmarks, WESAD physiological temporal-context reconstruction, and WESAD affective-computing demonstrations; coincidence detection is cut and filter-bank logic is folded into the reservoir framing | Draft available |
-| 5. Conclusions | Contributions, limitations, and future directions | Planned |
+| 3. Reproducibility and provenance bridge | Diagnoses the `Hybrane` reproducibility collapse, documents the fabrication-provenance methodology, and motivates the transition to the `PEO` platform | Draft available |
+| 4. Comparative study | How **composition** (the `PEO/LiOTf` grid) tunes volatile dynamics — switching, potentiation, and fading memory — and how electrolyte **chemistry** shifts them further as sample-limited side evidence | Draft available |
+| 5. Temporal computing | Data-driven reservoir simulations from Chapter 4 parameter cards: memory-capacity/NARMA benchmarks, WESAD physiological temporal-context reconstruction, and scoped WESAD affective-classification demonstrations | Draft available |
+| 6. Conclusions | Contributions, limitations, and future directions | Draft available |
 
 The proof-of-concept chapter expands the published work:
 
@@ -78,6 +79,10 @@ The chapter files compile both independently and as part of the complete thesis.
 ```sh
 make chapter1       # build/chapters/chapter1_introduction.pdf
 make chapter2       # build/chapters/chapter2_proof_of_concept.pdf
+make chapter3       # build/chapters/chapter3_bridge.pdf
+make chapter4       # build/chapters/chapter4_comparative.pdf
+make chapter5       # build/chapters/chapter5_temporal.pdf
+make chapter6       # build/chapters/chapter6_conclusions.pdf
 make thesis         # build/thesis.pdf
 make all            # build chapters and thesis
 make exports        # refresh committed PDF snapshots
