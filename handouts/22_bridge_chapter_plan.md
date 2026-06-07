@@ -69,6 +69,26 @@ Normalized area **0.26 (Hy, n=10) → 0.42 (PEO, n=19)**, Mann-Whitney **p=0.018
 
 **Hybrane stock (firm):** SY eliminated (old/new SY no significant change; new SY kept being bought); the colleague's one-off ITO guess was not borne out. Use `DEVICES_LIBRARY.csv` for true dates (`UPDATED_…` coarsens to month). The mechanism — drift to ohmic conduction + loss of potentiation — matches the notes' *"old low-current, high-area, multi-level"* → *"high-conductivity, undesirable"* transition.
 
+### 1E. Mechanistic hypothesis (include as a clearly-labelled hypothesis, ~½ page)
+
+The chapter should offer a *candidate chemistry*, not a proven one — the rest of the thesis is mechanistic, so a black-box "the stock went bad" is a gap a jury will probe; but a definitive answer is **not supportable** (no EIS on any Hybrane device — verified 0 rows; no GPC/NMR/Karl-Fischer of the stock; the aged stock no longer exists). Frame strictly as hypothesis + the experiments that would confirm it.
+
+**Leading hypothesis — moisture-driven hydrolytic aging of the hyperbranched polyester-amide Hybrane stock.** Hybrane is ester/amide-rich and strongly hygroscopic; over ~a year in the bottle it takes up water and slowly hydrolyses (chain scission). This accounts for *all* the measured signatures:
+
+- **Ohmic drift** (current ↑ at matched 1.2 V): absorbed water + polar scission products raise baseline ionic/leakage conductivity and plasticise the matrix.
+- **Window + potentiation collapse** (on-off → ~1.2, area → ~0.03, %ΔI → −2 %): memristance needs a matrix stiff enough to *hold* a field-displaced ionic profile (the Ch2 metastable-polarisation picture). A plasticised, lower-MW, water-laden host relaxes/leaks, so the loop closes and successive sweeps stop building up.
+- *(secondary)* acidic hydrolysis products could partially **dope the PPV-type Super Yellow**, adding a fixed irreversible conductance — another route to "high-conductivity, undesirable."
+
+**Internal support already in hand:**
+
+1. **Annealing recovery (quantified, suggestive).** Among late (degraded-era) devices, aggressive **150 °C annealing restores the 3 V window** — on-off median **1.95 (n=6) vs 1.22 (n=44)** standard-75 °C late, **Mann-Whitney p=0.024**, back to ~early-standard level (1.74). Driving off absorbed water / re-densifying the film is the natural explanation; a handling-only or inert-stock story does not predict this. *(Caveat: n=6, co-varying tweaks, 2 devices had measurement-pin issues — present as suggestive.)*
+2. The full **electrical signature** (ohmic drift + window/potentiation collapse) is the textbook fingerprint of a water-plasticised, ion-leaky film.
+3. The **material class** (hyperbranched polyester-amide) is hydrolytically labile and hygroscopic by construction.
+
+**Confirming experiments to list as future work / SI:** FTIR (ester C=O loss, –OH growth) and GPC (MW drop) on *retained aged vs fresh* stock; Karl-Fischer / TGA for water content; EIS to show Rion fell. None were run on the Hybrane corpus, so the hypothesis stays open — and, honestly, may never fully close because it concerns a consumable that no longer exists in its aged state.
+
+Reproduced by the `mechanism_annealing_recovery` block of `scripts/bridge_hybrane_peo_reproducibility.py`.
+
 ---
 
 ## 2. The campaign as documented in the notes (primary qualitative source)
