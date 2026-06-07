@@ -1,0 +1,39 @@
+%% ============================================================
+%%  Chapter 6 — Conclusions and Outlook
+%%
+%%  Author      : Carlos David Prado-Socorro
+%%  Institution : ICMol, Universitat de València
+%%
+%%  Stub reserved during the 6-chapter renumber (bridge chapter
+%%  inserted as Chapter 3). Compiles standalone or \include'd
+%%  from thesis.tex (guarded by \thesismode, as the chapters are).
+%% ============================================================
+
+%% ---- Standalone preamble (skipped when \include'd from thesis.tex) ----
+\ifdefined\thesismode\else
+  \documentclass[12pt, twoside]{report}
+  \usepackage{thesis-format}
+  \addbibresource{../bibliography/references.bib}
+  \begin{document}
+  \setcounter{chapter}{5}     % This is Chapter 6 when built standalone
+\fi
+
+%% ============================================================
+\chapter{Conclusions and Outlook}\label{ch:conclusions}
+%% ============================================================
+
+% TODO: draft the closing chapter. It should bring together the device-chemistry
+% axis (\cref{ch:poc}, \cref{ch:bridge}, \cref{ch:comparative}) and the
+% application axis (\cref{ch:temporal}), benchmark the work against temporal,
+% reservoir, and event-driven neuromorphic hardware, and state the limitations
+% of the evidence base.
+
+\noindent\emph{Chapter under construction.}
+
+%% ---- Standalone close (skipped when \include'd from thesis.tex) ----
+\ifdefined\thesismode
+  \endinput
+\fi
+
+\printbibliography[heading=bibintoc, title={References}]
+\end{document}

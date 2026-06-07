@@ -6,7 +6,7 @@
 %%
 %%  Thesis-level roadmap placed before Chapter 1. It states the
 %%  problem, the device idea, the evidence hierarchy, and the
-%%  five-chapter structure. Compiles standalone or \include'd
+%%  six-chapter structure. Compiles standalone or \include'd
 %%  from thesis.tex (guarded by \thesismode, as the chapters are).
 %% ============================================================
 
@@ -34,8 +34,8 @@ The thesis builds this argument on a deliberately graded evidence hierarchy, and
 
 \begin{itemize}
   \item \textbf{A fully characterised exemplar (Chapter~2).} A single proof-of-concept Super~Yellow/Hybrane/lithium-triflate device is characterised with the complete synaptic measurement suite---current--voltage hysteresis, potentiation and depression, excitatory post-synaptic current, separated short- and long-term retention, and spike-timing-dependent plasticity---and given a mechanistic interpretation in terms of cation--anion mobility asymmetry.
-  \item \textbf{A replicated composition spine with a sample-limited chemical landscape (Chapter~3).} A poly(ethylene oxide)-based corpus is built under a common protocol. Its quantitative spine is a \emph{replicated} composition series; host, anion, and cation substitutions are reported as an explicitly sample-limited chemical-tuning landscape, not as powered material laws. In particular, the \ce{Li+}\,>\,\ce{Na+}\,>\,\ce{K+} cation ordering is treated as a hypothesis to be tested, not assumed.
-  \item \textbf{An in-silico temporal-computing demonstration from measured dynamics (Chapter~4).} Compact behavioural models extracted from the Chapter~3 measurements are used in reservoir-computing simulations, with heterogeneity claimed only where the simulations support it and negative controls (including the affective-label null on real physiological streams) reported explicitly.
+  \item \textbf{A replicated composition spine with a sample-limited chemical landscape (Chapter~4).} A poly(ethylene oxide)-based corpus is built under a common protocol. Its quantitative spine is a \emph{replicated} composition series; host, anion, and cation substitutions are reported as an explicitly sample-limited chemical-tuning landscape, not as powered material laws. In particular, the \ce{Li+}\,>\,\ce{Na+}\,>\,\ce{K+} cation ordering is treated as a hypothesis to be tested, not assumed.
+  \item \textbf{An in-silico temporal-computing demonstration from measured dynamics (Chapter~5).} Compact behavioural models extracted from the Chapter~4 measurements are used in reservoir-computing simulations, with heterogeneity claimed only where the simulations support it and negative controls (including the affective-label null on real physiological streams) reported explicitly.
 \end{itemize}
 
 \section*{Open Questions and Objectives}
@@ -63,17 +63,19 @@ These questions translate into six ordered objectives:
 \section*{Structure of the Thesis}
 \label{subsec:outline}
 
-The thesis is organised in five chapters that follow this objective list.
+The thesis is organised in six chapters that follow this objective list.
 
 \paragraph{Chapter~1 --- Introduction.} Provides the conceptual and materials background, moving from the limits of conventional computing, through the biological synapse and the memristor, to the polymer-electrolyte composite adopted as the device strategy for the rest of the thesis.
 
 \paragraph{Chapter~2 --- Proof of Concept.} Reports the Super~Yellow/Hybrane/lithium-triflate device. It is the only device in the thesis for which the complete synaptic suite is treated as primary evidence, and it isolates the cation--host coordination chemistry that the comparative work then tests. The chapter is built on Prado-Socorro et al.~\cite{PradoSocorro2022}.
 
-\paragraph{Chapter~3 --- Compositional and Chemical Control.} Reformulates the proof-of-concept architecture on a PEO host loaded with alkali-metal triflates. Its quantitative spine is the replicated PEO/lithium-triflate composition grid; host, anion, and cation substitutions are reported as an illustrative, sample-limited chemical-tuning landscape rather than a powered Li/Na/K law. All claims rely on the same three common measurements.
+\paragraph{Chapter~3 --- Reproducibility, Degradation, and the Device-Provenance Methodology.} Documents the reproducibility crisis that ended the Hybrane fabrication line and motivated the switch to a PEO host. Under explicit controls (per-device weighting, a standard-protocol corpus, sweep-amplitude matching), it establishes the batch-over-time collapse of the Hybrane switching window, offers a moisture-driven hydrolytic-aging hypothesis for the host stock, and introduces the fabrication-provenance record, the normalized characterization procedure, and the automated feature pipeline that the remaining chapters rely on.
 
-\paragraph{Chapter~4 --- Data-Driven Temporal Computing.} Turns the experimental measurements into temporal-computing functionality. Compact behavioural models extracted from the Chapter~3 dynamics drive reservoir-computing simulations: memory-capacity and NARMA-style benchmarks, WESAD physiological-context reconstruction, and WESAD affective-computing demonstrations, with heterogeneity claimed where supported and nulls reported honestly.
+\paragraph{Chapter~4 --- Compositional and Chemical Control.} Reformulates the proof-of-concept architecture on a PEO host loaded with alkali-metal triflates. Its quantitative spine is the replicated PEO/lithium-triflate composition grid; host, anion, and cation substitutions are reported as an illustrative, sample-limited chemical-tuning landscape rather than a powered Li/Na/K law. All claims rely on the same three common measurements.
 
-\paragraph{Chapter~5 --- Conclusions and Outlook.} Brings together the device-chemistry axis and the application axis, benchmarks the work against temporal, reservoir, and event-driven neuromorphic hardware, and states the limitations of the evidence base.
+\paragraph{Chapter~5 --- Data-Driven Temporal Computing.} Turns the experimental measurements into temporal-computing functionality. Compact behavioural models extracted from the Chapter~4 dynamics drive reservoir-computing simulations: memory-capacity and NARMA-style benchmarks, WESAD physiological-context reconstruction, and WESAD affective-computing demonstrations, with heterogeneity claimed where supported and nulls reported honestly.
+
+\paragraph{Chapter~6 --- Conclusions and Outlook.} Brings together the device-chemistry axis and the application axis, benchmarks the work against temporal, reservoir, and event-driven neuromorphic hardware, and states the limitations of the evidence base.
 
 %% ---- Standalone close (skipped when \include'd from thesis.tex) ----
 \ifdefined\thesismode

@@ -19,7 +19,7 @@
   \usepackage{thesis-format}
   \addbibresource{../bibliography/references.bib}
   \begin{document}
-  \setcounter{chapter}{3}     % This is Chapter 4 when built standalone
+  \setcounter{chapter}{4}     % This is Chapter 5 when built standalone
 \fi
 
 %% --- Shared macros (\providecommand: harmless if an earlier chapter declared them) ---
@@ -88,7 +88,7 @@ The first tier of evidence is deliberately task-agnostic. Two capacity measures 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.66\linewidth]{../figures/chapter4/mc_curve.pdf}
-  \caption[Memory capacity versus delay: heterogeneity broadens memory]{Linear memory capacity $\mathrm{MC}_k$ as a function of delay $k$ for a homogeneous bank (all \PEO{} 0.3/0.09 nodes) versus a heterogeneous composition bank ($\tau\approx 3$--$26$\,s). The heterogeneous bank broadens recoverable memory across lags, raising total memory capacity from $4.2$ to $6.4$ (a $1.54\times$ increase; Wilcoxon $p=0.002$ over ten seeds), with the gain concentrated at short-to-intermediate lags. Shaded bands are $\pm 1$\,SD over ten random input/bank seeds. $N=24$ leaky nodes, random uniform input, linear (ridge) read-out; in-silico devices built from the Chapter~3 parameter cards.}
+  \caption[Memory capacity versus delay: heterogeneity broadens memory]{Linear memory capacity $\mathrm{MC}_k$ as a function of delay $k$ for a homogeneous bank (all \PEO{} 0.3/0.09 nodes) versus a heterogeneous composition bank ($\tau\approx 3$--$26$\,s). The heterogeneous bank broadens recoverable memory across lags, raising total memory capacity from $4.2$ to $6.4$ (a $1.54\times$ increase; Wilcoxon $p=0.002$ over ten seeds), with the gain concentrated at short-to-intermediate lags. Shaded bands are $\pm 1$\,SD over ten random input/bank seeds. $N=24$ leaky nodes, random uniform input, linear (ridge) read-out; in-silico devices built from the \Cref{ch:comparative} parameter cards.}
   \label{fig:ch4_mc_curve}
 \end{figure}
 
@@ -138,7 +138,7 @@ Affective computing --- the recognition of human emotional and physiological sta
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.82\linewidth]{../figures/chapter4/tau_coverage.pdf}
-  \caption[Device timescales versus affective-signal bands]{The Chapter~3-to-Chapter~4 bridge as a picture. Each \PEO{}/\LiTf{} composition cell is placed at its measured fading-memory time $\tau$ (markers, lower track) on the same logarithmic time axis as the characteristic timescale bands of the peripheral affective signals (coloured bars; \cref{tab:ch4_bands}). The composition grid ($\tau\approx 3$--$26$\,s) spans the phasic-EDA, respiration and HRV bands, with the lead cell \PEO{}~0.3/0.09 (orange) sitting in the slow LF-HRV band. The tonic, minutes-scale band is not reached by composition alone (shaded gap) and would require the drive-amplitude knob of \cref{ch:comparative} or a slower future cell. This is the visual form of the design rule: an application selects a timescale, and performance follows from how well the device family covers it.}
+  \caption[Device timescales versus affective-signal bands]{The \Cref{ch:comparative}-to-\Cref{ch:temporal} bridge as a picture. Each \PEO{}/\LiTf{} composition cell is placed at its measured fading-memory time $\tau$ (markers, lower track) on the same logarithmic time axis as the characteristic timescale bands of the peripheral affective signals (coloured bars; \cref{tab:ch4_bands}). The composition grid ($\tau\approx 3$--$26$\,s) spans the phasic-EDA, respiration and HRV bands, with the lead cell \PEO{}~0.3/0.09 (orange) sitting in the slow LF-HRV band. The tonic, minutes-scale band is not reached by composition alone (shaded gap) and would require the drive-amplitude knob of \cref{ch:comparative} or a slower future cell. This is the visual form of the design rule: an application selects a timescale, and performance follows from how well the device family covers it.}
   \label{fig:ch4_tau_coverage}
 \end{figure}
 
@@ -217,7 +217,7 @@ The final tier is the downstream task itself: classifying affective state from t
 \paragraph{Why heterogeneity does not pay off on the labels.} The null is not a failure of the devices but a property of the task. Affect labels are slowly varying, sustained states; their discriminative memory demand is dominated by a single slow, tonic band that the lead composition's relaxation time ($\tau \approx 19$--$26$\,s) already serves. Timescale heterogeneity converts into task performance only when the target requires memory at many distinct lags \emph{simultaneously} --- which the memory-capacity benchmark (\cref{fig:ch4_mc_curve}) and the physiological-context reconstruction (\cref{tab:ch4_physio}) both demand, and on which heterogeneity does pay, but which a single sustained label set does not. The honest reading, carried into \cref{sec:ch4_designrules}, is that the devices do real affective computing, that fading memory helps, and that composition-timescale \emph{matching} is the operative design lever --- with heterogeneity a generality and robustness hedge rather than a guaranteed win on any one label set.
 
 %% ------------------------------------------------------------
-\section[Design Rule: Matching Timescale to Task]{Design Rule: Matching Timescale to Task --- Judging the Chapter~3 Findings Against the Application}\label{sec:ch4_designrules}
+\section[Design Rule: Matching Timescale to Task]{Design Rule: Matching Timescale to Task --- Judging the Comparative-Chapter Findings Against the Application}\label{sec:ch4_designrules}
 %% ------------------------------------------------------------
 
 \Cref{sec:ch4_benchmarks,sec:ch4_physio,sec:ch4_wesad} together close the loop opened in \cref{ch:comparative}. That chapter showed that composition --- and, as a methodological corollary, drive amplitude --- \emph{sets} the fading-memory timescale of these devices. This chapter shows the other half of the design rule: an application \emph{selects} a timescale, or a set of timescales, and performance follows from how well the device family covers them --- the matching read directly off \cref{fig:ch4_tau_coverage}. The composition sweep makes the rule concrete in one direction (\cref{fig:ch4_composition_sweep}): the lead cell is the memory-capacity optimum because its relaxation time best matches a single seconds-scale target, which is the regime of Demonstration~A. The multi-lag results make it concrete in the other (\cref{tab:ch4_physio}): when the target spans bands that no single cell covers, the bank whose timescales are \emph{spread} to match them is the best single choice.
@@ -250,7 +250,7 @@ The claims of this chapter are bounded by scope conditions that are stated here 
 \paragraph{A single dataset, and an honest null.} The affective results rest on one corpus (\WESAD{}). The central negative result --- that timescale heterogeneity does not separably improve final-label classification --- is reported with error bars across seeds and sampling intervals rather than omitted, because it is informative: it localises exactly where heterogeneity helps and where it does not.
 
 %% ------------------------------------------------------------
-\section{Conclusions and Bridge to Chapter~5}\label{sec:ch4_conclusions}
+\section{Summary and Bridge to the Conclusions}\label{sec:ch4_conclusions}
 %% ------------------------------------------------------------
 
 This chapter has shown that a bank of solution-processed polymer-electrolyte memristors, characterised through nothing more than the three common measurements of \cref{ch:comparative}, performs genuine temporal computing. Reduced to compact, measured behavioural models and read out by a single linear regression, the devices reach competitive scores on the standard memory-capacity and \NARMA{} reservoir benchmarks, encode the multi-lag temporal context of real physiological signals, and classify affective state from the \WESAD{} corpus at a leave-one-subject-out macro-F1 of $0.894$ on a binary stress task and $0.758$ on a three-class streaming task.
