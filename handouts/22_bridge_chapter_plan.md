@@ -61,9 +61,14 @@ Absolute current rises within tightly matched amplitude (so it is material aging
 
 Two earlier mis-calls now fixed: Rev 4 called conductivity "confounded" because it used a single-point `conductance at max V` on all-corpus pooled pixels; Rev 5 called the window decline "tail-driven" because it read window features at 1.2 V with a whole-campaign correlation. Read at the expressing amplitude with the pre/post-inflection contrast, **both the window collapse and the ohmic drift are strong and significant.**
 
-### 1C. Resolution — PEO vs Hybrane at matched ~3 V (valid devices)
+### 1C. Resolution — why PEO (the positive turn of the story)
 
-Normalized area **0.26 (Hy, n=10) → 0.42 (PEO, n=19)**, Mann-Whitney **p=0.018**; on-off **2.45→4.91**. PEO restored a wider window — evidence-based pivot. **No reproducibility-CV claim** (CVs equal at matched 3 V — that earlier gap was amplitude pooling).
+Two distinct, both-defensible wins (and a clear statement of what "reproducible" means here):
+
+1. **Better features (wider/stronger window).** At matched ~3 V, valid devices: normalized area **0.26 (Hy) → 0.42 (PEO)**, Mann-Whitney **p=0.018**; on-off **2.45 → 4.91**.
+2. **Temporal reproducibility — the actual crisis solution.** PEO/Ag sustained a *usable* switching window across **~2.5 years** (2022→2024, n=46): on-off @3 V median **2.61** (yearly 3.3 / 2.6 / 1.9, no significant trend, ρ=−0.21 p=0.16). Hybrane sat at **1.35** after its stock-driven collapse to ~1.2. PEO simply did **not** exhibit the supply-degradation failure — that is the reproducibility win.
+
+**Be precise about "reproducible":** it is *temporal/batch* reproducibility (no stock collapse over years), **not** a within-batch device-to-device CV claim — at matched 3 V the CVs are only modestly different (PEO 0.38 vs Hy 0.47). Do not over-state CV; lead on temporal stability + window magnitude.
 
 ### 1D. Attribution & data notes
 
@@ -112,19 +117,17 @@ The Characterization/Fabrication notes trace the whole investigation. Anchor dat
 
 ---
 
-## 3. Infrastructure to credit (the ~18 months, made visible)
+## 3. The methodological legacy — the positive turn, carried forward
 
-Frame as the methodological backbone consumed by **both** later chapters, not biography (≤2 pp):
+This is a **forward-looking, positive** beat, not just credit for past effort: the crisis *forced* a methodological apparatus into existence, and that apparatus became the standard machinery for the entire rest of the thesis (Ch3 comparative, Ch4 temporal) and the group beyond. Frame it as "the crisis paid a lasting dividend." (≤2 pp.) Five durable outputs:
 
-- **DEVICES_LIBRARY** — the 88-column per-device fabrication-provenance schema *exists because* the crisis forced pinning every variable (storage atmosphere, light, baby-chamber, SY lot, cyclohexanone lot, operator, evaporation profile, free-text notes). It is the instrument that made the diagnosis possible.
-- **project_feature_extraction** (~6 mo) — raw Keithley → `DATABASE/DEVICES_<TYPE>_{DEVICE,PIXEL,CURVE}_INFO.csv`; the curve-level `is_broken`/`is_saturated` flags and every feature in the §1B panel come from here.
-- **project_feature_explorer** — Dash app that joins library metadata (Date, Components Group, metal, annealing, mass ratios, notes) onto any feature table for interactive feature-vs-date / batch-vs-batch exploration; **this is the tool with which the author originally identified the degradation trends**, and the §1 controls reproduce its slicing programmatically.
-- **project_device_cleaner** — Streamlit curation → `FILTERED_DEVICES.csv` (the per-device visual review that Ch3 already relies on).
-- **scripts_general/visualization_tools** — the timeline/`chemvar` viewers behind the contemporaneous degradation diagnosis.
-- **project_graphmaker** — thesis-figure generator.
-- Canonical as-built description already in repo: `docs/experimental_archive_and_pipeline.md`.
+- **A fabrication-provenance standard — DEVICES_LIBRARY.** The 88-column per-device schema *exists because* the crisis forced pinning every variable (storage atmosphere, light, baby-chamber, SY/cyclohexanone lot, operator, evaporation profile, free-text notes). It made the diagnosis possible and is now the permanent record for every device.
+- **A normalized electrical-characterization procedure.** A hard lesson of §1A/§1C is that *protocol sets the response* (sweep amplitude, pulse/read scheme). The campaign converged on fixed, documented protocols (the HYST/PULSES/DELAYTIME schemes used throughout Ch3/Ch4) so that devices and batches are finally comparable — the methodological precondition for the comparative chapter.
+- **A data pipeline for hundreds–thousands of tests — project_feature_extraction** (~6 mo): raw Keithley → `DATABASE/DEVICES_<TYPE>_{DEVICE,PIXEL,CURVE}_INFO.csv`; every feature in the §1B panel and in Ch3/Ch4 comes from here.
+- **Visualization / trend-discovery tools — project_feature_explorer** (Dash; the tool with which the trends were originally found; §1 controls reproduce its slicing), **project_device_cleaner** (Streamlit curation → `FILTERED_DEVICES.csv`), and **scripts_general/visualization_tools** (timeline/`chemvar` viewers). These turn the archive into discoverable trendlines.
+- **project_graphmaker** — thesis-figure generation. Canonical as-built description: `docs/experimental_archive_and_pipeline.md`.
 
-Framing line: *"The diagnosis required instrumentation that did not exist; building it is itself a contribution — and it is the same instrumentation that produces every quantitative result in the comparative and temporal-computing chapters that follow."*
+Framing line: *"The diagnosis required instrumentation that did not exist; building it — provenance capture, a normalized characterization procedure, an automated feature pipeline, and trend-discovery tooling — is itself a contribution, and it is the same instrumentation that produces every quantitative result in the comparative and temporal-computing chapters that follow."* So the Hybrane failure is, in the end, what made the rest of the thesis measurable.
 
 ---
 
@@ -132,9 +135,9 @@ Framing line: *"The diagnosis required instrumentation that did not exist; build
 
 1. **The reproducibility problem.** Scientific question, not confession: the Ch2 proof-of-concept was validated, but as the campaign scaled the memristive hysteresis became progressively harder to obtain — successive batches collapsed toward high-conductivity, low-area behaviour. Anchor on the v026 inflection.
 2. **Was it us or the materials? A controlled elimination.** Compact **methods-of-elimination table** (one row per tested cause from §2 → test → verdict). This is where the provenance library is *motivated*. Include the Lorenzo cross-person corroboration.
-3. **The quantitative degradation signal.** Open with the four controls (§1A) as the chapter's *methodological backbone* — per-device weighting (pixels/device fell 16→2), standard-protocol corpus, amplitude match, tail sensitivity — then present the §1B panel: **conductivity rises** (current/area, robust, amplitude-matched) and **potentiation falls** (% change in max-V current, robust) as the headline; normalized-window shrinkage as tail-driven support; explicitly note that **`broken %` is not a degradation metric** (it tracks handling, and improved). Mechanism: drift toward ohmic conduction with loss of pulse-to-pulse build-up.
-4. **The resolution: switch to PEO.** The Hybrane→PEO contrast at **matched ~3 V** (F3): wider window, normalized area 0.26→0.42 (p=0.018), on-off 2.45→4.91. Evidence-based pivot. **No reproducibility-CV claim** (confounded). Attribution: Hybrane stock (SY eliminated).
-5. **The infrastructure that made the diagnosis possible** (§3) — methods-foundation framing; forward-points to the comparative + temporal chapters.
+3. **The quantitative degradation signal.** Open with the four controls (§1A) as the chapter's *methodological backbone* (per-device weighting — pixels/device fell 16→2; standard-protocol corpus; amplitude match; tail sensitivity). Headline = **switching-window + potentiation collapse at 3 V** (on-off 2.44→1.21, normalized area 0.235→0.027, %ΔI +18%→−2%; §1B); **mechanism** = ohmic drift at matched 1.2 V (current/area rise); **chemical hypothesis** = §1E (moisture-driven hydrolytic stock aging) with the annealing-recovery test. Note `broken %` is a handling metric, not degradation.
+4. **The resolution: why PEO (the positive turn).** Two wins (§1C): **better features** — wider window at matched 3 V (area 0.26→0.42, p=0.018; on-off 2.45→4.91); and **temporal reproducibility** — PEO sustained a usable window (on-off ~2.6) across ~2.5 years (2022–2024) with no stock-driven collapse, which is the crisis solved. State "reproducible" precisely (temporal/batch, not within-batch CV). Attribution: Hybrane stock (SY eliminated).
+5. **The methodological legacy carried forward (§3).** The crisis's lasting dividend: the provenance standard (DEVICES_LIBRARY), the normalized characterization procedure, the feature pipeline, and the trend-discovery tooling — the same apparatus that produces every quantitative result in the comparative and temporal-computing chapters. Frame as the positive going-forward beat, not biography.
 6. **Reconciliation with Chapter 2 + bridge to the comparative study** (§6 below).
 
 ---
