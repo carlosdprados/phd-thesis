@@ -1,13 +1,13 @@
-block,feature,n,rho,p,family,rho_drop_tail,p_drop_tail,narea_median,onoff_median,mannwhitney_p
-C1_pixels_vs_date,number_pixels_measured,65.0,-0.8,1.22e-15,,,,,,
-degradation_panel,current at max v (uA),64.0,0.447,0.0002,conductivity,0.55,0.0,,,
-degradation_panel,area (V*uA),64.0,0.572,0.0,conductivity,0.686,0.0,,,
-degradation_panel,current difference at on-off (uA),64.0,0.513,0.0,conductivity,0.631,0.0,,,
-degradation_panel,percent change in max v current (%),64.0,-0.27,0.0311,potentiation,-0.329,0.0104,,,
-degradation_panel,normalized area,64.0,-0.29,0.02,window,-0.177,0.1766,,,
-degradation_panel,on-off ratio,64.0,-0.262,0.0363,window,-0.155,0.2382,,,
-degradation_panel,is saturated,64.0,0.268,0.0325,health,0.148,0.2581,,,
-degradation_panel,is broken,64.0,-0.399,0.0011,health,-0.593,0.0,,,
-resolution_matched3V,Hybrane,10.0,,,,,,0.264,2.447,
-resolution_matched3V,PEO,19.0,,,,,,0.416,4.907,
-resolution_matched3V,Hy_vs_PEO_MWU,,,,,,,,,0.0181
+block,feature,n,rho,p,n_early,median_early,n_later,median_later,mwu_p,rho_drop_tail,p_drop_tail,narea_median,onoff_median,mannwhitney_p
+C1_pixels_vs_date,number_pixels_measured,65.0,-0.8,1.22e-15,,,,,,,,,,
+window_collapse_3V,on-off ratio,,,,10.0,2.437,42.0,1.213,0.0019,,,,,
+window_collapse_3V,normalized area,,,,10.0,0.235,42.0,0.027,0.0005,,,,,
+window_collapse_3V,percent change in max v current (%),,,,10.0,17.878,42.0,-2.086,0.0134,,,,,
+ohmic_drift_1p2V,current at max v (uA),64.0,0.447,0.0002,,,,,,0.55,0.0,,,
+ohmic_drift_1p2V,area (V*uA),64.0,0.572,0.0,,,,,,0.686,0.0,,,
+ohmic_drift_1p2V,current difference at on-off (uA),64.0,0.513,0.0,,,,,,0.631,0.0,,,
+health_flags,is broken,64.0,-0.399,0.0011,,,,,,,,,,
+health_flags,is saturated,64.0,0.268,0.0325,,,,,,,,,,
+resolution_matched3V,Hybrane,10.0,,,,,,,,,,0.264,2.447,
+resolution_matched3V,PEO,19.0,,,,,,,,,,0.416,4.907,
+resolution_matched3V,Hy_vs_PEO_MWU,,,,,,,,,,,,,0.0181

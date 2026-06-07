@@ -22,13 +22,20 @@ FOUR CONTROLS, all required (each was shown to matter against the data):
       a year in, plus composition variants) which would otherwise contaminate
       the feature-vs-date story.
 
-  C3  Sweep-amplitude stratification. A 0->+X->0 loop with larger X excites the
-      device more, so it conducts more even when read back at the same voltage.
-      Amplitude is confounded with date AND material; analysis is confined to a
-      tightly matched ~1.2 V band (the sensitive low-V probe).
+  C3  Sweep-amplitude stratification, AND read each feature at the amplitude
+      where it is physically expressed. A 0->+X->0 loop with larger X excites the
+      device more, so it conducts more even when read back at the same voltage;
+      amplitude is confounded with date AND material. Crucially, the *window*
+      features (on-off ratio, normalized area) only open up at high amplitude --
+      at ~1.2 V they sit near unity for every device and cannot show a collapse --
+      so they must be read in the ~3 V stratum; the *conductivity* features are
+      read in the tightly matched ~1.2 V band.
 
-  C4  Recovery-tail sensitivity. Results are reported with and without the last
-      months (>= 2022-03), the deliberately-reverted "recovery" batches.
+  C4  Pre/post-inflection contrast + recovery-tail sensitivity. The notes place
+      the behavioural inflection at NM_v026 (2021-04-22); window collapse is a
+      step at that point, so it is tested as early(<=Apr 2021) vs later
+      (Mann-Whitney), which is more faithful than a whole-campaign correlation.
+      Trends are also checked dropping the recovery batches (>= 2022-03).
 
 broken != saturated:  broken = erratic/open-circuit (a contact/handling failure);
 saturated = a curve whose max current is BELOW the previous curve's (fails to
@@ -101,45 +108,64 @@ def main():
     rows.append(dict(block="C1_pixels_vs_date", feature="number_pixels_measured",
                      n=len(d), rho=round(float(rho), 3), p=float(f"{p:.2e}")))
 
-    # ---- Degradation panel: standard corpus, matched ~1.2 V, per-device ----
+    # ---- Degradation: read each feature at its expressing amplitude --------
     cur = pd.read_csv(os.path.join(DB, "DEVICES_HYST_CURVE_INFO.csv"), low_memory=False)
     cur = cur[cur["device_name"].isin(set(std["device_name"]))].copy()
     cur["date"] = cur["device_name"].map(date)
     mv = pd.to_numeric(cur["max voltage (V)"], errors="coerce")
-    cur12 = cur[(mv >= 1.0) & (mv <= 1.45)].copy()
-    print(f"\nStandard corpus n={std['device_name'].nunique()} devices; "
-          f"matched ~1.2 V curves n={len(cur12)} on {cur12['device_name'].nunique()} devices "
-          f"(span {std['Date'].min().date()}..{std['Date'].max().date()})")
+    cur12 = cur[(mv >= 1.0) & (mv <= 1.45)].copy()   # conductivity probe
+    cur3 = cur[(mv >= 2.6) & (mv <= 3.4)].copy()     # window probe
+    print(f"\nStandard corpus n={std['device_name'].nunique()} devices "
+          f"(span {std['Date'].min().date()}..{std['Date'].max().date()}); "
+          f"~1.2V curves n={len(cur12)}, ~3V curves n={len(cur3)}")
 
-    panel = [
-        ("current at max v (uA)", 0, "conductivity"),
-        ("area (V*uA)", 0, "conductivity"),
-        ("current difference at on-off (uA)", 0, "conductivity"),
-        ("percent change in max v current (%)", 0, "potentiation"),
-        ("normalized area", 0, "window"),
-        ("on-off ratio", 0, "window"),
-        ("is saturated", 1, "health"),
-        ("is broken", 1, "health"),
-    ]
+    INFL = pd.Timestamp("2021-05-01")  # post-NM_v026 inflection (2021-04-22)
+
+    def early_late(df, col, binary=False):
+        d = df.copy()
+        if binary:
+            d = d.assign(_v=d[col].astype(str).str.upper().eq("Y"))
+        else:
+            d = d.dropna(subset=[col]).assign(_v=pd.to_numeric(d[col], errors="coerce"))
+        fd = d.groupby("device_name")["day"].transform("min"); d = d[d["day"] == fd]
+        agg = "mean" if binary else "median"
+        pdv = d.groupby("device_name").agg(date=("date", "first"), y=("_v", agg)).dropna()
+        e = pdv[pdv["date"] < INFL]["y"]; l = pdv[pdv["date"] >= INFL]["y"]
+        if len(e) < 3 or len(l) < 3:
+            return None
+        _, p = stats.mannwhitneyu(e, l, alternative="two-sided")
+        return len(e), float(e.median()), len(l), float(l.median()), float(p)
+
     print("\n" + "=" * 74)
-    print("Degradation panel (per-device, standard corpus, matched ~1.2 V)")
-    print("  feature [family]                            all dates     |   drop recovery tail")
+    print("Window collapse at ~3 V  (pre-inflection <=Apr2021  vs  later; per-device)")
     print("-" * 74)
-    for col, binary, fam in panel:
-        a = per_device_freshest(cur12, col, date, binary=binary)
-        b = per_device_freshest(cur12, col, date, binary=binary, cutoff=TAIL)
-        def fmt(r):
-            return "n/a" if r is None else f"n={r[0]:2d} rho={r[1]:+.3f} p={r[2]:.4f}"
-        print(f"  {col:34s}[{fam:12s}] {fmt(a):24s} | {fmt(b)}")
-        if a:
-            rows.append(dict(block="degradation_panel", feature=col, family=fam,
-                             n=a[0], rho=round(a[1], 3), p=round(a[2], 4),
-                             rho_drop_tail=(round(b[1], 3) if b else None),
-                             p_drop_tail=(round(b[2], 4) if b else None)))
-    print("\n  Reading: conductivity features RISE (material goes ohmic) and potentiation")
-    print("  FALLS robustly (survive tail drop); normalized window shrinks but is tail-driven;")
-    print("  'is broken' DECREASES (handling/contacts improved) -> NOT a Hybrane-degradation")
-    print("  metric; 'is saturated' (fails-to-potentiate) rises weakly.")
+    for col in ["on-off ratio", "normalized area", "percent change in max v current (%)"]:
+        r = early_late(cur3, col)
+        if r:
+            print(f"  {col:34s}: early(n={r[0]:2d}) {r[1]:+.3f}  ->  later(n={r[2]:2d}) {r[3]:+.3f}   MWU p={r[4]:.4f}")
+            rows.append(dict(block="window_collapse_3V", feature=col, n_early=r[0], median_early=round(r[1], 3),
+                             n_later=r[2], median_later=round(r[3], 3), mwu_p=round(r[4], 4)))
+    print("  on-off ratio -> ~1.2 and normalized area -> ~0.03 means the switching window")
+    print("  (hence potentiation capability) collapses post-inflection; % change in max-V")
+    print("  current flips positive->negative (devices stop potentiating).")
+
+    print("\n" + "=" * 74)
+    print("Ohmic drift at matched ~1.2 V  (per-device Spearman vs date; +/- recovery tail)")
+    print("-" * 74)
+    for col in ["current at max v (uA)", "area (V*uA)", "current difference at on-off (uA)"]:
+        a = per_device_freshest(cur12, col, date)
+        b = per_device_freshest(cur12, col, date, cutoff=TAIL)
+        print(f"  {col:34s}: all rho={a[1]:+.3f} p={a[2]:.4f}  |  drop-tail rho={b[1]:+.3f} p={b[2]:.4f}")
+        rows.append(dict(block="ohmic_drift_1p2V", feature=col, n=a[0], rho=round(a[1], 3), p=round(a[2], 4),
+                         rho_drop_tail=round(b[1], 3), p_drop_tail=round(b[2], 4)))
+
+    print("\n  Health flags (per-device, ~1.2V): 'is broken' DECREASES over time (handling/")
+    print("  contacts improved -> NOT a degradation metric); 'is saturated' (fails-to-")
+    print("  potentiate) rises. Reported for completeness:")
+    for col in ["is broken", "is saturated"]:
+        a = per_device_freshest(cur12, col, date, binary=True)
+        print(f"    {col:14s}: rho={a[1]:+.3f} p={a[2]:.4f} (n={a[0]})")
+        rows.append(dict(block="health_flags", feature=col, n=a[0], rho=round(a[1], 3), p=round(a[2], 4)))
 
     # ---- Resolution: PEO vs Hybrane window at matched ~3 V -----------------
     print("\n" + "=" * 74)
