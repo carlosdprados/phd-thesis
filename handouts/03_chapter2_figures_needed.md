@@ -60,7 +60,7 @@ This document lists all figures referenced in `chapter2_proof_of_concept.tex` wi
 ### `fig:npulse`
 
 **Label:** `\label{fig:npulse}`  
-**Caption (suggested):** Dependence of conductance change (ΔG = G_f/G₀ × 100%) on the number of applied write pulses ($N_\mathrm{pulses}$) for $V_\mathrm{write}$ = 1 V and $t_\mathrm{wait}$ = 150 ms. The monotonically increasing relationship plotted on a logarithmic pulse-number axis demonstrates analog potentiation controllable over more than three decades of pulse count. The shaded region indicates the standard deviation of measurements across multiple independent devices.  
+**Caption (suggested):** Dependence of conductance change (ΔG = G_f/G₀ × 100%) on the number of applied write pulses ($N_\mathrm{pulses}$) for $V_\mathrm{write}$ = 1 V and $t_\mathrm{wait}$ = 150 ms. The monotonically increasing relationship plotted on a logarithmic pulse-number axis demonstrates analog potentiation controllable over more than three decades of pulse count. The shaded region indicates the standard deviation across five independent crossbar pixels on the NM_v055 substrate.  
 **Source:** Figure 3c of Prado-Socorro et al. *Adv. Electron. Mater.* 2022, 8, 2101192.  
 **File path (suggested):** `figures/ch2_fig5_npulse.pdf`
 
@@ -69,7 +69,7 @@ This document lists all figures referenced in `chapter2_proof_of_concept.tex` wi
 ### `fig:retention`
 
 **Label:** `\label{fig:retention}`  
-**Caption (suggested):** Memory retention kinetics. Conductance ratio (G_f/G₀ × 100%) as a function of waiting time $t_\mathrm{wait}$ for STM (1 V, 10 and 50 pulses, blue/red) and the longer-lived regime conventionally denoted LTM (3 V, 10 pulses, black). Solid lines are fits to the modified Kohlrausch stretched exponential function (Eq. 2.1). Characteristic times: $\tau_S$ = 2.5–3 s (STM); $\tau_L$ = 4.7 s (LTM). Operational retention: 10–15 s (STM); >45 s (LTM).  
+**Caption (suggested):** Memory retention kinetics. Conductance ratio (G_f/G₀ × 100%) as a function of waiting time $t_\mathrm{wait}$ for STM (1 V, 10 and 50 pulses, blue/red) and the longer-lived regime conventionally denoted LTM (3 V, 10 pulses, black). Solid lines are the standard-exponential fits reported in the SI: $\tau_S$ = 2.57 s and 3.01 s for the two STM traces, and $\tau_L$ = 4.73 s for the LTM trace. Operational retention: 10–15 s (STM); >45 s (LTM).  
 **Source:** Figure 3d of Prado-Socorro et al. *Adv. Electron. Mater.* 2022, 8, 2101192.  
 **File path (suggested):** `figures/ch2_fig6_retention.pdf`
 

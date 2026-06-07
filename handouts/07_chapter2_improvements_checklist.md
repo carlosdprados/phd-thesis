@@ -5,7 +5,7 @@
 **Author:** Carlos David Prado-Socorro  
 **Date:** 2026-06-02  
 **Status:** Actionable checklist. Each item records the problem, its location in `chapters/chapter2_proof_of_concept.tex`, the fix, and a done-criterion. Tiers are ordered by importance: **Tier 0** must be fixed before the chapter can be read as written; **Tier 1** are rigor/correctness issues a committee will challenge; **Tier 2** strengthen completeness; **Tier 3** are polish.  
-**Progress (2026-06-02 pass):** 12 of 18 items resolved and committed (all text/framing/arithmetic fixes plus figure scaffolding). The 6 remaining items are blocked on external experimental data or a pending decision — see the Resolution log below. After each fix, `make exports` was confirmed to exit 0.
+**Current progress (2026-06-07):** 16 of 18 items resolved. The archive review cleared the remaining Chapter 2 rigor blockers: the pulse-train reproducibility claim is now scoped to the recovered N=5 pixel population, and the retention model has been corrected to the standard exponential actually reported in the SI.
 
 > **Note on line numbers.** Line references reflect the state of the file at audit time (2026-06-02) and will drift as edits land. Each item also names the `\label` or section it lives in — anchor on that if the line number no longer matches.
 
@@ -25,10 +25,10 @@
 | Tier | Theme | Items | Done | Remaining |
 |------|-------|-------|------|-----------|
 | 0 | Blocking — chapter non-functional | 1 | 1 | 0 |
-| 1 | Rigor / correctness | 7 | 6 | 1 (1.7) |
-| 2 | Completeness / strengthening | 6 | 3 | 3 (2.1, 2.4, 2.6) |
+| 1 | Rigor / correctness | 7 | 7 | 0 |
+| 2 | Completeness / strengthening | 6 | 4 | 2 (2.1, 2.6) |
 | 3 | Polish | 4 | 4 | 0 |
-| **Total** | | **18** | **14** | **4** |
+| **Total** | | **18** | **16** | **2** |
 
 ---
 
@@ -45,11 +45,11 @@ All resolved items were committed individually, each gated on a clean `make expo
 | 1.4 | ☑ Done | `fix(chapter2): reconcile EPSC read-out bias…` | +1 V EPSC bias clarified as the state-defining read-out, distinct from the 0.5 V probe. |
 | 1.5 | ☑ Done | `fix(chapter2): use signed current-ratio notation…` | `R_n = I_{Sn}/I_{S0}`; conductance no longer written negative. |
 | 1.6 | ☑ Done | `fix(chapter2): separate cycling endurance…` | Section retitled "Ambient Shelf Stability"; endurance flagged uncharacterised. |
-| 1.7 | ☐ **BLOCKED (needs data)** | — | Device/batch N for every RSD/error-band; cannot be fabricated. |
+| 1.7 | ☑ Done | `fix(chapter2): qualify reproducibility and retention fits` | Pulse-train population recovered as five independent crossbar pixels on NM_v055; unsupported EPSC-RSD and batch-RSD claims removed. |
 | 2.1 | ☐ **PARTIAL** | (figures via 0.1) | Eight main floats scaffolded; importing the AFM/profilometry/degradation SI data + plots still pending. |
 | 2.2 | ☑ Done | `docs(chapter2): complete CrossRef audit…` (2026-06-03) | All 59 keys verified real & correctly attributed. 53 done by automated DOI→CrossRef diff + 6 earlier. 2 books (`Hebb1949`, `Gray1991`) retyped `@article`→`@book`. See 2026-06-03 addendum. |
 | 2.3 | ☑ Done | `fix(chapter2): correct first-author attribution…` | "Malliaras 2010" → "Zakhidov 2010" in the comparison table. |
-| 2.4 | ☐ **BLOCKED (needs data)** | — | Stretch exponent β and fit quality from the actual retention fits. |
+| 2.4 | ☑ Done | `fix(chapter2): qualify reproducibility and retention fits` | SI fits are standard exponential (β fixed to 1); no free β or R² was reported, so the chapter no longer claims a Kohlrausch barrier-distribution fit. |
 | 2.5 | ☑ Done | `docs(chapter2): frame ED/ECD timescale assignment…` | Marked a working interpretation with a Ch.3-testable consequence. |
 | 2.6 | ☐ **PARTIAL** | — | Chirality wording ("clockwise") **verified correct** for forward>return in Q1 → no change; the within-sweep vs across-sweep reconciliation needs the real `fig:iv_hyst`. |
 | 3.1 | ☑ Done | `style(chapter2): reduce repetition of the carried-forward handoff` | Intro role paragraph and comparison recap de-duplicated. |
@@ -57,7 +57,7 @@ All resolved items were committed individually, each gated on a clean `make expo
 | 3.3 | ☑ Done | `docs(chapter2): make the STDP fit explicitly piecewise…` | Per-branch fit in absolute delay with branch-specific `A_±`, `τ_±`. |
 | 3.4 | ☑ Done | `docs(chapter2): distinguish Li+ site binding energy…` | Well-depth vs migration-barrier disambiguated. |
 
-**What is needed to clear the remaining five.** 1.7 and 2.4 need the per-device statistics and retention-fit parameters from the experimental archive. (2.2 — full CrossRef audit — is now **done**; see the 2026-06-03 addendum.) 2.1 needs the SI datasets brought in (and folds into the real-figure effort that finishes 0.1). 2.6 needs the plotted I–V data to confirm the within/across-sweep description. 1.2 needs your decision on the STDP polarity label.
+**What remains.** 2.1 needs the SI support datasets brought into the thesis itself (AFM/profilometry/degradation plots, folded into the real-figure replacement for the current placeholders). 2.6 needs the plotted I--V data to reconcile the within-sweep versus across-sweep description in the final `fig:iv_hyst`.
 
 ---
 
@@ -144,11 +144,12 @@ A separate read flagged five claims that lacked a citation. Closing them surface
 - **Fix:** Reframe the section as *shelf / operational stability* honestly, and explicitly list cycling endurance as not-yet-measured / future work — or add endurance data if it exists in the archive.
 - **Done when:** The section no longer promises an endurance metric it does not deliver.
 
-### ☐ 1.7 — State sample sizes (N) for every reproducibility claim — BLOCKED (needs device/batch N from the experimental archive)
+### ☑ 1.7 — State sample sizes (N) for every reproducibility claim — DONE
 
 - **Problem:** RSD <10% / <15% / <20%, "multiple independent devices," and the shaded error bands are all reported without N (devices/batches) or a definition of the band (SD vs SEM vs CI).
 - **Locations:** lines 228 (`subsec:npulse` band), 373–375 (`subsec:reproducibility`).
 - **Fix:** Add N for each statistic and define what the shaded band represents. Cross-check the same N in the `fig:npulse` caption.
+- **Resolution (2026-06-07):** The archive supports the pulse-train reproducibility claim with five independent crossbar pixels on the NM_v055 substrate. The chapter now defines the `fig:npulse` shaded band as one standard deviation over those five pixels and reports the actual low-pulse-count spread (median RSD 8.9%, maximum 11.8% for `N_pulses < 100`). The unsupported EPSC-RSD and batch-to-batch RSD claims were removed rather than back-filled.
 - **Done when:** Each statistical claim carries an explicit N and band definition.
 
 ---
@@ -177,12 +178,13 @@ A separate read flagged five claims that lacked a citation. Closing them surface
 - **Fix:** Choose the correct first-author attribution and use it in both places (and confirm against the verified bib entry from item 2.2).
 - **Done when:** The reference is attributed identically wherever it appears.
 
-### ☐ 2.4 — Report the stretch exponent β (and fit quality) for the retention fits — BLOCKED (needs β/fit values from the data)
+### ☑ 2.4 — Correct the retention fit model and report available fit parameters — DONE
 
-- **Problem:** The Kohlrausch stretched-exponential fit underpins the "distribution of activation barriers" argument, but only τ is reported; β is never given.
-- **Locations:** Eq. `eq:kohlrausch` (line 240) and the τ values at line 247.
-- **Fix:** Report β for STM and LTM conditions, with R² or equivalent goodness-of-fit. Add the same to the `fig:retention` caption.
-- **Done when:** β and fit quality are stated alongside τ.
+- **Problem:** The chapter described the published retention fits as Kohlrausch stretched exponentials and built a "distribution of activation barriers" interpretation on that wording, but the SI reports standard exponential fits only.
+- **Locations:** former Eq. `eq:kohlrausch` (line 240 at audit time; now corrected to `eq:retention_exp`) and the τ values at line 247.
+- **Fix:** Report the actual fit model and available parameters. If no β/R² exists in the SI, do not invent one.
+- **Resolution (2026-06-07):** The chapter now uses the standard-exponential equation reported in the SI, states that β is fixed at 1 in that model, gives the three SI time constants and offsets/amplitudes, and explicitly notes that no free β or goodness-of-fit statistic was reported for these proof-of-concept traces.
+- **Done when:** The retention fit model, available parameters, and missing fit-quality metadata are stated without overclaiming.
 
 ### ☑ 2.5 — Anchor the ED/ECD model assignment to evidence **[JUDGEMENT]** — DONE (framed as interpretation)
 
@@ -237,7 +239,7 @@ A separate read flagged five claims that lacked a citation. Closing them surface
 - ☑ `make chapter2` (standalone) builds with **no undefined references** to `fig:` labels and no new warnings. *(Verified: 0 undefined `fig:` refs; only the expected cross-chapter `ch:`/`subsec:` refs remain in standalone.)*
 - ☑ `make thesis` (full build) resolves all `\cref` to Chapter 1 (`ch:intro`, `subsec:*`) — these are expected-undefined only in the standalone build. *(Verified: full thesis build has 0 undefined references.)*
 - ☑ Every figure is cited in the text *before* it appears, and every caption matches the numbers in the body. *(Each float placed after its first citation; captions cross-checked against body.)*
-- ☐ All chapter numbers, ratios, τ/β values, and energies are internally consistent between text, equations, figure captions, and the summary list (`sec:ch2_summary`). *(Pending β from item 2.4.)*
+- ☑ All chapter numbers, ratios, τ/β values, and energies are internally consistent between text, equations, figure captions, and the summary list (`sec:ch2_summary`). *(Item 2.4 resolved by correcting the model to β=1 fixed for the published standard-exponential SI fits.)*
 - ☑ The comparison table (`tab:comparison`) author labels match the verified bibliography. *(Author label fixed in 2.3; full CrossRef verification done in item 2.2 on 2026-06-03 — all table keys confirmed, including "Liu 2016" and "Zakhidov 2010".)*
 
 ---
