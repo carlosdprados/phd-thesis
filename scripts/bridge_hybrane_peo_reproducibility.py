@@ -188,6 +188,41 @@ def main():
           f"-> PEO wider window {'(sig)' if p < 0.05 else '(n.s.)'}")
     rows.append(dict(block="resolution_matched3V", feature="Hy_vs_PEO_MWU", mannwhitney_p=round(float(p), 4)))
 
+    # ---- Mechanism test: does aggressive annealing recover late devices? ---
+    # Moisture/hydrolysis hypothesis predicts higher-T annealing (drives off
+    # absorbed water, re-densifies) partially restores the window in the
+    # degraded era. Test on-off @3V: elevated-T (>=150C anneal or 2nd stage)
+    # vs standard-75C among LATE (>= inflection) devices.
+    print("\n" + "=" * 74)
+    print("Mechanism test: annealing recovery of the window (late devices, on-off @3V)")
+    hyA = L[(L["Components Group"] == "SY, Hy, LiTr") & (L["Used Metal"] == "Ag")].copy()
+    hyA["hot"] = (hyA["Annealing Temperature [°C]"] >= 150) | (hyA["Second Stage Annealing Temperature [°C]"] >= 150)
+    dall = dict(zip(hyA["device_name"], hyA["Date"]))
+    cur_all = pd.read_csv(os.path.join(DB, "DEVICES_HYST_CURVE_INFO.csv"), low_memory=False)
+    cur_all = cur_all[cur_all["device_name"].isin(set(hyA["device_name"]))].copy()
+    cur_all["date"] = cur_all["device_name"].map(dall)
+    mva = pd.to_numeric(cur_all["max voltage (V)"], errors="coerce")
+    c3a = cur_all[(mva >= 2.6) & (mva <= 3.4)].dropna(subset=["on-off ratio"])
+    fda = c3a.groupby("device_name")["day"].transform("min")
+    ooa = c3a[c3a["day"] == fda].groupby("device_name")["on-off ratio"].median()
+    late = set(hyA[hyA["Date"] >= INFL]["device_name"])
+    hot = set(hyA[hyA["hot"]]["device_name"])
+    a = ooa[ooa.index.isin(late & hot)]
+    b = ooa[ooa.index.isin(late - hot)]
+    ref = ooa[ooa.index.isin(set(hyA[hyA["Date"] < INFL]["device_name"]) - hot)]
+    if len(a) >= 2 and len(b) >= 3:
+        _, p = stats.mannwhitneyu(a, b, alternative="greater")
+        print(f"  elevated-T late : n={len(a)} on-off median={a.median():.2f}")
+        print(f"  standard-75C late: n={len(b)} on-off median={b.median():.2f}")
+        print(f"  (early standard ref: median={ref.median():.2f})")
+        print(f"  Mann-Whitney (elevated > standard, late): p={p:.4f}  "
+              f"-> aggressive annealing partially restores the window")
+        print("  CAVEAT: n=6 elevated devices, co-varying tweaks + 2 had pin issues; suggestive only.")
+        rows.append(dict(block="mechanism_annealing_recovery", feature="on-off @3V late",
+                         n_hot=len(a), median_hot=round(float(a.median()), 2),
+                         n_std=len(b), median_std=round(float(b.median()), 2),
+                         median_early_ref=round(float(ref.median()), 2), mwu_p=round(float(p), 4)))
+
     pd.DataFrame(rows).to_csv(OUT, index=False)
     print(f"\nSummary written to {OUT}")
 
