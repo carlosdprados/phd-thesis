@@ -25,10 +25,10 @@
 | Tier | Theme | Items | Done | Remaining |
 |------|-------|-------|------|-----------|
 | 0 | Blocking — chapter non-functional | 1 | 1 | 0 |
-| 1 | Rigor / correctness | 7 | 5 | 2 (1.2, 1.7) |
+| 1 | Rigor / correctness | 7 | 6 | 1 (1.7) |
 | 2 | Completeness / strengthening | 6 | 3 | 3 (2.1, 2.4, 2.6) |
 | 3 | Polish | 4 | 4 | 0 |
-| **Total** | | **18** | **13** | **5** |
+| **Total** | | **18** | **14** | **4** |
 
 ---
 
@@ -40,7 +40,7 @@ All resolved items were committed individually, each gated on a clean `make expo
 |------|-------------|--------|------|
 | 0.1 | ☑ Done | `docs(chapter2): scaffold eight figure floats…` | Placeholder floats with final captions/labels; **drop in real plots** to finish. All `\cref{fig:…}` now resolve. |
 | 1.1 | ☑ Done | `fix(chapter2): reframe short-time conductance overshoot…` | "Momentum" replaced by continued redistribution / residual-field + doping-front. |
-| 1.2 | ☐ **DEFERRED** | — | STDP Hebbian vs anti-Hebbian: user undecided; terminology left untouched. |
+| 1.2 | ☑ Done | `fix(chapter2): align STDP polarity label` | Sign convention stated as Δt = t_post − t_pre; causal potentiation is labelled asymmetric Hebbian consistently in Chapter 2, Chapter 6, and the figure handout. |
 | 1.3 | ☑ Done | `fix(chapter2): correct energy-density area unit…` | ~6 fJ per µm² (was "per 100 nm²", off by 10⁴). |
 | 1.4 | ☑ Done | `fix(chapter2): reconcile EPSC read-out bias…` | +1 V EPSC bias clarified as the state-defining read-out, distinct from the 0.5 V probe. |
 | 1.5 | ☑ Done | `fix(chapter2): use signed current-ratio notation…` | `R_n = I_{Sn}/I_{S0}`; conductance no longer written negative. |
@@ -109,12 +109,12 @@ A separate read flagged five claims that lacked a citation. Closing them surface
 - **Fix:** Keep the post-tetanic-potentiation analogy, but replace the mechanism with a defensible one: continued diffusional redistribution / slow doping-front kinetics / RC (double-layer charging) relaxation. State it as the proposed cause, not "momentum."
 - **Done when:** No appeal to ionic inertia/momentum remains; the overshoot has a physically sound proposed origin.
 
-### ☐ 1.2 — Resolve the Hebbian / anti-Hebbian contradiction **[JUDGEMENT]** — DEFERRED (awaiting your decision)
+### ☑ 1.2 — Resolve the Hebbian / anti-Hebbian contradiction **[JUDGEMENT]** — DONE
 
-- **Problem:** The text defines pre-before-post (Δt<0) → potentiation, post-before-pre → depression — the classic **Hebbian** causal rule — yet labels the result "asymmetric anti-Hebbian" in two places. Internal contradiction; also the Δt sign convention is never stated.
+- **Problem:** The text defined pre-before-post (Δt<0) → potentiation, post-before-pre → depression — the classic **Hebbian** causal rule — yet labelled the result "asymmetric anti-Hebbian" in two places. Internal contradiction; also the Δt sign convention was not stated.
 - **Locations:** definition at line 268; "anti-Hebbian" at lines 287 and 296; also propagates into the `fig:stdp` caption in `handouts/03_chapter2_figures_needed.md`.
-- **Fix:** Decide the convention (recommend stating Δt = t_post − t_pre explicitly), then make the label consistent with the measured polarity. If causal stimulation potentiates, it is Hebbian; reserve "anti-Hebbian" for causal depression. Update both the chapter and the figure caption.
-- **Done when:** Sign convention is stated once, and the verbal rule, the equation, the figure, and the label all agree.
+- **Fix:** Convention stated explicitly as Δt = t_post − t_pre. With that convention, causal stimulation potentiates and the measured kernel is asymmetric Hebbian. The chapter text, conclusion summary, and figure-caption handout now use the same label.
+- **Done when:** Sign convention is stated once, and the verbal rule, the equation, the figure, and the label all agree. **Done.**
 
 ### ☑ 1.3 — Fix the energy-density unit error — DONE
 

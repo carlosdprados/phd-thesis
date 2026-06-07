@@ -78,7 +78,7 @@ This document lists all figures referenced in `chapter2_proof_of_concept.tex` wi
 ### `fig:stdp`
 
 **Label:** `\label{fig:stdp}`  
-**Caption (suggested):** Spike-timing dependent plasticity (STDP) characterisation. (a) Measured STDP function: percentage conductance change ΔG as a function of pre/post-synaptic spike timing delay Δt, fitted to the asymmetric anti-Hebbian model (Eq. 2.2). Δt < 0: synaptic potentiation; Δt > 0: synaptic depression. Fitted time constant τ = 85–90 ms, consistent with biological values (~100 ms). Inset: schematic of pre- and postsynaptic voltage waveforms separated by delay Δt. (b–d) Total applied voltage waveform for Δt = +600, −300, and +50 ms, respectively, showing the algebraic summation of pre- and postsynaptic spike waveforms.  
+**Caption (suggested):** Spike-timing dependent plasticity (STDP) characterisation. (a) Measured STDP function: percentage conductance change ΔG as a function of pre/post-synaptic spike timing delay Δt, fitted to the asymmetric Hebbian model (Eq. 2.2; Δt = t_post − t_pre). Δt < 0: synaptic potentiation; Δt > 0: synaptic depression. Fitted time constant τ = 85–90 ms, consistent with biological values (~100 ms). Inset: schematic of pre- and postsynaptic voltage waveforms separated by delay Δt. (b–d) Total applied voltage waveform for Δt = +600, −300, and +50 ms, respectively, showing the algebraic summation of pre- and postsynaptic spike waveforms.  
 **Source:** Figure 4 of Prado-Socorro et al. *Adv. Electron. Mater.* 2022, 8, 2101192.  
 **File path (suggested):** `figures/ch2_fig7_stdp.pdf`
 

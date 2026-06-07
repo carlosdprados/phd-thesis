@@ -330,7 +330,7 @@ The states \(S_1\) and \(S_2\) are reached by \textit{excitatory} (positive pola
 
 \subsection{Spike-Timing Dependent Plasticity}\label{subsec:stdp}
 
-Spike-timing dependent plasticity is a timing-dependent Hebbian learning rule: it instantiates Hebb's local correlation principle~\cite{Hebb1949} in a form that was later observed experimentally in biological preparations~\cite{Markram1997, Bi1998}. It states that the change in synaptic weight depends on the relative timing of pre- and postsynaptic action potentials: if the presynaptic neuron fires shortly \textit{before} the postsynaptic neuron (causal ordering, $\Delta t < 0$), the synapse is potentiated (LTP); if the presynaptic neuron fires shortly \textit{after} the postsynaptic neuron (anti-causal ordering, $\Delta t > 0$), the synapse is depressed (LTD). The magnitude of the change decays exponentially with $|\Delta t|$. This temporal asymmetry is essential for the synaptic encoding of causal relationships in neural circuits and underlies the ability of STDP-based learning rules to implement unsupervised feature extraction and pattern recognition~\cite{Bichler2012}.
+Spike-timing dependent plasticity is a timing-dependent Hebbian learning rule: it instantiates Hebb's local correlation principle~\cite{Hebb1949} in a form that was later observed experimentally in biological preparations~\cite{Markram1997, Bi1998}. Here the timing delay is defined as \(\Delta t = t_{\mathrm{post}} - t_{\mathrm{pre}}\). With this convention, if the presynaptic neuron fires shortly \textit{before} the postsynaptic neuron (causal ordering, $\Delta t < 0$), the synapse is potentiated (LTP); if the presynaptic neuron fires shortly \textit{after} the postsynaptic neuron (anti-causal ordering, $\Delta t > 0$), the synapse is depressed (LTD). The magnitude of the change decays exponentially with $|\Delta t|$. This temporal asymmetry is essential for the synaptic encoding of causal relationships in neural circuits and underlies the ability of STDP-based learning rules to implement unsupervised feature extraction and pattern recognition~\cite{Bichler2012}.
 
 \subsubsection{Experimental Protocol}
 
@@ -349,7 +349,7 @@ For \(\Delta t > 0\) (post fires before pre), the overlap produces an anti-causa
 
 \subsubsection{STDP Curve and Fitting}
 
-\Cref{fig:stdp} shows the measured STDP function: the percentage conductance change $\Delta G$ plotted against the timing delay $\Delta t$. The characteristic anti-Hebbian asymmetry is observed: negative $\Delta t$ (causal) produces positive $\Delta G$ (potentiation), and positive $\Delta t$ (anti-causal) produces negative $\Delta G$ (depression). Each branch (potentiation for $\Delta t < 0$, depression for $\Delta t > 0$) is fitted separately, as a function of the absolute delay $|\Delta t|$, by a decaying exponential:
+\Cref{fig:stdp} shows the measured STDP function: the percentage conductance change $\Delta G$ plotted against the timing delay $\Delta t$. Under the sign convention above, the measured kernel is asymmetric Hebbian: negative $\Delta t$ (causal) produces positive $\Delta G$ (potentiation), and positive $\Delta t$ (anti-causal) produces negative $\Delta G$ (depression). Each branch (potentiation for $\Delta t < 0$, depression for $\Delta t > 0$) is fitted separately, as a function of the absolute delay $|\Delta t|$, by a decaying exponential:
 
 \begin{equation}
   \Delta G(\Delta t) = A_{\pm}\,\exp\!\left(-\frac{|\Delta t|}{\tau_{\pm}}\right) + G_0
@@ -365,7 +365,7 @@ where $A_{\pm}$ and $\tau_{\pm}$ are the branch-specific amplitude and time cons
   \label{fig:stdp}
 \end{figure}
 
-The result that the obtained learning rule corresponds to \textit{asymmetric anti-Hebbian} STDP (rather than the symmetric Hebbian or asymmetric Hebbian variants also observed in biology) reflects the specific voltage waveform design and the polarity conventions of the electrode configuration. Different waveform designs would be expected to produce different STDP kernels, offering an additional degree of tunability in the design of hardware neural network architectures built from these devices.
+The result that the obtained learning rule corresponds to \textit{asymmetric Hebbian} STDP reflects the specific voltage waveform design, the stated definition of \(\Delta t\), and the polarity conventions of the electrode configuration. Different waveform designs or an opposite sign convention would be expected to produce differently labelled STDP kernels, offering an additional degree of tunability in the design of hardware neural network architectures built from these devices.
 
 
 %% ------------------------------------------------------------
@@ -502,7 +502,7 @@ This chapter has reported the design, fabrication, and characterisation of a ful
 
   \item \textbf{EPSC multi-state readout.} The first of the extended protocols specific to this device: four readily distinguishable readout states were demonstrated around the device ground level, with signed EPSC readout ratios $R_n = I_{S_n}/I_{S_0}$ spanning from \(-17\) to \(+16\) relative to the ground-state response $S_0$ under the fixed read-out bias; given the analogue conductance tunability, this is a representative demonstration rather than an intrinsic limit on the number of accessible states.
 
-  \item \textbf{\STDP{}.} An asymmetric anti-Hebbian STDP function was measured, with time constant \(\tau = \SIrange{85}{90}{\milli\second}\), within the biologically realistic range of \(\sim\SI{100}{\milli\second}\)~\cite{Bi1998, Kuzum2013}.
+  \item \textbf{\STDP{}.} An asymmetric Hebbian STDP function was measured, with time constant \(\tau = \SIrange{85}{90}{\milli\second}\), within the biologically realistic range of \(\sim\SI{100}{\milli\second}\)~\cite{Bi1998, Kuzum2013}.
 
   \item \textbf{Mechanistic account.} The \STM{}/\LTM{} dichotomy was attributed to the differential Lewis acid--base interaction between the mobile ions (\ce{Li+} as hard acid, \ce{CF3SO3-} as soft base) and the host oxygen atoms of \Hybrane{} (hard Lewis bases). The weakly coordinated triflate anion is displaced at low bias and relaxes on a short timescale, giving rise to the \STM{} regime. The strongly coordinated lithium cation requires a higher bias to leave its coordination site and relaxes on a longer timescale, giving rise to the \LTM{} regime. The injection and bulk-transport physics are described jointly by the electrodynamic and electrochemical-doping models, in the reconciling framework of van Reenen and co-workers~\cite{vanReenen2010}.
 
