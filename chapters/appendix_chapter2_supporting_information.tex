@@ -39,6 +39,13 @@ Electrical measurements used a Keithley 2450 SourceMeter connected to a custom p
 
 The variable-pulse and variable-delay measurements use a common read--write--wait sequence. First, a low reading pulse, \(V_{\mathrm{read}}=\SI{0.5}{\volt}\), establishes the initial conductance \(G_0\). This voltage is below the independently determined ionic-redistribution threshold of approximately \SI{0.7}{\volt}~\cite{PradoSocorro2022}. Second, a train of \(N_{\mathrm{pulses}}\) write pulses of duration \SI{0.1}{\second} perturbs the ionic configuration. Third, after a waiting time \(t_{\mathrm{wait}}\) under open-circuit conditions, a second read pulse measures \(G_f\). The reported response is \(\Delta G=(G_f/G_0)\times100\%\). Between experiments, the device was reset by shorting the junction for \SI{300}{\second}, and \(G_0\) was checked before the next measurement.
 
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.82\linewidth]{../figures/chapter2/read_write_wait_protocol.pdf}
+  \caption[Read--write--wait protocol]{Read--write--wait protocol used for the pulse-number and retention measurements. A low read pulse establishes \(G_0\), a train of write pulses perturbs the ionic configuration, a controlled open-circuit waiting time allows relaxation, and a second read pulse measures \(G_f\). Generated from the protocol reported in Ref.~\cite{PradoSocorro2022}.}
+  \label{fig:stm_ltm}
+\end{figure}
+
 \subsection{Extended Synaptic Protocols}\label{app:ch2_extended_protocols}
 
 The EPSC experiment defines states operationally by their signed current response under a common \SI{+1}{\volt} read-out bias. The device is first held at \SI{+1}{\volt} for \SI{1}{\second} to define \(S_0\). Two \SI{+2}{\volt}, \SI{50}{\milli\second} pulses generate excited states \(S_1\) and \(S_2\), and two \SI{-2.5}{\volt}, \SI{50}{\milli\second} pulses generate inhibitory states \(S_3\) and \(S_4\). The signed ratios \(R_n=I_{S_n}/I_{S_0}\) are reported in \cref{subsec:epsc}.
@@ -48,6 +55,24 @@ For STDP, pre- and postsynaptic spikes are emulated by triangular voltage wavefo
   V(t) = V_{\mathrm{pre}}(t) + V_{\mathrm{post}}(t+\Delta t),
 \end{equation}
 with \(\Delta t=t_{\mathrm{post}}-t_{\mathrm{pre}}\). Each spike waveform has maximum amplitude \(V_{sp}=\SI{1.55}{\volt}\) and duration \SI{1.2}{\second}; \(\Delta t\) was varied from \SI{-600}{\milli\second} to \SI{+600}{\milli\second}. Negative \(\Delta t\) produces potentiation and positive \(\Delta t\) produces depression under the sign convention used in \cref{subsec:stdp}.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{../figures/chapter2/full_epsc_trace.pdf}
+    \caption{EPSC protocol trace.}
+    \label{fig:ch2_si_epsc_trace}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{../figures/chapter2/stdp_waveforms.pdf}
+    \caption{STDP waveform superposition.}
+    \label{fig:ch2_si_stdp_waveforms}
+  \end{subfigure}
+  \caption[Extended EPSC and STDP supporting panels]{Supporting protocol panels for the extended synaptic measurements. \textbf{(a)} Reconstructed EPSC trace showing the applied-voltage sequence and the signed current ratios reported for states \(S_0\)--\(S_4\). \textbf{(b)} Example pre/post triangular spikes and their algebraic sum for three timing offsets. These panels document the protocol logic; the compact evidence used in the main chapter is reported in \cref{fig:extended_synapse_summary}.}
+  \label{fig:ch2_si_extended_protocols}
+\end{figure}
 
 \subsection{Retention-Fit Parameters}\label{app:ch2_retention_fits}
 
@@ -75,3 +100,10 @@ The spin speed was selected from an optimisation over \SIrange{500}{3000}{\rpm}~
 Surface topography was characterised by tapping-mode AFM using a Bruker Dimension Icon instrument, a silicon probe with resonant frequency \SI{300}{\kilo\hertz} and force constant \SI{40}{\newton\per\metre}, and a scan rate of \SI{0.6}{\hertz}. The AFM images showed smooth films with RMS roughness of \SIrange{1}{3}{\nano\metre} over the investigated spin-speed range~\cite{PradoSocorro2022}. The absence of large phase-separated features supports the reading of the active layer as a homogeneous polymer-electrolyte composite at the scale relevant to the vertical junction.
 
 Ambient shelf stability was assessed over approximately two weeks (\(\sim\)\SI{300}{\hour}) on unencapsulated devices stored in air at room temperature~\cite{PradoSocorro2022}. The monitored quantities were baseline conductance \(G_0\), maximum conductance change \(\Delta G_{\mathrm{max}}\), and STM retention time \(\tau_S\). All three remained within \SI{20}{\percent} of their initial values over the measurement window. This is a shelf/calendar stability result, not a cycling-endurance measurement.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{../figures/chapter2/morphology_stability_support.pdf}
+  \caption[Morphology and shelf-stability support]{Supporting morphology and shelf-stability summary for the Chapter 2 device family. The processing condition used in the main device gives a \SI{209}{\nano\metre} active layer; tapping-mode AFM reports \SIrange{1}{3}{\nano\metre} RMS roughness across the investigated spin-speed window; and the ambient shelf-stability metrics remain within a \SI{20}{\percent} envelope over approximately \SI{300}{\hour}. Compiled from the supporting measurements reported in Ref.~\cite{PradoSocorro2022}; this is not a cycling-endurance result.}
+  \label{fig:ch2_si_morphology_stability}
+\end{figure}

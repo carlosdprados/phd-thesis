@@ -44,22 +44,6 @@
 \newcommand{\twoterminal}{two-terminal}
 \newcommand{\chTwoSIRef}[1]{\ifdefined\thesismode\cref{#1}\else Appendix~A\fi}
 
-%% --- Figure placeholder ---------------------------------------------------
-%% Draws a sized, framed box in place of a not-yet-generated figure so that
-%% the float, its caption, and its \label exist and all \cref{fig:...} resolve
-%% while the chapter still compiles cleanly (no missing-image errors).
-%% To finalise a figure, replace \figplaceholder{<height>}{<desc>} with the
-%% real \includegraphics{...}. Source captions/data: handouts/03_chapter2_figures_needed.md.
-\newcommand{\figplaceholder}[2]{%
-  \setlength{\fboxsep}{0pt}%
-  \fbox{\parbox[c][#1][c]{0.85\linewidth}{%
-    \centering\itshape [Figure placeholder]\\[2pt]
-    #2\\[2pt]
-    \footnotesize\upshape to be generated from data --- see
-    \texttt{handouts/03\_chapter2\_figures\_needed.md}%
-  }}%
-}
-
 %% ============================================================
 \chapter{Proof of Concept: Polymer-Based Composite Organic Memristive Devices}\label{ch:poc}
 %% ============================================================
@@ -124,8 +108,8 @@ The device adopts a vertical sandwich geometry, in which the active layer is pla
 
 \begin{figure}[htbp]
   \centering
-  \figplaceholder{7cm}{Two-terminal device architecture and proposed STM/LTM mechanism}
-  \caption[Two-terminal device architecture]{Schematic of the two-terminal vertical synaptic device. (a)~The biological synapse used as template. (b)~Device stack: ITO-glass bottom electrode / composite active layer / Ag top electrode (\SI{100}{\nano\metre}). (c)~Molecular structures of the three active-layer components: \SY{} (semiconducting PPV copolymer), \Hybrane{} (hyperbranched polyester-amide ion-transport host), and \LiTf{} (\ce{LiCF3SO3}). (d)~Proposed mechanism: at low voltage the fast triflate anions redistribute (STM); at high voltage the slow \ce{Li+} cations are also displaced (LTM). Adapted from Ref.~\cite{PradoSocorro2022}.}
+  \includegraphics[width=\linewidth]{../figures/chapter2/device_schematic.pdf}
+  \caption[Two-terminal device architecture]{Schematic of the two-terminal vertical synaptic device and active-layer mechanism. The device stack is ITO-glass / \SY{}/\Hybrane{}/\LiTf{} composite / Ag; the composite separates the electronic pathway, ion-transport host, and mobile-ion supply. The proposed mechanism assigns the faster STM response to weakly coordinated triflate redistribution and the longer-lived state to displacement of strongly coordinated \ce{Li+}. Schematic generated from the device geometry and mechanism reported in Ref.~\cite{PradoSocorro2022}.}
   \label{fig:device_schematic}
 \end{figure}
 
@@ -158,7 +142,7 @@ The fundamental electrical fingerprint of a memristive device is a current-volta
 
 \begin{figure}[htbp]
   \centering
-  \figplaceholder{6.5cm}{Current--voltage hysteresis over ten successive sweeps}
+  \includegraphics[width=0.86\linewidth]{../figures/chapter2/iv_hyst.pdf}
   \caption[Current--voltage hysteresis]{Current--voltage hysteresis of the composite memristive device. Ten successive positive triangular sweeps (\SIrange{0}{1.2}{\volt}, \SI{0.25}{\volt\per\second}, \SI{10}{\second} between cycles) show a progressive increase of conductance; the current at \SI{1}{\volt} rises by \SI{140}{\percent} from cycle~1 to cycle~2. The clockwise loop closes at the origin (pinched hysteresis) without abrupt switching. Data from Ref.~\cite{PradoSocorro2022}.}
   \label{fig:iv_hyst}
 \end{figure}
@@ -185,31 +169,17 @@ A pulsed voltage protocol was applied: 50 consecutive write pulses of \SI{+1}{\v
 
 The results demonstrate that the conductance can be continuously potentiated from its initial value by more than \SI{200}{\percent} during the \SI{+1}{\volt} pulse train, and subsequently depotentiated back toward the initial value during the \SI{-2}{\volt} train. The potentiation and depression curves are smooth and monotonic, without any abrupt transitions. The full reversibility of the process — the conductance returns to a value near the initial level after the complete depression protocol — confirms that the underlying ionic redistribution is non-destructive and does not permanently alter the chemical composition or morphology of the active layer.
 
-\begin{figure}[htbp]
-  \centering
-  \figplaceholder{6cm}{Reversible potentiation/depression under a pulse train}
-  \caption[Reversible potentiation and depression]{Analogue multi-state conductance tuning under a pulse-train protocol. Fifty consecutive \SI{+1}{\volt} write pulses continuously potentiate the conductance by more than \SI{200}{\percent}; fifty subsequent \SI{-2}{\volt} pulses depotentiate it back toward the initial state. The smooth, monotonic trajectories demonstrate reversible analogue tuning without abrupt SET/RESET transitions. Data from Ref.~\cite{PradoSocorro2022}.}
-  \label{fig:potentiation}
-\end{figure}
-
 The energy cost of each synaptic event (one write pulse of \SI{1}{\volt}, \SI{0.1}{\second}) can be estimated from the average current during the pulse. The resulting energy per event is approximately \SI{50}{\nano\joule}, or approximately \SI{6}{\femto\joule\per\micro\metre\squared} of device area (the \SI{0.0825}{\square\centi\metre} junction). This value is consistent with those reported for organic synaptic devices operating in the picojoule-to-nanojoule range~\cite{Xiao2016}, and comparable to the picojoule-to-nanojoule switching energies reported for inorganic memristive devices~\cite{YangStrukovStewart2013}.
 
 \subsubsection{Quantitative Pulsed Read--Write Protocol}
 
-To quantify the potentiation as a function of pulse number, and to separate the act of writing from the act of reading, a non-perturbing read protocol was adopted; the same protocol is reused for the depotentiation measurement of \cref{subsec:stm_ltm}. The read--write--wait sequence, shown schematically in \cref{fig:stm_ltm}, comprises three steps:
+To quantify the potentiation as a function of pulse number, and to separate the act of writing from the act of reading, a non-perturbing read protocol was adopted; the same protocol is reused for the depotentiation measurement of \cref{subsec:stm_ltm}. The read--write--wait sequence, detailed in \chTwoSIRef{app:ch2_read_write_wait}, comprises three steps:
 \begin{enumerate}
   \item \textbf{Read.} A reading pulse ($V_{\mathrm{read}} = \SI{0.5}{\volt}$) is applied to establish the initial conductance $G_0$. This reading voltage is intentionally low: the activation threshold for ionic redistribution in this system was determined by independent experiments to lie above \SI{0.7}{\volt}~\cite{PradoSocorro2022}, so $V_{\mathrm{read}} = \SI{0.5}{\volt}$ measures the conductance state without perturbing it.
   \item \textbf{Write.} A train of $N_{\mathrm{pulses}}$ write pulses ($V_{\mathrm{write}}$, duration \SI{0.1}{\second} each) is applied.
   \item \textbf{Wait and read.} After a waiting time $t_{\mathrm{wait}}$ under open-circuit (high-impedance) conditions, a second reading pulse is applied to measure the final conductance $G_f$.
 \end{enumerate}
 The conductance change is reported as the percentage ratio $\Delta G = (G_f/G_0) \times 100$.
-
-\begin{figure}[htbp]
-  \centering
-  \figplaceholder{5cm}{Read--write--wait protocol schematic}
-  \caption[Read--write--wait protocol]{Pulsed read--write--wait protocol used for the potentiation and retention measurements. A low read pulse ($V_{\mathrm{read}} = \SI{0.5}{\volt}$) establishes the baseline conductance $G_0$; a train of $N_{\mathrm{pulses}}$ write pulses perturbs the ionic configuration; after a controlled waiting time $t_{\mathrm{wait}}$ a second read pulse measures the relaxed state $G_f$. Adapted from Ref.~\cite{PradoSocorro2022}.}
-  \label{fig:stm_ltm}
-\end{figure}
 
 Between experiments, the device is fully reset by connecting the junction to a short circuit for \SI{300}{\second}, which discharges the ionic double layers and restores the homogeneous equilibrium ion distribution. The suitability of this reset protocol was verified by confirming that $G_0$ returns to its original value within the measurement uncertainty before each new experiment.
 
@@ -219,9 +189,20 @@ Between experiments, the device is fully reset by connecting the junction to a s
 
 \begin{figure}[htbp]
   \centering
-  \figplaceholder{6cm}{Potentiation versus number of write pulses}
-  \caption[Potentiation versus pulse number]{Dependence of the conductance change $\Delta G = (G_f/G_0)\times 100\%$ on the number of write pulses $N_{\mathrm{pulses}}$ for $V_{\mathrm{write}} = \SI{1}{\volt}$ and $t_{\mathrm{wait}} = \SI{150}{\milli\second}$. The monotonic increase over more than three decades of pulse count demonstrates analogue potentiation. The shaded band is the standard deviation across five independent crossbar pixels on the NM\_v055 substrate. Data from Ref.~\cite{PradoSocorro2022}.}
-  \label{fig:npulse}
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{../figures/chapter2/potentiation_depression.pdf}
+    \caption{Reversible potentiation/depression.}
+    \label{fig:potentiation}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{../figures/chapter2/pulse_number.pdf}
+    \caption{Pulse-number response.}
+    \label{fig:npulse}
+  \end{subfigure}
+  \caption[Pulse-driven conductance integration]{Pulse-driven conductance integration in the composite memristive device. \textbf{(a)} Fifty consecutive \SI{+1}{\volt} write pulses continuously potentiate the conductance; subsequent \SI{-2}{\volt} pulses depotentiate it toward the initial state. \textbf{(b)} Dependence of the conductance ratio \((G_f/G_0)\times100\%\) on the number of write pulses for \(V_{\mathrm{write}}=\SI{1}{\volt}\) and \(t_{\mathrm{wait}}=\SI{150}{\milli\second}\). The shaded band is one standard deviation across five independent crossbar pixels on the NM\_v055 substrate. Data regenerated from the local archive associated with Ref.~\cite{PradoSocorro2022}.}
+  \label{fig:pulse_integration}
 \end{figure}
 
 Within this archived pulse-train dataset, the low-pulse-count response is reproducible to approximately the \SI{10}{\percent} level: for the five independent pixels in \cref{fig:npulse}, the median relative standard deviation is \SI{8.9}{\percent} and the largest value is \SI{11.8}{\percent} over the points with $N_{\mathrm{pulses}} < 100$. The dispersion increases modestly at large pulse numbers, reflecting the probabilistic nature of the ionic migration dynamics at large driving forces.
@@ -234,8 +215,8 @@ The measurement reuses the pulsed read--write protocol of \cref{subsec:pulse_pot
 
 \begin{figure}[htbp]
   \centering
-  \figplaceholder{6cm}{Retention kinetics: STM and LTM relaxation curves}
-  \caption[Memory retention kinetics]{Memory retention kinetics. Conductance ratio $(G_f/G_0)\times 100\%$ versus waiting time $t_{\mathrm{wait}}$ for STM conditions (\SI{1}{\volt}; 10 and 50 pulses, blue/red) and the longer-lived regime denoted LTM (\SI{3}{\volt}, 10 pulses, black). Solid lines are standard-exponential fits of the form in \cref{eq:retention_exp}; the fit parameters are summarised in \chTwoSIRef{app:ch2_retention_fits}. Data from Ref.~\cite{PradoSocorro2022}.}
+  \includegraphics[width=0.82\linewidth]{../figures/chapter2/retention.pdf}
+  \caption[Memory retention kinetics]{Memory retention kinetics. Conductance ratio $(G_f/G_0)\times 100\%$ versus waiting time $t_{\mathrm{wait}}$ for STM conditions (\SI{1}{\volt}; 10 and 50 pulses, blue/red) and the longer-lived regime denoted LTM (\SI{3}{\volt}, 10 pulses, black). Solid lines are standard-exponential reconstructions of the form in \cref{eq:retention_exp}; the fit parameters are summarised in \chTwoSIRef{app:ch2_retention_fits}. Data and fit parameters from Ref.~\cite{PradoSocorro2022}.}
   \label{fig:retention}
 \end{figure}
 
@@ -264,13 +245,6 @@ The measurement protocol is as follows (\cref{fig:epsc}):
   \item \textbf{Excitation.} A short positive write pulse of \SI{+2}{\volt} for \SI{50}{\milli\second} is applied; the device is subsequently held at \SI{+1}{\volt} for \SI{1}{\second}, during which the conductance spontaneously relaxes to a new excited steady state $S_1$. The same sequence is repeated to produce a second excited state $S_2$.
   \item \textbf{Inhibition.} Two negative write pulses of \SI{-2.5}{\volt} for \SI{50}{\milli\second} are applied, producing inhibitory states $S_3$ and $S_4$.
 \end{enumerate}
-
-\begin{figure}[htbp]
-  \centering
-  \figplaceholder{6cm}{EPSC protocol and four distinguishable readout states}
-  \caption[Excitatory post-synaptic current]{Excitatory post-synaptic current (EPSC) measurement. Applied voltage and measured current versus time: the ground state $S_0$ is set at \SI{+1}{\volt}; \SI{+2}{\volt} pulses produce excited states $S_1$ and $S_2$; \SI{-2.5}{\volt} pulses produce inhibitory states $S_3$ and $S_4$. The four states are readily distinguishable from the ground state. Data from Ref.~\cite{PradoSocorro2022}.}
-  \label{fig:epsc}
-\end{figure}
 
 The four excited states are readily distinguishable from each other and from the ground state. Defining the \EPSC{} readout ratio $R_n = I_{S_n}/I_{S_0}$ as the signed current response of state $S_n$ normalised to that of the ground state $S_0$ under the fixed read-out bias used in the experiment, the values obtained are: $R_1 = 7.33$, $R_2 = 15.55$, $R_3 = -3.72$, $R_4 = -16.97$. (The ratio is formed from signed currents rather than conductances, so the inhibitory states carry a negative sign; conductance itself remains non-negative throughout.) The large absolute ratios (up to $\sim$16-fold increase or $\sim$17-fold decrease relative to $S_0$) provide a wide margin for reliable state identification in a practical device, even in the presence of noise. The four-state sequence used here is a representative demonstration rather than an upper bound: given the continuous, analogue conductance tunability established in \cref{subsec:pulse_potentiation}, the number of distinguishable readout states is not intrinsically limited to four, and many more intermediate levels could in principle be resolved by the same protocol within the available margin.
 
@@ -308,9 +282,20 @@ where $A_{\pm}$ and $\tau_{\pm}$ are the branch-specific amplitude and time cons
 
 \begin{figure}[htbp]
   \centering
-  \figplaceholder{6cm}{Spike-timing dependent plasticity function}
-  \caption[Spike-timing dependent plasticity]{Spike-timing dependent plasticity (STDP). Percentage conductance change $\Delta G$ as a function of the pre/post spike-timing delay $\Delta t$, with each branch fitted to the decaying exponential of \cref{eq:stdp_fit}. Causal timing ($\Delta t < 0$) produces potentiation and anti-causal timing ($\Delta t > 0$) produces depression, with fitted time constant $\tau = \SIrange{85}{90}{\milli\second}$, within the biologically realistic range ($\sim\SI{100}{\milli\second}$). Inset: pre- and postsynaptic voltage waveforms separated by $\Delta t$. Data from Ref.~\cite{PradoSocorro2022}.}
-  \label{fig:stdp}
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{../figures/chapter2/epsc_summary.pdf}
+    \caption{EPSC state ratios.}
+    \label{fig:epsc}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{../figures/chapter2/stdp_summary.pdf}
+    \caption{STDP timing kernel.}
+    \label{fig:stdp}
+  \end{subfigure}
+  \caption[Compact EPSC and STDP summary]{Compact summary of the extended synaptic measurements. \textbf{(a)} Signed EPSC readout ratios \(R_n=I_{S_n}/I_{S_0}\) for the four demonstrated states. \textbf{(b)} Spike-timing dependent plasticity: percentage conductance change \(\Delta G\) as a function of the pre/post spike-timing delay \(\Delta t\), with each branch fitted to the decaying exponential of \cref{eq:stdp_fit}. Data and reported state ratios from Ref.~\cite{PradoSocorro2022}; STDP curve regenerated from the local NM\_v055 Day19 archive.}
+  \label{fig:extended_synapse_summary}
 \end{figure}
 
 The result that the obtained learning rule corresponds to \textit{asymmetric Hebbian} STDP reflects the specific voltage waveform design, the stated definition of \(\Delta t\), and the polarity conventions of the electrode configuration. Different waveform designs or an opposite sign convention would be expected to produce differently labelled STDP kernels, offering an additional degree of tunability in the design of hardware neural network architectures built from these devices.
