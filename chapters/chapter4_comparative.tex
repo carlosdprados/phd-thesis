@@ -48,7 +48,7 @@
 \section{Introduction and Scope}\label{sec:ch4_intro}
 %% ------------------------------------------------------------
 
-\Cref{ch:poc} established, on a single fully characterised \SY{}/\Hybrane{}/\LiTf{} device, that a three-component polymer-electrolyte composite supports the full set of memristive functions in one \twoterminal{} platform. The natural next question --- and the subject of this chapter --- is how the \emph{dynamics} of these devices respond to deliberate changes in the composite, so that the volatile, fading-memory behaviour can be treated as something to be engineered rather than merely observed.
+\Cref{ch:poc} established, on a single fully characterised \SY{}, \Hybrane{}, and \LiTf{} device, that a three-component polymer-electrolyte composite supports the full set of memristive functions in one \twoterminal{} platform. The natural next question --- and the subject of this chapter --- is how the \emph{dynamics} of these devices respond to deliberate changes in the composite, so that the volatile, fading-memory behaviour can be treated as something to be engineered rather than merely observed.
 
 Three families of measurement recur on the same 2-T geometry throughout this chapter and the next, and are introduced here as a named set. They are (i) current--voltage hysteresis, which reports the steady-state switching window; (ii) potentiation as a function of the number of applied write pulses, which reports how the conductance is built up; and (iii) depotentiation as a function of the delay before read-out, which reports how a written state fades. These three measurements are the shared, abundant basis of the comparative work. The richer single-device synaptic protocols of \cref{ch:poc} --- excitatory post-synaptic current, separated short- and long-term memory, and spike-timing dependent plasticity --- are \emph{not} repeated across the families studied here; where they are invoked, they are used only as prior evidence from the Chapter~\ref{ch:poc} device and are labelled as such.
 
@@ -77,8 +77,8 @@ Two design axes are varied. The \emph{composition} axis varies the mass fraction
   \centering
   \caption[Electrical measurement protocols]{The three common measurements use distinct drive protocols (modern \SY{}/\PEO{}/\LiTf{}/Ag corpus). Crucially, potentiation and depotentiation differ in write amplitude, so the chapter never pools them and \Cref{ch:temporal} composes them only as an explicit assumption.}
   \label{tab:ch4_protocols}
-  {\small\setlength{\tabcolsep}{4pt}%
-  \begin{tabular}{@{}lll p{2.6cm}@{}}
+  {\small\setlength{\tabcolsep}{3pt}%
+  \begin{tabular}{@{}lll >{\raggedright\arraybackslash}p{2.45cm}@{}}
     \toprule
     Measurement & Write & Read & Pulse train \\
     \midrule
@@ -278,10 +278,10 @@ Because the drive amplitude itself co-sets the apparent timescale (\cref{sec:ch4
 The corresponding future-work programme is therefore well defined: a dedicated cation series in a single host and anion, at a single fixed protocol and electrode, with a sub-threshold read voltage (as in the proof-of-concept device of \cref{ch:poc}) and at least three replicates per cell, would convert the illustrative chemistry landscape into a powered comparison. The impedance corroboration of \cref{sec:ch4_eis} is likewise extensible: it is reported here only for the replicated \PEO{}/\LiTf{} composition axis at \SI{0}{\volt} DC, whereas the archive also holds bias-resolved spectra (up to \SI{3}{\volt} DC) and chemistry-varied devices that were not modelled, so a chemistry- and bias-resolved impedance study would test the host, anion, and barrier-distribution arguments that the present \SI{0}{\volt} analysis leaves open. A single matched-generation batch split between silver and gold top electrodes would likewise convert the illustrative electrode contrast of \cref{sec:ch4_electrode} into a clean, generation-controlled comparison. Encapsulation and a systematic ageing study would address the stability dimension.
 
 %% ------------------------------------------------------------
-\section{Conclusions and Bridge to the Temporal-Computing Chapter}\label{sec:ch4_bridge}
+\section{Bridge to Temporal Computing}\label{sec:ch4_bridge}
 %% ------------------------------------------------------------
 
-This chapter has shown that the volatile dynamics of \SY{}/polymer-electrolyte composites are controllable, and that the control is dominated by composition. Quantitatively, the fading-memory time of the \SY{}/\PEO{}/\LiTf{} system is tunable over roughly \SIrange{2}{20}{\second} by composition alone, with the switching window and potentiation strength varying in concert; chemistry (host, anion) extends this range further, illustratively; and the cation, contrary to the initial hypothesis, is not a robust controlling variable at the available power. A methodological result --- that the drive protocol co-sets the apparent timescale --- frames how all of this must be measured and compared.
+This chapter has shown that the volatile dynamics of \SY{} polymer-electrolyte composites are controllable, and that the control is dominated by composition. Quantitatively, the fading-memory time of the \SY{}/\PEO{}/\LiTf{} system is tunable over roughly \SIrange{2}{20}{\second} by composition alone, with the switching window and potentiation strength varying in concert; chemistry (host, anion) extends this range further, illustratively; and the cation, contrary to the initial hypothesis, is not a robust controlling variable at the available power. A methodological result --- that the drive protocol co-sets the apparent timescale --- frames how all of this must be measured and compared.
 
 What \Cref{ch:temporal} requires from the present chapter is precisely a set of behavioural ingredients: a composition-indexed family of fading-memory time constants spanning a useful range, a characterisation of how conductance is built up by pulses (including its saturation and turnover), and an account of device-to-device heterogeneity. Those ingredients are now in hand. They also define the shape of the design space the next chapter inherits: the fading-memory time and the input nonlinearity ($\alpha$) are \emph{coupled} through the \PEO{} fraction (\cref{fig:ch4_design_space}) --- a single composition selects a paired (memory, nonlinearity) operating point rather than two independent settings --- while the salt fraction acts as a partially separate lever on the usable dynamic range and turnover. A temporal-computing substrate must therefore be assembled from a \emph{bank} of compositions to span the behaviour it needs, rather than tuned to a single optimum; the heterogeneity catalogued here is what makes that bank possible. The next chapter treats them not as imperfections of a memory but as the raw material of a temporal-computing substrate.
 
@@ -290,8 +290,9 @@ What \Cref{ch:temporal} requires from the present chapter is precisely a set of 
 %% A unified bibliography is printed from thesis.tex in the thesis build,
 %% so the per-chapter \printbibliography runs only in standalone mode.
 \ifdefined\thesismode
-  \endinput
+  \let\thesisstandaloneclose\relax
+\else
+  \printbibliography[heading=bibintoc, title={References}]
+  \def\thesisstandaloneclose{\end{document}}
 \fi
-
-\printbibliography[heading=bibintoc, title={References}]
-\end{document}
+\thesisstandaloneclose

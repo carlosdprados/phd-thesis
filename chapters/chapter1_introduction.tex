@@ -247,7 +247,7 @@ For temporal computing, the same finite retention becomes the operating principl
 \begin{sidewaystable}
   \centering
   \caption{Direction in which each device parameter should be optimised under the trained-weight regime (\cref{subsec:memristive_metrics}) and under the fading-memory regime (\cref{subsec:volatile_reservoir}). Several optima are not merely different in magnitude but opposed in direction, which is why a single device cannot in general satisfy both regimes simultaneously.}\label{tab:param_optima}
-  \begin{tabularx}{\linewidth}{l X X}
+  \begin{tabularx}{\linewidth}{l >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X}
     \toprule
     \textbf{Parameter} & \textbf{Trained-weight optimum} & \textbf{Fading-memory optimum} \\
     \midrule
@@ -361,8 +361,8 @@ The five families and their trade-offs are collected in \cref{tab:organic_mechan
 \begin{sidewaystable}
   \centering
   \caption{Mechanism families behind organic memristive behaviour.}\label{tab:organic_mechanisms}
-  \footnotesize
-  \setlength{\tabcolsep}{4pt}
+  \scriptsize
+  \setlength{\tabcolsep}{3pt}
   \begin{tabularx}{\textheight}{l X l l l l}
     \toprule
     \textbf{Family} & \textbf{State variable} & \textbf{Reversibility} & \textbf{Analogue gradation} & \textbf{Timescale tunability} & \textbf{Refs.} \\
@@ -386,7 +386,7 @@ The two-terminal line developed in parallel. Liu's biomimicking redox organic me
 
 By the early 2020s the field had matured into a subfield consolidating around shared physical principles~\cite{VanDeBurgt2018, Markovic2020}, with the individually demanding features each demonstrated---ion-mediated operation in two- and three-terminal forms, analogue symmetric programming, short-to-long-term transitions, mechanical compliance, molecular precision---but not yet combined in one simple platform. The three-terminal route bought reversibility and analogue control at the cost of architectural complexity, the two-terminal redox route simplicity at the cost of full reversibility, and the molecular route precision at the cost of synthesis. In that 2022 publication context, the specific gap addressed by the proof-of-concept chapter was a two-terminal, reversible, multi-state, ion-mediated device with interpretable chemistry built from standard organic-electronic components. The route pursued here fills that gap with a composite of a conjugated semiconducting polymer, an ion-conducting polymer host, and a dissociated alkali-metal salt. These parallel developments are collected in \cref{fig:organic_timeline}.
 
-That framing should not be read as a frozen 2026 state-of-the-art claim. Since the proof-of-concept publication, organic neuromorphic electronics has advanced quickly, especially through organic electrochemical neurons and circuits for perception and biointerfacing~\cite{Harikesh2024OECNReview}, organic electrochemical-device systems for multimodal robotic learning~\cite{Krauhausen2024Robotics}, and broader organic-iontronic memristor chemistries for artificial synapses~\cite{Xia2024OIMReview}. Those developments strengthen the larger premise that mixed ionic--electronic organic devices are useful neuromorphic substrates. They do not, however, change the role of the present thesis, which is narrower: to use a self-contained two-terminal polymer-electrolyte composite as a chemically tunable fading-memory element for temporal computing.
+That framing should not be read as a frozen 2026 state-of-the-art claim. Since the proof-of-concept publication, organic neuromorphic electronics has advanced quickly, especially through organic electrochemical neurons and circuits for perception and biointerfacing~\cite{Harikesh2024OECNReview}, organic electrochemical-device systems for multimodal robotic learning~\cite{Krauhausen2024Robotics}, and organic-iontronic memristors for artificial synapses~\cite{Xia2024OIMReview}. Those developments strengthen the larger premise that mixed ionic--electronic organic devices are useful neuromorphic substrates. They do not, however, change the role of the present thesis, which is narrower: to use a self-contained two-terminal polymer-electrolyte composite as a chemically tunable fading-memory element for temporal computing.
 
 \begin{sidewaysfigure}
   \centering
@@ -442,7 +442,7 @@ PEO, in turn, acts as the central host for the broader comparative work. Its che
 
 The coupling between ionic redistribution in a polymer host and electronic transport in a conjugated semiconductor can be both stable and reversible, and polymer light-emitting electrochemical cells (LECs) are the clearest precedent for it~\cite{Tang2016}. An LEC is a simple two-terminal sandwich~\cite{Pei1995}: a conjugated light-emitting polymer is mixed from a common solution with an ion-conducting polymer and a dissociated salt. Under bias, cations migrate toward the cathode and anions toward the anode, forming doped regions that inject carriers into the undoped bulk, and the resulting dynamic p-i-n profile produces electroluminescence in the intrinsic region between the doped edges~\cite{Matyba2009}.
 
-Two models were historically used to describe this operation: an electrochemical-doping model~\cite{Pei1995, Smith1997}, in which the dominant effect is bulk doping of the conjugated polymer, and an electrodynamic model~\cite{deMello1998, deMello2002}, in which it is the lowering of charge-injection barriers by ion accumulation at the contacts. Later experiments~\cite{Matyba2009, Wagberg2008} and a unifying framework~\cite{vanReenen2010} showed these to be not contradictory mechanisms but limiting cases of the same ion redistribution under different injection regimes. The two models, their reconciliation, and the bias-off configuration that the memristive composite reuses are compared on a common cathode--anode position axis in \cref{fig:lec_models}; studies of electrochemical side reactions~\cite{Fang2008} additionally identify the degradation pathways that must be suppressed.
+Two models were historically used to describe this operation. In the electrochemical-doping model~\cite{Pei1995, Smith1997}, the dominant effect is bulk doping of the conjugated polymer; in the electrodynamic model~\cite{deMello1998, deMello2002}, it is the lowering of charge-injection barriers by ion accumulation at the contacts. Later experiments~\cite{Matyba2009, Wagberg2008} and a unifying framework~\cite{vanReenen2010} showed these to be limiting cases of the same ion redistribution under different injection regimes, not contradictory mechanisms. The two models, their reconciliation, and the bias-off configuration that the memristive composite reuses are compared on a common cathode--anode position axis in \cref{fig:lec_models}; studies of electrochemical side reactions~\cite{Fang2008} additionally identify the degradation pathways that must be suppressed.
 
 \begin{figure}[!htb]
   \centering
@@ -478,8 +478,9 @@ The resulting device target is specific: a solution-processed composite of a con
 
 %% ---- Standalone close (skipped when \include'd from thesis.tex) ----
 \ifdefined\thesismode
-  \endinput
+  \let\thesisstandaloneclose\relax
+\else
+  \printbibliography[heading=bibintoc, title={References}]
+  \def\thesisstandaloneclose{\end{document}}
 \fi
-
-\printbibliography[heading=bibintoc, title={References}]
-\end{document}
+\thesisstandaloneclose

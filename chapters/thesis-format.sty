@@ -76,6 +76,7 @@
   range-phrase         = \text{--},
   detect-all
 }
+\DeclareSIUnit{\angstrom}{\text{\AA}}
 
 %% --- Chemistry ---
 \RequirePackage[version=4]{mhchem}
@@ -116,6 +117,7 @@
   doi      = true,
   url      = false
 ]{biblatex}
+\AtBeginBibliography{\raggedright\sloppy}
 
 \RequirePackage[hidelinks, colorlinks=false]{hyperref}
 \RequirePackage{cleveref}

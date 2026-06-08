@@ -41,7 +41,7 @@
 \section{The Reproducibility Problem}\label{sec:bridge_problem}
 %% ------------------------------------------------------------
 
-\Cref{ch:poc} established, on a single fully characterised \SY{}/\Hybrane{}/\LiTf{} device, that a three-component polymer-electrolyte composite supports the complete set of memristive functions in one \twoterminal{} platform, and that the proof-of-concept device was stable on a two-week ambient shelf scale. \Cref{ch:comparative} will treat the volatile dynamics of these composites as something to be engineered across a replicated composition grid. Between those two results sits a problem that has to be confronted before the comparative study can be read on its own terms, and that is the subject of this short chapter: \emph{as the campaign scaled from a single validated device to a fabrication programme, the memristive hysteresis became progressively harder to obtain.} Successive batches of nominally identical \SY{}/\Hybrane{}/\LiTf{} devices drifted away from the low-current, high-area, multi-level behaviour of the proof-of-concept device toward a high-conductivity, low-window response with no usable switching --- and therefore no usable potentiation.
+\Cref{ch:poc} established, on a single fully characterised \SY{}, \Hybrane{}, and \LiTf{} device, that a three-component polymer-electrolyte composite supports the complete set of memristive functions in one \twoterminal{} platform, and that the proof-of-concept device was stable on a two-week ambient shelf scale. \Cref{ch:comparative} will treat the volatile dynamics of these composites as something to be engineered across a replicated composition grid. Between those two results sits a problem that has to be confronted before the comparative study can be read on its own terms, and that is the subject of this short chapter: \emph{as the campaign scaled from a single validated device to a fabrication programme, the memristive hysteresis became progressively harder to obtain.} Successive batches of nominally identical \SY{}/\Hybrane{}/\LiTf{} devices drifted away from the low-current, high-area, multi-level behaviour of the proof-of-concept device toward a high-conductivity, low-window response with no usable switching --- and therefore no usable potentiation.
 
 Two notions of stability must be kept apart here, and \cref{ch:poc} validated only the first. \emph{Calendar (shelf) stability of an individual device} --- whether a finished device retains its characteristics over days to weeks --- was demonstrated for the proof-of-concept device and, as shown below, holds quite generally for \Hybrane{} devices. \emph{Batch-scale reproducibility of the platform over the fabrication campaign} --- whether a device built this month behaves like one built last spring --- is a different metric on a different axis, and it is this second metric that failed. The failure is therefore a degradation \emph{over calendar time of the fabrication line}, not an ageing of devices after they are made; the distinction is load-bearing for everything that follows and is established quantitatively in \cref{sec:bridge_degradation}.
 
@@ -55,12 +55,12 @@ Faced with a drifting fabrication line and a list of open hypotheses, the team c
 
 \begin{table}[t]
   \centering
-  \caption[Methods-of-elimination summary]{The degradation investigation as a method of elimination. Each candidate cause was crossed as a deliberate batch (device codes in the standard \texttt{NM\_v\textit{nnn}} naming) with its variables pinned in the provenance record; the verdict column gives the campaign's reading. The processing variables that were tested and excluded leave the consumable reagent stock --- specifically the hyperbranched \Hybrane{} host --- as the residual suspect, pursued quantitatively in \cref{sec:bridge_degradation}.}
+  \caption[Methods-of-elimination summary]{Methods-of-elimination summary for the degradation investigation. Candidate causes were crossed as deliberate batches with variables pinned in the provenance record; the exclusions leave the hyperbranched \Hybrane{} host stock as the residual suspect, pursued quantitatively in \cref{sec:bridge_degradation}.}
   \label{tab:bridge_elimination}
   \footnotesize
   \setlength{\tabcolsep}{4pt}
-  \renewcommand{\arraystretch}{1.25}
-  \begin{tabular}{p{0.27\linewidth} p{0.30\linewidth} p{0.35\linewidth}}
+  \renewcommand{\arraystretch}{1.05}
+  \begin{tabular}{>{\raggedright\arraybackslash}p{0.27\linewidth} >{\raggedright\arraybackslash}p{0.30\linewidth} >{\raggedright\arraybackslash}p{0.35\linewidth}}
     \toprule
     \textbf{Candidate cause} & \textbf{Crossed as (batches)} & \textbf{Verdict} \\
     \midrule
@@ -105,6 +105,7 @@ The campaign record is qualitative; the claim that the platform degraded must be
   \footnotesize
   \setlength{\tabcolsep}{6pt}
   \renewcommand{\arraystretch}{1.2}
+  \resizebox{\linewidth}{!}{%
   \begin{tabular}{l l l l}
     \toprule
     \multicolumn{4}{l}{\textbf{Window collapse @ $\sim$\SI{3}{\volt}} (early $\leq$Apr 2021, $n=10$ vs later, $n=42$)} \\
@@ -128,7 +129,8 @@ The campaign record is qualitative; the claim that the platform degraded must be
     \multicolumn{4}{l}{\texttt{is\_broken} \emph{decreases} ($\rho=-0.40$, $p=0.001$) --- a handling metric, \emph{not} degradation;} \\
     \multicolumn{4}{l}{\texttt{is\_saturated} (fails to potentiate) \emph{rises} ($\rho=+0.27$, $p=0.03$).} \\
     \bottomrule
-  \end{tabular}
+  \end{tabular}%
+  }
 \end{table}
 
 \paragraph{Mechanism: ohmic drift at matched \boldmath$\sim$\SI{1.2}{\volt}.} The complementary signal lives in the conductivity, read in the tightly matched $\sim$\SI{1.2}{\volt} band so that the sweep-amplitude confound is held fixed. There, the absolute current rises with fabrication date: per device, the current at maximum voltage correlates with date at $\rho=+0.45$ ($p=0.0002$), the raw hysteresis area at $\rho=+0.57$, and the current difference at the on--off point at $\rho=+0.51$ (all $n=64$; \cref{fig:bridge_mechanism}a, \cref{tab:bridge_degradation}). Crucially, these correlations \emph{strengthen} when the deliberately-reverted recovery batches ($\geq$2022-03) are dropped --- to $\rho=+0.55$, $+0.69$, and $+0.63$ respectively --- which is exactly what one expects if those late batches are partial recoveries pulling against the underlying trend. Because the amplitude is held within a narrow band, this is a drift of the material toward more ohmic conduction, not an artefact of the sweep range. The window collapse (relative hysteresis $\to 0$) and the ohmic drift (absolute current $\uparrow$) are two faces of the same degradation. \emph{The magnitudes are deliberately reported as correlations and medians, not as a single multiplicative ``conductivity rise'', because the absolute current depends on the very sweep amplitude being controlled for.}
@@ -149,7 +151,7 @@ The rest of this thesis is mechanistic, so a black-box ``the stock went bad'' wo
 \paragraph{The hypothesis.} \Hybrane{} is a hyperbranched polyester-amide~\cite{Froehling2004,VoitLederer2009}: ester- and amide-rich, and strongly hygroscopic. The leading hypothesis is that, over roughly a year in the bottle, the stock takes up atmospheric water and slowly hydrolyses (chain scission), and that this single process accounts for all of the measured signatures.
 \begin{itemize}
   \item \textbf{Ohmic drift} (current $\uparrow$ at matched \SI{1.2}{\volt}): absorbed water together with polar scission products raises the baseline ionic and leakage conductivity and plasticises the matrix.
-  \item \textbf{Window and potentiation collapse} (on--off $\to\sim$\num{1.2}, area $\to\sim$\num{0.03}, $\%\Delta I\to-\SI{2}{\percent}$): memristance in this platform needs a matrix stiff enough to \emph{hold} a field-displaced ionic profile (the metastable-polarisation picture of \cref{ch:poc}). A plasticised, lower-molecular-weight, water-laden host relaxes and leaks, so the loop closes and successive sweeps stop building up conductance.
+  \item \textbf{Window collapse} (on--off $\to\sim$\num{1.2}, area $\to\sim$\num{0.03}, $\%\Delta I\to-\SI{2}{\percent}$): memristance needs a matrix stiff enough to \emph{hold} a field-displaced ionic profile (the metastable-polarisation picture of \cref{ch:poc}). A plasticised, lower-molecular-weight, water-laden host relaxes and leaks, so the loop closes and successive sweeps stop building up conductance.
   \item \emph{(secondary)} acidic hydrolysis products could partially dope the PPV-type \SY{}, adding a fixed, irreversible conductance --- a second route to the ``high-conductivity, undesirable'' state recorded in the notes.
 \end{itemize}
 
@@ -184,7 +186,7 @@ The crisis was resolved not by recovering the \Hybrane{} line but by changing th
 \end{figure}
 
 %% ------------------------------------------------------------
-\section{The Methodological Legacy Carried Forward}\label{sec:bridge_legacy}
+\section{Methodological Legacy}\label{sec:bridge_legacy}
 %% ------------------------------------------------------------
 
 The diagnosis of the previous sections required instrumentation that did not exist at the start of the campaign. Building it --- provenance capture, a normalized characterization procedure, an automated feature pipeline, and trend-discovery tooling --- is itself a contribution, and, decisively, it is the same instrumentation that produces every quantitative result in the comparative and temporal-computing chapters that follow. The crisis, in other words, paid a lasting dividend. Five durable outputs came out of it.
@@ -200,7 +202,7 @@ The diagnosis of the previous sections required instrumentation that did not exi
 The framing is forward-looking rather than biographical: the \Hybrane{} failure is, in the end, what made the rest of the thesis measurable. The same apparatus is what the comparative study of \cref{ch:comparative} and the data-driven temporal-computing study build upon.
 
 %% ------------------------------------------------------------
-\section{Reconciliation with Chapter~\texorpdfstring{\ref*{ch:poc}}{2} and Bridge to the Comparative Study}\label{sec:bridge_reconciliation}
+\section{Reconciliation and Bridge}\label{sec:bridge_reconciliation}
 %% ------------------------------------------------------------
 
 This chapter must be squared with \cref{ch:poc}, which attributed enhanced shelf stability to the \Hybrane{} matrix. The resolution is a partition, not a retraction, and it turns on the two-metric distinction of \cref{sec:bridge_problem}.
@@ -216,8 +218,9 @@ With the reproducibility crisis diagnosed and resolved by the move to a \PEO{} h
 %% A unified bibliography is printed from thesis.tex in the thesis build,
 %% so the per-chapter \printbibliography runs only in standalone mode.
 \ifdefined\thesismode
-  \endinput
+  \let\thesisstandaloneclose\relax
+\else
+  \printbibliography[heading=bibintoc, title={References}]
+  \def\thesisstandaloneclose{\end{document}}
 \fi
-
-\printbibliography[heading=bibintoc, title={References}]
-\end{document}
+\thesisstandaloneclose

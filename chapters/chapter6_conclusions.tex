@@ -110,7 +110,7 @@ The limitations map directly onto a forward programme, ordered here from the mos
 
 \paragraph{Power the chemistry landscape.} A dedicated cation series in a single host and anion, at a fixed protocol and electrode, with a sub-threshold read and at least three replicates per cell, would convert the illustrative host/anion/cation landscape into a powered comparison and settle the \ce{Li+}>\ce{Na+}>\ce{K+} question that this thesis could only report as a null. A chemistry- and bias-resolved impedance study, and a generation-controlled silver-versus-gold electrode split, would do the same for the microscopic and electrode levers.
 
-\paragraph{Confirm the degradation chemistry.} The moisture-driven hydrolytic-aging hypothesis for the \Hybrane{} stock (\cref{ch:bridge}) remains open, and may never fully close because it concerns a consumable that no longer exists in its aged state; FTIR, GPC, Karl-Fischer/TGA, and EIS on retained aged-versus-fresh stock are the experiments that would confirm or refute it, and the lesson --- pin and archive reagent provenance --- is already embedded in the methodology.
+\paragraph{Test the degradation chemistry.} The moisture-driven hydrolytic-aging hypothesis for the \Hybrane{} stock (\cref{ch:bridge}) remains open, and may never fully close because it concerns a consumable that no longer exists in its aged state. FTIR, GPC, Karl-Fischer/TGA, and EIS on retained aged-versus-fresh stock are the experiments that would confirm or refute it, and the lesson --- pin and archive reagent provenance --- is already embedded in the methodology.
 
 \paragraph{Engineer the host and salt for finer timescale control.} Chemical tailoring of the polyether host and the salt is the natural route to extending the accessible fading-memory window --- in particular toward the minutes-scale tonic band that composition alone does not reach --- and to decoupling the memory time from the input nonlinearity that composition currently couples.
 
@@ -128,8 +128,9 @@ The thesis began from a reframing: that a memristive device which forgets at a c
 
 %% ---- Standalone close (skipped when \include'd from thesis.tex) ----
 \ifdefined\thesismode
-  \endinput
+  \let\thesisstandaloneclose\relax
+\else
+  \printbibliography[heading=bibintoc, title={References}]
+  \def\thesisstandaloneclose{\end{document}}
 \fi
-
-\printbibliography[heading=bibintoc, title={References}]
-\end{document}
+\thesisstandaloneclose

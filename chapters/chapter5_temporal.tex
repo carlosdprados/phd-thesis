@@ -55,7 +55,7 @@ The chapter rests on a single thesis that connects it to \cref{ch:comparative}: 
 The evidence base is deliberately constrained. Every result is \emph{in silico}: each device node is a compact behavioural model whose parameters are taken directly from the \cref{ch:comparative} fits (\cref{sec:ch5_model}), and every read-out is a single linear regression, so that no claimed computation can be smuggled in through a nonlinear decoder or a hand-tuned dynamical system. No new devices are fabricated. Two demonstrations run throughout: Demonstration~A asks whether a \emph{single} composition suffices for a single-timescale feature, and Demonstration~B asks what a heterogeneous \emph{bank} adds when the target is multi-timescale. The scoped answer, assembled across the three tiers, is that the measured device models support temporal-computing demonstrations under constrained read-out conditions, that fading memory is the active ingredient, and that timescale heterogeneity is a measurable computational resource for memory breadth and a generality hedge --- rather than a guaranteed improvement on every task.
 
 %% ------------------------------------------------------------
-\section[A Measured Behavioural Model]{From Measured Dynamics to a Behavioural Model}\label{sec:ch5_model}
+\section{Measured Behavioural Model}\label{sec:ch5_model}
 %% ------------------------------------------------------------
 
 \Cref{ch:comparative} established that the fading memory of these composites is an engineerable quantity, dominated by composition. To put that memory to work, this chapter reduces each composition cell to a compact behavioural model and treats it as the unit cell of a reservoir computer. The model is deliberately minimal: it is fitted only to the three common measurements of \cref{ch:comparative} --- hysteresis, pulsed potentiation, and delayed depotentiation --- so that every simulation in this chapter traces back to measured data rather than to a hand-tuned dynamical system.
@@ -119,7 +119,7 @@ The first tier of evidence is deliberately task-agnostic. Two capacity measures 
 \end{figure}
 
 %% ------------------------------------------------------------
-\section[Affective Computing]{Affective Computing: A Native Timescale Match}\label{sec:ch5_affect}
+\section{Affective Computing}\label{sec:ch5_affect}
 %% ------------------------------------------------------------
 
 Affective computing --- the recognition of human emotional and physiological state by machines --- was framed by Picard as a route to more natural human--computer interaction, classically from \emph{peripheral} physiological signals that are slow, wearable-friendly, and unobtrusive to acquire \cite{Picard1997}. It is the flagship domain of this chapter, for two reasons that follow directly from \cref{ch:comparative}. First, the device timescale window --- fading-memory times from a few seconds to tens of seconds --- sits natively on top of the bands that carry affective information, so no aggressive time-rescaling is needed to bring signal and substrate into register (\cref{tab:ch5_bands}). Second, affective information is \emph{intrinsically multi-timescale}: a fast phasic electrodermal response, a respiration- and heart-rate-variability rhythm of a few seconds, and a tonic level that drifts over minutes all carry state at once~\cite{Boucsein2012EDA,TaskForce1996HRV,ChourpiliadisBhardwaj2022}. That structure is the signal-driven motivation for a heterogeneous bank, and it is also the deployment narrative for an organic, flexible, biocompatible, low-power substrate worn on the skin. \Cref{fig:ch5_tau_coverage} makes the match concrete: it places each composition cell at its measured fading-memory time $\tau$ on the same axis as the affective bands, so that the coverage of the device family --- and, candidly, the one band it does not reach with composition alone --- can be read off directly.
@@ -201,7 +201,7 @@ The final tier is the downstream task itself: classifying affective state from t
 \begin{table}[t]
   \centering
   \small
-  \caption[Streaming three-class affect tracking on WESAD]{Leave-one-subject-out macro-F1 for streaming baseline/stress/amusement tracking on \WESAD{} (means $\pm$ SD over ten bank seeds; matched input masks across banks). Each increment is the gain over the row above: fading memory contributes a small, consistent gain, while the timescale-heterogeneity increment is within noise (\textit{ns}).}
+  \caption[Streaming three-class affect tracking on WESAD]{Leave-one-subject-out macro-F1 for streaming three-class \WESAD{} tracking (means $\pm$ SD over ten bank seeds; matched input masks). Each increment is the gain over the row above: fading memory contributes a small, consistent gain, while the timescale-heterogeneity increment is within noise (\textit{ns}).}
   \label{tab:ch5_wesad}
   \begin{tabular}{lcc}
     \toprule
@@ -225,7 +225,7 @@ The final tier is the downstream task itself: classifying affective state from t
 \paragraph{Why heterogeneity does not pay off on the labels.} The null is not a failure of the devices but a property of the task. Affect labels are slowly varying, sustained states; their discriminative memory demand is dominated by a single slow, tonic band that the lead composition's relaxation time ($\tau \approx 19$--$26$\,s) already serves. Timescale heterogeneity converts into task performance only when the target requires memory at many distinct lags \emph{simultaneously} --- which the memory-capacity benchmark (\cref{fig:ch5_mc_curve}) and the physiological-context reconstruction (\cref{tab:ch5_physio}) both demand, and on which heterogeneity does pay, but which a single sustained label set does not. The reading carried into \cref{sec:ch5_designrules} is that the measured device models support affective classification under this protocol, that fading memory helps, and that composition-timescale \emph{matching} is the operative design lever --- with heterogeneity a generality and robustness hedge rather than a guaranteed win on any one label set.
 
 %% ------------------------------------------------------------
-\section[Design Rule: Matching Timescale to Task]{Design Rule: Matching Timescale to Task --- Judging the Comparative-Chapter Findings Against the Application}\label{sec:ch5_designrules}
+\section{Design Rule: Match Timescale to Task}\label{sec:ch5_designrules}
 %% ------------------------------------------------------------
 
 \Cref{sec:ch5_benchmarks,sec:ch5_physio,sec:ch5_wesad} together close the loop opened in \cref{ch:comparative}. That chapter showed that composition --- and, as a methodological corollary, drive amplitude --- \emph{sets} the fading-memory timescale of these devices. This chapter shows the other half of the design rule: an application \emph{selects} a timescale, or a set of timescales, and performance follows from how well the device family covers them --- the matching read directly off \cref{fig:ch5_tau_coverage}. The composition sweep makes the rule concrete in one direction (\cref{fig:ch5_composition_sweep}): the lead cell is the memory-capacity optimum because its relaxation time best matches a single seconds-scale target, which is the regime of Demonstration~A. The multi-lag results make it concrete in the other (\cref{tab:ch5_physio}): when the target spans bands that no single cell covers, the bank whose timescales are \emph{spread} to match them is the best single choice.
@@ -272,8 +272,9 @@ The concluding chapter draws together the contributions of the thesis and its li
 %% A unified bibliography is printed from thesis.tex in the thesis build,
 %% so the per-chapter \printbibliography runs only in standalone mode.
 \ifdefined\thesismode
-  \endinput
+  \let\thesisstandaloneclose\relax
+\else
+  \printbibliography[heading=bibintoc, title={References}]
+  \def\thesisstandaloneclose{\end{document}}
 \fi
-
-\printbibliography[heading=bibintoc, title={References}]
-\end{document}
+\thesisstandaloneclose
