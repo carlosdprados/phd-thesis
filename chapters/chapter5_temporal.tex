@@ -35,6 +35,10 @@
 \providecommand{\twoterminal}{two-terminal}
 \providecommand{\WESAD}{\textsc{wesad}}
 \providecommand{\NARMA}{NARMA-10}
+%% Standalone-safe reference into this chapter's Supporting Information
+%% (Appendix D). Resolves with \cref in the full thesis; prints a literal
+%% label in standalone builds, where the appendix is not included.
+\providecommand{\siTempRef}[1]{\ifdefined\thesismode\cref{#1}\else Appendix~D\fi}
 
 %% ============================================================
 \chapter{Data-Driven Temporal Computing with Polymer-Electrolyte Memristor Reservoirs}\label{ch:temporal}
@@ -69,7 +73,7 @@ Driven by a rate-coded input $u_n \in [0,1]$ sampled at interval $\Delta t$, a s
 \]
 so that the node integrates a compressive write of its (masked) input and then leaks by exactly the measured retention $\lambda_i$ over the sample interval; $w_i$ is the reservoir input mask. The internal state is read sub-threshold and is therefore assumed state-preserving, as in the proof-of-concept device of \cref{ch:poc}. Every read-out in this chapter is a single \emph{linear} ridge regression on the device states, so that any computation demonstrated is attributable to the devices and not to a nonlinear read-out.
 
-Two honesty constraints are carried explicitly from \cref{ch:comparative} into every result below. First, the write nonlinearity and the fading-memory law were measured at \emph{different write amplitudes} (\SI{3}{\volt} for potentiation, \SI{4}{\volt} for depotentiation; \cref{tab:ch4_protocols}); composing them in a single node is an explicit modelling assumption, not a measured fact, and it most likely under-estimates the true coupling between drive and retention. Second, both were measured at a single, effectively common inter-pulse cadence, so the model is not entitled to claims about input timing finer than that cadence. Both caveats would be removed by the single bench experiment set out in \cref{sec:ch5_limitations}.
+Two honesty constraints are carried explicitly from \cref{ch:comparative} into every result below. First, the write nonlinearity and the fading-memory law were measured at \emph{different write amplitudes} (\SI{3}{\volt} for potentiation, \SI{4}{\volt} for depotentiation; \cref{tab:ch4_protocols}); composing them in a single node is an explicit modelling assumption, not a measured fact, and it most likely under-estimates the true coupling between drive and retention. Second, both were measured at a single, effectively common inter-pulse cadence, so the model is not entitled to claims about input timing finer than that cadence. Both caveats would be removed by the single bench experiment set out in \cref{sec:ch5_limitations}. The per-cell parameter cards inherited from \cref{ch:comparative} and the full set of simulation and read-out settings are tabulated in \siTempRef{app:ch5_settings}.
 
 %% ------------------------------------------------------------
 \section{Reservoir Computing and the Common Metric Language}\label{sec:ch5_framework}

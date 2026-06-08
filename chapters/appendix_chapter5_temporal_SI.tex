@@ -1,0 +1,64 @@
+%% ============================================================
+%%  Appendix D — Chapter 5 (Temporal Computing) Supporting Info
+%%
+%%  \include'd from thesis.tex under \appendix. Documents the
+%%  parameter-card sourcing and the simulation / read-out
+%%  settings, so the in-silico results are reproducible from the
+%%  measured archive without consulting the scripts.
+%% ============================================================
+
+\chapter{Supporting Information for Chapter~\ref*{ch:temporal}}\label{app:ch5_si}
+
+This appendix documents how the behavioural-model parameter cards of
+\cref{sec:ch5_model} are sourced from the measured archive, and lists the
+simulation and read-out settings used across the three evidence tiers. Together
+with the per-cell tables of \cref{app:ch4_celltables}, it makes the in-silico
+results reproducible without consulting the analysis scripts
+(\texttt{scripts/ch4\_figures.py}, \texttt{scripts/ch4\_physio\_context.py}).
+
+\section{Parameter-Card Sourcing}\label{app:ch5_cards}
+
+Each composition cell is reduced to a parameter card
+$(\tau_c,\beta_c,\alpha_c,\text{peak}_c)$ that drives one reservoir node type. The
+values are taken directly from the comparative fits, with no free re-tuning:
+\begin{itemize}
+  \item the fading-memory law $\lambda_c(\Delta t)=\exp[-(\Delta t/\tau_c)^{\beta_c}]$ uses the per-cell $(\tau_c,\beta_c)$ of \cref{tab:ch4_decay_by_cell}; for the few cells without an identified stretched fit, a single exponential reproducing the model-free half-life is used instead ($\tau_c=t_{1/2}/\ln 2$, $\beta_c=1$);
+  \item the write nonlinearity uses the per-cell growth exponent $\alpha_c$ and peak enhancement of \cref{tab:ch4_pulses_by_cell};
+  \item the device-to-device spread injected into each bank is the within-cell scatter of those same tables.
+\end{itemize}
+The heterogeneous banks of \cref{sec:ch5_benchmarks,sec:ch5_physio} span the
+replicated \PEO{}/\LiTf{} composition cells of \cref{tab:ch4_decay_by_cell}
+($\tau$ from $\approx 3$ to $\approx 26$\,s); the homogeneous control banks are
+jittered copies of the lead cell \PEO{}~0.3/0.09 alone.
+
+\section{Simulation and Read-out Settings}\label{app:ch5_settings}
+
+\Cref{tab:ch5_settings} collects the settings used throughout
+\cref{ch:temporal}. All read-outs are a single linear ridge regression; no
+nonlinear decoder is used, so any demonstrated computation is attributable to the
+device nodes rather than the read-out.
+
+\begin{table}[t]
+  \centering
+  \caption[Reservoir simulation and read-out settings]{Simulation and read-out settings across the three evidence tiers of \cref{ch:temporal}. All banks are spatial banks of independent (non-recurrent) leaky nodes driven by randomly-masked input; all read-outs are linear ridge regression.}
+  \label{tab:ch5_settings}
+  \footnotesize
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.4cm}X@{}}
+    \toprule
+    Setting & Value \\
+    \midrule
+    Node model & $x^{(i)}_n=\lambda_i x^{(i)}_{n-1}+[\max(w_i u_n,0)]^{\alpha_i}$ (\cref{sec:ch5_model}) \\
+    Read-out & single linear ridge regression \\
+    Bank size $N$ & 24 (benchmarks); 48 (physiology/affect) \\
+    Seeds & 10 random input/bank seeds; means $\pm$ SD reported \\
+    Significance tests & paired Wilcoxon signed-rank over seeds (or subjects) \\
+    Memory capacity & $\mathrm{MC}_k$ summed over lags, random uniform input \cite{Jaeger2002STM} \\
+    NARMA & NARMA-10 system identification, NRMSE \cite{AtiyaParlos2000} \\
+    Information-processing capacity & degree-1 (linear) + degree-2 (nonlinear), bounded by $N$ \cite{Dambre2012} \\
+    Affective corpus & \WESAD{} chest signals, leave-one-subject-out over 15 subjects \cite{Schmidt2018WESAD} \\
+    Streaming cadence & $\Delta t=\SI{1}{\second}$; reconstruction delays $1,3,8,20,45$\,s \\
+    Affect scoring & class-balanced macro-F1 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
