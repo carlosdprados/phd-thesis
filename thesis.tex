@@ -45,6 +45,27 @@
 %% ============================================================
 \begin{document}
 
+%% ---- Front matter: contents listings ----
+%%  Lowercase-roman page numbering for the preliminary listings,
+%%  switched to arabic at the start of the body. \cleardoublepage
+%%  keeps each listing and the first body page on a recto (odd)
+%%  page in this twoside layout. The contents listings carry no
+%%  running header, so plain pagestyle is used for them.
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+{\cleardoublepage\pagestyle{plain}
+ \tableofcontents
+ \cleardoublepage
+ \phantomsection\addcontentsline{toc}{chapter}{\listfigurename}
+ \listoffigures
+ \cleardoublepage
+ \phantomsection\addcontentsline{toc}{chapter}{\listtablename}
+ \listoftables}
+
+\cleardoublepage
+\pagenumbering{arabic}
+
 %% ---- Front matter ----
 \include{chapters/frontmatter_motivation}
 
