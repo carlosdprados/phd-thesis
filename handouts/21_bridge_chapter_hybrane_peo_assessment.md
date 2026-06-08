@@ -14,9 +14,9 @@
 
 ## What the seam looks like today (grounded in the current draft)
 
-- The pivot is currently invisible. `chapters/chapter3_comparative.tex:64` says the comparative work "replaces the hyperbranched polyester-amide Hybrane host" with PEO in a subordinate clause; the reader is never told *why*.
+- The pivot is currently invisible. `chapters/chapter4_comparative.tex:64` says the comparative work "replaces the hyperbranched polyester-amide Hybrane host" with PEO in a subordinate clause; the reader is never told *why*.
 - Ch2 §2.7 (`chapter2_proof_of_concept.tex:437`) actively praises Hybrane: "enhanced stability is attributed to ... the Hybrane matrix," ~300 h shelf life, <15–20% variability. This **contradicts** the real campaign finding (Hybrane devices were not reproducible over the longer term and degraded).
-- The ~18 months of infrastructure work appears only as passing "methods" references: the curation registry (`chapter3_comparative.tex:116`), the confound-audit scripts (lines 73, 82). The DEVICES_LIBRARY, the `feature_extraction` pipeline (~6 months of programming), `device_cleaner`, and the visualization/timeline tooling are essentially uncredited.
+- The ~18 months of infrastructure work appears only as passing "methods" references: the curation registry (`chapter4_comparative.tex:116`), the confound-audit scripts (lines 73, 82). The DEVICES_LIBRARY, the `feature_extraction` pipeline (~6 months of programming), `device_cleaner`, and the visualization/timeline tooling are essentially uncredited.
 
 ---
 

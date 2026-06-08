@@ -4,7 +4,7 @@
 
 **Author:** Carlos David Prado-Socorro
 **Date:** 2026-06-04
-**Status:** Active planning document. **Supersedes the application structure (§4.4–§4.6) of [`04_chapter4_temporal_computing_plan.md`](04_chapter4_temporal_computing_plan.md)**, which predates the v4 Chapter-3 reframe and still assumes a *comparative* cation fit (≥3 devices/cell). The modelling backbone of handout 04 (§4.3 behavioural model, validation, parameter cards) and the circuit-integration / design-rules sections (§4.7–§4.8) remain valid and are reused. Read alongside [`08_chapter3_4_claims_audit.md`](08_chapter3_4_claims_audit.md) and [`05_chapter4_data_pipeline.md`](05_chapter4_data_pipeline.md).
+**Status:** Active planning document under the old numbering, where the temporal-computing material was Chapter 4. In the bound thesis it is Chapter 5. **Supersedes the application structure (§4.4–§4.6) of [`04_chapter4_temporal_computing_plan.md`](04_chapter4_temporal_computing_plan.md)**, which predates the v4 comparative-chapter reframe and still assumes a *comparative* cation fit (≥3 devices/cell). The modelling backbone of handout 04 (§4.3 behavioural model, validation, parameter cards) and the circuit-integration / design-rules sections (§4.7–§4.8) remain valid and are reused. Read alongside [`08_chapter3_4_claims_audit.md`](08_chapter3_4_claims_audit.md), [`05_chapter4_data_pipeline.md`](05_chapter4_data_pipeline.md), and `docs/current_chapter_numbering.md`.
 
 > **⚠️ UPDATE 2026-06-04 (WESAD downloaded & run — results are in; see new [§13](#13-measured-wesad-results-2026-06-04--honest-narrative-pivot) and [§14](#14-physiological-temporal-context-reconstruction-2026-06-04--affect-aligned-heterogeneity-benchmark)).** The flagship Demonstration-B claim as written in §2/§6 — *"the heterogeneous reservoir wins the multi-timescale affect task the homogeneous one cannot cover"* — **is NOT supported by the measured WESAD label-classification data**, even after rebuilding the task as a memory-demanding *streaming* one (the fair test). What the data DO support: (i) the in-silico device reservoir does real affective computing (Demo A binary **0.894**; Demo B 3-class **~0.76**); (ii) fading **memory** helps the streaming task (**+0.049** vs instantaneous; **+0.014–0.020** controlling for dimensionality); (iii) timescale **heterogeneity** is *within noise* on WESAD labels (**ΔF1 het−hom = +0.005 ± 0.011**, 7/10 seeds), because the discriminative label memory demand is dominated by a single slow (tonic) band the lead composition already serves. **The "heterogeneity is a computational resource" claim is therefore anchored on two measured benchmarks:** architecture-level MC (**1.49×**) and the new WESAD physiological temporal-context reconstruction (**R² 0.756 vs 0.744 best homogeneous, N=48**), while final affect labels are reported as a real downstream task with an honest heterogeneity null. §2, §6, §7 below are kept for provenance but must be read through §13–§14.
 
@@ -52,8 +52,8 @@ Two consequences: (i) the device is *natively matched* to these signals — no a
 ## 3. Shared modelling backbone (built once)
 
 Per-device, composition-indexed behavioural model (full spec: handout 04 §4.3):
-- **write nonlinearity** φ_c(N): from PULSES descriptors ([`ch3_pulses_by_cell.csv`](ch3_pulses_by_cell.csv)) — compressive growth exponent α, peak/dynamic range, turnover.
-- **fading memory** λ_c(Δt): Kohlrausch τ_c, β_c from DELAYTIME ([`ch3_decay_by_cell.csv`](ch3_decay_by_cell.csv)).
+- **write nonlinearity** φ_c(N): from PULSES descriptors ([`ch4_pulses_by_cell.csv`](ch4_pulses_by_cell.csv)) — compressive growth exponent α, peak/dynamic range, turnover.
+- **fading memory** λ_c(Δt): Kohlrausch τ_c, β_c from DELAYTIME ([`ch4_decay_by_cell.csv`](ch4_decay_by_cell.csv)).
 - **read transfer** f_c(V_read, x): from HYST window metrics.
 - **noise / spread**: device-to-device + cycle-to-cycle from within-cell replicates.
 
@@ -148,17 +148,17 @@ The connective tissue between Ch3 and Ch4:
 
 ## 12. Next steps (build order)
 
-1. **`scripts/ch4_model.py`** — ✅ **STARTED (2026-06-04).** `ParameterCard` per composition cell assembled from `ch3_decay_by_cell.csv` + `ch3_pulses_by_cell.csv`; `decay_factor(dt)` (identified Kohlrausch τ/β, else single-exp from t½) and `potentiation_ratio(N)` (power-law to peak + turnover roll-off); `lead_card()` = PEO0.3/0.09; runnable self-test PASSES (9 Li cards). **TODO:** leave-one-dataset-out validation vs raw curves; per-device spread for the variability envelope; pulse-encoding front end.
-2. **`scripts/ch4_reservoir.py`** — ✅ **EXPANDED (2026-06-04).** Spatial multi-node bank + **linear Memory Capacity** (Jaeger, ridge), **NARMA-10**, and a **per-composition sweep**.
+1. **`scripts/ch5_model.py`** — ✅ **STARTED (2026-06-04).** `ParameterCard` per composition cell assembled from `ch4_decay_by_cell.csv` + `ch4_pulses_by_cell.csv`; `decay_factor(dt)` (identified Kohlrausch τ/β, else single-exp from t½) and `potentiation_ratio(N)` (power-law to peak + turnover roll-off); `lead_card()` = PEO0.3/0.09; runnable self-test PASSES (9 Li cards). **TODO:** leave-one-dataset-out validation vs raw curves; per-device spread for the variability envelope; pulse-encoding front end.
+2. **`scripts/ch5_reservoir.py`** — ✅ **EXPANDED (2026-06-04).** Spatial multi-node bank + **linear Memory Capacity** (Jaeger, ridge), **NARMA-10**, and a **per-composition sweep**.
    - *Demo-B (heterogeneity):* heterogeneous bank total MC = 6.12 vs homogeneous = 4.10 → **1.49×**, gain at short lags.
    - *Demo-A validation (sweep):* **best total-MC = PEO 0.3/0.09** (the lead, MC 3.44); best NARMA-10 = PEO 0.3/0.045 (NRMSE 0.627), lead a close 2nd (0.669). **Both winners are in the low-PEO row, as Ch3 predicts** — so 0.3/0.09 is validated as the memory-capacity optimum, with 0.3/0.045 competitive on NARMA (its larger dynamic range helps drive).
    - *Caveat:* absolute NARMA NRMSE is high (~0.6–0.8) — a bank of *independent* (non-recurrent, 1T1M) leaky nodes is a weak NARMA reservoir; only the *relative* composition ranking is claimed. Self-test PASSES.
    - **TODO:** single-node *time-multiplexed* (delay-feedback) variant for Demo A; MC(k) + sweep figures; inject measured device-to-device spread; drive-diversity nodes (Demo B).
-3. **`scripts/ch4_wesad.py`** — ✅ **DONE ON REAL DATA (2026-06-04).** WESAD present at `data/wesad/WESAD/S2..S17` (15 subjects). Now multichannel (chest **EDA + Resp + Temp + HR-from-ECG**; robust R-peak detection via scipy), per-subject robust scaling (preserves tonic level, LOSO-safe), cached at the scaled-stream level. **Demo A** = window-level binary stress/baseline (EDA, lead bank). **Demo B rebuilt as STREAMING** continuous per-step affect tracking (reservoir runs over the whole session; per-step ridge one-hot; LOSO; causal label smoothing) — the memory-demanding fair test — with **het / hom / instantaneous / memoryless** banks, per-class F1, seed error bars, and a dt sweep. Self-test + synthetic smoke test pass. **Results: see [§13](#13-measured-wesad-results-2026-06-04--honest-narrative-pivot).** Net: multichannel + per-subject scaling lifted Demo A to **0.894**; the streaming reformulation made the task memory-demanding (memory helps) but **Demo B did NOT clear the homogeneous control** (ΔF1 = +0.005 ± 0.011, ns).
-4. ✅ **`scripts/ch4_physio_context.py` (2026-06-04)** — **NEW affect-aligned heterogeneity benchmark.** Uses real WESAD EDA/Resp/Temp/HR streams, but the target is multi-lag physiological context reconstruction rather than final affect labels: reconstruct each channel at 1, 3, 8, 20 and 45 s delays from the reservoir state (LOSO, linear ridge, N=48). Results: instantaneous R² **0.673**, memoryless **0.674**, homogeneous fast **0.741**, homogeneous slow **0.744**, heterogeneous **0.756 ± 0.002**. Heterogeneity gain over the best homogeneous control = **+0.012 R²**; memory gain over instantaneous = **+0.084 R²**. Outputs: `handouts/ch4_physio_context_results.csv`, `figures/chapter4/physio_context_reconstruction.pdf`. See [§14](#14-physiological-temporal-context-reconstruction-2026-06-04--affect-aligned-heterogeneity-benchmark).
-5. ✅ **`scripts/ch4_figures.py` (2026-06-04)** — `figures/chapter4/mc_curve.pdf` (MC(k), heterog. 6.1 vs homog. 4.1) + `composition_sweep.pdf` (MC & NARMA by cell). Demo-A/B figures done. The physiology-context figure is generated by `scripts/ch4_physio_context.py`.
+3. **`scripts/ch5_wesad.py`** — ✅ **DONE ON REAL DATA (2026-06-04).** WESAD present at `data/wesad/WESAD/S2..S17` (15 subjects). Now multichannel (chest **EDA + Resp + Temp + HR-from-ECG**; robust R-peak detection via scipy), per-subject robust scaling (preserves tonic level, LOSO-safe), cached at the scaled-stream level. **Demo A** = window-level binary stress/baseline (EDA, lead bank). **Demo B rebuilt as STREAMING** continuous per-step affect tracking (reservoir runs over the whole session; per-step ridge one-hot; LOSO; causal label smoothing) — the memory-demanding fair test — with **het / hom / instantaneous / memoryless** banks, per-class F1, seed error bars, and a dt sweep. Self-test + synthetic smoke test pass. **Results: see [§13](#13-measured-wesad-results-2026-06-04--honest-narrative-pivot).** Net: multichannel + per-subject scaling lifted Demo A to **0.894**; the streaming reformulation made the task memory-demanding (memory helps) but **Demo B did NOT clear the homogeneous control** (ΔF1 = +0.005 ± 0.011, ns).
+4. ✅ **`scripts/ch5_physio_context.py` (2026-06-04)** — **NEW affect-aligned heterogeneity benchmark.** Uses real WESAD EDA/Resp/Temp/HR streams, but the target is multi-lag physiological context reconstruction rather than final affect labels: reconstruct each channel at 1, 3, 8, 20 and 45 s delays from the reservoir state (LOSO, linear ridge, N=48). Results: instantaneous R² **0.673**, memoryless **0.674**, homogeneous fast **0.741**, homogeneous slow **0.744**, heterogeneous **0.756 ± 0.002**. Heterogeneity gain over the best homogeneous control = **+0.012 R²**; memory gain over instantaneous = **+0.084 R²**. Outputs: `handouts/ch5_physio_context_results.csv`, `figures/chapter4/physio_context_reconstruction.pdf`. See [§14](#14-physiological-temporal-context-reconstruction-2026-06-04--affect-aligned-heterogeneity-benchmark).
+5. ✅ **`scripts/ch5_figures.py` (2026-06-04)** — `figures/chapter4/mc_curve.pdf` (MC(k), heterog. 6.1 vs homog. 4.1) + `composition_sweep.pdf` (MC & NARMA by cell). Demo-A/B figures done. The physiology-context figure is generated by `scripts/ch5_physio_context.py`.
 6. **Single-node *time-multiplexed* (delay-feedback) Demo-A variant** — optional alternative architecture; not required for the claim.
-7. Draft `chapters/chapter4_temporal.tex` around the three-level evidence structure: MC/NARMA → physiological-context reconstruction → WESAD label task.
+7. Draft `chapters/chapter5_temporal.tex` around the three-level evidence structure: MC/NARMA → physiological-context reconstruction → WESAD label task.
 
 ---
 
@@ -205,7 +205,7 @@ This *unifies* Ch3 → Ch4: Ch3 shows composition (and drive) **set** the device
 
 - `figures/chapter4/wesad_affect.pdf` — (a) Demo A reservoir vs static; (b) Demo B streaming decomposition (inst → +dim → +memory → +heterog) with seed error bars.
 - `figures/chapter4/mc_curve.pdf`, `composition_sweep.pdf` — unchanged architecture-level heterogeneity result.
-- `figures/chapter4/physio_context_reconstruction.pdf`, `handouts/ch4_physio_context_results.csv` — real-WESAD physiological temporal-context reconstruction result.
+- `figures/chapter4/physio_context_reconstruction.pdf`, `handouts/ch5_physio_context_results.csv` — real-WESAD physiological temporal-context reconstruction result.
 - Cache: `data/wesad/_cache_EDA-Resp-Temp-HR_4hz.npz` (scaled streams; gitignored with the dataset).
 
 ### 13.5 Scope / caveats to state in the chapter
@@ -214,7 +214,7 @@ In-silico devices; linear readout; HR from chest ECG (cleaner than wrist BVP); p
 
 ### 13.6 Open decision for the writing pass
 
-Chapter framing options were put to the author; **selected: build the streaming task** (done, above). Remaining call for the draft: present Ch4 as **(benchmarks = where heterogeneity wins) + (WESAD = where the devices do real affect, memory helps, heterogeneity is an honest null)** — the recommended honest structure — before writing `chapters/chapter4_temporal.tex`.
+Chapter framing options were put to the author; **selected: build the streaming task** (done, above). Remaining call for the draft: present current Ch5 as **(benchmarks = where heterogeneity wins) + (WESAD = where the devices do real affect, memory helps, heterogeneity is an honest null)** — the recommended honest structure — before writing `chapters/chapter5_temporal.tex`.
 
 ---
 
@@ -246,7 +246,7 @@ Chapter framing options were put to the author; **selected: build the streaming 
 
 ## 15. Hardening pass (2026-06-06) — statistics, IPC, and three new figures
 
-A review pass on the drafted chapter added the rigour and figures below. All numbers are reproducible from `scripts/ch4_reservoir.py`, `ch4_physio_context.py`, `ch4_figures.py`.
+A review pass on the drafted chapter added the rigour and figures below. All numbers are reproducible from `scripts/ch5_reservoir.py`, `ch5_physio_context.py`, `ch5_figures.py`.
 
 ### 15.1 Symmetric statistical rigour (the positive results now tested like the null)
 
@@ -258,7 +258,7 @@ The original draft stress-tested the *null* (het−hom on WESAD labels) but repo
 
 ### 15.2 IPC computed (Dambre was cited but never used)
 
-`ipc()` in `ch4_reservoir.py`: Legendre-degree decomposition, ridge factor reused across all probe targets, noise floor from an independent stream. Result (N=24, 10 seeds):
+`ipc()` in `ch5_reservoir.py`: Legendre-degree decomposition, ridge factor reused across all probe targets, noise floor from an independent stream. Result (N=24, 10 seeds):
 
 | Bank | total | linear (deg 1) | nonlinear (deg 2) |
 | --- | ---: | ---: | ---: |

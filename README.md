@@ -72,14 +72,10 @@ The proof-of-concept chapter expands the published work:
 | [`handouts/`](handouts) | Planning documents, outlines, and working notes |
 | [`docs/`](docs) | Reference docs about the experimental archive and analysis pipeline (data and code live in the sibling `Nanomem_Devices_Library/`) |
 
-**Naming convention.** Chapter sources, internal labels, and `figures/chapterN/`
-directories all follow the **bound chapter order** (Ch3 = bridge, Ch4 =
-comparative, Ch5 = temporal). The figure-generation scripts and the per-cell data
-CSVs in `handouts/` retain their **legacy numbering** from before the bridge
-chapter was inserted, so `scripts/ch3_figures.py` produces the Chapter-4 figures
-and `scripts/ch4_figures.py` the Chapter-5 figures. Their output paths
-(`FIGDIR`) point at the correct bound-order directory; only the script filenames
-are legacy.
+**Naming convention.** Chapter sources, internal labels, `figures/chapterN/`,
+analysis scripts, and current per-cell CSV artifacts now follow the **bound
+chapter order**: Ch3 = bridge, Ch4 = comparative, Ch5 = temporal. The canonical
+map is recorded in [`docs/current_chapter_numbering.md`](docs/current_chapter_numbering.md).
 
 ## Build The Thesis
 

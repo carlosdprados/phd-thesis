@@ -1,13 +1,13 @@
-# Handout 19 — Gold (Au) electrode corpus: assessment for Chapter 3
+# Handout 19 — Gold (Au) electrode corpus: assessment for Chapter 4
 
-**Date:** 2026-06-05 · **Script:** `scripts/ch3_electrode.py` · **Table:** `handouts/ch3_electrode_by_cell.csv`
+**Date:** 2026-06-05 · **Script:** `scripts/ch4_electrode.py` · **Table:** `handouts/ch4_electrode_by_cell.csv`
 
 This handout answers the question: *we also have devices with gold (Au) top electrodes instead of
-silver (Ag) — do Chapter 3's claims still hold, are there new claims, and where (if anywhere) should
+silver (Ag) — do Chapter 4's claims still hold, are there new claims, and where (if anywhere) should
 they go?*
 
-All numbers below are reproduced by `scripts/ch3_electrode.py` from the same DATABASE the rest of
-Chapter 3 uses (`DEVICES_LIBRARY.csv` for species identity, `UPDATED_DEVICES_LIBRARY.csv` for the
+All numbers below are reproduced by `scripts/ch4_electrode.py` from the same DATABASE the rest of
+Chapter 4 uses (`DEVICES_LIBRARY.csv` for species identity, `UPDATED_DEVICES_LIBRARY.csv` for the
 collapsed mass-ratio values and the evaporated-electrode thickness, plus the HYST / PULSES /
 DELAYTIME / FILTERED tables).
 
@@ -37,7 +37,7 @@ Its chemistry coverage (all 0.3/0.09):
 
 Two consequences are immediate and non-negotiable:
 
-1. **The composition spine — Chapter 3's only quantitative, replicated result — cannot be tested on
+1. **The composition spine — Chapter 4's only quantitative, replicated result — cannot be tested on
    Au at all.** Au has no composition variation. Nothing about the composition claims is confirmed or
    refuted by the Au data; they remain a silver-only result.
 2. The Au data *can* speak to the **chemistry axis** (host / cation / anion) and to the **electrode**
@@ -51,7 +51,7 @@ limit, weaker vetting than the Ag numbers.
 
 ---
 
-## 2. Do the Chapter 3 claims hold on Au?
+## 2. Do the Chapter 4 claims hold on Au?
 
 ### 2a. Composition claims — untestable (not contradicted)
 No Au composition variation exists. The claims stand as silver-only; Au is silent.
@@ -70,7 +70,7 @@ PEO > TMPE retention reproduces on Au, and the host also orders the **switching 
 **Cation (Li/Na/K, TMPE/OTf).** Au has no Na/K *decay* data, so the retention null cannot be
 re-tested on Au. But the **switching window is flat across the cation series** on Au — on-off
 1.29 (Li) / 1.47 (Na) / 1.43 (K), normalised area 0.066 / 0.108 / 0.063 — i.e. **no clean cation
-ordering**, the same null Chapter 3 reports for Ag, now seen on a second electrode and via an
+ordering**, the same null Chapter 4 reports for Ag, now seen on a second electrode and via an
 independent observable (the steady-state window rather than the decay). **Cation null reproduces.**
 (The UV-Vis band-edge invariance in §3.5 already uses this same Au/TMPE generation.)
 
@@ -128,26 +128,26 @@ the threshold, not raise it), pointing to an interfacial/electrode origin.
 
 ---
 
-## 4. Recommendation: fold into Chapter 3 (do **not** spin a new chapter; do **not** leave as-is)
+## 4. Recommendation: fold into Chapter 4 (do **not** spin a new chapter; do **not** leave as-is)
 
 - **New chapter? No.** Single composition, small n per cell, no human curation, electrode/generation
   confound. It has neither the replication of the composition spine nor the independent breadth to
-  carry a chapter at Chapter 3's evidential standard.
-- **Leave as-is? No.** Chapter 3 currently *holds Au out* (§3.2, §3.9 "electrode … held out rather
+  carry a chapter at Chapter 4's evidential standard.
+- **Leave as-is? No.** Chapter 4 previously *held Au out* (§4.2, §4.9 "electrode … held out rather
   than modelled"). But the Au data does two genuinely useful things: it **independently replicates the
   host effect and the cation null on a second electrode** (materially strengthening the illustrative
-  chemistry landscape, which is Chapter 3's weakest tier), and it reveals a **clean, physically
+  chemistry landscape, which is Chapter 4's weakest tier), and it reveals a **clean, physically
   sensible electrode lever**. Discarding that wastes corroboration the chapter needs.
-- **Fold into Chapter 3 — yes.** Concretely:
-  1. A short **electrode subsection** (sibling of EIS §3.7 and the microscopic-corroboration material),
+- **Fold into Chapter 4 — yes.** Concretely:
+  1. A short **electrode subsection** (sibling of EIS §4.7 and the microscopic-corroboration material),
      reporting the Ag-active / Au-inert contrast as an *illustrative* finding with the quartet above,
      the active-vs-inert reading, and the generation/curation/n caveats stated plainly.
   2. One or two sentences in the **chemistry section** noting that the host effect and cation null
      **reproduce on the Au electrode** (cross-electrode replication), with n stated.
-  3. Soften §3.9: the electrode is no longer merely "held out" — it is now reported illustratively and
+  3. Soften §4.9: the electrode is no longer merely "held out" — it is now reported illustratively and
      used as cross-electrode corroboration; the residual confound (generation) is the honest caveat.
   4. Optionally a figure (electrode contrast: window / potentiation / retention, Ag vs Au at the lead
      cell). Lower priority than the prose.
 
-Scope stays small and squarely inside Chapter 3's existing "composition = quantitative / chemistry +
+Scope stays small and squarely inside Chapter 4's existing "composition = quantitative / chemistry +
 electrode = illustrative" two-tier discipline. The quantitative spine is untouched.

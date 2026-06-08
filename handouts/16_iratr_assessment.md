@@ -1,15 +1,15 @@
-# Handout 16 — IR-ATR (ATR-FTIR) dataset: assessment for Chapter 3
+# Handout 16 — IR-ATR (ATR-FTIR) dataset: assessment for Chapter 4
 
 **Date:** 2026-06-05
-**Script:** `scripts/ch3_iratr.py` · **Band table:** `handouts/ch3_iratr_bands.csv`
-**Chapter figure:** `figures/chapter3/iratr_chemistry.pdf` (combined, used in §3.5).
+**Script:** `scripts/ch4_iratr.py` · **Band table:** `handouts/ch4_iratr_bands.csv`
+**Chapter figure:** `figures/chapter4/iratr_chemistry.pdf` (combined, used in §4.5).
 **Exploratory figures:** `…/iratr_fingerprint.pdf`, `…/iratr_triflate_nsSO3.pdf`,
 `…/iratr_host_crystallinity.pdf`
 
-**STATUS (2026-06-05): integrated.** Folded into §3.5 (chemistry landscape) per the
-recommendation below — intro sentence + one combined figure `fig:ch3_iratr`; the
+**STATUS (2026-06-05): integrated.** Folded into §4.5 (chemistry landscape) per the
+recommendation below — intro sentence + one combined figure `fig:ch4_iratr`; the
 ν_s(SO₃)/cation-null added to the cation paragraph, the PEO/TMPE crystallinity contrast to
-the host paragraph, and a corroboration clause to the §3.7 mechanistic discussion. Humidity
+the host paragraph, and a corroboration clause to the §4.7 mechanistic discussion. Humidity
 set excluded. Chapter builds clean.
 
 ## 1. What the data is

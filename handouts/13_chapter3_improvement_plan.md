@@ -1,16 +1,16 @@
 <!-- markdownlint-disable-file MD013 -->
 
-# Chapter 3 — Improvement Plan
+# Historical Comparative-Chapter Improvement Plan
 
 **Date:** 2026-06-04  
-**Purpose:** Convert the Chapter 3 audit into an actionable plan for strengthening the chapter as a thesis chapter and as a possible future publication basis.
+**Purpose:** Historical plan for strengthening the comparative chapter. It was written when the comparative chapter was still numbered Chapter 3; in the bound thesis it is Chapter 4.
 
 > **Progress (2026-06-04, critically verified):**
-> - **#1 protocol correction — DONE & VERIFIED.** Confirmed from `DEVICES_*_PIXEL_INFO.csv`: composition PULSES are **3 V/1.5 V** (32/32), DELAYTIME **4 V/2 V** (30/32; v114 is the 3 V/6 V overlay). Added **Table 3.1** (per-measurement protocols), fixed the §3.2 prose and the §3.4 "common 4 V/2 V" claim, and **sharpened limitation #4 + the Ch4 caveat** to the real point: φ (3 V) and λ (4 V) are at *different write amplitudes*, so the Ch4 composition assumes a compatibility the protocol result shows is only approximate. Builds clean (chapter + thesis).
-> - **#5 design-space scatter + #4 heterogeneity — DONE (combined).** `fig:ch3_design_space` (Fig in Discussion): per-device $t_{1/2}$ vs peak ratio, colour=PEO, shape=salt. Framed *honestly* — PEO sets the broad region (paired operating point), with large within-composition scatter shown, not averaged. Per-device coupling is only **moderate** (corr≈0.4), so it is presented as "paired region + heterogeneity", not a deterministic law.
+> - **#1 protocol correction — DONE & VERIFIED.** Confirmed from `DEVICES_*_PIXEL_INFO.csv`: composition PULSES are **3 V/1.5 V** (32/32), DELAYTIME **4 V/2 V** (30/32; v114 is the 3 V/6 V overlay). Added **Table 4.1** (per-measurement protocols), fixed the §4.2 prose and the §4.4 "common 4 V/2 V" claim, and **sharpened limitation #4 + the Ch5 caveat** to the real point: φ (3 V) and λ (4 V) are at *different write amplitudes*, so the Ch5 composition assumes a compatibility the protocol result shows is only approximate. Builds clean (chapter + thesis).
+> - **#5 design-space scatter + #4 heterogeneity — DONE (combined).** `fig:ch4_design_space` (Fig in Discussion): per-device $t_{1/2}$ vs peak ratio, colour=PEO, shape=salt. Framed *honestly* — PEO sets the broad region (paired operating point), with large within-composition scatter shown, not averaged. Per-device coupling is only **moderate** (corr≈0.4), so it is presented as "paired region + heterogeneity", not a deterministic law.
 > - **#6 physical hypothesis — DONE.** Hedged "working mechanistic picture" paragraph in Discussion (PEO dilutes SY percolation + eases ionic relaxation → window/potentiation/retention move together; salt = chargeable-state budget → turnover; host/anion = coordination/barrier distribution). Explicitly not a microscopic proof.
-> - **#7 protocol design rule — largely DONE** via Table 3.1 + sharpened limitation #4.
-> - 2026-06-07: **#2 provenance schematic/table** and the explicit curve→pixel/device→cell aggregation description are now in the Chapter 4 methods. Representative raw curves are already in the main chapter through `fig:ch3_representative`.
+> - **#7 protocol design rule — largely DONE** via Table 4.1 + sharpened limitation #4.
+> - 2026-06-07: **#2 provenance schematic/table** and the explicit curve→pixel/device→cell aggregation description are now in the Chapter 4 methods. Representative raw curves are already in the main chapter through `fig:ch4_representative`.
 > - Remaining: **#8** attrition table, **#10** EIS SI note, **#11** archive→SI. All presentation/SI; none affects a headline number.
 
 ## Executive Direction
@@ -52,9 +52,9 @@ DEVICES_LAB_DATA
   -> project_feature_extraction
   -> DATABASE/*.csv
   -> project_device_cleaner / FILTERED_DEVICES.csv
-  -> ch3_png_qa_curation.csv
-  -> scripts/ch3_4_dynamics_fits.py
-  -> ch3_decay_by_cell.csv / ch3_pulses_by_cell.csv / figures
+  -> ch4_png_qa_curation.csv
+  -> scripts/ch4_dynamics_fits.py
+  -> ch4_decay_by_cell.csv / ch4_pulses_by_cell.csv / figures
 ```
 
 **Action:**
@@ -62,11 +62,11 @@ DEVICES_LAB_DATA
 - Add a compact schematic or table showing the raw-to-figure pipeline.
 - Name the key reproducibility artifacts:
   - `docs/experimental_archive_and_pipeline.md`
-  - `handouts/ch3_png_qa_curation.csv`
-  - `scripts/ch3_4_dynamics_fits.py`
-  - `scripts/ch3_figures.py`
-  - `handouts/ch3_decay_by_cell.csv`
-  - `handouts/ch3_pulses_by_cell.csv`
+  - `handouts/ch4_png_qa_curation.csv`
+  - `scripts/ch4_dynamics_fits.py`
+  - `scripts/ch4_comparative_figures.py`
+  - `handouts/ch4_decay_by_cell.csv`
+  - `handouts/ch4_pulses_by_cell.csv`
 
 **Acceptance criterion:** the reader understands that the figures are not hand-assembled from cherry-picked PNGs; the curation registry is machine-readable and applied automatically.
 
@@ -188,11 +188,11 @@ The archive starts broad and narrows substantially after protocol matching and Q
 
 **Source artifacts:**
 
-- `handouts/ch3_coverage_audit.csv`
-- `handouts/ch3_ch4_device_inventory.csv`
+- `handouts/ch4_coverage_audit.csv`
+- `handouts/ch4_device_inventory.csv`
 - `handouts/ch4_device_manifest_DRAFT.csv`
-- `handouts/ch3_decay_by_cell.csv`
-- `handouts/ch3_pulses_by_cell.csv`
+- `handouts/ch4_decay_by_cell.csv`
+- `handouts/ch4_pulses_by_cell.csv`
 
 **Acceptance criterion:** the evidence-tier distinction is auditably visible, not just asserted.
 
@@ -219,7 +219,7 @@ Profilometry exists and should be acknowledged because thickness may vary with c
 **Priority:** medium-to-low  
 **Placement:** supplementary/appendix
 
-EIS exists in the archive and `v247-v252` have EIS rows, but the current Chapter 3 claims are not built on EIS.
+EIS exists in the archive and `v247-v252` have EIS rows, but the current Chapter 4 claims are not built on EIS.
 
 **Action:**
 
@@ -239,7 +239,7 @@ The following are useful but too detailed for the main flow:
 - Device-folder naming drift and why `UPDATED_DEVICES_LIBRARY.csv` is canonical.
 - `FILTERED_DEVICES.csv` semantics: exclusion list, not a good-device list.
 - The fact that the working pipeline is CSV/TXT, not consolidated HDF5/Parquet.
-- Which data types exist but are not used as Chapter 3 claims: VCONST, EIS, AFM/IR/UV-Vis placeholders, lock-in HDF5 side data.
+- Which data types exist but are not used as Chapter 4 claims: VCONST, EIS, AFM/IR/UV-Vis placeholders, lock-in HDF5 side data.
 
 **Acceptance criterion:** Chapter 3 remains readable, while the thesis still documents the data infrastructure well enough for reproducibility.
 

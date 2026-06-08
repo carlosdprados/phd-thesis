@@ -7,13 +7,13 @@ Paste everything below the line into a new Claude Code session started from the
 
 ---
 
-You are continuing a PhD thesis. Your task this session: **(1) build the figures and (2) draft the new standalone "bridge" chapter** (Hybrane→PEO reproducibility pivot) that will be inserted between the current Chapter 2 and Chapter 3.
+You are continuing a PhD thesis. Historical note: this prompt was used to draft the bridge chapter that is now Chapter 3. It is retained as provenance, not as a current task.
 
 ## Read these first (do not skip)
 
 - `handouts/22_bridge_chapter_plan.md` — the authoritative plan (rev 5+). Follow it. Pay special attention to §1A–1E (controls, verified results, mechanistic hypothesis), §2 (notes/quotes), §3 (methods legacy), §4 (chapter structure), §5 (figures), §6 (Ch2 reconciliation).
 - `scripts/bridge_hybrane_peo_reproducibility.py` and `handouts/bridge_hybrane_peo_summary.csv` — the reproducible evidence. **Re-run the script first** (`python3 scripts/bridge_hybrane_peo_reproducibility.py`) and cite only numbers it prints, in case the DATABASE changed.
-- `chapters/chapter2_proof_of_concept.tex` and `chapters/chapter3_comparative.tex` — for tone, LaTeX macros (`\SY`, `\Hybrane`, `\PEO`, `\LiTf`, `\twoterminal`, etc.), the `\ifdefined\thesismode` standalone guard, figure/caption style, and `\cref`/label conventions. `chapters/thesis-format.sty` holds shared formatting.
+- `chapters/chapter2_proof_of_concept.tex` and `chapters/chapter4_comparative.tex` — for tone, LaTeX macros (`\SY`, `\Hybrane`, `\PEO`, `\LiTf`, `\twoterminal`, etc.), the `\ifdefined\thesismode` standalone guard, figure/caption style, and `\cref`/label conventions. `chapters/thesis-format.sty` holds shared formatting.
 - Project memory `bridge_chapter_decision.md` (loaded via MEMORY.md) — the condensed decisions.
 
 Data lives in the sibling folder; scripts use `DB = "../Nanomem_Devices_Library/DATABASE"` from repo root. The author's interactive tool is `../Nanomem_Devices_Library/project_feature_explorer` (for reference; the audit script already reproduces its slicing).
@@ -39,11 +39,11 @@ Create `scripts/bridge_figures.py` (matplotlib; reuse the loading/corpus logic f
 - **F3 — resolution:** (a) Hybrane vs PEO normalized-area & on-off at matched 3 V (box/strip, p=0.018); (b) PEO temporal stability — on-off @3 V per device vs year (2022–2024) showing the sustained window vs Hybrane's collapsed level.
 - Optional **F4** — annealing-recovery (late 150 °C vs 75 °C on-off @3 V).
 
-Match the visual style of existing `scripts/ch3_figures.py` / `ch4_figures.py` if present. Commit after the figures render.
+Match the visual style of existing `scripts/ch4_comparative_figures.py` / `ch5_figures.py` if present. Commit after the figures render.
 
 ## Deliverable 2 — chapter draft
 
-Create `chapters/chapter3_bridge.tex` with `\chapter{...}\label{ch:bridge}`, mirroring the standalone `\ifdefined\thesismode` guard and preamble of `chapter3_comparative.tex` so it compiles standalone. Target **12–18 pp**, methods + negative-result + positive-legacy — **not** a lab diary. Follow the §4 structure:
+Create `chapters/chapter3_bridge.tex` with `\chapter{...}\label{ch:bridge}`, mirroring the standalone `\ifdefined\thesismode` guard and preamble of `chapter4_comparative.tex` so it compiles standalone. Target **12–18 pp**, methods + negative-result + positive-legacy — **not** a lab diary. Follow the §4 structure:
 
 1. The reproducibility problem (anchor on the v026 inflection; scientific question, not confession).
 2. Was it us or the materials? — a controlled elimination (compact methods-of-elimination *table* from §2; the Lorenzo cross-person corroboration; this motivates the provenance library).

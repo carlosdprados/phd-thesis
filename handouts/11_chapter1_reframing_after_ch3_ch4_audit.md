@@ -79,7 +79,7 @@ The main evidence shift is clear:
 
 **Current visual issue:** Panel (b) says "Cation identity (primary knob)" and "Composition knobs (secondary tuners)." The caption calls the cation/composition ordering the "central hypothesis" tested in Chapter 3.
 
-**Problem:** This is the strongest visual overclaim in Chapter 1. It conflicts directly with the revised Chapter 3 plan, where composition is the quantitative spine and cation is sample-limited.
+**Problem:** This is the strongest visual overclaim in Chapter 1. It conflicts directly with the revised old-Chapter-3/current-Chapter-4 plan, where composition is the quantitative spine and cation is sample-limited.
 
 **Suggested new figure:** Replace Figure 14 with a thesis-specific "evidence-disciplined tuning map":
 
@@ -127,9 +127,9 @@ The key label should be "composition-indexed fading-memory bank" rather than "ca
 
 **Former framing now addressed in `chapters/chapter1_introduction.tex`:** Chapter 3 was described as a composition and ion-identity-dependence chapter, and Chapter 4 models were said to be extracted per composition and per cation.
 
-**Problem:** The current Chapter 3 plan says composition is quantitative; host/anion/cation are illustrative. Chapter 4 should not look like it depends on a robust cation axis.
+**Problem:** The current Chapter 4 plan says composition is quantitative; host/anion/cation are illustrative. Chapter 5 should not look like it depends on a robust cation axis.
 
-**Suggested reframing:** Update the Chapter 3 outline to match `handouts/10_chapter3_comparative_plan.md`:
+**Suggested reframing:** Update the old Chapter-3/current Chapter-4 outline to match `handouts/10_chapter3_comparative_plan.md`:
 
 - "Compositional and Chemical Control of Volatile Polymer-Electrolyte Memristive Dynamics"
 - quantitative spine: PEO/LiTr composition grid;

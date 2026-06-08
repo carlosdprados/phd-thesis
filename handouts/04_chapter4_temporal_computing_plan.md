@@ -80,7 +80,7 @@ Reframe → Consolidate → Model → Apply → Constrain → Rules
 - Mapping of each dataset to its originating device generation in `Nanomem_Devices_Library/DEVICES_LAB_DATA/YYYY-QN/NM_vXXX_.../`
 - Curated device list frozen in `handouts/ch4_device_manifest.csv`, with two strata: (i) the **PEO/LiTr concentration series** covering the composition axis; (ii) the **fixed-composition PEO/LiTr, PEO/NaTr, PEO/KTr set** at mass fractions 0.3 / 0.09 covering the cation axis. Each stratum must contain ≥ 3 devices per cell that pass the read-disturb sanity check
 - Chapter 2 Paper 1 device (SY/Hybrane/LiTf): full measurement suite, used strictly as a **Li-only prior / sanity-check source**. It is *not* a Chapter 3 PEO/LiTr device and cannot stand in for one in quantitative fits; it supplies functional-form priors and cross-checks
-- TMPE- and alkali-TFSI (LiBis / NaBis / KBis) devices from the broader archive are **excluded** from the Chapter 4 manifest: their dataset is too sparse for a comparative fit. Chapter 3 reports them as exploratory side evidence; Chapter 4 does not model them
+- TMPE- and alkali-TFSI (LiBis / NaBis / KBis) devices from the broader archive are **excluded** from the old Chapter-4 manifest: their dataset is too sparse for a comparative fit. Current Chapter 4 reports them as exploratory side evidence; current Chapter 5 does not model them
 
 #### 4.2.2 Dataset inventory table — common PEO/triflate comparative data
 
@@ -372,11 +372,11 @@ Note: every entry in the table is a qualitative rule of thumb. The *quantitative
 | ------- | ------------- | ----------------------- |
 | `fig:ch4_framing` | Conceptual schematic contrasting a static-weight crossbar with a heterogeneous fading-memory bank | Original schematic |
 | `fig:ch4_dataset_map` | Visual inventory of the three common dynamical datasets (I–V, N-pulse, delay-time) across the `ch4_device_manifest.csv` devices, organised along the composition axis (PEO/LiTr concentration series) and the cation axis (PEO/{Li,Na,K}Tr at 0.3 / 0.09) | `chapter4_pipeline.py` over `Nanomem_Devices_Library/` |
-| `fig:ch4_model_fits` | Example model fits overlayed on I–V (`Day1_Hyst`), N-pulse potentiation (`Day2_NmbPls`), and delay-time depotentiation (`Day2_DlyTime`) for one device of each composition–cation cell used in the simulations | `chapter4_pipeline.py` |
+| `fig:ch5_model_fits` | Example model fits overlayed on I–V (`Day1_Hyst`), N-pulse potentiation (`Day2_NmbPls`), and delay-time depotentiation (`Day2_DlyTime`) for one device of each composition–cation cell used in the simulations | `chapter4_pipeline.py` |
 | `fig:ch4_param_cards` | Parameter distributions (f_c from I–V, φ_c from N-pulse, λ_c from delay-time) per composition–cation cell | `chapter4_pipeline.py` |
-| `fig:ch4_reservoir_arch` | Historical schematic of the heterogeneous reservoir architecture with composition-diverse PEO/triflate banks and linear readout | Original schematic |
-| `fig:ch4_reservoir_bench` | Memory capacity and classification accuracy vs. reservoir size and heterogeneity | Simulation from parameter cards |
-| `fig:ch4_reservoir_variability` | Accuracy vs. injected device-to-device and cycle-to-cycle spread | Simulation from parameter cards |
+| `fig:ch5_reservoir_arch` | Historical schematic of the heterogeneous reservoir architecture with composition-diverse PEO/triflate banks and linear readout | Original schematic |
+| `fig:ch5_reservoir_bench` | Memory capacity and classification accuracy vs. reservoir size and heterogeneity | Simulation from parameter cards |
+| `fig:ch5_reservoir_variability` | Accuracy vs. injected device-to-device and cycle-to-cycle spread | Simulation from parameter cards |
 | `fig:ch4_coincidence_kernel` | Fitted delay-time depotentiation curves reinterpreted as coincidence kernels K_c(Δt) across the PEO/triflate corpus | From Chapter 3 `Day2_DlyTime` data |
 | `fig:ch4_coincidence_det` | Detection probability vs. Δt for each composition–cation cell under noise | Simulation from parameter cards |
 | `fig:ch4_filterbank_impulse` | Impulse responses h_c(t) for selected cells, reconstructed from (λ_c, φ_c), compared to ideal leaky integrators with the same τ | Simulation from parameter cards |
@@ -404,7 +404,7 @@ Chapter 2 SY/Hybrane/LiTf supplementary datasets (priors and sanity checks only,
 - Separated STM/LTM retention (two-voltage protocol)
 - Impedance spectroscopy
 
-**Explicitly excluded from the Chapter 4 manifest:** TMPE-based composites and alkali-TFSI (LiBis / NaBis / KBis) devices — their coverage of the three common measurements is too sparse for a comparative fit. Chapter 3 reports them as exploratory side evidence; Chapter 4 does not model them.
+**Explicitly excluded from the old Chapter-4 manifest:** TMPE-based composites and alkali-TFSI (LiBis / NaBis / KBis) devices — their coverage of the three common measurements is too sparse for a comparative fit. Current Chapter 4 reports them as exploratory side evidence; current Chapter 5 does not model them.
 
 **Curated device list:** `handouts/ch4_device_manifest.csv`, frozen at the start of Chapter 4 writing, with ≥ 3 devices per composition–cation cell all passing the read-disturb sanity check (§3.4 of `05_chapter4_data_pipeline.md`).
 

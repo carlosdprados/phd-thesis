@@ -1,7 +1,7 @@
-# Handout 17 — XRD dataset: assessment for Chapter 3 (and a correction to the ATR host claim)
+# Handout 17 — XRD dataset: assessment for Chapter 4 (and a correction to the ATR host claim)
 
 **Date:** 2026-06-05
-**Script:** `scripts/ch3_xrd.py` · **Figure:** `figures/chapter3/xrd_amorphous.pdf`
+**Script:** `scripts/ch4_xrd.py` · **Figure:** `figures/chapter4/xrd_amorphous.pdf`
 
 ## 1. What the data is
 
@@ -57,6 +57,6 @@ composition axis), value being:
 2. **Corrective:** disciplines the ATR host reading from "semicrystalline" to "locally
    ordered", which is the honest, defensible statement.
 
-Slot: one figure (`fig:ch3_xrd`) + 2–3 sentences folded into the host paragraph of §3.5,
-right after the ATR crystallinity sentence; update the §3.7 discussion clause likewise.
+Slot: one figure (`fig:ch4_iratr`, panel c) + 2–3 sentences folded into the host paragraph of §4.5,
+right after the ATR crystallinity sentence; update the §4.7 discussion clause likewise.
 Do **not** over-claim; this is a null/amorphous + corrective result, not a new positive lever.

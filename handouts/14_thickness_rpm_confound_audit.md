@@ -3,7 +3,7 @@
 # Thickness / Spin-Coat-RPM Confound Audit — Chapters 3 & 4
 
 **Author:** Carlos David Prado-Socorro · **Date:** 2026-06-04 · **Status:** resolved — claims stand.
-**Reproduce:** `python3 scripts/thickness_rpm_audit.py` (prints the table below + regenerates `figures/chapter3/thickness_control.pdf`).
+**Reproduce:** `python3 scripts/thickness_rpm_audit.py` (prints the table below + regenerates `figures/chapter4/thickness_control.pdf`).
 **Companion:** the broader claims ledger [`08_chapter3_4_claims_audit.md`](08_chapter3_4_claims_audit.md), which controlled protocol amplitude (§13), electrode Ag/Au (§16), and aging — but **not** film thickness. This handout closes that gap.
 
 ---
@@ -12,7 +12,7 @@
 
 Devices were spin-coated at different RPM. Crucially, RPM was sometimes — **but not for every comparison batch** — raised for higher PEO/LiTr concentrations, deliberately, to thin the otherwise-thicker film and partially equalise thickness across the composition grid. **Source of truth for thickness = `DATABASE/DEVICES_PROFILOMETRY_STATS.csv` (nm).**
 
-So: are the Chapter-3 composition claims (higher PEO → smaller switching window, lower potentiation exponent α, shorter fading-memory time) and the Chapter-4 parameter cards / simulations **contaminated** by this deliberate thickness tuning, i.e. is "PEO effect" partly a "thickness effect"?
+So: are the Chapter-4 composition claims (higher PEO → smaller switching window, lower potentiation exponent α, shorter fading-memory time) and the Chapter-5 parameter cards / simulations **contaminated** by this deliberate thickness tuning, i.e. is "PEO effect" partly a "thickness effect"?
 
 ## 1. Method
 
@@ -83,6 +83,6 @@ Supporting evidence:
 
 No values, parameter cards, or simulations were re-computed (the audit shows none should). Added for **transparency** so the question is answered on the record:
 
-- **Ch3** §Materials: a "thickness is controlled, not confounding" paragraph + the supplementary figure `fig:ch3_thickness_control` (`figures/chapter3/thickness_control.pdf`).
-- **Ch4** §Limitations: one sentence cross-referencing the Ch3 thickness control.
+- **Ch4** §Materials: a "thickness is controlled, not confounding" paragraph + the supplementary figure `fig:ch4_thickness_control` (`figures/chapter4/thickness_control.pdf`).
+- **Ch5** §Limitations: one sentence cross-referencing the Ch4 thickness control.
 - **This handout** + the committed `scripts/thickness_rpm_audit.py` (reproducible).

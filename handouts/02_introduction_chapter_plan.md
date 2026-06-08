@@ -19,7 +19,7 @@ Computing limits → Brain-inspired solutions → The memristor (static *and* dy
 The revised flow adds two inflection points:
 
 1. After introducing the memristor, the reader is shown that "memristive device" is a broader concept than "non-volatile weight": it also covers volatile, fading-memory, time-varying elements.
-2. Before stating the thesis objectives, the reader is shown that a device family with tunable fading memory and controlled heterogeneity is the natural substrate for *temporal* computing, with physical reservoir computing as the active Chapter-4 route. Coincidence detection and leaky filtering remain useful introductory paradigms, but they are not co-equal Chapter-4 demonstrations in the current thesis plan.
+2. Before stating the thesis objectives, the reader is shown that a device family with tunable fading memory and controlled heterogeneity is the natural substrate for *temporal* computing, with physical reservoir computing as the active Chapter-5 route. Coincidence detection and leaky filtering remain useful introductory paradigms, but they are not co-equal Chapter-5 demonstrations in the current thesis plan.
 
 ---
 

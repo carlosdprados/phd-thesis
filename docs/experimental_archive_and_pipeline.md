@@ -4,7 +4,7 @@
 
 **Author:** Carlos David Prado-Socorro · **Verified:** 2026-06-03 (against the files on disk)
 
-This is the **ground-truth description of what actually exists** in the experimental archive and its Python tooling, as observed directly in the files. It is the empirical counterpart to the forward-looking specification in [`../handouts/05_chapter4_data_pipeline.md`](../handouts/05_chapter4_data_pipeline.md): that document defines what Chapters 3–4 *will require*; this one records what is *already there*. Where they disagree, this document reflects the disk and the other is the plan.
+This is the **ground-truth description of what actually exists** in the experimental archive and its Python tooling, as observed directly in the files. It is the empirical counterpart to the forward-looking specification in [`../handouts/05_chapter4_data_pipeline.md`](../handouts/05_chapter4_data_pipeline.md): that document defines what the comparative and temporal-computing chapters *will require*; this one records what is *already there*. Where they disagree, this document reflects the disk and the other is the plan.
 
 The data and code live **outside this git repo**, in a sibling folder:
 
@@ -103,7 +103,7 @@ Types and headline features:
 
 ## 7. Status of the planned Chapter-4 artifacts
 
-As of 2026-06-04, the full archival artifacts that `05` originally planned **do not yet exist**: `handouts/ch4_device_manifest.csv` and `scripts_general/chapter4_pipeline.py` are absent, and no consolidated HDF5/Parquet containers are produced. The DATABASE CSVs (regenerated May 2025) plus `FILTERED_DEVICES.csv` (June 2025) remain the **archive-level canonical source of truth**. Separately, the thesis repo now has a current Chapter-4 simulation layer in `scripts/ch4_model.py`, `scripts/ch4_reservoir.py`, `scripts/ch4_wesad.py`, and `scripts/ch4_figures.py`, fed by the curated `handouts/ch3_*.csv` and `handouts/ch4_*.csv` tables; that layer is not the same thing as the missing full archival `chapter4_pipeline.py`.
+As of 2026-06-04, the full archival artifacts that `05` originally planned **do not yet exist**: `handouts/ch4_device_manifest.csv` and `scripts_general/chapter4_pipeline.py` are absent, and no consolidated HDF5/Parquet containers are produced. The DATABASE CSVs (regenerated May 2025) plus `FILTERED_DEVICES.csv` (June 2025) remain the **archive-level canonical source of truth**. Separately, the thesis repo now has a current Chapter-5 simulation layer in `scripts/ch5_model.py`, `scripts/ch5_reservoir.py`, `scripts/ch5_wesad.py`, and `scripts/ch5_figures.py`, fed by the curated Chapter-4 parameter tables in `handouts/ch4_*.csv`; that layer is not the same thing as the missing full archival `chapter4_pipeline.py`.
 
 ## 8. Corrections / open points vs the planning docs
 

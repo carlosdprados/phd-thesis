@@ -169,10 +169,10 @@ Ch2 §2.7 (`chapters/chapter2_proof_of_concept.tex:437`) attributes *enhanced st
 LaTeX cross-refs use labels (`ch:poc`, `ch:comparative`, `ch:temporal`), so numbers auto-update; the work is filenames + docs.
 
 - New file `chapters/chapter3_bridge.tex` with label `\label{ch:bridge}` and the `\ifdefined\thesismode` standalone guard.
-- Rename: `chapter3_comparative.tex`→`chapter4_comparative.tex`; `chapter4_temporal.tex`→`chapter5_temporal.tex`; **reserve `chapter6_conclusions.tex`** (author-approved) — stub it now with `\chapter{Conclusions}\label{ch:conclusions}` so the structure is locked.
+- Completed rename: `chapter3_comparative.tex`→`chapter4_comparative.tex`; `chapter4_temporal.tex`→`chapter5_temporal.tex`; `chapter6_conclusions.tex` reserved and drafted.
 - `thesis.tex`: insert `\include{chapters/chapter3_bridge}` after chapter2 (line ~53) and update the renamed includes.
 - `Makefile`: update chapter targets/paths.
-- Figures: new chapter under `figures/chapter3_bridge/`; existing Ch3 figures stay put (the comparative chapter keeps its folder even as it becomes Ch4 — or rename for tidiness in the same commit).
+- Figures: bridge chapter under `figures/chapter3/`; comparative figures under `figures/chapter4/`; temporal-computing figures under `figures/chapter5/`.
 - Update Ch2 summary forward-pointer and comparative-chapter back-pointer to `\cref{ch:bridge}`.
 - **Docs/memory renumber:** `handouts/01_thesis_structure.md`, `handouts/00_thesis_overview_memory.md`, and memory `thesis_structure.md` from 5- to 6-chapter plan (Intro · PoC · **Bridge** · Comparative · Temporal · Conclusions). Grep handouts/memory for "Chapter 3/4" assumptions.
 - Build the full thesis after renaming to confirm numbering/refs resolve.

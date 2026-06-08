@@ -1,6 +1,6 @@
-# Handout 18 — UV-Vis dataset: assessment for Chapter 3
+# Handout 18 — UV-Vis dataset: assessment for Chapter 4
 
-**Date:** 2026-06-05 · **Script:** `scripts/ch3_uvvis.py` · **Figure:** `figures/chapter3/uvvis_bandedge.pdf`
+**Date:** 2026-06-05 · **Script:** `scripts/ch4_uvvis.py` · **Figure:** `figures/chapter4/uvvis_bandedge.pdf`
 
 ## 1. What the data is
 
@@ -50,8 +50,8 @@ the loop: the differences seen electrically are ionic, not a change in SY's opti
 
 ## 4. Recommendation
 
-**Include, briefly** — one compact figure (`fig:ch3_uvvis`, the normalised band-edge overlay)
-+ 1–2 sentences in §3.5 (cation paragraph / host context) and a clause in the §3.7 discussion,
+**Include, briefly** — one compact figure (`fig:ch4_uvvis`, the normalised band-edge overlay)
+1--2 sentences in §4.5 (cation paragraph / host context) and a clause in the §4.7 discussion,
 stated as illustrative and flagged as a separate (Au/2025/TMPE) generation. Do not over-claim:
 it is an invariance (a controlled negative), valuable precisely because it pins the SY
 electronic backbone as fixed across the electrolyte chemistries.

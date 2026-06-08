@@ -52,7 +52,7 @@ So the chapter should **lead with composition** (its strongest, replicated resul
 
 ## 6. Open tasks before writing
 
-- [ ] Refit (point-level QA) the composition-grid devices to publish clean per-cell τ, β, potentiation parameters (extend `scripts/ch3_4_dynamics_fits.py`).
+- [ ] Refit (point-level QA) the composition-grid devices to publish clean per-cell τ, β, potentiation parameters (extend `scripts/ch4_dynamics_fits.py`).
 - [ ] Read-disturb check on the composition devices (`05` prerequisite) before freezing the manifest.
 - [ ] Decide figure set: composition heatmaps (window, τ), the chemistry-landscape bar charts (with n labels), the v114 amplitude-confound figure.
 - [ ] If chemistry axes are kept, generate matched-protocol/electrode subsets only.

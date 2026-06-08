@@ -225,7 +225,7 @@ Fourteen insertion points met the criteria. They are listed in reading order.
 The following candidates were considered but not retained in the current fourteen-figure plan:
 
 - **HSAB periodic-table excerpt in §1.6.1.** The HSAB ordering is compact enough to carry in prose and is now reused twice — once as panel (c) of Figure 12 (the chemistry figure) and once as a labelled axis in Figure 14 (b); a dedicated periodic-table figure would duplicate material that the reader can already parse.
-- **Detailed behavioural-model block diagram for Chapter 4 in §1.7.** Chapter 4 has its own planning document (`handouts/04_chapter4_temporal_computing_plan.md`) and its own figure budget; the Chapter 1 outline should not preempt it.
+- **Detailed behavioural-model block diagram for Chapter 5 in §1.7.** Chapter 5 has its own planning documents (`handouts/04_chapter4_temporal_computing_plan.md` and `handouts/12_chapter4_demonstration_plan_v4.md`, both named under the old numbering) and its own figure budget; the Chapter 1 outline should not preempt it.
 
 ---
 

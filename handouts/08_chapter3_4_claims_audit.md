@@ -11,15 +11,15 @@
 ## 0. Resume pointer (read first)
 
 - **Method:** analysis driven from `Nanomem_Devices_Library/DATABASE` (regenerated May 2025) — `UPDATED_DEVICES_LIBRARY.csv` for chemistry, the `*_PIXEL_INFO.csv` tables for measurement presence, `FILTERED_DEVICES.csv` for erratic-pixel flags. Corpus = **PEO host + triflate salt = 149 devices**.
-- **Artifact:** [`ch3_ch4_device_inventory.csv`](ch3_ch4_device_inventory.csv) — one row per PEO/triflate device with chemistry, electrode, and per-type pixel counts. Regenerate with the script noted in §5.
-- **Done:** §1–§3 coverage/scope/ledger, §6 first-pass trends, §7 manifest candidates, §8 dynamics, §9 cross-validation, §10 **τ,β** alignment, §11 cation expansion, §12 PNG QA (2023-10), §13 **read-voltage confound (decisive)**. Artifacts: `ch3_ch4_device_inventory.csv`, `ch4_device_manifest_DRAFT.csv`, `ch4_decay_fits.csv`, `ch4_pulse_descriptors.csv`, `scripts/ch3_4_dynamics_fits.py`.
+- **Artifact:** [`ch4_device_inventory.csv`](ch4_device_inventory.csv) — one row per PEO/triflate device with chemistry, electrode, and per-type pixel counts. Regenerate with the script noted in §5.
+- **Done:** §1–§3 coverage/scope/ledger, §6 first-pass trends, §7 manifest candidates, §8 dynamics, §9 cross-validation, §10 **τ,β** alignment, §11 cation expansion, §12 PNG QA (2023-10), §13 **read-voltage confound (decisive)**. Artifacts: `ch4_device_inventory.csv`, `ch4_device_manifest_DRAFT.csv`, `ch4_decay_fits.csv`, `ch4_pulse_descriptors.csv`, `scripts/ch4_dynamics_fits.py`.
 - **Cation verdict (C3):** at matched protocol (4 V/2 V) PEO/triflate shows Li longest (HSAB-consistent, n=1 Na/K) but it does **not** generalise across host/anion → no universal Li>Na>K. The dominant τ lever is **potentiation amplitude** (write/read protocol), not cation (§13, C12). **Composition result (C1/C2) stands** (uniform 4 V/2 V).
 - **TFSI QA done (§14):** PEO/TFSI collapsed (only v321 Li usable); TMPE/TFSI all clean → cleanest cation comparison = K shortest, Li≈Na (n=2), but not robust across families. Cation analysis is now **complete**: no universal ordering; potentiation amplitude ≫ host > anion > cation.
-- **Coverage audit (step A) done — §16 + `ch3_coverage_audit.csv`:** only composition (PEO/LiTr/Ag) is replicated (n=2–4); host/anion/cation are n≤2 illustrative; Au-electrode confound caught (corrected §15).
-- **Rework APPROVED & SHIPPED (v4):** full Ch3 plan = `10_chapter3_comparative_plan.md`; canonical `00`/`01`/`05` + README updated to v4. Proposal/diff retained in `09_…PROPOSAL.md`.
+- **Coverage audit (step A) done — §16 + `ch4_coverage_audit.csv`:** only composition (PEO/LiTr/Ag) is replicated (n=2–4); host/anion/cation are n≤2 illustrative; Au-electrode confound caught (corrected §15).
+- **Rework APPROVED & SHIPPED (v4):** full old-Ch3/current-Ch4 plan = `10_chapter3_comparative_plan.md`; canonical `00`/`01`/`05` + README updated to v4. Proposal/diff retained in `09_…PROPOSAL.md`.
 - **Delay-fit QA scan (§17)** + **rescue outcomes:** v149 discard (both), v148 delay discard / pulses keep, v151 delay salvageable (2/5/10/60/300 s). Composition spine = good-fit {0.3,0.6,1.2}×{0.045,0.09} cells.
-- **Curation registry shipped (§18):** `handouts/ch3_png_qa_curation.csv` is the single source of truth for hand-picked points; `scripts/ch3_4_dynamics_fits.py` reads + applies it (reproducible refits).
-- **Next:** broaden the fit script beyond manifest candidates to do the **good-fit composition refit** over all PEO/LiTr cells (using the registry, incl. v151), publish clean per-cell τ/β; then write Ch3 or formalise the Ch4 model. Always match protocol + electrode + composition.
+- **Curation registry shipped (§18):** `handouts/ch4_png_qa_curation.csv` is the single source of truth for hand-picked points; `scripts/ch4_dynamics_fits.py` reads + applies it (reproducible refits).
+- **Next:** broaden the fit script beyond manifest candidates to do the **good-fit composition refit** over all PEO/LiTr cells (using the registry, incl. v151), publish clean per-cell τ/β; then write the current Chapter 4 or formalise the Chapter 5 model. Always match protocol + electrode + composition.
 - **Caveats on current numbers:** "has measurement" = ≥1 pixel row in that type's `PIXEL_INFO`; the §1 coverage counts do **not** exclude flagged pixels (they are an upper bound), whereas the §6/§7 trend + clean-manifest counts **do**. Neither yet verifies a common protocol or replicate quality.
 - **Flag granularity (verified 2026-06-03):** FILTERED exclusion is applied per `(device, day, pixel, measurement_type)`, **not** per device — a flag removes only that pixel's that-type aggregate. All **221 flags match a real measurement row (100%)**, partial flagging is preserved (e.g. NM_v009: 6 of 27 HYST pixels dropped, 21 kept), and including `day` is equivalent to `(device, pixel)` for the current flags. **Caveat — flagging is HYST-heavy: 207 HYST vs only 3 PULSES + 11 DELAYTIME flags.** FILTERED has screened almost nothing in PULSES/DELAYTIME, so the decay (τ/β) and potentiation fits must apply their **own** goodness-of-fit + read-disturb screening rather than rely on FILTERED.
 
@@ -100,7 +100,7 @@ Status key: ✅ supported by data · 🟡 limited / preliminary · 🔴 unsuppor
 
 ## 5. Reproducibility
 
-Coverage numbers and [`ch3_ch4_device_inventory.csv`](ch3_ch4_device_inventory.csv) were produced by an ad-hoc Python pass over the DATABASE CSVs on 2026-06-03 (pandas-free, stdlib `csv`). When this is promoted to a committed script it should live at `scripts/` (thesis repo) or `scripts_general/chapter4_pipeline.py` (`05` §5.1) and take the inventory/manifest as output.
+Coverage numbers and [`ch4_device_inventory.csv`](ch4_device_inventory.csv) were produced by an ad-hoc Python pass over the DATABASE CSVs on 2026-06-03 (pandas-free, stdlib `csv`). When this is promoted to a committed script it should live at `scripts/` (thesis repo) or `scripts_general/chapter4_pipeline.py` (`05` §5.1) and take the inventory/manifest as output.
 
 ---
 
@@ -173,7 +173,7 @@ This supports a defensible **2-axis composition design with replicates**: a **PE
 
 ## 8. Quantitative dynamics — model identification (2026-06-03)
 
-Artifacts: [`ch4_decay_fits.csv`](ch4_decay_fits.csv), [`ch4_pulse_descriptors.csv`](ch4_pulse_descriptors.csv); reproducible via `scripts/ch3_4_dynamics_fits.py`. DELAYTIME restricted to the common **2.0 V read** protocol (grid 1–300 s); PULSES at **1.5 V** (grid N = 1–1000).
+Artifacts: [`ch4_decay_fits.csv`](ch4_decay_fits.csv), [`ch4_pulse_descriptors.csv`](ch4_pulse_descriptors.csv); reproducible via `scripts/ch4_dynamics_fits.py`. DELAYTIME restricted to the common **2.0 V read** protocol (grid 1–300 s); PULSES at **1.5 V** (grid N = 1–1000).
 
 **Why t½, not τ.** The stretched-exponential `A·exp[−(t/τ)^β]+C` is only **identified in 16/30** delay curves — with 8 points, β and τ trade off and several fits collapse to τ→0. So the **primary timescale is a model-free half-enhancement time `t½`** (log-interpolated delay at which the conductance enhancement halves); the identified τ agrees with t½ where it converges, and is reported as secondary.
 
@@ -367,7 +367,7 @@ Better-supported than any cation cell, because both hosts have multiple Li devic
 
 ## 16. Coverage audit (step A) — what each axis can actually claim (2026-06-03)
 
-Clean all-3 (flag- and broken-excluded) device counts per cell, SY-based, **Ag electrode, 0.3/0.09** unless noted. Full matrix: [`ch3_coverage_audit.csv`](ch3_coverage_audit.csv).
+Clean all-3 (flag- and broken-excluded) device counts per cell, SY-based, **Ag electrode, 0.3/0.09** unless noted. Full matrix: [`ch4_coverage_audit.csv`](ch4_coverage_audit.csv).
 
 **Axis 1 — Composition (PEO/LiTr/Ag), peo × salt:**
 
@@ -419,7 +419,7 @@ Scanned every claim-relevant delay curve (64 device·day·pixel groups) with a s
 
 ## 18. Curation registry — single source of truth for hand-picked points (2026-06-04)
 
-**Gap closed.** Until now the PNG-derived point selections lived only as prose (§12–§17). They are now consolidated in a machine-readable registry — **`handouts/ch3_png_qa_curation.csv`** — one row per (device, measurement_type): `verdict` (use / clean / discard), `kept_points` (hand-picked delay-times in s, or pulse counts), `day`, `pixel`, `reviewer`, `date`, `notes`. **`scripts/ch3_4_dynamics_fits.py` now reads and applies it** (discard → drop the curve; clean → keep only listed points; use/absent → all points), so every refit is reproducible from the registry rather than from scattered notes.
+**Gap closed.** Until now the PNG-derived point selections lived only as prose (§12–§17). They are now consolidated in a machine-readable registry — **`handouts/ch4_png_qa_curation.csv`** — one row per (device, measurement_type): `verdict` (use / clean / discard), `kept_points` (hand-picked delay-times in s, or pulse counts), `day`, `pixel`, `reviewer`, `date`, `notes`. **`scripts/ch4_dynamics_fits.py` now reads and applies it** (discard → drop the curve; clean → keep only listed points; use/absent → all points), so every refit is reproducible from the registry rather than from scattered notes.
 
 Captured so far (all PNG-reviewed): 2023-10 batch (v247–v252), old PEO/Tr (v114/115/116), TFSI batches (v321–v326, v333–v338), and the §17 rescue candidates (v148/v149/v151). Verified applied: v248's decay now refits on its 6 cleaned points; discarded curves are dropped.
 
@@ -427,7 +427,7 @@ Captured so far (all PNG-reviewed): 2023-10 batch (v247–v252), old PEO/Tr (v11
 
 ## 19. Broadened composition refit — full PEO/LiTr/Ag population + v151 (2026-06-04)
 
-**Change.** `scripts/ch3_4_dynamics_fits.py` previously built its composition `cell` map from `manifest_candidate==1` only. It now includes **all** PEO/LiTr/Ag devices (chemistry-landscape cells still come from manifest candidates), so the curation-salvaged low-concentration row enters the spine. Data-availability + FILTERED + curation `discard` + the quality screen filter the rest downstream, so broadening is safe — in practice the only new contributor is **v151** (the bulk of non-candidates, v092–103 / v164–175, carry no DELAYTIME/PULSES data; v247 is a curation `discard`).
+**Change.** `scripts/ch4_dynamics_fits.py` previously built its composition `cell` map from `manifest_candidate==1` only. It now includes **all** PEO/LiTr/Ag devices (chemistry-landscape cells still come from manifest candidates), so the curation-salvaged low-concentration row enters the spine. Data-availability + FILTERED + curation `discard` + the quality screen filter the rest downstream, so broadening is safe — in practice the only new contributor is **v151** (the bulk of non-candidates, v092–103 / v164–175, carry no DELAYTIME/PULSES data; v247 is a curation `discard`).
 
 **New honesty gate.** A reported stretched-`τ` now also requires **n ≥ 6** points (keeps ≥ 2 dof on the 4-parameter fit). v151's curated 5-point decay therefore contributes the **model-free `t½` only**, not an over-fitted `τ`. (The `clean`-curve floor for *entering* the fit was lowered 6 → 5 so v151's 5 hand-picked points are admitted at all.)
 
@@ -439,22 +439,22 @@ Captured so far (all PNG-reviewed): 2023-10 batch (v247–v252), old PEO/Tr (v11
 | 0.09  | — | 19.2 (n=8) | 3.5 (n=3) | 6.0 (n=3) |
 | 0.18  | 22.4 (n=1, v151) | — | 5.5 (n=2) | 9.0 (n=3) |
 
-Identified `τ`: PEO0.3 ≈ 24–26 s (β 0.64–0.82) → PEO0.6 ≈ 3–4.6 s → PEO1.2 ≈ 7–10 s. The **lower-PEO → longer-retention** trend holds and v151 (22.4 s, the longest single cell) **extends** it to PEO 0.15 — corroborating, not part of, the replicated grid. Newly filled pulse cell PEO0.3/salt0.18 (v141+v148, n=2): weak, peak ≈ 3.8, no turnover — consistent with the "more dilute SY → weaker potentiation" reading. Chapter 3's stated numbers (2–20 s; PEO0.3 longest ≈19 s; τ≈20–25 s; β 0.6–0.9) are unchanged by the refit.
+Identified `τ`: PEO0.3 ≈ 24–26 s (β 0.64–0.82) → PEO0.6 ≈ 3–4.6 s → PEO1.2 ≈ 7–10 s. The **lower-PEO → longer-retention** trend holds and v151 (22.4 s, the longest single cell) **extends** it to PEO 0.15 — corroborating, not part of, the replicated grid. Newly filled pulse cell PEO0.3/salt0.18 (v141+v148, n=2): weak, peak ≈ 3.8, no turnover — consistent with the "more dilute SY → weaker potentiation" reading. Current Chapter 4's stated numbers (2–20 s; PEO0.3 longest ≈19 s; τ≈20–25 s; β 0.6–0.9) are unchanged by the refit.
 
-**New artifacts (single source for figures):** `handouts/ch3_decay_by_cell.csv`, `handouts/ch3_pulses_by_cell.csv` (per-cell medians with n_dev / n_identified).
+**New artifacts (single source for figures):** `handouts/ch4_decay_by_cell.csv`, `handouts/ch4_pulses_by_cell.csv` (per-cell medians with n_dev / n_identified).
 
-## 20. Chapter-3 figures generated + HYST median-vs-mean correction (2026-06-04)
+## 20. Chapter-4 figures generated + HYST median-vs-mean correction (2026-06-04)
 
-**`scripts/ch3_figures.py`** produces the three Ch3 figures into `figures/chapter3/` (composition_heatmaps, chemistry_landscape, protocol_overlay), wired into `chapters/chapter3_comparative.tex` (placeholders replaced; builds standalone + in thesis, exit 0).
+**`scripts/ch4_comparative_figures.py`** produces the Chapter 4 comparative figures into `figures/chapter4/` (composition_heatmaps, chemistry_landscape, protocol_overlay), wired into `chapters/chapter4_comparative.tex` (placeholders replaced; builds standalone + in thesis, exit 0).
 
-- **Composition heatmaps** recompute the HYST window metrics from DATABASE (FILTERED + broken excluded; device-median-of-curve-medians) and read `t½` from `ch3_decay_by_cell.csv`. Each cell annotated with value + n.
+- **Composition heatmaps** recompute the HYST window metrics from DATABASE (FILTERED + broken excluded; device-median-of-curve-medians) and read `t½` from `ch4_decay_by_cell.csv`. Each cell annotated with value + n.
 - **HYST aggregation correction.** The on-off-ratio distribution is strongly right-skewed (e.g. PEO0.3/salt0.045: median **3.4**, mean **7.8**, max **40**, n=4 devices). §6.2's "7.8" was the **mean**; the figure and chapter now use the robust **device-median** (3.4) throughout, so a few outlying sweeps don't define a cell. Chapter §3.4 text updated to match (on-off 3.3→2.4 across PEO at salt0.09; largest *area* 0.44 at the low-salt/low-PEO corner; per-sweep skew noted explicitly).
 - **Protocol overlay** = v114 R4 at its two protocols. Reproduced 4.6 s (3 V, R²=0.82, noisy) → 15.5 s (6 V, R²=0.97) with a **single** exponential (the chapter's methodology); the 4-param stretched form is degenerate on the clean 6 V curve. Model-free t½ corroborates (4.5→13.4 s).
 - **Chemistry bars** are illustrative values from §14–§15 / curation (host PEO 22 s n=3 vs TMPE 3.8 s n=1; anion PEO/Tr 20 s n=3 vs PEO/TFSI 0.4 s n=1; cation TMPE/TFSI Li 6.3 / Na 7.0 / K 3.5 s, n=2 each), each bar n-labelled.
 
 ## 21. Pulse (number-of-pulses) study — application-relevant findings + Fig 3.2 (2026-06-04)
 
-The PULSES descriptors ([`ch4_pulse_descriptors.csv`](ch4_pulse_descriptors.csv), per-cell in [`ch3_pulses_by_cell.csv`](ch3_pulses_by_cell.csv)) give the **input-integration / write transfer function** that Ch4 needs. Two *separate, sensical* composition axes emerge (verified per-device, not just cell medians):
+The PULSES descriptors ([`ch4_pulse_descriptors.csv`](ch4_pulse_descriptors.csv), per-cell in [`ch4_pulses_by_cell.csv`](ch4_pulses_by_cell.csv)) give the **input-integration / write transfer function** that Ch4 needs. Two *separate, sensical* composition axes emerge (verified per-device, not just cell medians):
 
 - **PEO sets potentiation strength.** Growth exponent α (log–log slope) falls with PEO — cleanest at salt0.045 where per-device values are tight: PEO0.3 [1.06,1.23,1.02,1.16]≈1.1 → PEO0.6 ≈0.5 → PEO1.2 [0.33,0.33,0.28]≈0.31. Peak ratio (usable dynamic range) maximal at the low-PEO/low-salt corner (≈480× at PEO0.3/0.045), few-fold at high PEO. *Noisier at salt0.18*; the PEO0.3/salt0.18 cell (α≈0.18) is the sparse n=2 curation-salvaged cell (v141/v148) and is not leaned on.
 - **Salt sets the turnover ceiling.** Device-consistent: **salt0.045 → all cells turn over by N≈100–300** (turnover 3/4, 3/3, 2/3); **salt0.18 → none turn over, growth sustained to N≈1000** (0/2, 1/3, 0/3); salt0.09 mixed (transition). More salt = more chargeable states before saturation.
@@ -463,7 +463,7 @@ The PULSES descriptors ([`ch4_pulse_descriptors.csv`](ch4_pulse_descriptors.csv)
 
 **Key honest caveat (now in Ch3 §3.8 limitations):** integration was measured at a **single fixed inter-pulse interval (0.103 s)** and forgetting separately (post-potentiation decay). No experiment varies input *timing*, so Ch4 must **compose** φ(N) and τ — a modelling assumption, not a measured fact. A varied-interval pulse-train experiment is the test.
 
-**Figure:** `fig_potentiation()` in `scripts/ch3_figures.py` → `figures/chapter3/potentiation_grid.pdf` = Fig 3.2 (α, peak ratio, turnover fraction over the grid; n annotated).
+**Figure:** `fig_potentiation()` in `scripts/ch4_comparative_figures.py` → `figures/chapter3/potentiation_grid.pdf` = Fig 3.2 (α, peak ratio, turnover fraction over the grid; n annotated).
 
 ## 22. TMPE/triflate cation series — authoritative attribution + the anion-flip (2026-06-04)
 
@@ -487,7 +487,7 @@ Direct refits (simple-exp τ, curation applied):
 
 **(a) Protocol mislabel (handout 13 #1) — FIXED.** Composition **PULSES = 3 V/1.5 V** (32/32), **DELAYTIME = 4 V/2 V** (30/32; v114 = 3 V/6 V overlay), confirmed from `DEVICES_*_PIXEL_INFO.csv`. Chapter wrongly said "common 4 V/2 V" and "30-pulse potentiation". Added **Table 3.1**; fixed §3.2/§3.4 prose; sharpened limitation #4 + Ch4 caveat (φ at 3 V vs λ at 4 V → composition assumes amplitude-compatibility the v114 result shows is only approximate).
 
-**(b) Au-electrode contamination of the 0.3/0.09 cell — FIXED.** The manifest flags Au PEO/Li devices **v265/266/268/269/270** as `manifest_candidate=1`; `scripts/ch3_4_dynamics_fits.py` pulled them into the composition `cell` via the `is_cand` branch, contaminating the **PEO 0.3/0.09** cell (two Au devices at t½≈87 s). Fix: require `electrode==Ag` for the composition spine. Effect — **headline robust**, counts corrected:
+**(b) Au-electrode contamination of the 0.3/0.09 cell — FIXED.** The manifest flags Au PEO/Li devices **v265/266/268/269/270** as `manifest_candidate=1`; `scripts/ch4_dynamics_fits.py` pulled them into the composition `cell` via the `is_cand` branch, contaminating the **PEO 0.3/0.09** cell (two Au devices at t½≈87 s). Fix: require `electrode==Ag` for the composition spine. Effect — **headline robust**, counts corrected:
 
 | 0.3/0.09 | before (with Au) | after (Ag-only) |
 |---|---|---|

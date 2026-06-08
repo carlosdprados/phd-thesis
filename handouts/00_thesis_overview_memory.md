@@ -264,7 +264,7 @@ Chapter 6: Conclusions & Outlook
 | Chapter 2 (LaTeX, full) | ✅ Complete | `chapters/chapter2_proof_of_concept.tex` |
 | Temporal-computing old planning document (old Ch4 numbering) | Partially superseded | `handouts/04_chapter4_temporal_computing_plan.md` |
 | Temporal-computing data / pipeline spec (old Ch4 numbering) | Data reference; execution partly superseded | `handouts/05_chapter4_data_pipeline.md` |
-| Comparative/temporal claims audit (old Ch3/Ch4 numbering) | Mostly historical ledger | `handouts/08_chapter3_4_claims_audit.md` (+ `ch3_*.csv`, `scripts/ch3_4_dynamics_fits.py`) |
+| Comparative/temporal claims audit (old Ch3/Ch4 numbering) | Mostly historical ledger | `handouts/08_chapter3_4_claims_audit.md` (+ `ch3_*.csv`, `scripts/ch4_dynamics_fits.py`) |
 | Comparative full plan (old Ch3 numbering) + proposal/diff | Historical planning baseline | `handouts/10_chapter3_comparative_plan.md`, `handouts/09_chapter3_revised_plan_PROPOSAL.md` |
 | Comparative improvement plan (old Ch3 numbering) | ✅ Current Ch4 follow-up list | `handouts/13_chapter3_improvement_plan.md` |
 | Temporal-computing demonstration plan (old Ch4 numbering) | Historical execution plan; Chapter 5 is now drafted | `handouts/12_chapter4_demonstration_plan_v4.md` |

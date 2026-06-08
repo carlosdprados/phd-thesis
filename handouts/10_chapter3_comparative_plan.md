@@ -1,8 +1,8 @@
 <!-- markdownlint-disable-file MD013 -->
 
-# Chapter 3 — Full Plan: Compositional and Chemical Control of Volatile Polymer-Electrolyte Memristive Dynamics
+# Historical Chapter-3 / Current Chapter-4 Full Plan: Compositional and Chemical Control of Volatile Polymer-Electrolyte Memristive Dynamics
 
-**Author:** Carlos David Prado-Socorro · **Date:** 2026-06-03 · **Status:** Historical approved plan. Chapter 3 has now been drafted in `chapters/chapter3_comparative.tex`, and follow-up work is tracked in `handouts/13_chapter3_improvement_plan.md`. Use this file for original Chapter-3 structure and evidence rationale, not for current progress status. Evidence basis: claims audit `08_chapter3_4_claims_audit.md` (§1–§16); rationale/diff: `09_chapter3_revised_plan_PROPOSAL.md`.
+**Author:** Carlos David Prado-Socorro · **Date:** 2026-06-03 · **Status:** Historical approved plan from the old numbering, where the comparative chapter was Chapter 3. In the bound thesis this material is Chapter 4 and is drafted in `chapters/chapter4_comparative.tex`; follow-up work is tracked in `handouts/13_chapter3_improvement_plan.md` as historical provenance. Use this file for original structure and evidence rationale, not for current progress status. Evidence basis: claims audit `08_chapter3_4_claims_audit.md` (§1–§16); rationale/diff: `09_chapter3_revised_plan_PROPOSAL.md`.
 
 > **One-line thesis of the chapter.** In SY/polymer-electrolyte composites, the **composition** of the ion-transport phase is a *replicated, quantitative* knob on the volatile memristive dynamics (switching window, potentiation, and a fading-memory time constant τ tunable over ≈ 2–20 s); electrolyte **chemistry** (host, anion, cation) shifts those dynamics further but is documented here as an *illustrative, sample-limited* landscape; and the **drive protocol** (potentiation amplitude) is shown to set the apparent timescale, a result that disciplines all cross-device comparison.
 
@@ -22,7 +22,7 @@
 
 ## 3. Methods & analysis (reproducible)
 
-- Feature pipeline `Nanomem_Devices_Library` → DATABASE CSVs; per-device fits via `scripts/ch3_4_dynamics_fits.py`.
+- Feature pipeline `Nanomem_Devices_Library` → DATABASE CSVs; per-device fits via `scripts/ch4_dynamics_fits.py`.
 - **Fading-memory model = Kohlrausch stretched exponential** (same as Ch2 `eq:kohlrausch`): ΔG(t)=ΔG₀·exp[−(t/τ)^β]+ΔG∞. Report **τ** (relaxation time) and **β** (stretch). The pipeline `exp decay: tau` (β=1) is a stable proxy, used after **per-device QA** (point-level outlier removal; many raw fits are bad — §13/§16).
 - Cross-validated against the pipeline's independently pre-computed τ/saturation (corr 0.93–1.0, §9).
 - **Comparison discipline:** any cross-device τ statement holds composition, electrode, and drive protocol fixed.
@@ -80,5 +80,5 @@ The composition τ ladder, device heterogeneity, β-shape diversity, and potenti
 
 - **Scope/length:** ~30–40 pages (unchanged from `01`).
 - **Status:** core composition results ready to write; chemistry-landscape figures need matched-protocol/electrode subsets; v114 protocol figure ready.
-- **Open data tasks (pre-writing):** extend `scripts/ch3_4_dynamics_fits.py` to emit clean per-cell τ/β/potentiation for the composition grid; read-disturb check; freeze the composition-grid manifest.
+- **Open data tasks (pre-writing):** extend `scripts/ch4_dynamics_fits.py` to emit clean per-cell τ/β/potentiation for the composition grid; read-disturb check; freeze the composition-grid manifest.
 - **Claim crosswalk:** every figure traces to a claim in `08` §3 ledger (C1/C2 composition ✅; C8/C9/C10 ✅; C11 host/anion 🟡; C3 cation 🔴; C12 protocol ✅).

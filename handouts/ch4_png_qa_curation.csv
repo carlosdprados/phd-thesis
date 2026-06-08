@@ -1,0 +1,42 @@
+device_name,measurement_type,day,pixel,verdict,kept_points,reviewer,date,notes
+NM_v247,DELAYTIME,11,L4,discard,,PNG-user,2026-06-03,flat/noisy R2~0.17 broken
+NM_v247,PULSES,11,,discard,,PNG-user,2026-06-03,barely rises - erratic
+NM_v247,HYST,11,,discard,,PNG-user,2026-06-03,near open-circuit
+NM_v248,DELAYTIME,11,R6,clean,1;2;5;30;60;180,PNG-user,2026-06-03,drop 10s & 300s (rise); weak signal maxR~2.7; tau~3.0s cleaned
+NM_v248,PULSES,11,,use,all,PNG-user,2026-06-03,weak; flat to 300 then jump at 1000 - defensible
+NM_v248,HYST,11,,use,all,PNG-user,2026-06-03,pointy-banana shape (atypical)
+NM_v249,DELAYTIME,11,,use,all,PNG-user,2026-06-03,clean exp decay R2~0.91 tau~10.7s
+NM_v249,PULSES,11,,use,all,PNG-user,2026-06-03,mountain/turnover by 1000
+NM_v249,HYST,11,,use,all,PNG-user,2026-06-03,fine
+NM_v250,DELAYTIME,11,,use,all,PNG-user,2026-06-03,clean exp decay R2~0.93 tau~3.8s
+NM_v250,PULSES,11,,use,all,PNG-user,2026-06-03,sensible rising
+NM_v250,HYST,11,,use,all,PNG-user,2026-06-03,fine
+NM_v251,DELAYTIME,11,,use,all,PNG-user,2026-06-03,clean exp decay R2~0.99 tau~5.0s
+NM_v251,PULSES,11,,use,all,PNG-user,2026-06-03,strong to 300 then turnover
+NM_v251,HYST,11,,use,all,PNG-user,2026-06-03,broad/round (ideal)
+NM_v252,DELAYTIME,11,,use,all,PNG-user,2026-06-03,clean exp decay R2~0.96 tau~6.7s
+NM_v252,PULSES,11,,use,all,PNG-user,2026-06-03,sharp to 300 then turnover
+NM_v252,HYST,11,,use,all,PNG-user,2026-06-03,fine
+NM_v114,DELAYTIME,13,R4,clean,2;5;10;15;25;40;60;90;120;180;300,PNG-user,2026-06-03,day13; drop first pt (1s); 3.0V read / 6V write protocol
+NM_v115,DELAYTIME,2,R4,clean,1;40;60;90;120;180;300,PNG-user,2026-06-03,keep 1s & >=40s; 3.0V/6V protocol; tau~34s
+NM_v115,PULSES,2,,use,all,PNG-user,2026-06-03,fine-shaped
+NM_v116,DELAYTIME,13,R4,clean,1;25;40;60;90;120;180;300,PNG-user,2026-06-03,keep 1s & >=25s; 3.0V/6V protocol; tau~27s
+NM_v116,PULSES,13,,use,all,PNG-user,2026-06-03,fine-shaped
+NM_v321,DELAYTIME,8,,clean,1;2;5;10;60;300,PNG-user,2026-06-03,PEO/TFSI; only usable PEO/TFSI delay; tau~0.4s
+NM_v322,DELAYTIME,9,L6,discard,,PNG-user,2026-06-03,flat/broken R2~0.06
+NM_v323,DELAYTIME,9,R2,discard,,PNG-user,2026-06-03,not a proper decay
+NM_v324,DELAYTIME,9,R5,discard,,PNG-user,2026-06-03,not a proper decay
+NM_v325,DELAYTIME,9,R5,discard,,PNG-user,2026-06-03,not a proper decay
+NM_v326,DELAYTIME,9,R5,discard,,PNG-user,2026-06-03,not a proper decay
+NM_v333,DELAYTIME,1,,use,all,PNG-user,2026-06-03,TMPE/TFSI clean; tau~9.0s
+NM_v334,DELAYTIME,2,,use,all,PNG-user,2026-06-03,TMPE/TFSI clean; tau~3.7s
+NM_v335,DELAYTIME,1,,use,all,PNG-user,2026-06-03,TMPE/TFSI clean; tau~7.5s
+NM_v336,DELAYTIME,2,,use,all,PNG-user,2026-06-03,TMPE/TFSI clean; tau~6.6s
+NM_v337,DELAYTIME,2,,use,all,PNG-user,2026-06-03,TMPE/TFSI clean; tau~3.7s
+NM_v338,DELAYTIME,1,,use,all,PNG-user,2026-06-03,TMPE/TFSI clean; tau~3.2s
+NM_v148,DELAYTIME,3,R3,discard,,PNG-user,2026-06-04,delay erratic beyond repair
+NM_v148,PULSES,3,,use,all,PNG-user,2026-06-04,pulses more defensible
+NM_v149,DELAYTIME,3,R3,discard,,PNG-user,2026-06-04,delay erratic beyond repair
+NM_v149,PULSES,3,,discard,,PNG-user,2026-06-04,pulses erratic beyond repair
+NM_v151,DELAYTIME,3,R3,clean,2;5;10;60;300,PNG-user,2026-06-04,delay salvageable with these points
+NM_v151,PULSES,3,,discard,,PNG-user,2026-06-04,pulses do not work

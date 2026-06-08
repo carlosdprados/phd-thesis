@@ -32,14 +32,14 @@ Quantitatively, inline reproducibility pointers (`scripts/…`, `handouts/…`,
 **Recommendation — create Appendix B/C/D mirroring Appendix A**, and move:
 
 - **Ch4 → SI (strongest case):**
-  - The raw-to-summary provenance table (`tab:ch3_provenance`) — pure data lineage.
+  - The raw-to-summary provenance table (`tab:ch4_provenance`) — pure data lineage.
   - The "aggregation ladder" paragraph and the data-quality / curation-registry
-    details (`sec:ch3_methods`).
+    details (`sec:ch4_methods`).
   - The Kohlrausch fit-identification thresholds and the β-range discussion.
   - The **thickness-confound** four-point enumerated argument + partial
     correlations, and the **"other fabrication variables"** paragraph. Keep in
     main text: one result sentence ("thickness covaries with PEO but the
-    dynamics track composition; full audit in SI") + `fig:ch3_thickness_control`.
+    dynamics track composition; full audit in SI") + `fig:ch4_thickness_control`.
   - The EIS equivalent-circuit description (Munar circuit, the
     freely-fitted-vs-bounded caveat, ill-conditioning) — condense to the
     model-free headline in main text, push circuit detail to SI.
@@ -50,8 +50,8 @@ Quantitatively, inline reproducibility pointers (`scripts/…`, `handouts/…`,
   `φ ⊗ λ ⊗ f` parameter-card construction would suffice.
 
 **Data currently invisible to the jury.** Several key quantitative tables exist
-*only* as external CSVs (`handouts/ch3_decay_by_cell.csv`,
-`ch3_pulses_by_cell.csv`, `ch3_eis_by_cell.csv`, …). A committee cannot open
+*only* as external CSVs (`handouts/ch4_decay_by_cell.csv`,
+`ch4_pulses_by_cell.csv`, `ch4_eis_by_cell.csv`, …). A committee cannot open
 `handouts/*.csv`. Promote the per-cell median/`n` tables into the new SI so every
 plotted number is verifiable inside the document. This *adds* the missing data
 rather than moving it.
@@ -65,18 +65,13 @@ handled honestly — no action needed beyond the SI repackaging above.
 
 ## B. Consistency issues
 
-1. **Internal labels/paths lag the chapter renumbering** (reader-invisible but a
-   real maintenance hazard). After the bridge was inserted as Ch3:
-   - `chapter4_comparative.tex` *is Chapter 4* but uses `sec:ch3_*`,
-     `fig:ch3_*`, `tab:ch3_*` labels and `figures/chapter3/`.
-   - `chapter5_temporal.tex` *is Chapter 5* but uses `*:ch4_*` labels and
-     `figures/chapter4/`.
-   - `figures/chapter3/` is the comparative chapter; `figures/chapter3_bridge/`
-     is the actual Ch3.
-   Cross-references resolve correctly via `\cref`, so nothing is wrong in the
-   PDF — but anyone editing (supervisor, future you) will be misled. Either do a
-   one-pass rename to `ch4_*/ch5_*`, or add a `README` note documenting the
-   offset. Low urgency, high confusion-prevention.
+1. **Internal labels/paths lagging the chapter renumbering — resolved
+   2026-06-08.** After the bridge was inserted as Ch3, the comparative and
+   temporal artifacts temporarily retained old `ch3_*`/`ch4_*` prefixes. Active
+   chapter labels, figure directories, scripts, and current machine-readable
+   CSVs now follow the bound order (`ch4_*` for the comparative chapter,
+   `ch5_*` for the temporal-computing chapter). The canonical map is
+   `docs/current_chapter_numbering.md`.
 
 2. **Dead code:** `\figplaceholder` macro defined in `chapter4_comparative.tex`
    is unused (all figures are real). → **Fixed in this pass** (removed).

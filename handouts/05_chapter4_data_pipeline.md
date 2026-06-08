@@ -4,7 +4,7 @@
 
 **Author:** Carlos David Prado-Socorro  
 **Date:** April 12, 2026  
-**Status:** Data/protocol reference, partly superseded as an execution plan. This document still defines the experimental evidence base and the three common measurements, but its old Chapter-4 application routing (§4.4–§4.6 of handout 04: reservoir + coincidence + filter bank) has been replaced by `12_chapter4_demonstration_plan_v4.md`. Current repo-local Chapter-4 modelling runs through `scripts/ch4_model.py`, `scripts/ch4_reservoir.py`, `scripts/ch4_wesad.py`, `scripts/ch4_physio_context.py`, and `scripts/ch4_figures.py`; `chapter4_pipeline.py` and consolidated HDF5/Parquet outputs remain aspirational pipeline targets, not current prerequisites.
+**Status:** Data/protocol reference, partly superseded as an execution plan. This document still defines the experimental evidence base and the three common measurements, but its old Chapter-4 application routing (§4.4–§4.6 of handout 04: reservoir + coincidence + filter bank) has been replaced by `12_chapter4_demonstration_plan_v4.md`. Current repo-local Chapter-4 modelling runs through `scripts/ch5_model.py`, `scripts/ch5_reservoir.py`, `scripts/ch5_wesad.py`, `scripts/ch5_physio_context.py`, and `scripts/ch5_figures.py`; `chapter4_pipeline.py` and consolidated HDF5/Parquet outputs remain aspirational pipeline targets, not current prerequisites.
 
 **v3 (2026-04-12) — correction of scope.** Earlier revisions described the comparative corpus as an Ag-electrode NM_vXXX series employing LiTFSI / NaTFSI / KTFSI salts in a Hybrane-class / TMPE host. That description was inherited from a stale planning note and does not reflect the real archive. The actual comparative corpus is a PEO-based triflate series: a PEO/LiTr concentration sub-study plus a PEO/LiTr, PEO/NaTr, PEO/KTr fixed-composition set at PEO and salt mass fractions of 0.3 and 0.09. TMPE-based composites and alkali-TFSI (LiBis / NaBis / KBis) devices exist but are *exploratory* and are explicitly excluded from the Chapter 4 manifest. Chapter 2 supplementary measurements (EPSC, STDP, separated STM/LTM, impedance) remain Paper 1 (SY/Hybrane/LiTf) data and are used only as Li-only priors and sanity checks.
 
@@ -260,7 +260,7 @@ Every section of the Chapter 4 plan is now grounded in a specific subset of thes
 
 ## 7. Pre-Flight Checklist Before Writing Chapter 4
 
-The following was the original full pipeline gate for Chapter 4. It remains the target for a final archival pipeline, but it is no longer a literal blocker for the current in-repo simulation pass, which already uses the curated `handouts/ch3_*.csv` / `handouts/ch4_*.csv` tables and the `scripts/ch4_*.py` harnesses.
+The following was the original full pipeline gate for the old Chapter-4 application plan. It remains the target for a final archival pipeline, but it is no longer a literal blocker for the current in-repo Chapter-5 simulation pass, which already uses the curated `handouts/ch4_*.csv` tables and the `scripts/ch5_*.py` harnesses.
 
 - [ ] `handouts/ch4_device_manifest.csv` exists and, for each composition–cation cell in the PEO/triflate corpus, lists ≥ 3 devices that have all three measurement types present
 - [ ] All devices in the manifest have passed the read-disturb sanity check (§3.4)
@@ -279,8 +279,8 @@ Only when every item above is ticked does Chapter 4 have a defensible empirical 
 ## 8. Open Items and Known Risks
 
 - **Protocol drift:** the NM_vXXX series spans several quarters; N-pulse and delay-time protocols may have been refined mid-series. The manifest must record the protocol version for each device, and any protocol mismatch within a composition–cation cell must either be reconciled or disqualify the device.
-- **Cycle-to-cycle volatility vs. device-to-device volatility:** the pipeline must report both separately. Chapter 4's reservoir robustness claim depends on this distinction.
+- **Cycle-to-cycle volatility vs. device-to-device volatility:** the pipeline must report both separately. Chapter 5's reservoir robustness claim depends on this distinction.
 - **Stretched-exponential β is temperature-dependent:** all measurements should be documented as room-temperature, and devices measured outside a narrow temperature band should be flagged.
 - **Compliance-limited sweeps:** any I–V curve that saturates against the Keithley current compliance has truncated f_c(V_read, x) and must be either re-measured at a higher compliance or excluded from the high-V part of the fit.
-- **Pipeline versioning:** if the `scripts_general/` analysis code is updated between dry runs and final Chapter 4 figures, all parameter cards must be regenerated — not retroactively edited.
-- **Host-chemistry confound:** the Chapter 2 Paper 1 device uses a Hybrane host, while the Chapter 3 / Chapter 4 comparative corpus uses a PEO host. This is why the Chapter 2 measurements are used only as functional-form priors and cross-checks, not as comparative fits. Any use of Chapter 2 quantitative numbers in Chapter 4 must explicitly acknowledge this difference.
+- **Pipeline versioning:** if the `scripts_general/` analysis code is updated between dry runs and final Chapter 5 figures, all parameter cards must be regenerated — not retroactively edited.
+- **Host-chemistry confound:** the Chapter 2 Paper 1 device uses a Hybrane host, while the Chapter 4 comparative corpus uses a PEO host. This is why the Chapter 2 measurements are used only as functional-form priors and cross-checks, not as comparative fits. Any use of Chapter 2 quantitative numbers in Chapter 5 must explicitly acknowledge this difference.

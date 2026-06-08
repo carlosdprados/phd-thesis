@@ -12,7 +12,7 @@ Source of truth for thickness = DATABASE/DEVICES_PROFILOMETRY_STATS.csv (nm).
 RPM + composition = DATABASE/DEVICES_LIBRARY.csv.
 Dynamics metrics (t_half, tau, growth exponent, peak ratio) = the per-device fit
 artifacts handouts/ch4_decay_fits.csv and handouts/ch4_pulse_descriptors.csv
-(produced by scripts/ch3_4_dynamics_fits.py).
+(produced by scripts/ch4_dynamics_fits.py).
 
 Verdict (see handouts/14_thickness_rpm_confound_audit.md): PEO and thickness covary
 (RPM compensation was incomplete), but thickness has *no* effect on the dynamics once
@@ -21,7 +21,7 @@ no reported value, parameter card, or simulation changes.
 
 Outputs:
   - prints the joined table, correlations, partial correlations, and the verdict
-  - figures/chapter4/thickness_control.pdf  (fig:ch3_thickness_control)
+  - figures/chapter4/thickness_control.pdf  (fig:ch4_thickness_control)
 """
 import csv, math, os, statistics
 from collections import defaultdict
