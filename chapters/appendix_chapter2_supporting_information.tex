@@ -95,11 +95,11 @@ with \(\Delta t=t_{\mathrm{post}}-t_{\mathrm{pre}}\). Each spike waveform has ma
 
 \section{Morphology and Stability Support}\label{app:ch2_morphology_stability}
 
-The spin speed was selected from an optimisation over \SIrange{500}{3000}{\rpm}~\cite{PradoSocorro2022}. Low speeds produced films that were too thick and less uniform; high speeds made the film thin enough that substrate roughness became a larger fraction of the total thickness. The \SI{2000}{\rpm} condition used for the main device produced an active-layer thickness of \SI{209}{\nano\metre}, measured by contact profilometry across a masked step edge with an Ambios XP-1 profilometer.
+The spin speed was selected from a \SIrange{500}{3000}{\rpm} optimisation~\cite{PradoSocorro2022}. Low speeds produced films that were too thick and less uniform; high speeds made the film thin enough for substrate roughness to matter. The main device used \SI{2000}{\rpm}, giving a \SI{209}{\nano\metre} active layer measured by contact profilometry across a masked step edge with an Ambios XP-1 profilometer.
 
 Surface topography was characterised by tapping-mode AFM using a Bruker Dimension Icon instrument, a silicon probe with resonant frequency \SI{300}{\kilo\hertz} and force constant \SI{40}{\newton\per\metre}, and a scan rate of \SI{0.6}{\hertz}. The AFM images showed smooth films with RMS roughness of \SIrange{1}{3}{\nano\metre} over the investigated spin-speed range~\cite{PradoSocorro2022}. The absence of large phase-separated features supports the reading of the active layer as a homogeneous polymer-electrolyte composite at the scale relevant to the vertical junction.
 
-Ambient shelf stability was assessed over approximately two weeks (\(\sim\)\SI{300}{\hour}) on unencapsulated devices stored in air at room temperature~\cite{PradoSocorro2022}. The monitored quantities were baseline conductance \(G_0\), maximum conductance change \(\Delta G_{\mathrm{max}}\), and STM retention time \(\tau_S\). All three remained within \SI{20}{\percent} of their initial values over the measurement window. This is a shelf/calendar stability result, not a cycling-endurance measurement.
+Ambient shelf stability was assessed for approximately two weeks (\(\sim\)\SI{300}{\hour}) on unencapsulated devices stored in air at room temperature~\cite{PradoSocorro2022}. The monitored quantities were baseline conductance \(G_0\), maximum conductance change \(\Delta G_{\mathrm{max}}\), and STM retention time \(\tau_S\). All three remained within \SI{20}{\percent} of their initial values over the measurement window. This is a shelf/calendar stability result, not a cycling-endurance measurement.
 
 \begin{figure}[htbp]
   \centering
@@ -107,3 +107,63 @@ Ambient shelf stability was assessed over approximately two weeks (\(\sim\)\SI{3
   \caption[Morphology and shelf-stability support]{Supporting morphology and shelf-stability summary for the Chapter 2 device family. The processing condition used in the main device gives a \SI{209}{\nano\metre} active layer; tapping-mode AFM reports \SIrange{1}{3}{\nano\metre} RMS roughness across the investigated spin-speed window; and the ambient shelf-stability metrics remain within a \SI{20}{\percent} envelope over approximately \SI{300}{\hour}. Compiled from the supporting measurements reported in Ref.~\cite{PradoSocorro2022}; this is not a cycling-endurance result.}
   \label{fig:ch2_si_morphology_stability}
 \end{figure}
+
+\paragraph{Encapsulation outlook.} The ambient stability is expected to improve further with encapsulation, standard practice in organic electronics: a thin \ce{SiO2} or \ce{Si3N4} barrier deposited by atomic-layer or chemical-vapour deposition would suppress the oxygen and water ingress that are the two primary degradation pathways~\cite{LewisWeaver2004}. That even unencapsulated devices survive two weeks establishes the baseline robustness of the composite.
+
+\section{Ion-Transport Models for the Composite}\label{app:ch2_ion_models}
+
+This section details the injection and bulk-transport descriptions summarised in \cref{sec:mechanism}. The two limiting-case models are inherited from the polymer light-emitting electrochemical cell (LEC) literature and reconciled by van~Reenen \textit{et al.}~\cite{vanReenen2010} as two regimes of the same ion redistribution.
+
+\subsection{Equilibrium Ion Distribution and Response to an Applied Field}
+
+In the absence of an applied voltage, the ions (\ce{Li+} cations and \ce{CF3SO3-} anions) are distributed homogeneously throughout the active layer. The equilibrium distribution is not strictly uniform at the atomic scale --- each \ce{Li+} ion occupies a local coordination site within the Hybrane matrix, and the triflate anions occupy interstitial positions between the coordinated cations --- but on the scale of the film thickness (\SI{209}{\nano\metre}), the macroscopic charge density is uniform and the net electric field within the film is zero (apart from any built-in field arising from the electrode work function difference), as in the polymer-electrolyte picture inherited from LECs~\cite{Pei1995,deMello1998,vanReenen2010}.
+
+When a voltage is applied across the device, an electric field $\mathcal{E} = V/d$ (where $d$ is the film thickness) is established. In the absence of free charge carriers that could screen this field, it would be uniform throughout the film. However, the mobile ions respond to the field by migrating: cations drift toward the cathode (ITO at positive bias on Ag), and anions drift toward the anode (Ag). This migration leads to the build-up of a charged double layer at each electrode interface on a timescale determined by the ionic mobility and the film thickness. The resulting non-uniform ionic charge distribution concentrates the field in a thin screening length near each electrode, while the bulk of the film is field-free~\cite{deMello1998,deMello2002}, with consequences for charge injection described by the two models below.
+
+\subsection{Electrodynamic Model}
+
+In the electrodynamic (ED) model, first formulated by deMello \textit{et al.}~\cite{deMello1998, deMello2002} to describe LECs, charge injection at the electrode--organic interface is the rate-limiting step for current flow. In this injection-limited regime, the current density is governed by thermionic emission over the Schottky barrier at the metal--polymer interface,
+\begin{equation}
+  J \propto T^2 \exp\!\left(-\frac{\Phi_B}{k_B T}\right),
+  \label{eq:thermionic}
+\end{equation}
+where $\Phi_B$ is the effective barrier height, $T$ the absolute temperature, and $k_B$ the Boltzmann constant. The ionic double layer at the electrode interface reduces $\Phi_B$ by bending the polymer bands: positive ionic charge near ITO lowers the conduction-band edge there, while negative ionic charge near Ag raises the valence-band edge, both reducing the effective injection barrier. In the memristive context, conductance changes therefore arise from changes in the interface ion concentration: a higher concentration of positive ions near ITO means lower $\Phi_B$, higher hole injection, and higher conductance, and the ions relax back toward equilibrium by thermal diffusion once the field is removed --- the physical basis of the memory decay.
+
+\subsection{Electrochemical Doping Model: Ohmic Injection}
+
+The electrochemical doping (ECD) model, formulated by Pei \textit{et al.}~\cite{Pei1995} and developed by subsequent authors~\cite{Smith1997, Matyba2009}, instead takes charge injection to be ohmic (not rate-limiting), so the majority of the voltage drop occurs in the bulk and the current is limited by bulk conductivity. The defining feature is that ion accumulation \textit{electrochemically dopes} the conjugated polymer: cations accumulate near the cathode, stabilising injected electrons (\textit{n}-doping), and anions near the anode, stabilising injected holes (\textit{p}-doping); the doped regions are far more conductive than the undoped polymer. The degree of doping --- and hence the conductance --- is set by the extent of ionic migration, which is governed by the history of applied voltage, so the conductance records the cumulative ionic-displacement history.
+
+\subsection{Resolution of the Two Models}
+
+The prolonged LEC-community debate over the relative validity of the ED and ECD models was resolved by van~Reenen \textit{et al.}~\cite{vanReenen2010}, who showed both to be correct in different limits: the ED model when injection is strongly barrier-limited (low-conductance semiconductor, large electrode work-function mismatch), the ECD model when injection is ohmic (high-conductance semiconductor, small mismatch). A device may operate in the ED regime at early times, before significant ionic redistribution, and transition toward the ECD regime as the double layers build up. The working interpretation adopted for the present device --- ED with the fast triflate-driven response, ECD with the slow \ce{Li+}-driven response --- is stated in \cref{sec:mechanism}.
+
+\section{Historical Comparison at the Time of Publication}\label{app:ch2_comparison}
+
+\Cref{tab:ch2_historical_comparison} places the device alongside representative organic and hybrid memristive devices available at the time of the 2022 publication, on the axes of \cref{subsec:memristive_metrics}: device structure, accessible conductance states, short- and long-term memory, STDP, and reversibility. It is a historical positioning, not a 2026 state-of-the-art claim.
+
+\begin{sidewaystable}
+  \centering
+  \caption{Historical comparison of key performance metrics of the present work with representative organic and hybrid memristive devices available at the time of the 2022 publication. ``2-T'' = two-terminal; ``3-T'' = three-terminal; ``STM'' = short-term memory; ``LTM'' = long-term memory; ``STDP'' = spike-timing dependent plasticity; ``---'' = not reported or not applicable.}\label{tab:ch2_historical_comparison}
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{llccllcc}
+    \toprule
+    \textbf{Reference} & \textbf{Material} & \textbf{Structure} & \textbf{States} & \textbf{STM} & \textbf{LTM} & \textbf{STDP} & \textbf{Reversible} \\
+    \midrule
+    Zakhidov 2010~\cite{Zakhidov2010}      & [Ru(bpy)$_3$]$^{2+}$/PF$_6^-$ & 2-T & 2    & ---           & ---        & No  & Partial \\
+    Lei 2014~\cite{Lei2014}                & PVA film                  & 2-T & 2    & ---           & ---        & No  & No      \\
+    Liu 2016~\cite{Liu2016}                & [EV(ClO$_4$)]/(BTPA-F)   & 2-T & cont.& Yes (tunable) & Yes        & No  & No      \\
+    Gkoupidenis 2015~\cite{Gkoupidenis2015}& PEDOT:PSS (OECT)          & 3-T & cont.& Yes           & No         & Yes & Yes     \\
+    Xu 2016~\cite{Xu2016}                  & PEDOT:PSS (OECT)          & 3-T & cont.& Yes           & Yes        & No  & Yes     \\
+    Kim 2018~\cite{Kim2018}                & Elastic organic composite & 3-T & cont.& Yes           & No         & Yes & Yes     \\
+    Goswami 2017~\cite{Goswami2017}        & Molecular switch          & 2-T & 2    & ---           & Yes        & No  & Yes     \\
+    Seo 2019~\cite{Seo2019}                & P3HT organic FET          & 3-T & cont.& Yes           & No         & Yes & Yes     \\
+    \midrule
+    \textbf{This work}~\cite{PradoSocorro2022} & \textbf{SY/Hybrane/LiOTf}  & \textbf{2-T} & \textbf{cont.} & \textbf{Yes (10--15\,s)} & \textbf{Yes (>45\,s)} & \textbf{Yes} & \textbf{Full} \\
+    \bottomrule
+  \end{tabular}
+\end{sidewaystable}
+
+Two combinations not represented in the comparison set at the time stand out. The first is the coexistence of \STM{} and \LTM{} in a single 2-T device that is also fully reversible. Of the prior reports, Liu and co-workers~\cite{Liu2016} comes closest, with tunable short- to long-term transitions in a 2-T structure; the redox route, however, modifies the active layer irreversibly at each cycle, precluding practical cyclic operation~\cite{Heremans2011}. The present device reaches comparable \STM{}/\LTM{} functionality with full reversibility (conductance returns to \(G_0\) after the reset protocol). The second is STDP in a fully reversible 2-T architecture: the earlier organic STDP demonstrations~\cite{Gkoupidenis2015, Kim2018, Seo2019} were all 3-T with a gate supplying the timing rule, whereas here the rule emerges from the superposition of pre- and postsynaptic pulses at the single Ag terminal.
+
+The remaining axes summarise the operating regime rather than a competitive claim. The ambient shelf lifetime (about \SI{300}{\hour} unencapsulated) exceeds most comparable unencapsulated organic memristive devices by roughly an order of magnitude~\cite{Shih2016}; cycling endurance, not characterised here, is where mature inorganic platforms reach \(>10^{10}\) cycles~\cite{IelminiWong2018}. The energy per synaptic event (about \SI{50}{\nano\joule}) is consistent with other organic ionic devices~\cite{Xiao2016} but higher than the picojoule budgets of dedicated CMOS neuromorphic hardware~\cite{IndiveriLiu2015,Horowitz2014} and of the best inorganic memristors~\cite{YangStrukovStewart2013}, reflecting the lower switching speed and larger area of this proof-of-concept device; area scaling toward the \(\sim\)\SI{100}{\nano\metre\squared} inorganic regime would close much of that gap.
