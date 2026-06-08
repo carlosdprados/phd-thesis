@@ -42,7 +42,7 @@ import matplotlib.pyplot as plt
 
 DB = "../Nanomem_Devices_Library/DATABASE"
 OUT = "handouts"
-FIGDIR = "figures/chapter3"
+FIGDIR = "figures/chapter4"
 
 plt.rcParams.update({
     "font.family": "serif", "font.size": 9, "axes.titlesize": 9,

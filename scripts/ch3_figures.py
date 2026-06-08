@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the three Chapter-3 figures into figures/chapter3/.
+"""Generate the three Chapter-3 figures into figures/chapter4/.
 
 Run from the repo root:  python3 scripts/ch3_figures.py
 Depends on the per-cell summaries written by scripts/ch3_4_dynamics_fits.py
@@ -31,7 +31,7 @@ from matplotlib.colors import LogNorm
 
 DB = "../Nanomem_Devices_Library/DATABASE"
 OUT = "handouts"
-FIGDIR = "figures/chapter3"
+FIGDIR = "figures/chapter4"
 
 plt.rcParams.update({
     "font.family": "serif",

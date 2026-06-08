@@ -22,7 +22,7 @@ from ch4_reservoir import (load_cards, make_nodes, run_states, memory_capacity,
                            mc_curve_seeded, composition_sweep, paired_stats,
                            ipc_seeded, DT)  # noqa: E402
 
-FIGDIR = "figures/chapter4"
+FIGDIR = "figures/chapter5"
 plt.rcParams.update({"font.family": "serif", "font.size": 9, "figure.dpi": 150,
                      "savefig.bbox": "tight"})
 

@@ -21,7 +21,7 @@ no reported value, parameter card, or simulation changes.
 
 Outputs:
   - prints the joined table, correlations, partial correlations, and the verdict
-  - figures/chapter3/thickness_control.pdf  (fig:ch3_thickness_control)
+  - figures/chapter4/thickness_control.pdf  (fig:ch3_thickness_control)
 """
 import csv, math, os, statistics
 from collections import defaultdict
@@ -32,7 +32,7 @@ import matplotlib.pyplot as plt
 
 DB = "../Nanomem_Devices_Library/DATABASE"
 HO = "handouts"
-FIGDIR = "figures/chapter3"
+FIGDIR = "figures/chapter4"
 
 plt.rcParams.update({
     "font.family": "serif",

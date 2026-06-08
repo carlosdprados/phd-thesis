@@ -7,7 +7,7 @@ the same per-device, standard-protocol, amplitude-matched quantities that the
 audit script tests (and only the numbers it prints).
 
 Run from the repo root:  python scripts/bridge_figures.py
-Writes PDFs into figures/chapter3_bridge/:
+Writes PDFs into figures/chapter3/:
   F1  bridge_window_collapse.pdf   on-off & normalized area @3V, early vs later
   F2  bridge_mechanism.pdf         ohmic drift @1.2V vs date (+ methodology insets)
   F3  bridge_resolution.pdf        Hy vs PEO @3V, and PEO on-off vs year 2022-24
@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 
 from bridge_hybrane_peo_reproducibility import load, hybrane_standard, DB, TAIL
 
-FIGDIR = "figures/chapter3_bridge"
+FIGDIR = "figures/chapter3"
 INFL = pd.Timestamp("2021-05-01")  # post-NM_v026 inflection (2021-04-22)
 
 plt.rcParams.update({

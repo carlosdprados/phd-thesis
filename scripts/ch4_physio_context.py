@@ -27,7 +27,7 @@ bank of the same size.
 Outputs
 -------
   handouts/ch4_physio_context_results.csv
-  figures/chapter4/physio_context_reconstruction.pdf
+  figures/chapter5/physio_context_reconstruction.pdf
 
 Honesty controls
 ----------------
@@ -59,7 +59,7 @@ LAGS_S = (1, 3, 8, 20, 45)
 SEEDS = range(10)
 RIDGE = 1e-3
 OUT_CSV = "handouts/ch4_physio_context_results.csv"
-FIG_PATH = "figures/chapter4/physio_context_reconstruction.pdf"
+FIG_PATH = "figures/chapter5/physio_context_reconstruction.pdf"
 
 
 def lag_group(lag):

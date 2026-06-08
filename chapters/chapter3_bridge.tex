@@ -95,7 +95,7 @@ The campaign record is qualitative; the claim that the platform degraded must be
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{../figures/chapter3_bridge/bridge_window_collapse.pdf}
+  \includegraphics[width=\linewidth]{../figures/chapter3/bridge_window_collapse.pdf}
   \caption[Switching-window collapse at \texorpdfstring{$\sim$}{~}3\,V]{Switching-window collapse across the campaign on the standard \SY{}/\Hybrane{}/\LiTf{}/Ag corpus, read at the $\sim$\SI{3}{\volt} stratum where the window is expressed, one value per device. (a)~On--off ratio and (b)~normalized hysteresis area, both for devices fabricated before the NM\_v026 inflection ($\leq$Apr 2021) versus later. Boxes are quartiles; points are individual devices; the annotated $p$ is a two-sided Mann--Whitney test. The window collapses by roughly a factor of two in on--off ratio and an order of magnitude in area. Reproduced by \texttt{scripts/bridge\_figures.py} (F1).}
   \label{fig:bridge_window}
 \end{figure}
@@ -137,7 +137,7 @@ The campaign record is qualitative; the claim that the platform degraded must be
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{../figures/chapter3_bridge/bridge_mechanism.pdf}
+  \includegraphics[width=\linewidth]{../figures/chapter3/bridge_mechanism.pdf}
   \caption[Ohmic drift and the methodology that isolates it]{Mechanism and methodology. (a)~Per-device hysteresis area read at the matched $\sim$\SI{1.2}{\volt} band rises with fabrication date (log axis; Spearman $\rho=+0.57$ over all dates, strengthening to $+0.69$ when the recovery-tail batches, open diamonds, $\geq$2022-03, are dropped). \emph{Inset:} the number of pixels measured per device falls over the campaign ($\rho=-0.80$), which is why every statistic is computed per device rather than per pixel. (b)~Sweep amplitude is itself confounded with date: the matched $\sim$\SI{1.2}{\volt} conductivity probe and the $\sim$\SI{3}{\volt} window probe (shaded) are the two strata used throughout, never pooled. Reproduced by \texttt{scripts/bridge\_figures.py} (F2).}
   \label{fig:bridge_mechanism}
 \end{figure}
@@ -159,7 +159,7 @@ The rest of this thesis is mechanistic, so a black-box ``the stock went bad'' wo
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.62\linewidth]{../figures/chapter3_bridge/bridge_annealing_recovery.pdf}
+  \includegraphics[width=0.62\linewidth]{../figures/chapter3/bridge_annealing_recovery.pdf}
   \caption[Annealing recovery of the switching window]{Annealing-recovery test of the hydrolysis hypothesis (\Hybrane{}/Ag, on--off ratio at $\sim$\SI{3}{\volt}, per device). Among late, degraded-era devices, an aggressive $\geq$\SI{150}{\celsius} anneal restores the window (median \num{1.22}$\to$\num{1.95}) toward the early-standard reference (\num{1.74}); one-sided Mann--Whitney $p=0.024$. Suggestive only ($n=6$ hot devices, co-varying tweaks, two with pin issues). Reproduced by \texttt{scripts/bridge\_figures.py} (F4).}
   \label{fig:bridge_annealing}
 \end{figure}
@@ -180,7 +180,7 @@ The crisis was resolved not by recovering the \Hybrane{} line but by changing th
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{../figures/chapter3_bridge/bridge_resolution.pdf}
+  \includegraphics[width=\linewidth]{../figures/chapter3/bridge_resolution.pdf}
   \caption[PEO restores and sustains the switching window]{Resolution of the reproducibility crisis by switching to a \PEO{} host (silver electrode, $\sim$\SI{3}{\volt}, per device). (a)~Normalized hysteresis area and (b)~on--off ratio are larger for \PEO{} than for contemporaneous \Hybrane{} valid devices ($p=0.018$ for area). (c)~PEO temporal reproducibility: the per-device on--off ratio holds at a usable level (median $\approx$\num{2.6}) across 2022--2024 with no collapse, well above the degraded-\Hybrane{} level (dashed line, \num{1.35}). Reproduced by \texttt{scripts/bridge\_figures.py} (F3).}
   \label{fig:bridge_resolution}
 \end{figure}
