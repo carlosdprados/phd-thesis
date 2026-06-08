@@ -165,3 +165,31 @@ Coverage is generally strong and claims are well-anchored. Two items:
 5. (done) Remove dead `\figplaceholder` macro. [B2]
 
 Items 2–4 are editorial decisions for the author; item 1 is a correctness blocker.
+
+---
+
+## Resolution (2026-06-08)
+
+All five items were implemented across five commits:
+
+1. **[D1] Citations** — all 11 new Ch3–Ch6 references CrossRef-verified clean (no
+   hallucinations); hydrolysis claim grounded in ester/amide chemistry with two
+   bib sources. See `25_bibliography_audit_ch3_6.md`. The full thesis bibliography
+   is now CrossRef-verified.
+2. **[A] SI appendices** — Appendix B (Ch3 controls), C (Ch4 provenance +
+   confound audits + fit thresholds + EIS circuit + **promoted per-cell decay /
+   pulses / EIS / electrode tables**), D (Ch5 parameter-card sourcing +
+   simulation settings). Main chapters keep result + figures + a guarded
+   one-line SI pointer (`\si*Ref`, standalone-safe like Ch2's `\chTwoSIRef`).
+3. **[C] Editorial pass** — all 16 honesty meta-labels removed; "not a
+   confession", "apologetic", duplicate "shown, not averaged", and
+   "hold it throughout" cut; Ch2 intro relitigation and section roadmap compressed.
+4. **[B] Consistency** — internal labels (`ch3_→ch4_`, `ch4_→ch5_`) and figure
+   directories renamed to the bound chapter order; includegraphics + script
+   `FIGDIR` outputs updated; stale banner comments fixed; naming convention
+   documented in `README.md`.
+5. **[B2] Dead `\figplaceholder` macro** removed.
+
+Final state: full thesis builds clean, **215 pages, 0 undefined references / 0
+undefined citations**; standalone chapter builds compile (only the expected
+cross-chapter refs are undefined in standalone mode).
