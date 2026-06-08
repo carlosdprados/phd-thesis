@@ -49,6 +49,15 @@ DEVICE_045 = (
     / "2021-Q2_Devices"
     / "2021-06-12_NM_v045_(cmplt_annlng,slowevap,newSy,EPSC&PotDepotTest)"
 )
+# Hysteresis: NM_v025 reproduces the published Fig. 2a analogue fan-out
+# (peak ~0.42 uA, ~15x on/off across ten cycles). Identical 1:0.30:0.09
+# SY/Hybrane/LiOTf formulation to the canonical proof-of-concept device.
+DEVICE_025 = (
+    DATA
+    / "DEVICES_LAB_DATA"
+    / "2021-Q2_Devices"
+    / "2021-04-07_NM_v025_(spiral,dgrd_in_glvbx_lght)"
+)
 
 COLORS = {
     "blue": "#276FBF",
@@ -112,75 +121,168 @@ def style_axes(ax: plt.Axes) -> None:
     ax.tick_params(direction="out", length=3, width=0.8)
 
 
-def fig_device_schematic() -> None:
-    fig, ax = plt.subplots(figsize=(7.4, 4.0))
-    ax.set_xlim(0, 10)
-    ax.set_ylim(0, 6)
-    ax.axis("off")
+def _shade(hex_color: str, factor: float) -> tuple[float, float, float]:
+    """Lighten (factor>1) or darken (factor<1) a hex colour for face shading."""
+    h = hex_color.lstrip("#")
+    rgb = np.array([int(h[i : i + 2], 16) for i in (0, 2, 4)], dtype=float) / 255.0
+    if factor >= 1.0:
+        out = rgb + (1.0 - rgb) * (factor - 1.0)
+    else:
+        out = rgb * factor
+    return tuple(np.clip(out, 0.0, 1.0))
 
-    # Device stack.
-    x0, y0, w = 0.6, 0.9, 3.0
-    layers = [
-        ("glass", 0.55, "#DDEAF7"),
-        ("ITO", 0.35, "#9AD0C2"),
-        ("SY/Hybrane/LiOTf", 1.45, "#FFE8A3"),
-        ("Ag", 0.55, "#C7C7C7"),
+
+def _iso_slab(ax, x0, y0, w, h, depth, color, label=None):
+    """Draw one isometric slab (front + top + right face) of the device stack."""
+    from matplotlib.patches import Polygon
+
+    ox, oy = depth  # screen-space depth offset
+    front = [(x0, y0), (x0 + w, y0), (x0 + w, y0 + h), (x0, y0 + h)]
+    top = [
+        (x0, y0 + h),
+        (x0 + w, y0 + h),
+        (x0 + w + ox, y0 + h + oy),
+        (x0 + ox, y0 + h + oy),
     ]
-    y = y0
-    for label, h, color in layers:
-        ax.add_patch(Rectangle((x0, y), w, h, facecolor=color, edgecolor="0.25", linewidth=0.9))
-        ax.text(x0 + w / 2, y + h / 2, label, ha="center", va="center", fontsize=8)
-        y += h
-    ax.text(x0 + w / 2, y + 0.25, "ITO / composite / Ag vertical junction", ha="center", fontsize=9, weight="bold")
-    ax.annotate(
-        "209 nm active layer",
-        xy=(x0 + w + 0.1, y0 + 0.55 + 0.35 + 0.72),
-        xytext=(x0 + w + 1.0, y0 + 2.0),
-        arrowprops=dict(arrowstyle="-|>", lw=0.8, color="0.25"),
-        ha="right",
-        va="center",
-        fontsize=8,
+    right = [
+        (x0 + w, y0),
+        (x0 + w + ox, y0 + oy),
+        (x0 + w + ox, y0 + h + oy),
+        (x0 + w, y0 + h),
+    ]
+    ax.add_patch(Polygon(top, closed=True, facecolor=_shade(color, 1.18), edgecolor="0.25", lw=0.8, joinstyle="round"))
+    ax.add_patch(Polygon(right, closed=True, facecolor=_shade(color, 0.80), edgecolor="0.25", lw=0.8, joinstyle="round"))
+    ax.add_patch(Polygon(front, closed=True, facecolor=color, edgecolor="0.25", lw=0.8, joinstyle="round"))
+    if label:
+        ax.text(x0 + w / 2, y0 + h / 2, label, ha="center", va="center", fontsize=8.5, color="0.12")
+
+
+def fig_device_schematic() -> None:
+    from matplotlib.patches import Polygon
+
+    fig, (axL, axR) = plt.subplots(
+        1, 2, figsize=(7.4, 3.5), gridspec_kw={"width_ratios": [1.0, 1.15], "wspace": 0.04}
     )
-    ax.text(x0 + w / 2, y0 - 0.35, r"active area $=0.0825$ cm$^2$", ha="center", fontsize=8)
+    for ax in (axL, axR):
+        ax.set_xlim(0, 10)
+        ax.set_ylim(0, 10)
+        ax.axis("off")
 
-    # Material roles and mechanism.
-    mx, my = 5.0, 1.0
-    ax.add_patch(Rectangle((mx, my), 4.2, 3.55, facecolor="#FFF7E0", edgecolor="0.25", linewidth=0.9))
-    ax.text(mx + 2.1, my + 3.85, "polymer-electrolyte active layer", ha="center", fontsize=9, weight="bold")
+    # ---- (a) isometric device stack -------------------------------------
+    palette = {
+        "glass": "#DCE8F5",
+        "ito": "#7FC6B6",
+        "composite": "#FBD162",
+        "ag": "#C2C6CB",
+    }
+    depth = (1.25, 0.8)
+    x0, w = 0.7, 3.7
+    layers = [
+        ("glass", 0.95, palette["glass"], "glass"),
+        ("ito", 0.55, palette["ito"], "ITO"),
+        ("composite", 2.15, palette["composite"], None),
+        ("ag", 0.75, palette["ag"], "Ag"),
+    ]
+    y = 1.4
+    mids = []
+    for _, h, color, inner in layers:
+        _iso_slab(axL, x0, y, w, h, depth, color, inner)
+        mids.append(y + h / 2)
+        y += h
+    top_y = y
+    ox, oy = depth
 
-    rng = np.random.default_rng(3)
-    for _ in range(13):
-        x = mx + 0.35 + rng.random() * 3.45
-        y = my + 0.45 + rng.random() * 2.65
-        ax.plot([x - 0.12, x, x + 0.12], [y - 0.08, y + 0.08, y - 0.02], color="#6B6B2D", lw=1.1)
-    for i, (x, y) in enumerate([(5.55, 3.8), (6.55, 3.25), (7.95, 3.55), (6.15, 1.75), (8.2, 1.95)]):
-        ax.add_patch(Circle((x, y), 0.15, facecolor="#6AAFE6", edgecolor="0.2", lw=0.6))
-        ax.text(x, y, r"Li$^+$", ha="center", va="center", fontsize=6)
-        ax.plot([x - 0.28, x + 0.28], [y - 0.25, y + 0.25], color="#6AAFE6", lw=0.8, alpha=0.6)
-    for x, y in [(5.75, 2.95), (7.15, 2.6), (8.55, 2.85), (6.9, 1.55), (8.65, 1.35)]:
-        ax.add_patch(Circle((x, y), 0.13, facecolor="#F28E8E", edgecolor="0.2", lw=0.6))
-        ax.text(x, y, r"OTf$^-$", ha="center", va="center", fontsize=5.7)
+    # composite inner label (full ternary name, kept inside the wide slab)
+    axL.text(
+        x0 + w / 2,
+        mids[2] + 0.05,
+        "SY / Hybrane /\nLiOTf composite",
+        ha="center",
+        va="center",
+        fontsize=7.8,
+        color="0.12",
+    )
 
-    ax.add_patch(FancyArrowPatch((5.15, 0.45), (6.95, 0.45), arrowstyle="-|>", mutation_scale=10, lw=1.0, color=COLORS["red"]))
-    ax.add_patch(FancyArrowPatch((7.05, 0.45), (9.0, 0.45), arrowstyle="-|>", mutation_scale=10, lw=1.0, color=COLORS["blue"]))
-    ax.text(5.95, 0.13, "low field\nOTf$^-$ -> STM", ha="center", va="top", fontsize=7.7)
-    ax.text(8.05, 0.13, "higher field\nLi$^+$ -> longer-lived state", ha="center", va="top", fontsize=7.7)
+    # short thickness callouts on the right (kept inside panel (a))
+    lx = x0 + w + ox + 0.25
+    for ymid, text in [(mids[3], "100 nm"), (mids[2], "209 nm")]:
+        axL.annotate(
+            text,
+            xy=(x0 + w + ox * 0.5, ymid + oy * 0.5),
+            xytext=(lx, ymid + oy * 0.5),
+            arrowprops=dict(arrowstyle="-", lw=0.7, color="0.45"),
+            va="center",
+            ha="left",
+            fontsize=7.6,
+            color="0.2",
+        )
 
-    ax.text(
-        5.18,
-        4.18,
-        "SY: electronic path\nHybrane: oxygen-rich ion host\nLiOTf: mobile cation/anion pair",
-        fontsize=7.7,
-        color=COLORS["gray"],
-        va="top",
-        bbox=dict(facecolor="#FFF7E0", edgecolor="none", pad=1.0),
+    # bias terminals + geometry note
+    axL.text(x0 + w / 2 + ox * 0.5, top_y + oy + 0.55, "$V$ applied to Ag", ha="center", fontsize=8.2, color=COLORS["red"])
+    axL.text(x0 + w / 2 + ox * 0.5, top_y + oy + 1.15, r"active area $= 0.0825$ cm$^2$", ha="center", fontsize=7.8, color="0.3")
+    axL.text(x0 + w / 2 + ox * 0.5, 0.6, "ITO grounded", ha="center", fontsize=8.2, color="0.25")
+    axL.text(0.0, 9.4, "(a)", fontsize=11, weight="bold")
+
+    # ---- (b) two-state ion-migration mechanism --------------------------
+    axR.text(0.2, 9.4, "(b)", fontsize=11, weight="bold")
+    axR.text(5.0, 9.45, "ion-mediated conductance change", ha="center", fontsize=8.8, weight="bold", color="0.12")
+
+    def mechanism_cell(ax, y_base, height, title, title_color, moving):
+        """One stacked sub-panel: two electrodes, polymer host, ordered ions.
+
+        Upper two-thirds hold the polymer chains and coordinated Li+; the lower
+        third is a clean drift lane carrying only the mobile species + arrow.
+        """
+        left_x, right_x = 1.1, 8.9
+        # electrodes
+        ax.add_patch(Rectangle((left_x - 0.55, y_base), 0.55, height, facecolor=palette["ito"], edgecolor="0.3", lw=0.7))
+        ax.add_patch(Rectangle((right_x, y_base), 0.55, height, facecolor=palette["ag"], edgecolor="0.3", lw=0.7))
+        ax.text(left_x - 0.275, y_base - 0.28, "ITO", ha="center", va="top", fontsize=6.6, color="0.3")
+        ax.text(right_x + 0.275, y_base - 0.28, "Ag", ha="center", va="top", fontsize=6.6, color="0.3")
+        # polymer host: a few smooth chains in the upper region
+        xs = np.linspace(left_x, right_x, 200)
+        for k in range(2):
+            yc = y_base + height * (0.58 + 0.24 * k)
+            ax.plot(xs, yc + 0.09 * np.sin((xs - left_x) * 2.0 + k), color="#9AA050", lw=1.1, alpha=0.75, zorder=1)
+        # coordinated Li+ sitting on the chains (hard oxygen coordination)
+        released = moving == "Li"
+        for fx, fk in [(2.6, 0), (5.4, 1), (7.2, 0)]:
+            cy = y_base + height * (0.58 + 0.24 * fk)
+            face = "#Bcd4ec" if released else "#5FA3DD"
+            ax.add_patch(Circle((fx, cy), 0.20, facecolor=face, edgecolor="0.2", lw=0.5, zorder=3, alpha=0.55 if released else 1.0))
+            ax.text(fx, cy, r"Li$^+$", ha="center", va="center", fontsize=5.6, color="white", zorder=4)
+        # drift lane (lower third)
+        lane = y_base + height * 0.22
+        if moving == "OTf":
+            ion_col, ion_fc = COLORS["red"], "#E8736F"
+            for fx in (5.6, 6.7, 7.8):
+                ax.add_patch(Circle((fx, lane), 0.24, facecolor=ion_fc, edgecolor="0.2", lw=0.5, zorder=3))
+                ax.text(fx, lane, r"OTf$^-$", ha="center", va="center", fontsize=5.2, color="white", zorder=4)
+            ax.add_patch(FancyArrowPatch((2.6, lane), (5.0, lane), arrowstyle="-|>", mutation_scale=12, lw=1.4, color=ion_col, zorder=2))
+        else:
+            ion_col = "#3F7FC0"
+            for fx in (5.4, 6.6, 7.8):
+                ax.add_patch(Circle((fx, lane), 0.24, facecolor="#5FA3DD", edgecolor="0.2", lw=0.5, zorder=3))
+                ax.text(fx, lane, r"Li$^+$", ha="center", va="center", fontsize=5.6, color="white", zorder=4)
+            ax.add_patch(FancyArrowPatch((2.6, lane), (5.0, lane), arrowstyle="-|>", mutation_scale=15, lw=1.9, color=ion_col, zorder=2))
+        ax.text(5.0, y_base + height + 0.22, title, ha="center", va="bottom", fontsize=7.6, color=title_color, weight="bold")
+
+    mechanism_cell(
+        axR, 5.4, 2.6,
+        r"low field ($\sim$1 V): OTf$^-$ drifts $\rightarrow$ short-term memory",
+        COLORS["red"], moving="OTf",
+    )
+    mechanism_cell(
+        axR, 1.0, 2.6,
+        r"high field ($\sim$3 V): Li$^+$ released $\rightarrow$ long-lived state",
+        COLORS["blue"], moving="Li",
     )
 
     save(fig, "device_schematic.pdf")
 
 
 def fig_iv_hyst() -> None:
-    path = DEVICE_055 / "Day1_Hyst" / "L4" / "hysteresis_data.csv"
+    path = DEVICE_025 / "DayX_Hyst" / "Day5" / "L4" / "hysteresis_data.csv"
     _, rows = read_table(path)
     by_curve: dict[int, list[tuple[int, float, float]]] = {}
     for row in rows:
@@ -191,18 +293,38 @@ def fig_iv_hyst() -> None:
 
     fig, ax = plt.subplots(figsize=(5.7, 3.7))
     cmap = plt.get_cmap("viridis", 10)
+
+    def forward_current_at(curve: int, target_v: float) -> float:
+        points = sorted(by_curve[curve])
+        v = np.array([p[1] for p in points])
+        i = np.array([p[2] for p in points])
+        top = int(np.argmax(v))
+        return float(np.interp(target_v, v[:top + 1], i[:top + 1]))
+
     for curve in range(10):
         points = sorted(by_curve[curve])
         v = np.array([p[1] for p in points])
         i = np.array([p[2] for p in points])
         ax.plot(v, i, lw=1.05, color=cmap(curve), alpha=0.95)
 
+    i_first = forward_current_at(0, 1.0)
+    i_last = forward_current_at(9, 1.0)
+    on_off = i_last / i_first
+
     ax.axhline(0, color="0.5", lw=0.6)
     ax.axvline(0, color="0.5", lw=0.6)
     ax.set_xlabel("voltage (V)")
     ax.set_ylabel(r"current ($\mu$A)")
-    ax.set_title("NM_v055 Day 1, pixel L4: ten positive sweeps")
+    ax.set_title("ten successive positive sweeps")
     ax.text(0.05, 0.94, "0 -> 1.2 V -> 0\n0.25 V s$^{-1}$", transform=ax.transAxes, va="top", fontsize=8)
+    ax.annotate(
+        rf"$\times${on_off:.0f} on/off at 1 V",
+        xy=(1.0, i_last),
+        xytext=(0.32, i_last * 0.98),
+        arrowprops=dict(arrowstyle="-|>", lw=0.8, color="0.3"),
+        va="center",
+        fontsize=8,
+    )
     style_axes(ax)
     sm = cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=1, vmax=10))
     cbar = fig.colorbar(sm, ax=ax, fraction=0.05, pad=0.03)
