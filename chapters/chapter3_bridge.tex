@@ -53,7 +53,7 @@ The fabrication and characterisation notes place a sharp behavioural inflection 
 
 Faced with a drifting fabrication line and a list of open hypotheses, the team crossed the candidate causes one at a time, each as a deliberate batch with its variables pinned. \Cref{tab:bridge_elimination} summarises the campaign as a method of elimination: one row per tested cause, the batches that tested it, and the verdict. This is also where the provenance library that the rest of the thesis relies on was motivated --- one cannot run an elimination of this kind without a record that pins every process variable per device.
 
-\begin{table}[t]
+\begin{table}[htbp]
   \centering
   \caption[Methods-of-elimination summary]{Methods-of-elimination summary for the degradation investigation. Candidate causes were crossed as deliberate batches with variables pinned in the provenance record; the exclusions leave the hyperbranched \Hybrane{} host stock as the residual suspect, pursued quantitatively in \cref{sec:bridge_degradation}.}
   \label{tab:bridge_elimination}
@@ -81,6 +81,7 @@ Faced with a drifting fabrication line and a list of open hypotheses, the team c
 
 Two entries deserve emphasis. First, device NM\_v067 (2021-10-21) records that a second experimenter, working independently, ``has the same problems with devices'': the failure crosses people, which removes individual technique as the cause and points to a shared material or systemic origin. (The same note also guessed at the \ITO{}; that guess was not borne out by the substrate study.) Second, the \SY{} semiconductor was an explicit co-suspect --- an old bottle was noticeably ``more viscous \ldots\ maybe because of bonds degradation in the old one'' --- but the old-versus-new \SY{} comparison produced no significant change, and the group kept buying fresh \SY{} throughout the period in which devices continued to collapse. With illumination, atmosphere, transport, substrate, solvent, evaporation, and the semiconductor each crossed and excluded, the residual suspect is the remaining consumable that aged on the shelf between batches: the hyperbranched \Hybrane{} host stock. The remainder of the chapter tests that attribution quantitatively and offers a candidate chemistry for it.
 
+\FloatBarrier  % flush Table 3.1 within its own section, near its discussion
 %% ------------------------------------------------------------
 \section{The Quantitative Degradation Signal}\label{sec:bridge_degradation}
 %% ------------------------------------------------------------
@@ -98,7 +99,7 @@ The campaign record is qualitative; the claim that the platform degraded must be
   \label{fig:bridge_window}
 \end{figure}
 
-\begin{table}[t]
+\begin{table}[htbp]
   \centering
   \caption[Quantitative degradation signal]{The degradation as a multi-feature signal on the standard corpus, per device. \emph{Window collapse} is read at $\sim$\SI{3}{\volt} as an early-vs-later step at the NM\_v026 inflection (Mann--Whitney). \emph{Ohmic drift} is read at matched $\sim$\SI{1.2}{\volt} as a per-device Spearman correlation with fabrication date, reported with all dates and with the recovery tail ($\geq$2022-03) dropped; the correlation \emph{strengthens} when the reverted batches are removed, as expected if they are partial recoveries. Health flags are shown for completeness and are discussed in the text.}
   \label{tab:bridge_degradation}
@@ -166,6 +167,7 @@ The rest of this thesis is mechanistic, so a black-box ``the stock went bad'' wo
 
 \paragraph{Confirming experiments (future work).} The hypothesis would be tested directly by Fourier-transform infrared spectroscopy (loss of the ester C=O band, growth of --OH) and gel-permeation chromatography (a molecular-weight drop) on \emph{retained aged versus fresh} stock; by Karl-Fischer titration or thermogravimetry for water content; and by impedance spectroscopy to show that the ionic resistance fell. None were run on the \Hybrane{} corpus, so the hypothesis stays open --- and may never fully close, because it concerns a consumable that no longer exists in its aged state.
 
+\FloatBarrier  % flush Table 3.2 (and §3.3 figures) before leaving the section
 %% ------------------------------------------------------------
 \section{The Resolution: Why PEO}\label{sec:bridge_resolution}
 %% ------------------------------------------------------------
