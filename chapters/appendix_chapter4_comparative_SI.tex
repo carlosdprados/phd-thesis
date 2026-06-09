@@ -50,6 +50,28 @@ raw-to-summary trail underlying these screened descriptors.
   \end{tabularx}
 \end{table}
 
+\begin{table}[p]
+  \centering
+  \caption[Figure-level provenance for Chapter 4]{Figure-level provenance for the Chapter~4 figures whose detailed file paths are not repeated in the main captions. Script names are relative to the thesis repository; raw measurements reside in the experimental archive paths listed by the scripts.}
+  \label{tab:ch4_figure_provenance}
+  \scriptsize
+  \renewcommand{\arraystretch}{0.92}
+  \setlength{\tabcolsep}{2pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.1cm}>{\raggedright\arraybackslash}p{4.4cm}>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    Output & Reproduced by & Principal inputs and audit trail \\
+    \midrule
+    \Cref{fig:ch4_thickness_control} & \path{scripts/thickness_rpm_audit.py} & \path{DEVICES_PROFILOMETRY_STATS.csv} joined to the screened Chapter~4 descriptors; audit in \path{handouts/14_thickness_rpm_confound_audit.md}. \\
+    \Cref{fig:ch4_representative,fig:ch4_composition_heatmaps,fig:ch4_heterogeneity,fig:ch4_potentiation,fig:ch4_design_space} & \path{scripts/ch4_comparative_figures.py} & \path{handouts/ch4_decay_fits.csv}, \path{handouts/ch4_pulse_descriptors.csv}, \path{handouts/ch4_decay_by_cell.csv}, and \path{handouts/ch4_pulses_by_cell.csv}; curve curation in \path{handouts/ch4_png_qa_curation.csv}. \\
+    \Cref{fig:ch4_chemistry_landscape,fig:ch4_protocol} & \path{scripts/ch4_comparative_figures.py} & Chemistry-landscape values from the screened descriptor tables; the protocol overlay uses the same-device v114 matched-amplitude comparison recorded in the Chapter~4 audit trail. \\
+    \Cref{fig:ch4_iratr} & \path{scripts/ch4_iratr.py}; \path{scripts/ch4_xrd.py} & ATR band extraction in \path{handouts/ch4_iratr_bands.csv}; assessments in \path{handouts/16_iratr_assessment.md} and \path{handouts/17_xrd_assessment.md}. \\
+    \Cref{fig:ch4_uvvis} & \path{scripts/ch4_uvvis.py} & 2025 \SY{}/\TMPE{} cation-series UV-Vis spectra; assessment in \path{handouts/18_uvvis_assessment.md}. \\
+    \Cref{fig:ch4_eis} & \path{scripts/ch4_eis.py} & \SI{0}{\volt}-DC impedance descriptors from the experimental database, joined to \path{handouts/ch4_decay_by_cell.csv}; per-cell output in \path{handouts/ch4_eis_by_cell.csv}. \\
+    \Cref{fig:ch4_electrode} & \path{scripts/ch4_electrode.py} & Silver-versus-gold metrics in \path{handouts/ch4_electrode_by_cell.csv}; audit in \path{handouts/19_electrode_au_assessment.md}. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
 \paragraph{The aggregation ladder.} The aggregation is deliberately
 conservative. HYST raw points are first reduced to sweep-level features in
 \path{DEVICES_HYST_CURVE_INFO.csv}; broken or FILTERED rows are removed; device
