@@ -41,20 +41,25 @@ V_READ = 0.5               # sub-threshold read bias [V]
 # ----------------------------------------------------------------------------
 # (1) Sensor site: chest vs wrist
 # ----------------------------------------------------------------------------
-def site_comparison(cards, sigmas=(0.0, 0.2, 0.4)):
+def site_comparison(cards):
     """Continuous binary stress detection (ch5_onset) on the chest vs the wrist
-    signals, clean and under sensor noise. Returns {site: {sigma: {bank: F1}}}."""
+    signals, clean and under sensor noise, SEED-AVERAGED via the noise sweep so the
+    numbers match the rest of the chapter. Returns {site: dict} with per-bank F1 at
+    sigma 0 and 0.4, clean false-alarm rates, and the per-subject paired het-inst
+    test at sigma=0.4."""
     sites = {"chest (ECG+Resp+EDA+Temp)": load_raw(),
              "wrist (Empatica E4: EDA+Temp+PPG)": load_raw_wrist()}
     out = {}
     for name, raw in sites.items():
-        out[name] = {}
-        for sg in sigmas:
-            r = O.evaluate(raw, cards, sigma=sg)
-            out[name][sg] = {b: r[b]["f1"] for b in ("inst", "mem0", "hom", "het")}
-        # clean false-alarm rates too
-        r0 = O.evaluate(raw, cards, sigma=0.0)
-        out[name]["far0"] = {b: r0[b]["far"] for b in ("inst", "het")}
+        sw = O.noise_sweep(raw, cards)
+        i0, i4 = sw["sigmas"].index(0.0), sw["sigmas"].index(0.4)
+        rN = O.evaluate(raw, cards, sigma=0.4)             # per-subject scores @ sigma 0.4
+        out[name] = dict(
+            f1_0={b: sw["banks"][b]["f1"][i0][0] for b in ("inst", "mem0", "hom", "het")},
+            f1_4={b: sw["banks"][b]["f1"][i4][0] for b in ("inst", "mem0", "hom", "het")},
+            far0={b: sw["banks"][b]["far"][i0][0] for b in ("inst", "hom", "het")},
+            paired=O._paired(rN["het"]["subj_f1"], rN["inst"]["subj_f1"]),
+        )
     return out
 
 
@@ -101,17 +106,19 @@ def main():
     if not os.path.isdir("data/wesad/WESAD"):
         print("WESAD not present; run scripts/ch5_wesad.py for download instructions.")
     else:
-        print("(1) SENSOR SITE -- continuous binary stress-detection macro-F1\n")
+        print("(1) SENSOR SITE -- continuous binary stress-detection macro-F1 "
+              "(seed-averaged)\n")
         cmp = site_comparison(cards)
-        for name, byo in cmp.items():
+        for name, d in cmp.items():
             print(f"  {name}")
-            sigmas = [k for k in byo if isinstance(k, float)]
-            print("      " + "  ".join(f"sig={s:g}:" .ljust(8) for s in sigmas))
-            for b in ("inst", "het"):
-                row = "  ".join(f"{byo[s][b]:.3f}".ljust(8) for s in sigmas)
-                print(f"      {b:5s} {row}")
-            fa = byo["far0"]
-            print(f"      clean false-alarm: inst {fa['inst']:.3f} -> het {fa['het']:.3f}\n")
+            print(f"      {'bank':5s} {'F1 sig0':>8} {'F1 sig0.4':>10} {'FAR sig0':>9}")
+            for b in ("inst", "mem0", "hom", "het"):
+                far = d["far0"].get(b)
+                fars = f"{far:9.3f}" if far is not None else f"{'--':>9}"
+                print(f"      {b:5s} {d['f1_0'][b]:8.3f} {d['f1_4'][b]:10.3f} {fars}")
+            p = d["paired"]
+            print(f"      paired het-inst F1@sig0.4: {p['mean']:+.3f}, "
+                  f"{int(p['frac_pos']*p['n'])}/{p['n']}, p={p['p']:.1e}\n")
 
     print("(2) DEPLOYMENT ENVELOPE (from measured Chapter 2 device constants)\n")
     for N in (24, 48):
