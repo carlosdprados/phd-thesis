@@ -30,18 +30,14 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+import figstyle
+
 DB = "../Nanomem_Devices_Library/DATABASE"
 HO = "handouts"
 FIGDIR = "figures/chapter4"
 
-plt.rcParams.update({
-    "font.family": "serif",
-    "font.size": 9,
-    "axes.titlesize": 9,
-    "axes.labelsize": 9,
-    "figure.dpi": 150,
-    "savefig.bbox": "tight",
-})
+figstyle.apply()
+COLORS = figstyle.COLORS
 
 
 def fnum(x):
@@ -213,18 +209,18 @@ sc = axA.scatter(xs, [r["th"] for r in A], c=[r["rpm"] for r in A],
                  cmap="viridis", s=34, edgecolor="k", linewidth=0.3, zorder=3)
 for p in peo_levels:
     m = statistics.median([r["th"] for r in li_ag if r["peo"] == p])
-    axA.plot([xpos[p] - 0.22, xpos[p] + 0.22], [m, m], color="crimson", lw=1.6, zorder=2)
+    axA.plot([xpos[p] - 0.22, xpos[p] + 0.22], [m, m], color=COLORS["red"], lw=1.6, zorder=2)
 axA.set_xticks(range(len(peo_levels)))
 axA.set_xticklabels([str(p) for p in peo_levels])
 axA.set_xlabel("PEO mass fraction")
 axA.set_ylabel("film thickness (nm)")
-axA.set_title("(a) thickness covaries with PEO\n(red = cell median; colour = spin RPM)")
+figstyle.panel(axA, "a", "thickness covaries with PEO\n(red = cell median; colour = spin RPM)")
 cb = fig.colorbar(sc, ax=axA, pad=0.02)
 cb.set_label("spin-coat RPM", fontsize=8)
 
 # Panel B: log t_half vs thickness, coloured by PEO (memory tracks PEO colour, not x)
 B = [r for r in li_ag if r["lt"] is not None]
-cmap = {0.3: "#2166ac", 0.6: "#999999", 1.2: "#b2182b"}
+cmap = {0.3: COLORS["blue"], 0.6: COLORS["gray"], 1.2: COLORS["red"]}
 for p in peo_levels:
     pts = [r for r in B if r["peo"] == p]
     axB.scatter([r["th"] for r in pts], [r["t_half"] for r in pts],
@@ -233,8 +229,8 @@ axB.set_yscale("log")
 axB.set_xlabel("film thickness (nm)")
 axB.set_ylabel(r"fading-memory time $t_{1/2}$ (s)")
 prtxt, npt = partial(B, "th", "lt", "peo")
-axB.set_title("(b) memory tracks PEO, not thickness\n"
-              rf"$r(\mathrm{{thick}},\,t_{{1/2}}\,|\,\mathrm{{PEO}})={prtxt:+.2f}$ (n={npt})")
+figstyle.panel(axB, "b", "memory tracks PEO, not thickness\n"
+               rf"$r(\mathrm{{thick}},\,t_{{1/2}}\,|\,\mathrm{{PEO}})={prtxt:+.2f}$ (n={npt})")
 axB.legend(fontsize=7, frameon=False, loc="upper right")
 
 fig.tight_layout()

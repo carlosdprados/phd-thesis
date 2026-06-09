@@ -34,6 +34,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+import figstyle
+
 # ----------------------------------------------------------------------
 # Locate the experimental archive (sibling of the thesis repo)
 # ----------------------------------------------------------------------
@@ -221,13 +223,13 @@ def main():
 
 
 def make_figures(spectra):
-    plt.rcParams.update({"font.size": 9, "axes.linewidth": 0.8,
-                         "figure.dpi": 150})
+    figstyle.apply()
+    COLORS = figstyle.COLORS
 
     # ===== Figure 1: host x cation fingerprint matrix =====
     fig, axes = plt.subplots(1, 2, figsize=(9.2, 4.2))
     hosts = ["PEO", "TMPE"]
-    cat_color = {"Li": "#1f77b4", "Na": "#2ca02c", "K": "#d62728"}
+    cat_color = {"Li": COLORS["blue"], "Na": COLORS["green"], "K": COLORS["red"]}
     matrix = {("PEO", "Li"): "v126", ("PEO", "Na"): "v127", ("PEO", "K"): "v128",
               ("TMPE", "Li"): "v129", ("TMPE", "Na"): "v130", ("TMPE", "K"): "v131"}
     for ax, host in zip(axes, hosts):
@@ -252,7 +254,7 @@ def make_figures(spectra):
         ax.set_xlim(1350, 700)
         ax.legend(fontsize=7, frameon=False)
     axes[0].set_ylabel("normalised absorbance (offset baseline)")
-    fig.suptitle(r"ATR-FTIR fingerprint: triflate \& polyether bands "
+    fig.suptitle("ATR-FTIR fingerprint: triflate & polyether bands "
                  "(SY blend, 0.3/0.09)", fontsize=10)
     fig.tight_layout(rect=(0, 0, 1, 0.96))
     p1 = os.path.join(FIGDIR, "iratr_fingerprint.pdf")
@@ -321,11 +323,11 @@ def make_figures(spectra):
     axL.set_ylim(0, 1.12)
     axL.set_xlabel(r"wavenumber (cm$^{-1}$)")
     axL.set_ylabel(r"normalised $\nu_s$(SO$_3$) absorbance")
-    axL.set_title(r"(a) ATR: triflate ion-association band")
+    figstyle.panel(axL, "a", "ATR: triflate ion-association band")
     axL.legend(fontsize=6.5, frameon=False, ncol=2)
 
-    for dev, lab, c in [("v126", "PEO/Li (locally ordered)", "#1f77b4"),
-                        ("v129", "TMPE/Li (amorphous)", "#d62728")]:
+    for dev, lab, c in [("v126", "PEO/Li (locally ordered)", COLORS["blue"]),
+                        ("v129", "TMPE/Li (amorphous)", COLORS["red"])]:
         if dev not in spectra:
             continue
         x, a, t, *_ = spectra[dev]
@@ -339,11 +341,11 @@ def make_figures(spectra):
     axM.set_xlim(1300, 820)
     axM.set_xlabel(r"wavenumber (cm$^{-1}$)")
     axM.set_ylabel("normalised absorbance")
-    axM.set_title("(b) ATR: host C-O-C local order (Li, film)")
+    figstyle.panel(axM, "b", "ATR: host C-O-C local order (Li, film)")
     axM.legend(fontsize=7, frameon=False)
 
     # (c) XRD panel
-    xrd = {"v126": ("PEO/Li", "#1f77b4"), "v129": ("TMPE/Li", "#d62728")}
+    xrd = {"v126": ("PEO/Li", COLORS["blue"]), "v129": ("TMPE/Li", COLORS["red"])}
     off = 0.0
     for dev, (lab, c) in xrd.items():
         path = XRD_FILES.get(dev)
@@ -361,14 +363,14 @@ def make_figures(spectra):
     for pk in (21.5, 30.6, 35.5):
         axR.axvline(pk, color="0.6", ls="-", lw=0.5, zorder=0)
     for pk in (19.1, 23.3):
-        axR.axvline(pk, color="#1f77b4", ls=":", lw=0.8, zorder=0)
+        axR.axvline(pk, color=COLORS["blue"], ls=":", lw=0.8, zorder=0)
     axR.text(30.6, off + 1.7, "ITO", fontsize=6.5, color="0.4", ha="center")
-    axR.text(20.0, off + 1.7, "PEO\n(exp.)", fontsize=6, color="#1f77b4", ha="center")
+    axR.text(20.0, off + 1.7, "PEO\n(exp.)", fontsize=6, color=COLORS["blue"], ha="center")
     axR.set_xlim(10, 40)
     axR.set_yticks([])
     axR.set_xlabel(r"$2\theta$ (deg, Cu-K$\alpha$)")
     axR.set_ylabel("intensity (ITO-norm., offset)")
-    axR.set_title("(c) XRD: films are X-ray amorphous")
+    figstyle.panel(axR, "c", "XRD: films are X-ray amorphous")
     axR.legend(fontsize=7, frameon=False, loc="upper left")
 
     fig.suptitle("Microscopic corroboration of the chemistry axis: ATR + XRD "

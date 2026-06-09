@@ -28,6 +28,10 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+import figstyle
+figstyle.apply()
+COLORS = figstyle.COLORS
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 LAB = os.path.normpath(os.path.join(
@@ -38,9 +42,9 @@ os.makedirs(FIGDIR, exist_ok=True)
 
 Q1 = os.path.join(LAB, "2025-Q1_Devices")
 BASE = {
-    "Li":     (f"{Q1}/2025-02-26_NM_v317_(TMPELiTr,Au,3000rpm,90deg,newmixing,UV-Vis)/Day1_UV-Vis/", "#1f77b4"),
-    "Na":     (f"{Q1}/2025-02-26_NM_v318_(TMPENaTr,Au,3000rpm,90deg,newmixing,UV-Vis)/Day1_UV-Vis/", "#2ca02c"),
-    "K":      (f"{Q1}/2025-02-26_NM_v319_(TMPEKTr,Au,3000rpm,90deg,newmixing,UV-Vis)/Day1_UV-Vis/", "#d62728"),
+    "Li":     (f"{Q1}/2025-02-26_NM_v317_(TMPELiTr,Au,3000rpm,90deg,newmixing,UV-Vis)/Day1_UV-Vis/", COLORS["blue"]),
+    "Na":     (f"{Q1}/2025-02-26_NM_v318_(TMPENaTr,Au,3000rpm,90deg,newmixing,UV-Vis)/Day1_UV-Vis/", COLORS["green"]),
+    "K":      (f"{Q1}/2025-02-26_NM_v319_(TMPEKTr,Au,3000rpm,90deg,newmixing,UV-Vis)/Day1_UV-Vis/", COLORS["red"]),
     "no salt": (f"{Q1}/2025-02-26_NM_v320_(TMPE,Au,3000rpm,90deg,newmixing,UV-Vis)/Day1_UV-Vis/", "0.45"),
 }
 
@@ -100,7 +104,7 @@ def main():
         ax.plot(xx, yy / pk, color=c, lw=1.4, ls=ls, label=f"SY/TMPE/{ion}"
                 if ion != "no salt" else "SY/TMPE (no salt)")
     ax.axvline(496, color="0.7", ls=":", lw=0.8)
-    ax.text(500, 0.08, "onset\n~2.50 eV", fontsize=7, color="0.4")
+    ax.text(504, 0.10, "onset\n~2.50 eV", fontsize=7, color="0.4", ha="left")
     ax.set_xlim(320, 620)
     ax.set_xlabel("wavelength (nm)")
     ax.set_ylabel("normalised absorbance (SY peak = 1)")
@@ -110,6 +114,7 @@ def main():
     secx = ax.secondary_xaxis("top", functions=(lambda w: 1239.8 / np.clip(w, 1, None),
                                                 lambda e: 1239.8 / np.clip(e, 1e-6, None)))
     secx.set_xlabel("energy (eV)", fontsize=8)
+    secx.spines["top"].set_visible(True)   # keep the secondary energy axis line
     fig.tight_layout()
     p = os.path.join(FIGDIR, "uvvis_bandedge.pdf")
     fig.savefig(p)

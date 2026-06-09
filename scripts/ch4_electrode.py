@@ -43,15 +43,15 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+import figstyle
+
 DB = "../Nanomem_Devices_Library/DATABASE"
 OUT = "handouts"
 FIGDIR = "figures/chapter4"
 
-plt.rcParams.update({
-    "font.family": "serif", "font.size": 9, "axes.titlesize": 9,
-    "axes.labelsize": 9, "figure.dpi": 150, "savefig.bbox": "tight",
-})
-AG_C, AU_C = "#1f4e79", "#b8860b"  # silver-blue, gold
+figstyle.apply()
+COLORS = figstyle.COLORS
+AG_C, AU_C = COLORS["blue"], "#B8860B"  # silver-blue, gold (semantic: Au electrode)
 
 
 def L(f):
@@ -275,7 +275,7 @@ def make_figure(hyst, pul, decay_all):
                            label=(el if lab else None)); lab = False
     ax[0].axhline(0.5, ls=":", c="0.6", lw=0.8)
     ax[0].set_xlabel("delay (s)"); ax[0].set_ylabel("norm. enhancement")
-    ax[0].set_title("(a) fading memory (PEO/Li)"); ax[0].legend(frameon=False, fontsize=8)
+    figstyle.panel(ax[0], "a", "fading memory (PEO/Li)"); ax[0].legend(frameon=False, fontsize=8)
 
     # (b) switching window across chemistry, Ag vs Au (cation series flat on Au)
     cells_b = ["PEO/Li/OTf", "TMPE/Li/OTf", "TMPE/Na/OTf", "TMPE/K/OTf"]
@@ -286,7 +286,7 @@ def make_figure(hyst, pul, decay_all):
                 for ce in cells_b]
         ax[1].bar(x + (k - 0.5) * w, vals, w, color=col, label=el)
     ax[1].set_xticks(x); ax[1].set_xticklabels(labs, rotation=30, ha="right")
-    ax[1].set_ylabel("on-off ratio"); ax[1].set_title("(b) switching window")
+    ax[1].set_ylabel("on/off ratio"); figstyle.panel(ax[1], "b", "switching window")
     ax[1].legend(frameon=False, fontsize=8)
 
     # (c) potentiation peak ratio, Ag vs Au (log)
@@ -298,7 +298,7 @@ def make_figure(hyst, pul, decay_all):
                 for ce in cells_c]
         ax[2].bar(x + (k - 0.5) * w, vals, w, color=col, label=el)
     ax[2].set_yscale("log"); ax[2].set_xticks(x); ax[2].set_xticklabels(labs_c)
-    ax[2].set_ylabel("potentiation peak ratio"); ax[2].set_title("(c) potentiation")
+    ax[2].set_ylabel("potentiation peak ratio"); figstyle.panel(ax[2], "c", "potentiation")
     ax[2].legend(frameon=False, fontsize=8)
 
     fig.tight_layout()

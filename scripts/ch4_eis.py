@@ -40,14 +40,14 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+import figstyle
+
 DB = "../Nanomem_Devices_Library/DATABASE"
 OUT = "handouts"
 FIGDIR = "figures/chapter4"
 
-plt.rcParams.update({
-    "font.family": "serif", "font.size": 9, "axes.titlesize": 9,
-    "axes.labelsize": 9, "figure.dpi": 150, "savefig.bbox": "tight",
-})
+figstyle.apply()
+COLORS = figstyle.COLORS
 
 
 def load(f):
@@ -217,7 +217,7 @@ def main():
     axA.plot(peos, cmed, "k-o", lw=1.4, ms=4, zorder=3, label="PEO median")
     axA.set_yscale("log"); axA.set_xlabel("PEO mass fraction")
     axA.set_ylabel(r"$Z_{\mathrm{real}}$ at Nyquist apex ($\Omega$), 0 V DC")
-    axA.set_title("(a) Ionic impedance vs composition")
+    figstyle.panel(axA, "a", "ionic impedance vs composition")
     handles = [plt.Line2D([], [], marker="o", ls="", color=cmap[s], label=f"salt {s}") for s in salt_levels]
     handles.append(plt.Line2D([], [], marker="o", color="k", label="PEO median"))
     axA.legend(handles=handles, fontsize=6.5, frameon=False, loc="upper right")
@@ -230,7 +230,7 @@ def main():
     z_by_peo = {p: med([cm_z[k] for k in cm_z if k[0] == p]) for p in peo_levels}
     t_by_peo = {p: med([thalf[k] for k in thalf if k[0] == p]) for p in peo_levels}
 
-    c_eis, c_mem = "#1f4e79", "#b5651d"
+    c_eis, c_mem = COLORS["blue"], COLORS["orange"]
     # EIS cells (left axis)
     for k, v in cm_z.items():
         axB.scatter(k[0], v, s=20, color=c_eis, alpha=0.4, edgecolor="none", zorder=2)
@@ -240,9 +240,10 @@ def main():
     axB.set_xlabel("PEO mass fraction")
     axB.set_ylabel(r"EIS $Z_{\mathrm{real}}$ at apex ($\Omega$)", color=c_eis)
     axB.tick_params(axis="y", labelcolor=c_eis)
-    axB.set_title("(b) Two measurements, one composition axis")
+    figstyle.panel(axB, "b", "two measurements, one composition axis")
 
     axB2 = axB.twinx()
+    figstyle.keepspine(axB2, "right")  # twin axis carries the t_1/2 scale
     for k, v in thalf.items():
         if v and np.isfinite(v):
             axB2.scatter(k[0], v, s=20, marker="s", color=c_mem, alpha=0.4, edgecolor="none", zorder=2)
