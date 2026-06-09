@@ -14,7 +14,8 @@ This appendix documents how the behavioural-model parameter cards of
 simulation and read-out settings used across the three evidence tiers. Together
 with the per-cell tables of \cref{app:ch4_celltables}, it makes the in-silico
 results reproducible without consulting the analysis scripts
-(\path{scripts/ch5_figures.py}, \path{scripts/ch5_physio_context.py}).
+(\path{scripts/ch5_figures.py}, \path{scripts/ch5_physio_context.py},
+\path{scripts/ch5_onset.py}).
 
 \section{Parameter-Card Sourcing}\label{app:ch5_cards}
 
@@ -62,3 +63,28 @@ device nodes rather than the read-out.
     \bottomrule
   \end{tabularx}
 \end{table}
+
+\section{Continuous-Monitoring Stress Test}\label{app:ch5_robust}
+
+The deployment-robustness result of \cref{sec:ch5_robust} (\path{scripts/ch5_onset.py})
+is a continuous binary stress detector: at every $\Delta t = \SI{1}{\second}$ step the
+read-out predicts stress (\WESAD{} label~2) versus not-stress (baseline and amusement
+pooled), leave-one-subject-out, with the same single linear ridge read-out and
+$15$-second causal label smoothing used in the streaming task. Four matched banks of
+$N=24$ nodes are compared on identical input masks: the instantaneous input (no
+memory), a memoryless bank (leak set to zero, dimensionality only), the homogeneous
+lead-only bank, and the heterogeneous composition bank.
+
+Sensor corruption is modelled by adding, to the per-subject scaled streams
+(channels in $[0,1]$), independent Gaussian noise of standard deviation $\sigma$ at
+every sample, plus sparse motion-artefact bursts (short windows of amplified noise at
+a $1\%$ per-sample rate), clipped back to $[0,1]$; the same realisation is applied to
+the training and held-out streams so the comparison isolates each architecture's
+intrinsic noise tolerance. Robustness curves are seed-averaged over three bank/noise
+seeds; the per-subject significance test at $\sigma=0.4$ is a paired Wilcoxon
+signed-rank over the fifteen subjects. Reported metrics are the binary macro-F1, the
+pooled false-alarm rate (fraction of not-stress steps called stress), and --- for
+completeness, though they do not separate the banks --- the transition-window
+macro-F1 (steps within $\pm\SI{20}{\second}$ of a label change) and the onset
+detection latency (time to the first $\geq\SI{5}{\second}$ sustained stress call after
+each onset).

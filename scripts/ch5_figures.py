@@ -288,6 +288,54 @@ def fig_wesad(cards, seeds=range(5)):
           f"Demo B inst {f1_inst:.3f} memless {mem0.mean():.3f} hom {hom.mean():.3f} het {het.mean():.3f})")
 
 
+def fig_robust_monitoring(cards):
+    """Continuous stress monitoring: fading memory is a noise-robust affective
+    substrate. (a) binary stress-detection macro-F1 vs injected sensor-noise sigma --
+    the memory banks stay flat while the instantaneous and memoryless controls
+    collapse, because temporal integration rejects transient artefact. (b) accuracy
+    in the hard region near label transitions on clean streams -- memory lifts it,
+    where the instantaneous level is most ambiguous. Needs the WESAD dataset."""
+    import ch5_onset as O
+    if not os.path.isdir("data/wesad/WESAD"):
+        print("skip robust_monitoring.pdf (WESAD dataset not present)")
+        return
+    raw = O.load_raw()
+    sw = O.noise_sweep(raw, cards)
+    sig = sw["sigmas"]
+    rN = O.evaluate(raw, cards, sigma=sig[-1])         # per-subject scores at the top sigma
+    style = {"inst": ("#b0b0b0", "o", "instantaneous (no memory)"),
+             "mem0": ("#8c8c8c", "^", "memoryless bank (dim. only)"),
+             "hom":  ("#4c72b0", "s", "homogeneous (memory, 1$\\tau$)"),
+             "het":  ("#c44e52", "D", "heterogeneous (memory, $\\tau$ spread)")}
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.6, 3.2),
+                                 gridspec_kw={"width_ratios": [1.45, 1]})
+    for b, (col, mk, lab) in style.items():
+        m = np.array([v for v, _ in sw["banks"][b]["f1"]])
+        s = np.array([e for _, e in sw["banks"][b]["f1"]])
+        a1.plot(sig, m, mk + "-", ms=4, color=col, label=lab)
+        a1.fill_between(sig, m - s, m + s, color=col, alpha=0.15)
+    a1.set_xlabel("injected sensor-noise $\\sigma$ (channels $\\in[0,1]$)")
+    a1.set_ylabel("binary stress-detection macro-F1")
+    a1.set_title("(a) Robustness to sensor noise", fontsize=9.5)
+    a1.legend(frameon=False, fontsize=6.4, loc="lower left")
+    # panel (b): per-subject het vs inst at the top noise level -> all above diagonal
+    si = rN["inst"]["subj_f1"]; sh = rN["het"]["subj_f1"]
+    keys = [k for k in sh if k in si]
+    xi = np.array([si[k] for k in keys]); yi = np.array([sh[k] for k in keys])
+    lo = min(xi.min(), yi.min()) - 0.03; hi = max(xi.max(), yi.max()) + 0.03
+    a2.plot([lo, hi], [lo, hi], "--", c="0.6", lw=0.9)
+    a2.scatter(xi, yi, s=22, color="#c44e52", edgecolor="0.2", linewidth=0.4, zorder=3)
+    a2.set_xlim(lo, hi); a2.set_ylim(lo, hi); a2.set_aspect("equal")
+    a2.set_xlabel("instantaneous F1"); a2.set_ylabel("heterogeneous F1")
+    n_above = int(np.sum(yi > xi))
+    a2.set_title(f"(b) Per subject, $\\sigma={sig[-1]:g}$\n({n_above}/{len(keys)} above diagonal)",
+                 fontsize=9)
+    fig.tight_layout()
+    p = os.path.join(FIGDIR, "robust_monitoring.pdf"); fig.savefig(p); plt.close(fig)
+    print(f"wrote {p}  (sigma{sig[-1]:g} binF1 inst {sw['banks']['inst']['f1'][-1][0]:.3f} "
+          f"-> het {sw['banks']['het']['f1'][-1][0]:.3f}; {n_above}/{len(keys)} subjects up)")
+
+
 def main():
     os.makedirs(FIGDIR, exist_ok=True)
     cards = load_cards(li_only=True)
@@ -297,6 +345,7 @@ def main():
     fig_mc_curve(cards)
     fig_composition_sweep(cards)
     fig_wesad(cards)
+    fig_robust_monitoring(cards)
 
 
 if __name__ == "__main__":
