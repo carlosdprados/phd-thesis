@@ -310,17 +310,18 @@ def make_figure(rows, path=FIG_PATH):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+    import figstyle
 
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    plt.rcParams.update({"font.family": "serif", "font.size": 9, "figure.dpi": 150,
-                         "savefig.bbox": "tight"})
+    figstyle.apply()
+    COLORS = figstyle.COLORS
 
     order = [
-        ("instantaneous", "instantaneous\ninput", "#b0b0b0"),
-        ("memoryless", "memoryless\nbank", "#8c8c8c"),
-        ("homogeneous_fast", "homogeneous\nfast", "#55a868"),
-        ("homogeneous_slow", "homogeneous\nslow", "#4c72b0"),
-        ("heterogeneous", "heterogeneous\nbank", "#c44e52"),
+        ("instantaneous", "instantaneous input", "#b0b0b0"),
+        ("memoryless", "memoryless bank", "#8c8c8c"),
+        ("homogeneous_fast", "homogeneous fast", COLORS["green"]),
+        ("homogeneous_slow", "homogeneous slow", COLORS["blue"]),
+        ("heterogeneous", "heterogeneous bank", COLORS["red"]),
     ]
     means, errs = [], []
     for cond, _, _ in order:
@@ -332,7 +333,7 @@ def make_figure(rows, path=FIG_PATH):
     groups = ["fast 1-3 s", "mid 8 s", "slow 20-45 s"]
     group_labels = ["fast\n1-3 s", "mid\n8 s", "slow\n20-45 s"]
     group_conditions = ["homogeneous_fast", "homogeneous_slow", "heterogeneous"]
-    group_colors = ["#55a868", "#4c72b0", "#c44e52"]
+    group_colors = [COLORS["green"], COLORS["blue"], COLORS["red"]]
     group_text = ["hom. fast", "hom. slow", "heterog."]
 
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.6, 3.1),
@@ -342,9 +343,10 @@ def make_figure(rows, path=FIG_PATH):
            edgecolor="0.2", linewidth=0.5, width=0.65, capsize=3,
            error_kw={"lw": 0.8})
     a1.set_xticks(x)
-    a1.set_xticklabels([lab for _, lab, _ in order], fontsize=7.4)
+    a1.set_xticklabels([lab for _, lab, _ in order], fontsize=7.2,
+                       rotation=22, ha="right", rotation_mode="anchor")
     a1.set_ylabel("held-out $R^2$")
-    a1.set_title("(a) Real physiological context", fontsize=8.5)
+    figstyle.panel(a1, "a", "real physiological context")
     a1.set_ylim(0.62, 0.78)
     for xi, val in zip(x, means):
         a1.text(xi, val + 0.006, f"{val:.3f}", ha="center", fontsize=7)
@@ -362,7 +364,7 @@ def make_figure(rows, path=FIG_PATH):
     a2.set_xticklabels(group_labels)
     a2.set_ylim(0.62, 0.83)
     a2.set_ylabel("held-out $R^2$")
-    a2.set_title("(b) Timescale groups", fontsize=8.5)
+    figstyle.panel(a2, "b", "timescale groups")
     a2.legend(frameon=False, fontsize=7.2, loc="upper right")
 
     fig.text(0.5, -0.04,

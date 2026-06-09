@@ -22,9 +22,11 @@ from ch5_reservoir import (load_cards, make_nodes, run_states, memory_capacity,
                            mc_curve_seeded, composition_sweep, paired_stats,
                            ipc_seeded, DT)  # noqa: E402
 
+import figstyle
+
 FIGDIR = "figures/chapter5"
-plt.rcParams.update({"font.family": "serif", "font.size": 9, "figure.dpi": 150,
-                     "savefig.bbox": "tight"})
+figstyle.apply()
+COLORS = figstyle.COLORS
 
 
 def fig_mc_curve(cards, N=24, max_k=30):
@@ -33,12 +35,12 @@ def fig_mc_curve(cards, N=24, max_k=30):
     st = paired_stats(het_tot, hom_tot)
     k = np.arange(1, max_k + 1)
     fig, ax = plt.subplots(figsize=(4.6, 3.2))
-    ax.plot(k, hom_m, "o-", ms=3, color="#4c72b0",
+    ax.plot(k, hom_m, "o-", ms=3, color=COLORS["blue"],
             label=f"homogeneous (MC$={hom_tot.mean():.1f}\\pm{hom_tot.std(ddof=1):.1f}$)")
-    ax.fill_between(k, hom_m - hom_sd, hom_m + hom_sd, color="#4c72b0", alpha=0.18)
-    ax.plot(k, het_m, "s-", ms=3, color="#c44e52",
+    ax.fill_between(k, hom_m - hom_sd, hom_m + hom_sd, color=COLORS["blue"], alpha=0.18)
+    ax.plot(k, het_m, "s-", ms=3, color=COLORS["red"],
             label=f"heterogeneous (MC$={het_tot.mean():.1f}\\pm{het_tot.std(ddof=1):.1f}$)")
-    ax.fill_between(k, het_m - het_sd, het_m + het_sd, color="#c44e52", alpha=0.18)
+    ax.fill_between(k, het_m - het_sd, het_m + het_sd, color=COLORS["red"], alpha=0.18)
     ax.set_xlabel(f"delay $k$ (lags of $\\Delta t={DT:g}$ s)")
     ax.set_ylabel("memory capacity MC$_k$")
     ax.set_title(f"Memory capacity vs lag (N={N} nodes)")
@@ -60,14 +62,14 @@ def fig_composition_sweep(cards, N=16, max_k=30):
     nrs = [r[3] for r in rows]; nrsd = [r[4] for r in rows]
     x = np.arange(len(rows))
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.4, 3.0))
-    cols = ["#dd8452" if r[5] else "#4c72b0" for r in rows]
+    cols = [COLORS["orange"] if r[5] else COLORS["blue"] for r in rows]
     ek = dict(ecolor="0.3", capsize=2, error_kw={"lw": 0.8})
     a1.bar(x, mcs, yerr=mcsd, color=cols, edgecolor="0.2", linewidth=0.5, **ek)
     a1.set_xticks(x); a1.set_xticklabels(labels, rotation=45, ha="right", fontsize=7)
-    a1.set_ylabel("total memory capacity"); a1.set_title("(a) MC by composition")
+    a1.set_ylabel("total memory capacity"); figstyle.panel(a1, "a", "MC by composition")
     a2.bar(x, nrs, yerr=nrsd, color=cols, edgecolor="0.2", linewidth=0.5, **ek)
     a2.set_xticks(x); a2.set_xticklabels(labels, rotation=45, ha="right", fontsize=7)
-    a2.set_ylabel("NARMA-10 NRMSE (lower better)"); a2.set_title("(b) NARMA-10 by composition")
+    a2.set_ylabel("NARMA-10 NRMSE (lower better)"); figstyle.panel(a2, "b", "NARMA-10 by composition")
     fig.text(0.5, -0.04, "PEO / salt mass fraction (orange = lead cell 0.3/0.09); "
              "error bars $\\pm 1$ SD over 10 seeds", ha="center", fontsize=8)
     fig.tight_layout()
@@ -82,8 +84,8 @@ def fig_robustness(cards, N=24, jitters=(0.0, 0.06, 0.12, 0.20, 0.30, 0.40)):
     bank keeps its advantage across the whole realistic spread, and modest scatter
     does not degrade -- and slightly aids -- recoverable memory."""
     fig, ax = plt.subplots(figsize=(4.6, 3.2))
-    for het, col, mk, lab in [(False, "#4c72b0", "o", "homogeneous"),
-                              (True, "#c44e52", "s", "heterogeneous")]:
+    for het, col, mk, lab in [(False, COLORS["blue"], "o", "homogeneous"),
+                              (True, COLORS["red"], "s", "heterogeneous")]:
         means, sds = [], []
         for j in jitters:
             _, _, tot = mc_curve_seeded(cards, het, N, jitter=j)
@@ -115,9 +117,9 @@ def fig_ipc(cards, N=24):
     lin = [hom["linear"][0], het["linear"][0]]
     nl = [hom["nonlinear"][0], het["nonlinear"][0]]
     tot_sd = [hom["total"][1], het["total"][1]]
-    ax.bar(x, lin, width=0.6, color="#4c72b0", edgecolor="0.2", linewidth=0.5,
+    ax.bar(x, lin, width=0.6, color=COLORS["blue"], edgecolor="0.2", linewidth=0.5,
            label="linear (degree 1)")
-    ax.bar(x, nl, width=0.6, bottom=lin, color="#dd8452", edgecolor="0.2",
+    ax.bar(x, nl, width=0.6, bottom=lin, color=COLORS["orange"], edgecolor="0.2",
            linewidth=0.5, label="nonlinear (degree 2)")
     tot = [a + b for a, b in zip(lin, nl)]
     ax.errorbar(x, tot, yerr=tot_sd, fmt="none", ecolor="0.2", capsize=3, lw=0.8)
@@ -150,11 +152,11 @@ def fig_tau_coverage(cards):
 
     # affective signal bands (s): (name, lo, hi)  -- cf. Table 4.1
     bands = [
-        ("Phasic EDA (SCR)", 1.0, 10.0, "#dd8452"),
-        ("Respiration",      3.0, 5.0,  "#55a868"),
-        ("HRV (HF)",         2.5, 7.0,  "#8172b3"),
-        ("HRV (LF)",         7.0, 25.0, "#4c72b0"),
-        ("Tonic SCL",        60.0, 300.0, "#c44e52"),
+        ("Phasic EDA (SCR)", 1.0, 10.0, COLORS["orange"]),
+        ("Respiration",      3.0, 5.0,  COLORS["green"]),
+        ("HRV (HF)",         2.5, 7.0,  COLORS["purple"]),
+        ("HRV (LF)",         7.0, 25.0, COLORS["blue"]),
+        ("Tonic SCL",        60.0, 300.0, COLORS["red"]),
     ]
 
     fig, ax = plt.subplots(figsize=(6.4, 3.4))
@@ -166,28 +168,35 @@ def fig_tau_coverage(cards):
                 edgecolor=col, linewidth=0.8)
         ax.text(lo * 0.85, y, name, ha="right", va="center", fontsize=7.6)
 
-    # composition-cell tau markers (lower track), labelled with staggered offsets
+    # composition-cell tau markers (lower track). Several cells sit at nearly
+    # identical tau (~3 s), so the dots stay at their true tau while the labels
+    # are fanned out to evenly spaced positions and joined by thin leader lines.
+    # Cells are tau-sorted and labels are placed in the same order, so leaders
+    # never cross.
     ytick = 0.0
-    for j, c in enumerate(full):
+    y_lab = -1.35
+    lab_xs = np.logspace(np.log10(1.15), np.log10(26.0), len(full))
+    for c, lx in zip(full, lab_xs):
         is_lead = (c.peo == "0.3" and c.salt == "0.09")
-        col = "#dd8452" if is_lead else "#333333"
+        col = COLORS["orange"] if is_lead else "#333333"
         ax.plot([c.tau, c.tau], [0.4, y0 + 0.4], color=col,
                 lw=1.4 if is_lead else 0.6, alpha=0.55 if is_lead else 0.25,
                 zorder=0)
         ax.plot(c.tau, ytick, "o", ms=7 if is_lead else 5, color=col, zorder=3)
-        dy = -11 if (j % 2 == 0) else -21      # stagger to avoid label overlap
-        ax.annotate(f"{c.peo}/{c.salt}", (c.tau, ytick), xytext=(0, dy),
-                    textcoords="offset points", ha="center", fontsize=6.4,
+        ax.plot([c.tau, lx], [ytick - 0.18, y_lab + 0.30], color=col,
+                lw=0.5, alpha=0.45, zorder=1)
+        ax.annotate(f"{c.peo}/{c.salt}", (lx, y_lab), ha="center", va="top",
+                    rotation=90, fontsize=6.2,
                     color=col, fontweight="bold" if is_lead else "normal")
-    ax.text(full[0].tau * 0.55, ytick, "composition\ncells ($\\tau$)",
+    ax.text(0.92, ytick, "composition\ncells ($\\tau$)",
             ha="right", va="center", fontsize=7.6)
 
     ax.set_xscale("log")
     ax.set_xlim(0.8, 400)
-    ax.set_ylim(-1.1, y0 + 1.0)
+    ax.set_ylim(-2.9, y0 + 1.0)
     ax.set_yticks([])
     ax.set_xlabel("characteristic timescale (s)")
-    ax.set_title("Device fading-memory times vs affective-signal bands", fontsize=9.5)
+    ax.set_title("device fading-memory times vs affective-signal bands", fontsize=9.5)
     # mark the uncovered tonic gap (annotation sits in the band region, not on labels)
     gap_lo = max(c.tau for c in full) * 1.05
     ax.axvspan(gap_lo, 60, color="0.85", alpha=0.35, zorder=-1)
@@ -251,11 +260,11 @@ def fig_wesad(cards, seeds=range(5)):
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.6, 3.2),
                                  gridspec_kw={"width_ratios": [1, 1.7]})
     # panel (a)
-    a1.bar([0, 1], [f1A_res, f1A_stat], color=["#dd8452", "#b0b0b0"],
+    a1.bar([0, 1], [f1A_res, f1A_stat], color=[COLORS["orange"], "#b0b0b0"],
            edgecolor="0.2", linewidth=0.5, width=0.6)
     a1.set_xticks([0, 1]); a1.set_xticklabels(["device\nreservoir", "static\nbaseline"])
     a1.set_ylim(0, 1); a1.set_ylabel("LOSO macro-F1")
-    a1.set_title("(a) Demo A: window binary\nstress/baseline (EDA)", fontsize=8.5)
+    figstyle.panel(a1, "a", "Demo A: window binary\nstress/baseline (EDA)")
     a1.axhline(0.5, ls=":", c="0.5", lw=0.8); a1.text(1.5, 0.52, "chance", fontsize=6.5,
                                                       ha="right", color="0.5")
     for x, v in zip([0, 1], [f1A_res, f1A_stat]):
@@ -265,13 +274,13 @@ def fig_wesad(cards, seeds=range(5)):
               "homogeneous\n(memory, 1$\\tau$)", "heterogeneous\n(memory, $\\tau$ spread)"]
     vals = [f1_inst, mem0.mean(), hom.mean(), het.mean()]
     errs = [0, mem0.std(), hom.std(), het.std()]
-    cols = ["#b0b0b0", "#8c8c8c", "#4c72b0", "#c44e52"]
+    cols = ["#b0b0b0", "#8c8c8c", COLORS["blue"], COLORS["red"]]
     x = np.arange(4)
     a2.bar(x, vals, yerr=errs, color=cols, edgecolor="0.2", linewidth=0.5,
            width=0.62, capsize=3, error_kw={"lw": 0.8})
     a2.set_xticks(x); a2.set_xticklabels(labels, fontsize=7.2)
     a2.set_ylim(0.6, 0.81); a2.set_ylabel("LOSO macro-F1")
-    a2.set_title("(b) Demo B: streaming 3-class affect tracking", fontsize=8.5)
+    figstyle.panel(a2, "b", "Demo B: streaming 3-class affect tracking")
     # cumulative decomposition: inst -> +dim -> +memory -> +heterogeneity
     def _step(x0, x1, y, txt):
         a2.annotate("", xy=(x1, y), xytext=(x0, y),
@@ -305,8 +314,8 @@ def fig_robust_monitoring(cards):
     rN = O.evaluate(raw, cards, sigma=sig[-1])         # per-subject scores at the top sigma
     style = {"inst": ("#b0b0b0", "o", "instantaneous (no memory)"),
              "mem0": ("#8c8c8c", "^", "memoryless bank (dim. only)"),
-             "hom":  ("#4c72b0", "s", "homogeneous (memory, 1$\\tau$)"),
-             "het":  ("#c44e52", "D", "heterogeneous (memory, $\\tau$ spread)")}
+             "hom":  (COLORS["blue"], "s", "homogeneous (memory, 1$\\tau$)"),
+             "het":  (COLORS["red"], "D", "heterogeneous (memory, $\\tau$ spread)")}
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.6, 3.2),
                                  gridspec_kw={"width_ratios": [1.45, 1]})
     for b, (col, mk, lab) in style.items():
@@ -316,7 +325,7 @@ def fig_robust_monitoring(cards):
         a1.fill_between(sig, m - s, m + s, color=col, alpha=0.15)
     a1.set_xlabel("injected sensor-noise $\\sigma$ (channels $\\in[0,1]$)")
     a1.set_ylabel("binary stress-detection macro-F1")
-    a1.set_title("(a) Robustness to sensor noise", fontsize=9.5)
+    figstyle.panel(a1, "a", "robustness to sensor noise")
     a1.legend(frameon=False, fontsize=6.4, loc="lower left")
     # panel (b): per-subject het vs inst at the top noise level -> all above diagonal
     si = rN["inst"]["subj_f1"]; sh = rN["het"]["subj_f1"]
@@ -324,12 +333,11 @@ def fig_robust_monitoring(cards):
     xi = np.array([si[k] for k in keys]); yi = np.array([sh[k] for k in keys])
     lo = min(xi.min(), yi.min()) - 0.03; hi = max(xi.max(), yi.max()) + 0.03
     a2.plot([lo, hi], [lo, hi], "--", c="0.6", lw=0.9)
-    a2.scatter(xi, yi, s=22, color="#c44e52", edgecolor="0.2", linewidth=0.4, zorder=3)
+    a2.scatter(xi, yi, s=22, color=COLORS["red"], edgecolor="0.2", linewidth=0.4, zorder=3)
     a2.set_xlim(lo, hi); a2.set_ylim(lo, hi); a2.set_aspect("equal")
     a2.set_xlabel("instantaneous F1"); a2.set_ylabel("heterogeneous F1")
     n_above = int(np.sum(yi > xi))
-    a2.set_title(f"(b) Per subject, $\\sigma={sig[-1]:g}$\n({n_above}/{len(keys)} above diagonal)",
-                 fontsize=9)
+    figstyle.panel(a2, "b", f"per subject, $\\sigma={sig[-1]:g}$\n({n_above}/{len(keys)} above diagonal)")
     fig.tight_layout()
     p = os.path.join(FIGDIR, "robust_monitoring.pdf"); fig.savefig(p); plt.close(fig)
     print(f"wrote {p}  (sigma{sig[-1]:g} binF1 inst {sw['banks']['inst']['f1'][-1][0]:.3f} "
