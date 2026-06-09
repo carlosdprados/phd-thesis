@@ -15,7 +15,8 @@ simulation and read-out settings used across the three evidence tiers. Together
 with the per-cell tables of \cref{app:ch4_celltables}, it makes the in-silico
 results reproducible without consulting the analysis scripts
 (\path{scripts/ch5_figures.py}, \path{scripts/ch5_physio_context.py},
-\path{scripts/ch5_onset.py}, \path{scripts/ch5_deployment.py}).
+\path{scripts/ch5_onset.py}, \path{scripts/ch5_deployment.py},
+\path{scripts/ch5_noneeg.py}).
 
 \section{Parameter-Card Sourcing}\label{app:ch5_cards}
 
@@ -88,6 +89,15 @@ completeness, though they do not separate the banks --- the transition-window
 macro-F1 (steps within $\pm\SI{20}{\second}$ of a label change) and the onset
 detection latency (time to the first $\geq\SI{5}{\second}$ sustained stress call after
 each onset).
+
+The cross-corpus replication (\cref{tab:ch5_crosscorpus}, \path{scripts/ch5_noneeg.py})
+applies the \emph{same} detector and noise model to the PhysioNet Non-EEG corpus
+\cite{Birjandtalab2016} (open access; obtainable with
+\path{wfdb.dl_database('noneeg', 'data/noneeg')}). The \SI{8}{\hertz} electrodermal
+and temperature record and the \SI{1}{\hertz} heart-rate record are resampled onto a
+common timeline and per-subject scaled exactly as the \WESAD{} streams; the phase
+annotations map cognitive and emotional stress to the stress class and relaxation to
+not-stress, with the physical-stress (exercise) phase excluded.
 
 \section{Deployment Envelope}\label{app:ch5_deploy}
 

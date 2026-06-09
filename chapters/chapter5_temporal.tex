@@ -191,7 +191,25 @@ The reservoir is run continuously over each \WESAD{} session at $\Delta t = \SI{
 \section{WESAD Affective Classification}\label{sec:ch5_wesad}
 %% ------------------------------------------------------------
 
-The final tier is the downstream task itself: classifying affective state from the \WESAD{} physiological streams with the device reservoir and a linear read-out, leave-one-subject-out. It is reported here as a scoped application demonstration: the measured device models support affective classification under the constrained read-out used here, and the contribution of timescale heterogeneity to final labels is reported with error bars, including where it is null. For external calibration, the study that introduced \WESAD{} reports a three-class chest accuracy of $76.5\%$ at macro-F1 $\approx 0.72$ with engineered window features and conventional classifiers under the same leave-one-subject-out protocol, and a binary stress-detection accuracy of $\approx 93\%$ \cite{Schmidt2018WESAD}; the device reservoir's scores below are of the same order. The point is not to beat a bespoke classifier, but to show that a bank of slow organic-memristor models read by a single linear regression can reach comparable performance under this protocol.
+The final tier is the downstream task itself: classifying affective state from the \WESAD{} physiological streams with the device reservoir and a linear read-out, leave-one-subject-out. It is reported here as a scoped application demonstration: the measured device models support affective classification under the constrained read-out used here, and the contribution of timescale heterogeneity to final labels is reported with error bars, including where it is null. For external calibration, the study that introduced \WESAD{} reports a three-class chest accuracy of $76.5\%$ at macro-F1 $\approx 0.72$ with engineered window features and conventional classifiers under the same leave-one-subject-out protocol, and a binary stress-detection accuracy of $\approx 93\%$ \cite{Schmidt2018WESAD}; the device reservoir's scores below are of the same order. Placed against the wider \WESAD{} literature (\cref{tab:ch5_sota}), which spans engineered-feature classifiers and trained deep networks, the device reservoir's leave-one-subject-out macro-F1 sits in the same range. The point is not to beat a bespoke classifier, but to show that a bank of slow organic-memristor models read by a single linear regression can reach comparable performance under this protocol.
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption[The device reservoir against the WESAD literature]{The device reservoir against representative published \WESAD{} systems. Figures are as reported by each study: classification \emph{accuracy} for the engineered-feature and deep-network systems, the stricter class-balanced \emph{macro-F1} for this work. Metrics and validation protocols differ across studies (Schmidt et al.\ and this work use leave-one-subject-out), so the table is context rather than a head-to-head ranking; its purpose is to show that a single linear read-out on slow organic-device states reaches the same range as trained deep classifiers, with no trained feature extractor. Binary $=$ stress vs.\ non-stress; three-class $=$ baseline/stress/amusement.}
+  \label{tab:ch5_sota}
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{llcc}
+    \toprule
+    Study & Approach & Three-class & Binary \\
+    \midrule
+    Schmidt et al.\ (2018)~\cite{Schmidt2018WESAD}   & engineered features, AdaBoost/RF & $76.5\%$ (F1 $0.72$) & $93.0\%$ \\
+    Bobade \& Vani (2020)~\cite{Bobade2020}          & engineered features, neural net  & $84.3\%$ & $95.2\%$ \\
+    Gil-Mart{\'\i}n et al.\ (2022)~\cite{GilMartin2022} & CNN on spectral features      & $85.1\%$ & $96.6\%$ \\
+    \textbf{This work} & device-reservoir states, linear read-out & F1 $0.758$ & F1 $0.894$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 \paragraph{Demonstration~A: a single composition suffices for a single-timescale feature.} Binary stress-versus-baseline classification from electrodermal activity, read out at the window level from the lead composition alone, reaches a leave-one-subject-out macro-F1 of $0.894$ (\cref{fig:ch5_wesad}a). This supports the Demonstration-A claim that one well-matched composition can act as a useful affect-aligned node. It comes, however, with an instructive caveat: a static feature baseline (the mean, standard deviation, last value and slope of the same signal) matches it ($0.899$). The 60-second-window task is therefore quasi-static --- the discriminative information sits in the instantaneous signal level, not in its temporal history --- which is exactly why timescale heterogeneity has nothing to contribute here, and why a memory-demanding reformulation is needed to test the heterogeneity claim fairly.
 
@@ -237,6 +255,25 @@ The scores of \cref{sec:ch5_wesad} are dominated by long stretches of sustained 
   \caption[Continuous stress monitoring is robust to sensor noise]{Continuous stress monitoring with device reservoirs (binary stress vs.\ baseline-plus-amusement, per-step, leave-one-subject-out, linear read-out). (a)~Detection macro-F1 against the magnitude $\sigma$ of injected sensor noise and motion-artefact bursts: the fading-memory banks (homogeneous, heterogeneous) stay flat at $\approx 0.92$, while the instantaneous and memoryless controls collapse, because temporal integration rejects transient artefact. Bands are $\pm 1$\,SD over seeds. (b)~Per-subject scores at $\sigma=0.4$: the heterogeneous memory bank beats the instantaneous read in all fifteen subjects (paired Wilcoxon $p<10^{-4}$). Memory, not its heterogeneity, is the active ingredient; the homogeneous bank is equally robust.}
   \label{fig:ch5_robust_monitoring}
 \end{figure}
+
+\paragraph{Cross-corpus replication.} A single corpus cannot establish generality, so the robustness test was repeated on an independent dataset: the PhysioNet Non-EEG corpus of Birjandtalab et al.~\cite{Birjandtalab2016}, twenty subjects wearing a \emph{different} wrist sensor (an Affectiva Q recording electrodermal activity and skin temperature, with a pulse-oximeter heart rate) through relaxation and cognitive, emotional, and physical stress phases. Taking cognitive and emotional stress as the stress class against relaxation --- the psychosocial analogue of the \WESAD{} stressor, with the physical-exertion phase held out as a different mechanism whose racing heart rate is trivially separable from the instantaneous signal alone --- and running the identical detector reproduces the \WESAD{} result on this independent sensor and population (\cref{tab:ch5_crosscorpus}). The corpus is harder in absolute terms (clean macro-F1 $\approx 0.65$--$0.68$, against $\approx 0.91$ on the cleaner \WESAD{} chest signals) and, as on \WESAD{}, the clean-stream memory advantage is small and not resolved. But under sensor noise the same divergence reappears, more sharply: the instantaneous detector falls from $0.651$ to $0.516$ while the fading-memory bank holds near $0.66$, a $+0.130$ advantage at $\sigma=0.4$ that is positive in nineteen of the twenty subjects (paired Wilcoxon $p<10^{-5}$). The noise-robustness of the temporal substrate is therefore not a property of one dataset; it transfers to a new corpus, sensor, and population.
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption[Cross-corpus replication on the PhysioNet Non-EEG dataset]{Cross-corpus replication of the noise-robustness result on the independent PhysioNet Non-EEG stress corpus~\cite{Birjandtalab2016} (twenty subjects; Affectiva Q wrist electrodermal activity and temperature plus pulse-oximeter heart rate; cognitive and emotional stress versus relaxation; leave-one-subject-out, linear read-out). As on \WESAD{}, the instantaneous detector collapses under injected sensor noise while the fading-memory banks hold; the heterogeneous-minus-instantaneous advantage at $\sigma=0.4$ is $+0.130$ ($19/20$ subjects, $p<10^{-5}$). Memory, not its spread, is again the active ingredient.}
+  \label{tab:ch5_crosscorpus}
+  \setlength{\tabcolsep}{8pt}
+  \begin{tabular}{lcc}
+    \toprule
+    Detector & macro-F1 (clean) & macro-F1 ($\sigma=0.4$) \\
+    \midrule
+    Instantaneous (no memory) & 0.651 & 0.516 \\
+    Homogeneous (memory)      & \textbf{0.682} & \textbf{0.657} \\
+    Heterogeneous (memory)    & 0.667 & 0.646 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 %% ------------------------------------------------------------
 \section{Toward a Worn Device: Sensor Site and Operating Budget}\label{sec:ch5_deploy}
@@ -317,7 +354,7 @@ The claims of this chapter are bounded by scope conditions that are stated here 
 
 \paragraph{Heterogeneity axes.} The quantitative heterogeneous banks span the replicated \PEO{}/\LiTf{} composition grid. The chemistry and drive-amplitude axes of \cref{ch:comparative}, being sample-limited ($n\le 2$ per matched cell), enter only as illustrative additional knobs; Demonstration~B is therefore a principle demonstration of composition heterogeneity, not a powered comparison across chemistries. The composition cells that define these banks index \emph{composition}, not film thickness: although spin-coating speed and residual film thickness covary with the \PEO{} fraction, the parameter cards inherited here were shown to be governed by composition rather than thickness (\cref{fig:ch4_thickness_control}, \cref{sec:ch4_materials}), so the heterogeneity exploited in this chapter is compositional in origin.
 
-\paragraph{A single dataset, and a reported null.} The affective results rest on one corpus (\WESAD{}). The central negative result --- that timescale heterogeneity does not separably improve final-label classification --- is reported with error bars across seeds and sampling intervals rather than omitted, because it is informative: it localises exactly where heterogeneity helps and where it does not.
+\paragraph{Corpora, and a reported null.} The affective classification results rest principally on one corpus (\WESAD{}); the deployment-critical noise-robustness finding is replicated on a second, independent corpus, wrist sensor, and population (the PhysioNet Non-EEG dataset, \cref{sec:ch5_robust}), but a broader multi-corpus study, and the affective dimensions beyond stress such as continuous valence and arousal, remain future work. The central negative result --- that timescale heterogeneity does not separably improve final-label classification --- is reported with error bars across seeds and sampling intervals rather than omitted, because it is informative: it localises exactly where heterogeneity helps and where it does not.
 
 %% ------------------------------------------------------------
 \section{Summary and Bridge to the Conclusions}\label{sec:ch5_conclusions}
