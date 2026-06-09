@@ -95,12 +95,15 @@ def apply() -> None:
 def panel(ax, letter: str, title: str | None = None) -> None:
     """Nature-style bold lower-case panel label at the top-left.
 
-    Uses matplotlib's left/centre dual-title slots so the bold letter never
-    overlaps the data or the (optional) centred descriptive title.
+    The bold letter and the (optional) descriptive title are rendered as a
+    single left-aligned title -- the letter is emboldened with mathtext so it
+    can never overlap a wide centred title or the data, however narrow the
+    panel. ``title`` may itself contain maths (e.g. ``r"peak ratio $\\alpha$"``).
     """
-    ax.set_title(letter, loc="left", fontweight="bold", fontsize=10)
-    if title is not None:
-        ax.set_title(title, loc="center")
+    if title:
+        ax.set_title(rf"$\mathbf{{{letter}}}$   {title}", loc="left")
+    else:
+        ax.set_title(rf"$\mathbf{{{letter}}}$", loc="left")
 
 
 def despine(ax, top: bool = True, right: bool = True,
