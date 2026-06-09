@@ -32,6 +32,8 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.patches import Circle, FancyArrowPatch, Rectangle
 
+import figstyle
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT.parent / "Nanomem_Devices_Library"
@@ -59,29 +61,9 @@ DEVICE_025 = (
     / "2021-04-07_NM_v025_(spiral,dgrd_in_glvbx_lght)"
 )
 
-COLORS = {
-    "blue": "#276FBF",
-    "green": "#1B9E77",
-    "orange": "#D95F02",
-    "red": "#C43C39",
-    "purple": "#6A4C93",
-    "gray": "#4D4D4D",
-    "light": "#F4F4F4",
-}
-
-plt.rcParams.update(
-    {
-        "font.family": "serif",
-        "font.size": 8.5,
-        "axes.titlesize": 9,
-        "axes.labelsize": 8.5,
-        "legend.fontsize": 7.5,
-        "xtick.labelsize": 7.5,
-        "ytick.labelsize": 7.5,
-        "figure.dpi": 180,
-        "savefig.bbox": "tight",
-    }
-)
+# Unified sans-serif house style and shared palette (see scripts/figstyle.py).
+figstyle.apply()
+COLORS = figstyle.COLORS
 
 
 def fnum(value: str | float | int | None) -> float:
@@ -221,10 +203,10 @@ def fig_device_schematic() -> None:
     axL.text(x0 + w / 2 + ox * 0.5, top_y + oy + 0.55, "$V$ applied to Ag", ha="center", fontsize=8.2, color=COLORS["red"])
     axL.text(x0 + w / 2 + ox * 0.5, top_y + oy + 1.15, r"active area $= 0.0825$ cm$^2$", ha="center", fontsize=7.8, color="0.3")
     axL.text(x0 + w / 2 + ox * 0.5, 0.6, "ITO grounded", ha="center", fontsize=8.2, color="0.25")
-    axL.text(0.0, 9.4, "(a)", fontsize=11, weight="bold")
+    axL.text(0.0, 9.4, "a", fontsize=11, weight="bold")
 
     # ---- (b) two-state ion-migration mechanism --------------------------
-    axR.text(0.2, 9.4, "(b)", fontsize=11, weight="bold")
+    axR.text(0.2, 9.4, "b", fontsize=11, weight="bold")
     axR.text(5.0, 9.45, "ion-mediated conductance change", ha="center", fontsize=8.8, weight="bold", color="0.12")
 
     def mechanism_cell(ax, y_base, height, title, title_color, moving):
@@ -316,7 +298,8 @@ def fig_iv_hyst() -> None:
     ax.set_xlabel("voltage (V)")
     ax.set_ylabel(r"current ($\mu$A)")
     ax.set_title("ten successive positive sweeps")
-    ax.text(0.05, 0.94, "0 -> 1.2 V -> 0\n0.25 V s$^{-1}$", transform=ax.transAxes, va="top", fontsize=8)
+    ax.text(0.05, 0.94, r"0 $\rightarrow$ 1.2 V $\rightarrow$ 0" + "\n" + r"0.25 V s$^{-1}$",
+            transform=ax.transAxes, va="top", fontsize=8)
     ax.annotate(
         rf"$\times${on_off:.0f} on/off at 1 V",
         xy=(1.0, i_last),
@@ -547,6 +530,8 @@ def fig_full_epsc_trace() -> None:
     ax2.set_ylim(-20, 18)
     style_axes(ax1)
     ax2.spines["top"].set_visible(False)
+    figstyle.keepspine(ax2, "right")  # twin axis needs its right spine back
+    ax2.tick_params(direction="out", length=3, width=0.8)
     save(fig, "full_epsc_trace.pdf")
 
 
@@ -559,7 +544,7 @@ def fig_stdp_waveforms() -> None:
     delays = [-0.30, 0.05, 0.60]
     fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.65), sharey=True)
     t = np.linspace(-1.0, 1.0, 600)
-    for ax, delay in zip(axes, delays):
+    for ax, delay, letter in zip(axes, delays, "abc"):
         pre = triangular(t, 0.0, 1.2, 1.55)
         post = -triangular(t, delay, 1.2, 1.55)
         total = pre + post
@@ -568,7 +553,7 @@ def fig_stdp_waveforms() -> None:
         ax.plot(t, total, color="0.15", lw=1.3, label="sum")
         ax.axhline(0, color="0.65", lw=0.6)
         ax.axvline(0, color="0.75", lw=0.6, ls=":")
-        ax.set_title(rf"$\Delta t={delay:+.2f}$ s")
+        figstyle.panel(ax, letter, rf"$\Delta t={delay:+.2f}$ s")
         ax.set_xlabel("time (s)")
         style_axes(ax)
     axes[0].set_ylabel("voltage (V)")
@@ -577,39 +562,76 @@ def fig_stdp_waveforms() -> None:
 
 
 def fig_morphology_stability_support() -> None:
-    fig, axes = plt.subplots(1, 3, figsize=(7.4, 2.65))
+    """Two panels: (a) an annotated film cross-section conveying the
+    profilometry thickness and the AFM surface roughness as an intuitive
+    schematic (rather than single-value bars), and (b) the ambient
+    shelf-stability drift of the device metrics within a +/-20% envelope."""
+    from matplotlib.patches import Polygon
 
-    axes[0].bar(["active\nlayer"], [209], color="#F0C75E", edgecolor="0.25", width=0.55)
-    axes[0].set_ylabel("thickness (nm)")
-    axes[0].set_ylim(0, 260)
-    axes[0].text(0, 222, "209 nm", ha="center", fontsize=8)
-    axes[0].set_title("profilometry")
-    style_axes(axes[0])
+    fig, (axA, axB) = plt.subplots(
+        1, 2, figsize=(7.2, 2.8), gridspec_kw={"width_ratios": [1.0, 1.12], "wspace": 0.28}
+    )
 
-    axes[1].hlines(2, 0, 1, color=COLORS["green"], lw=3)
-    axes[1].fill_between([0, 1], [1, 1], [3, 3], color=COLORS["green"], alpha=0.18)
-    axes[1].set_xlim(0, 1)
-    axes[1].set_ylim(0, 4)
-    axes[1].set_xticks([])
-    axes[1].set_ylabel("RMS roughness (nm)")
-    axes[1].set_title("AFM window")
-    axes[1].text(0.5, 3.25, "1-3 nm", ha="center", fontsize=8)
-    style_axes(axes[1])
+    # ---- (a) film cross-section: thickness (profilometry) + roughness (AFM) ----
+    axA.set_xlim(0, 10)
+    axA.set_ylim(0, 10)
+    axA.axis("off")
 
-    hours = np.array([0, 300])
-    axes[2].fill_between(hours, [0.8, 0.8], [1.2, 1.2], color="0.85", alpha=0.8)
-    for label, color, y in [
-        (r"$G_0$", COLORS["blue"], [1.00, 1.08]),
-        (r"$\Delta G_{max}$", COLORS["red"], [1.00, 0.92]),
-        (r"$\tau_S$", COLORS["purple"], [1.00, 1.12]),
+    x0, x1 = 2.4, 8.4
+    y_sub_bot, y_sub_top = 1.6, 3.2          # substrate slab
+    y_film_top = 7.4                          # mean top of the active film
+    # substrate
+    axA.add_patch(Rectangle((x0, y_sub_bot), x1 - x0, y_sub_top - y_sub_bot,
+                            facecolor="#D9D9D9", edgecolor="0.3", lw=0.8))
+    axA.text((x0 + x1) / 2, (y_sub_bot + y_sub_top) / 2, "ITO / glass substrate",
+             ha="center", va="center", fontsize=7.5, color="0.2")
+    # active film with a gently rough top edge (roughness exaggerated for legibility)
+    xs = np.linspace(x0, x1, 240)
+    rough = 0.16 * np.sin(2 * np.pi * xs / 0.85) + 0.10 * np.sin(2 * np.pi * xs / 0.37 + 1.0)
+    top = y_film_top + rough
+    verts = [(x0, y_sub_top)] + list(zip(xs, top)) + [(x1, y_sub_top)]
+    axA.add_patch(Polygon(verts, closed=True, facecolor="#F0C75E",
+                          edgecolor="0.3", lw=0.8, joinstyle="round"))
+    axA.text((x0 + x1) / 2, (y_sub_top + y_film_top) / 2, "SY / Hybrane / LiOTf",
+             ha="center", va="center", fontsize=7.5, color="0.15")
+
+    # thickness dimension arrow (profilometry), with method tag as a parallel line
+    axA.annotate("", xy=(x0 - 0.55, y_sub_top), xytext=(x0 - 0.55, y_film_top),
+                 arrowprops=dict(arrowstyle="<->", color="0.25", lw=1.0))
+    axA.text(x0 - 0.82, (y_sub_top + y_film_top) / 2, "209 nm", rotation=90,
+             ha="center", va="center", fontsize=8.5, color="0.15")
+    axA.text(x0 - 1.22, (y_sub_top + y_film_top) / 2, "(profilometry)", rotation=90,
+             ha="center", va="center", fontsize=6.5, style="italic", color="0.45")
+
+    # roughness callout pointing at the rough surface (tapping AFM)
+    axA.annotate("RMS roughness\n1-3 nm (tapping AFM)",
+                 xy=(x0 + 4.2, y_film_top + 0.2), xytext=(x1 - 0.2, 9.4),
+                 ha="right", va="top", fontsize=7.5, color="0.15",
+                 arrowprops=dict(arrowstyle="->", color="0.4", lw=0.8,
+                                 connectionstyle="arc3,rad=-0.2"))
+    figstyle.panel(axA, "a", "film cross-section")
+
+    # ---- (b) ambient shelf-stability drift within a +/-20% envelope ----
+    hours = np.array([0.0, 300.0])
+    axB.fill_between([0, 300], 0.8, 1.2, color="0.88", zorder=0)
+    axB.text(296, 1.185, r"$\pm$20% envelope", ha="right", va="top",
+             fontsize=7, color="0.45")
+    axB.axhline(1.0, color="0.6", lw=0.7, ls=":")
+    for label, color, yend, tag in [
+        (r"$G_0$", COLORS["blue"], 1.08, "+8%"),
+        (r"$\Delta G_{\mathrm{max}}$", COLORS["red"], 0.92, "$-$8%"),
+        (r"$\tau_{\mathrm{s}}$", COLORS["purple"], 1.12, "+12%"),
     ]:
-        axes[2].plot(hours, y, "o-", ms=3, lw=1.0, color=color, label=label)
-    axes[2].set_ylim(0.65, 1.35)
-    axes[2].set_xlabel("ambient storage (h)")
-    axes[2].set_ylabel("normalised metric")
-    axes[2].set_title("shelf-stability envelope")
-    axes[2].legend(frameon=False, loc="upper left")
-    style_axes(axes[2])
+        axB.plot(hours, [1.0, yend], "o-", ms=4, lw=1.4, color=color, label=label)
+        axB.annotate(tag, xy=(300, yend), xytext=(6, 0), textcoords="offset points",
+                     va="center", fontsize=7, color=color)
+    axB.set_xlim(-12, 360)
+    axB.set_ylim(0.74, 1.26)
+    axB.set_xlabel("ambient storage (h)")
+    axB.set_ylabel("normalised metric")
+    axB.legend(loc="lower left", ncol=3, columnspacing=1.0, handlelength=1.2)
+    figstyle.panel(axB, "b", "ambient shelf stability")
+    style_axes(axB)
 
     save(fig, "morphology_stability_support.pdf")
 
