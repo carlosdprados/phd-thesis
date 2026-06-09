@@ -22,24 +22,20 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+import figstyle
+
 from bridge_hybrane_peo_reproducibility import load, hybrane_standard, DB, TAIL
 
 FIGDIR = "figures/chapter3"
 INFL = pd.Timestamp("2021-05-01")  # post-NM_v026 inflection (2021-04-22)
 
-plt.rcParams.update({
-    "font.family": "serif",
-    "font.size": 9,
-    "axes.titlesize": 9,
-    "axes.labelsize": 9,
-    "figure.dpi": 150,
-    "savefig.bbox": "tight",
-})
+figstyle.apply()
+COLORS = figstyle.COLORS
 
-C_EARLY = "#2c7fb8"   # early / pristine
-C_LATE = "#d95f0e"    # later / degraded
-C_PEO = "#31a354"     # PEO host
-C_HOT = "#756bb1"     # elevated-T anneal
+C_EARLY = COLORS["blue"]    # early / pristine
+C_LATE = COLORS["orange"]   # later / degraded
+C_PEO = COLORS["green"]     # PEO host
+C_HOT = COLORS["purple"]    # elevated-T anneal
 
 
 def per_device(df, col, date_map):
@@ -56,7 +52,7 @@ def jitter(n, w=0.08):
     return (np.random.RandomState(0).rand(n) - 0.5) * 2 * w
 
 
-def box_strip(ax, groups, labels, colors, ylabel, title, log=False):
+def box_strip(ax, groups, labels, colors, ylabel, title, log=False, letter=None):
     data = [g.values for g in groups]
     bp = ax.boxplot(data, widths=0.5, showfliers=False, patch_artist=True,
                     medianprops=dict(color="black", lw=1.4))
@@ -69,7 +65,10 @@ def box_strip(ax, groups, labels, colors, ylabel, title, log=False):
     ax.set_xticks(range(1, len(labels) + 1))
     ax.set_xticklabels(labels)
     ax.set_ylabel(ylabel)
-    ax.set_title(title)
+    if letter:
+        figstyle.panel(ax, letter, title)
+    else:
+        ax.set_title(title)
     if log:
         ax.set_yscale("log")
 
@@ -91,9 +90,9 @@ def main():
 
     # ===================== F1 — window collapse @3V ========================
     fig, axes = plt.subplots(1, 2, figsize=(7.0, 3.4))
-    for ax, col, ylab, ttl in [
-        (axes[0], "on-off ratio", "on-off ratio @3 V", "(a) switching window"),
-        (axes[1], "normalized area", "normalized area @3 V", "(b) normalized hysteresis area"),
+    for ax, col, ylab, letter, ttl in [
+        (axes[0], "on-off ratio", "on-off ratio @3 V", "a", "switching window"),
+        (axes[1], "normalized area", "normalized area @3 V", "b", "normalized hysteresis area"),
     ]:
         pdv = per_device(cur3, col, date)
         e = pdv[pdv["date"] < INFL]["y"]
@@ -101,7 +100,7 @@ def main():
         _, p = stats.mannwhitneyu(e, l, alternative="two-sided")
         box_strip(ax, [e, l],
                   [f"early\n($\\leq$Apr 2021)\nn={len(e)}", f"later\nn={len(l)}"],
-                  [C_EARLY, C_LATE], ylab, ttl)
+                  [C_EARLY, C_LATE], ylab, ttl, letter=letter)
         ymax = max(e.max(), l.max())
         ax.annotate(f"Mann–Whitney $p={p:.4f}$\nmedian {e.median():.2f} $\\to$ {l.median():.2f}"
                     if col == "on-off ratio" else
@@ -131,7 +130,7 @@ def main():
     ax.set_yscale("log")
     ax.set_ylabel("hysteresis area @1.2 V  (V$\\cdot\\mu$A)")
     ax.set_xlabel("fabrication date")
-    ax.set_title("(a) ohmic drift at matched $\\sim$1.2 V")
+    figstyle.panel(ax, "a", "ohmic drift at matched $\\sim$1.2 V")
     xd = (pdv["date"] - pdv["date"].min()).dt.days.values.astype(float)
     rho_all, p_all = stats.spearmanr(xd, pdv["y"].values)
     m = ~tail.values
@@ -171,7 +170,7 @@ def main():
     ax.axhspan(2.6, 3.4, color=C_EARLY, alpha=0.18, label="$\\sim$3 V window probe")
     ax.set_ylabel("sweep max voltage (V)")
     ax.set_xlabel("fabrication date")
-    ax.set_title("(b) sweep amplitude is confounded with date")
+    figstyle.panel(ax, "b", "sweep amplitude is confounded with date")
     ax.legend(loc="upper right", fontsize=7, framealpha=0.9)
     for lab in ax.get_xticklabels():
         lab.set_rotation(30)
@@ -202,13 +201,13 @@ def main():
     fig, axes = plt.subplots(1, 3, figsize=(9.2, 3.4))
     box_strip(axes[0], [hy_na, peo_na],
               [f"Hybrane\nn={len(hy_na)}", f"PEO\nn={len(peo_na)}"],
-              [C_LATE, C_PEO], "normalized area @3 V", "(a) hysteresis area")
+              [C_LATE, C_PEO], "normalized area @3 V", "hysteresis area", letter="a")
     axes[0].annotate(f"Mann–Whitney $p={p_na:.3f}$\n{hy_na.median():.2f} $\\to$ {peo_na.median():.2f}",
                      xy=(0.5, 0.97), xycoords="axes fraction", ha="center", va="top",
                      fontsize=8, bbox=dict(boxstyle="round", fc="white", ec="0.6", alpha=0.9))
     box_strip(axes[1], [hy_oo, peo_oo],
               [f"Hybrane\nn={len(hy_oo)}", f"PEO\nn={len(peo_oo)}"],
-              [C_LATE, C_PEO], "on-off ratio @3 V", "(b) switching window")
+              [C_LATE, C_PEO], "on-off ratio @3 V", "switching window", letter="b")
     axes[1].annotate(f"median {hy_oo.median():.2f} $\\to$ {peo_oo.median():.2f}",
                      xy=(0.5, 0.97), xycoords="axes fraction", ha="center", va="top",
                      fontsize=8, bbox=dict(boxstyle="round", fc="white", ec="0.6", alpha=0.9))
@@ -227,7 +226,7 @@ def main():
     years = sorted(d["yr"].unique())
     groups = [d[d["yr"] == y]["oo"] for y in years]
     box_strip(axes[2], groups, [f"{y}\nn={len(g)}" for y, g in zip(years, groups)],
-              [C_PEO] * len(years), "on-off ratio @3 V", "(c) PEO temporal reproducibility")
+              [C_PEO] * len(years), "on-off ratio @3 V", "PEO temporal reproducibility", letter="c")
     axes[2].axhline(1.35, color=C_LATE, ls="--", lw=1.2)
     axes[2].annotate("degraded Hybrane (1.35)", xy=(0.5, 1.35), xycoords=("axes fraction", "data"),
                      fontsize=7, color=C_LATE, ha="center", va="bottom")
