@@ -235,8 +235,9 @@ def make_banks(cards, dt, n_in, seed=7):
 # ----------------------------------------------------------------------------
 def evaluate(raw, cards, dt=DT_WES, sigma=0.0, seed=7, smooth=None):
     """One full comparison (inst/mem0/hom/het) at a given noise level. Returns a
-    dict of metrics per bank."""
-    C = len(CHANNELS)
+    dict of metrics per bank. The channel count is inferred from the data, so the
+    same harness serves the 4-channel chest set and the 3-channel wrist set."""
+    C = next(iter(raw.values()))[0].shape[1]
     smooth = int(SMOOTH_S / dt) if smooth is None else smooth
     het, hom, mem0 = make_banks(cards, dt, C, seed)
     specs = {

@@ -239,6 +239,34 @@ The scores of \cref{sec:ch5_wesad} are dominated by long stretches of sustained 
 \end{figure}
 
 %% ------------------------------------------------------------
+\section{Toward a Worn Device: Sensor Site and Operating Budget}\label{sec:ch5_deploy}
+%% ------------------------------------------------------------
+
+The robustness of the previous section is a laboratory statement until two further questions are answered: whether the advantage survives a consumer-grade sensor, and what the device would cost to run. Both are answered from the same measured ingredients --- the \WESAD{} wrist recordings and the device constants of \cref{ch:poc} --- without any new assumption.
+
+\paragraph{Sensor site.} \WESAD{} records every session twice: from a chest strap (the clean electrocardiogram and respiration used so far) and from an Empatica E4 wrist band, the form factor of a real affective wearable but with fewer and far noisier channels --- skin conductance, skin temperature, and a photoplethysmogram from which heart rate must be recovered, with no respiration. Re-running the continuous stress detector of \cref{sec:ch5_robust} on the wrist signals (\cref{tab:ch5_wrist}) tells a consistent story. The static, instantaneous detector loses ground on the wrist, its clean macro-F1 falling from $0.914$ on the chest to $0.881$ as the noisier photoplethysmographic heart rate and the missing respiration channel degrade the instantaneous signal. The fading-memory reservoir is essentially unaffected by the move to the wrist ($0.923 \to 0.928$): it recovers from temporal context what the static read loses to channel quality. The memory advantage is therefore \emph{larger} on the wrist than on the chest ($+0.047$ on clean streams, widening to $+0.072$ under injected noise), which is the right way round for deployment --- the harder, more realistic sensor is exactly where the temporal substrate helps most, and fading memory again roughly halves the false-alarm rate ($0.062 \to 0.034$).
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption[Stress detection: chest versus consumer wrist sensor]{Continuous binary stress-detection macro-F1 on the \WESAD{} chest strap versus the Empatica E4 wrist band (leave-one-subject-out, linear read-out). Moving to the noisier consumer sensor degrades the instantaneous (static) detector but not the fading-memory reservoir, so the memory advantage is larger on the wrist; $\sigma$ is the injected sensor-noise level of \cref{fig:ch5_robust_monitoring}.}
+  \label{tab:ch5_wrist}
+  \setlength{\tabcolsep}{6pt}
+  \begin{tabular}{lcccc}
+    \toprule
+    & \multicolumn{2}{c}{chest (ECG+Resp+EDA+Temp)} & \multicolumn{2}{c}{wrist (E4: EDA+Temp+PPG)} \\
+    \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+    Detector & clean & $\sigma=0.4$ & clean & $\sigma=0.4$ \\
+    \midrule
+    Instantaneous (no memory)   & 0.914 & 0.837 & 0.881 & 0.848 \\
+    Memory reservoir (het)      & \textbf{0.923} & \textbf{0.924} & \textbf{0.928} & \textbf{0.920} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Operating budget.} The reservoir's appeal for a worn device is that its computation is the physics of the material: the dynamics are fixed and untrained, and only the linear read-out is fitted, by a single closed-form ridge solve rather than gradient descent. The trained part is therefore one $(N{+}1)\times K$ weight matrix --- $75$ weights for the $N=24$, three-class banks here, $147$ for the $N=48$ banks --- against the $10^{4}$ to $10^{6}$ trainable weights of the deep models usually brought to wearable affect, a reduction of roughly two to four orders of magnitude that puts on-device, per-user calibration within reach. The energy budget follows from the measured device of \cref{ch:poc}: at the proof-of-concept energy of $\approx\SI{50}{\nano\joule}$ per write event ($\approx\SI{6}{\femto\joule\per\micro\metre\squared}$ over the \SI{0.0825}{\square\centi\metre} junction), charging each of $N$ nodes once per one-second update draws of order a microwatt ($\approx\SI{1.2}{\micro\watt}$ at $N=24$), while the read-out is $N\,K$ multiply--accumulates, well under a nanojoule per step. These are unoptimised, large-area figures; reducing the junction toward the integrated-device regime would cut the per-event energy by orders of magnitude. The point is the order of magnitude and the contrast in kind: the device responds in the sub-kilohertz regime, comfortably above the sub-hertz bandwidth of affective physiology, so the substrate is never the bottleneck, and the temporal feature extraction that a digital pipeline must compute happens for free as the signal drives the material. The full budget and its assumptions are tabulated in \siTempRef{app:ch5_deploy}.
+
+%% ------------------------------------------------------------
 \section{Design Rule: Match Timescale to Task}\label{sec:ch5_designrules}
 %% ------------------------------------------------------------
 

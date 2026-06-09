@@ -159,6 +159,76 @@ def load_raw(channels=CHANNELS, cache=True):
     return raw
 
 
+# ----------------------------------------------------------------------------
+# Wrist loading (Empatica E4: the consumer-wearable site -- fewer, noisier channels)
+# ----------------------------------------------------------------------------
+WRIST_FS = {"BVP": 64.0, "EDA": 4.0, "TEMP": 4.0, "ACC": 32.0}
+WRIST_CHANNELS = ["EDA", "Temp", "HR"]   # no respiration on the wrist; HR from PPG/BVP
+
+
+def hr_from_bvp(bvp, fs=WRIST_FS["BVP"], fs_out=SLOW_FS):
+    """Instantaneous heart rate from the wrist photoplethysmogram (BVP) by systolic
+    peak detection (band-pass 0.5-8 Hz, peak find, physiological clip + median
+    filter), resampled to fs_out. PPG on a moving wrist is markedly noisier than
+    chest ECG -- which is the point of the wrist comparison."""
+    from scipy.signal import butter, filtfilt, find_peaks, medfilt
+    bvp = np.asarray(bvp, float).ravel()
+    n_out = max(int(len(bvp) * fs_out / fs), 1)
+    b, a = butter(2, [0.5 / (fs / 2), 8.0 / (fs / 2)], btype="band")
+    f = filtfilt(b, a, bvp)
+    pk, _ = find_peaks(f, distance=int(0.4 * fs))
+    tg = np.arange(n_out) / fs_out
+    if len(pk) < 3:
+        return np.full(n_out, 70.0)
+    t_pk = pk / fs
+    hr = np.clip(60.0 / np.diff(t_pk), 40.0, 180.0)
+    if len(hr) >= 5:
+        hr = medfilt(hr, 5)
+    return np.interp(tg, t_pk[1:], hr, left=hr[0], right=hr[-1])
+
+
+def _load_subject_wrist(pkl_path, channels):
+    with open(pkl_path, "rb") as fh:
+        d = pickle.load(fh, encoding="latin1")
+    wrist = d["signal"]["wrist"]
+    cols = [hr_from_bvp(wrist["BVP"]) if n == "HR"
+            else _resample(wrist[n.upper()], WRIST_FS[n.upper()], SLOW_FS)
+            for n in channels]
+    n = min(len(c) for c in cols)
+    lab = _resample_labels(d["label"], n)
+    U = np.column_stack([c[:n] for c in cols])
+    return _scale_subject(U), lab
+
+
+def load_raw_wrist(channels=WRIST_CHANNELS, cache=True):
+    """Return {sid: (U (T,C) scaled @ SLOW_FS, lab)} from the wrist Empatica E4
+    signals. Same scaling/caching contract as load_raw()."""
+    cache_path = os.path.join(os.path.dirname(WESAD_DIR),
+                              f"_cache_wrist_{'-'.join(channels)}_{SLOW_FS:g}hz.npz")
+    raw = {}
+    if cache and os.path.exists(cache_path):
+        z = np.load(cache_path, allow_pickle=True)
+        for k in z.files:
+            if k.endswith("_U"):
+                sid = k[:-2]
+                raw[sid] = (z[f"{sid}_U"], z[f"{sid}_lab"])
+        print(f"  (loaded {len(raw)} wrist subjects from cache {cache_path})")
+    else:
+        for pkl in sorted(glob.glob(os.path.join(WESAD_DIR, "S*", "S*.pkl"))):
+            sid = os.path.basename(pkl).split(".")[0]
+            try:
+                raw[sid] = _load_subject_wrist(pkl, channels)
+            except Exception as e:
+                print(f"  ! skip {sid}: {e}")
+        if cache and raw:
+            flat = {}
+            for sid, (U, lab) in raw.items():
+                flat[f"{sid}_U"] = U; flat[f"{sid}_lab"] = lab
+            np.savez_compressed(cache_path, **flat)
+            print(f"  (cached {len(raw)} wrist subjects -> {cache_path})")
+    return raw
+
+
 def windows_from(U, lab):
     """Slice (T,C) into fixed windows >80% a single label in LABELS -> [(win,lab)]."""
     w = int(WIN_S * SLOW_FS); s = int(STRIDE_S * SLOW_FS)

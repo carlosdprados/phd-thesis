@@ -15,7 +15,7 @@ simulation and read-out settings used across the three evidence tiers. Together
 with the per-cell tables of \cref{app:ch4_celltables}, it makes the in-silico
 results reproducible without consulting the analysis scripts
 (\path{scripts/ch5_figures.py}, \path{scripts/ch5_physio_context.py},
-\path{scripts/ch5_onset.py}).
+\path{scripts/ch5_onset.py}, \path{scripts/ch5_deployment.py}).
 
 \section{Parameter-Card Sourcing}\label{app:ch5_cards}
 
@@ -88,3 +88,41 @@ completeness, though they do not separate the banks --- the transition-window
 macro-F1 (steps within $\pm\SI{20}{\second}$ of a label change) and the onset
 detection latency (time to the first $\geq\SI{5}{\second}$ sustained stress call after
 each onset).
+
+\section{Deployment Envelope}\label{app:ch5_deploy}
+
+\Cref{tab:ch5_deployment} collects the operating budget quoted in
+\cref{sec:ch5_deploy} (\path{scripts/ch5_deployment.py}). The trainable-parameter
+count is exact: the reservoir dynamics are fixed physical devices, and the read-out
+is a single $(N{+}1)\times K$ ridge-regression weight matrix. The energy figures are
+order-of-magnitude estimates built from the \emph{measured} proof-of-concept device of
+\cref{ch:poc} (\cref{app:ch2_si}): an energy per write event of $\approx\SI{50}{\nano\joule}$
+(a \SI{1}{\volt}, \SI{0.1}{\second} pulse), equivalently $\approx\SI{6}{\femto\joule\per\micro\metre\squared}$
+over the \SI{0.0825}{\square\centi\metre} junction (the two agree to within $1\%$,
+$\SI{6}{\femto\joule\per\micro\metre\squared}\times\SI{0.0825}{\square\centi\metre}\approx\SI{49.5}{\nano\joule}$).
+The estimate conservatively charges each node one full write event per
+one-second update; the sub-threshold, state-preserving read at \SI{0.5}{\volt} is
+cheaper, and these are unoptimised large-area figures, so the absolute energy should
+be read as an upper bound that integration would lower. The read-out compute is
+$N\,K$ multiply--accumulates per step at an assumed \SI{1}{\pico\joule} per operation.
+
+\begin{table}[t]
+  \centering
+  \caption[Reservoir deployment envelope versus a deep model]{Deployment envelope for an $N$-node device reservoir read out by a linear classifier of $K$ classes, from the measured device constants of \cref{ch:poc}, contrasted with a typical gradient-trained deep model. Parameter counts are exact; energy figures are order-of-magnitude estimates (see text).}
+  \label{tab:ch5_deployment}
+  \footnotesize
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{4.3cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    Quantity & Device reservoir (this work) & Deep model (typical) \\
+    \midrule
+    Trainable parameters & $(N{+}1)K$: 75 ($N{=}24$) / 147 ($N{=}48$), $K{=}3$ & $10^{4}$--$10^{6}$ \\
+    Reservoir dynamics & physical, untrained (0 parameters) & --- \\
+    Training method & one closed-form ridge solve & gradient descent / backpropagation \\
+    Energy per update & $\approx N\times\SI{50}{\nano\joule}$ ($\approx\SI{1.2}{\micro\joule}$ at $N{=}24$) & --- \\
+    Average power (1\,Hz, always-on) & $\approx\SIrange{1.2}{2.4}{\micro\watt}$ ($N{=}24$--48) & --- \\
+    Read-out compute & $NK$ MACs/step ($<\SI{1}{\nano\joule}$) & --- \\
+    Operating regime & sub-kHz (affect is sub-Hz) & --- \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
