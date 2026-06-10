@@ -196,7 +196,7 @@ print("parameter cards, and simulations are unaffected. See handouts/14_*.md.\n"
 # figure
 # --------------------------------------------------------------------------
 os.makedirs(FIGDIR, exist_ok=True)
-fig, (axA, axB) = plt.subplots(1, 2, figsize=(8.2, 3.6))
+fig, (axA, axB) = plt.subplots(1, 2, figsize=(7.6, 3.2))
 
 # Panel A: thickness vs PEO, coloured by RPM (shows covariation + RPM compensation)
 peo_levels = [0.3, 0.6, 1.2]
@@ -206,31 +206,39 @@ import numpy as np
 rng = np.random.default_rng(0)
 xs = [xpos[r["peo"]] + rng.uniform(-0.13, 0.13) for r in A]
 sc = axA.scatter(xs, [r["th"] for r in A], c=[r["rpm"] for r in A],
-                 cmap="viridis", s=34, edgecolor="k", linewidth=0.3, zorder=3)
+                 cmap="viridis", s=34, edgecolor="white", linewidth=0.5, zorder=3)
 for p in peo_levels:
     m = statistics.median([r["th"] for r in li_ag if r["peo"] == p])
     axA.plot([xpos[p] - 0.22, xpos[p] + 0.22], [m, m], color=COLORS["red"], lw=1.6, zorder=2)
+    if p == peo_levels[0]:
+        axA.text(xpos[p] - 0.26, m, "cell\nmedian", color=COLORS["red"], fontsize=6.5,
+                 ha="right", va="center")
 axA.set_xticks(range(len(peo_levels)))
 axA.set_xticklabels([str(p) for p in peo_levels])
+axA.set_xlim(-0.85, len(peo_levels) - 0.6)
 axA.set_xlabel("PEO mass fraction")
 axA.set_ylabel("film thickness (nm)")
-figstyle.panel(axA, "a", "thickness covaries with PEO\n(red = cell median; colour = spin RPM)")
+figstyle.panel(axA, "a", "thickness covaries with PEO")
 cb = fig.colorbar(sc, ax=axA, pad=0.02)
+cb.outline.set_visible(False)
+cb.ax.tick_params(labelsize=6.5, length=2.5, width=0.6)
 cb.set_label("spin-coat RPM", fontsize=8)
 
 # Panel B: log t_half vs thickness, coloured by PEO (memory tracks PEO colour, not x)
 B = [r for r in li_ag if r["lt"] is not None]
-cmap = {0.3: COLORS["blue"], 0.6: COLORS["gray"], 1.2: COLORS["red"]}
+cmap = {0.3: COLORS["blue"], 0.6: COLORS["green"], 1.2: COLORS["red"]}
 for p in peo_levels:
     pts = [r for r in B if r["peo"] == p]
     axB.scatter([r["th"] for r in pts], [r["t_half"] for r in pts],
-                color=cmap[p], s=36, edgecolor="k", linewidth=0.3, label=f"PEO {p}")
+                color=cmap[p], s=36, edgecolor="white", linewidth=0.5, label=f"PEO {p}")
 axB.set_yscale("log")
 axB.set_xlabel("film thickness (nm)")
 axB.set_ylabel(r"fading-memory time $t_{1/2}$ (s)")
 prtxt, npt = partial(B, "th", "lt", "peo")
-figstyle.panel(axB, "b", "memory tracks PEO, not thickness\n"
-               rf"$r(\mathrm{{thick}},\,t_{{1/2}}\,|\,\mathrm{{PEO}})={prtxt:+.2f}$ (n={npt})")
+figstyle.panel(axB, "b", "memory tracks PEO, not thickness")
+# the decisive statistic as an in-panel read-out, not a title
+axB.text(0.03, 0.04, rf"$r(\mathrm{{thick}},\,t_{{1/2}}\,|\,\mathrm{{PEO}})={prtxt:+.2f}$ ($n={npt}$)",
+         transform=axB.transAxes, fontsize=7, color="0.35", va="bottom")
 axB.legend(fontsize=7, frameon=False, loc="upper right")
 
 fig.tight_layout()

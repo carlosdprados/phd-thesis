@@ -260,7 +260,16 @@ def raw_decays(dns):
 def make_figure(hyst, pul, decay_all):
     """Electrode contrast at the lead 0.3/0.09 cell: retention up, window down
     (and cation-flat), potentiation down, for inert Au vs active Ag."""
-    fig, ax = plt.subplots(1, 3, figsize=(9.2, 3.0))
+    import matplotlib.colors as mcolors
+
+    def bar_style(bars, c):
+        """Nature-style bars: light fill, full-strength coloured edge."""
+        for b in bars:
+            b.set_facecolor(mcolors.to_rgba(c, 0.22))
+            b.set_edgecolor(c)
+            b.set_linewidth(1.1)
+
+    fig, ax = plt.subplots(1, 3, figsize=(7.4, 2.7))
 
     # (a) PEO/Li/OTf fading-memory decays, Ag vs Au (clean curves only)
     for el, col in [("Ag", AG_C), ("Au", AU_C)]:
@@ -271,11 +280,14 @@ def make_figure(hyst, pul, decay_all):
             pts = sorted(set(pts))
             t = np.array([p[0] for p in pts]); y = np.array([p[1] for p in pts])
             y0 = y[t == 1][0] if (t == 1).any() else y[0]
-            ax[0].semilogx(t, y / y0, "-o", ms=3, lw=1.1, color=col, alpha=0.85,
+            ax[0].semilogx(t, y / y0, "-o", ms=2.6, lw=1.0, color=col, alpha=0.85,
                            label=(el if lab else None)); lab = False
     ax[0].axhline(0.5, ls=":", c="0.6", lw=0.8)
+    ax[0].text(0.98, 0.52, "$t_{1/2}$", transform=ax[0].get_yaxis_transform(),
+               color="0.5", fontsize=6.5, ha="right", va="bottom")
     ax[0].set_xlabel("delay (s)"); ax[0].set_ylabel("norm. enhancement")
-    figstyle.panel(ax[0], "a", "fading memory (PEO/Li)"); ax[0].legend(frameon=False, fontsize=8)
+    figstyle.panel(ax[0], "a", "fading memory (PEO/Li)")
+    ax[0].legend(frameon=False, fontsize=7, loc="upper right")
 
     # (b) switching window across chemistry, Ag vs Au (cation series flat on Au)
     cells_b = ["PEO/Li/OTf", "TMPE/Li/OTf", "TMPE/Na/OTf", "TMPE/K/OTf"]
@@ -284,10 +296,11 @@ def make_figure(hyst, pul, decay_all):
     for k, (el, col) in enumerate([("Ag", AG_C), ("Au", AU_C)]):
         vals = [med([med([t[0] for t in hyst.get(dn, [])]) for dn in cell_devs(el, ce) if dn in hyst])
                 for ce in cells_b]
-        ax[1].bar(x + (k - 0.5) * w, vals, w, color=col, label=el)
-    ax[1].set_xticks(x); ax[1].set_xticklabels(labs, rotation=30, ha="right")
+        bars = ax[1].bar(x + (k - 0.5) * w, vals, w, label=el)
+        bar_style(bars, col)
+    ax[1].set_xticks(x); ax[1].set_xticklabels(labs, rotation=30, ha="right", fontsize=6.8)
     ax[1].set_ylabel("on/off ratio"); figstyle.panel(ax[1], "b", "switching window")
-    ax[1].legend(frameon=False, fontsize=8)
+    ax[1].legend(frameon=False, fontsize=7)
 
     # (c) potentiation peak ratio, Ag vs Au (log)
     cells_c = ["PEO/Li/OTf", "TMPE/Li/OTf"]
@@ -296,10 +309,11 @@ def make_figure(hyst, pul, decay_all):
     for k, (el, col) in enumerate([("Ag", AG_C), ("Au", AU_C)]):
         vals = [med([med([t[0] for t in pul.get(dn, [])]) for dn in cell_devs(el, ce) if dn in pul])
                 for ce in cells_c]
-        ax[2].bar(x + (k - 0.5) * w, vals, w, color=col, label=el)
+        bars = ax[2].bar(x + (k - 0.5) * w, vals, w)
+        bar_style(bars, col)
     ax[2].set_yscale("log"); ax[2].set_xticks(x); ax[2].set_xticklabels(labs_c)
     ax[2].set_ylabel("potentiation peak ratio"); figstyle.panel(ax[2], "c", "potentiation")
-    ax[2].legend(frameon=False, fontsize=8)
+    # no legend: (b) next door already keys Ag/Au with the same colours
 
     fig.tight_layout()
     os.makedirs(FIGDIR, exist_ok=True)

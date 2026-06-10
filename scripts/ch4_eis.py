@@ -206,12 +206,15 @@ def main():
     # ---- figure ----
     fig, (axA, axB) = plt.subplots(1, 2, figsize=(7.4, 3.2))
     salt_levels = sorted({r["salt"] for r in md})
-    cmap = {s: c for s, c in zip(salt_levels, ["#1f77b4", "#2ca02c", "#d62728", "#9467bd"])}
+    # salt levels in green/orange/purple -- blue/red are reserved for PEO
+    # levels elsewhere in the chapter
+    cmap = {s: c for s, c in zip(salt_levels, [COLORS["green"], COLORS["orange"],
+                                               COLORS["purple"], COLORS["gray"]])}
 
     # (a) Zapex vs PEO, per device coloured by salt, cell-median line
     for r in md:
-        axA.scatter(r["peo"], r["zapex"], s=22, color=cmap.get(r["salt"], "gray"),
-                    alpha=0.55, edgecolor="none", zorder=2)
+        axA.scatter(r["peo"], r["zapex"], s=24, color=cmap.get(r["salt"], "gray"),
+                    alpha=0.65, edgecolor="none", zorder=2)
     peos = sorted({k[0] for k in cm_z})
     cmed = [med([cm_z[k] for k in cm_z if k[0] == p]) for p in peos]
     axA.plot(peos, cmed, "k-o", lw=1.4, ms=4, zorder=3, label="PEO median")
@@ -252,8 +255,7 @@ def main():
     axB2.set_yscale("log")
     axB2.set_ylabel(r"fading-memory time $t_{1/2}$ (s)", color=c_mem)
     axB2.tick_params(axis="y", labelcolor=c_mem)
-    axB.legend([l1, l2], ["EIS ionic impedance", r"fading memory $t_{1/2}$"],
-               fontsize=6.5, frameon=False, loc="lower left")
+    # no legend: the two coloured y-axes already name the two measurements
 
     fig.tight_layout()
     out = os.path.join(FIGDIR, "eis_ionic.pdf")
