@@ -1,0 +1,8 @@
+metric,value,n,note
+sigma_lnTau_within_cell,0.846,27,"device-to-device scatter at fixed (PEO,salt); = reservoir jitter"
+sigma_lnTau_total_group,1.59,31,CONFLATED: pools designed PEO x salt sweep -- do not cite
+sigma_lnTau_ctrl_rpm_anneal,0.9107,27,residual after cell + RPM + anneal
+spearman_resid_thickness,0.1415,31,within-cell residual vs film thickness (expect ~0)
+spearman_resid_day,0.0473,32,within-cell residual vs aging/day (expect ~0)
+old_cited_value,0.12,,the undocumented number the figure used
+thickness_coverage,31/31,,devices with profilometry
