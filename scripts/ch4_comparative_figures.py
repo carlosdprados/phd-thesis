@@ -581,6 +581,111 @@ def fig_heterogeneity():
     print("wrote", p)
 
 
+# ----------------------------------------------------------------------------
+# Figure — the realised measured palette across the WHOLE device library
+# ----------------------------------------------------------------------------
+# Where fig_design_space is restricted to the Li/PEO spine, this places EVERY
+# silver device that carries both a switching window and a fading timescale in a
+# single (window x retention) map, spanning all ion-conductor hosts, cations and
+# anions. It is the literal picture of the heterogeneous palette the temporal
+# chapter draws on: a descriptive map, not a causal claim. Built from the
+# canonical DATABASE (FILTERED-flagged and broken pixels dropped) joined to the
+# device library, so it uses the same source of truth as the rest of the chapter.
+def _host_salt(components):
+    """Split a Components-Group string ('SY, PEO, LiTr') into (host, cation, anion)."""
+    toks = [t.strip() for t in (components or "").split(",")]
+    if len(toks) < 3:
+        return None
+    host, salt = toks[1], toks[2]
+    if "TFSI" in salt or "Bis" in salt:
+        anion = "TFSI"
+        cation = salt.replace("TFSI", "").replace("Bis", "") or "?"
+    elif salt.endswith("Tr"):
+        anion = "OTf"
+        cation = salt[:-2] or "?"
+    else:                       # ionic-liquid cations (EMIm, BMIm) carried as-is
+        anion, cation = "IL", salt
+    return host, cation, anion
+
+
+def fig_palette():
+    lib = {r["device_name"]: r for r in load("UPDATED_DEVICES_LIBRARY.csv")}
+    flags = filtered_flags()
+
+    def dev_median(fname, col, mtype, broken_col):
+        """Device-median of `col`, dropping FILTERED and broken pixels."""
+        acc = collections.defaultdict(list)
+        for r in load(fname):
+            dev = g(r, "device_name")
+            if (dev, g(r, "day"), g(r, "pixel"), mtype) in flags:
+                continue
+            if g(r, broken_col) == "True":
+                continue
+            v = fnum(g(r, col))
+            if v is not None and np.isfinite(v) and v > 0:
+                acc[dev].append(v)
+        return {d: med(v) for d, v in acc.items()}
+
+    window = dev_median("DEVICES_HYST_PIXEL_INFO.csv", "on-off ratio mean", "HYST", "is broken")
+    tau = dev_median("DEVICES_DELAYTIME_PIXEL_INFO.csv", "exp decay: tau (s)", "DELAYTIME", "is pixel broken")
+
+    host_col = {"PEO": COLORS["blue"], "Hy": COLORS["green"], "TMPE": COLORS["red"]}
+    cat_mk = {"Li": "o", "Na": "^", "K": "s", "Im": "D", "EMIm": "v", "BMIm": "P"}
+
+    pts = []
+    for dev in sorted(set(window) & set(tau)):
+        L = lib.get(dev)
+        if not L or g(L, "Used Metal") != "Ag":
+            continue
+        hs = _host_salt(g(L, "Components Group"))
+        if not hs:
+            continue
+        host, cation, _ = hs
+        if host not in host_col:
+            continue
+        is_lead = (host == "PEO" and cation == "Li"
+                   and g(L, "Ion-Conducting Polymer Mass Ratio") == "0.3"
+                   and g(L, "Salt Mass Ratio") == "0.09")
+        pts.append((window[dev], tau[dev], host, cation, is_lead))
+
+    fig, ax = plt.subplots(figsize=(5.4, 3.8))
+    for x, y, host, cation, is_lead in pts:
+        ax.scatter(x, y, c=host_col[host], marker=cat_mk.get(cation, "o"),
+                   s=86 if is_lead else 40,
+                   edgecolor="0.1" if is_lead else "0.3",
+                   linewidth=1.4 if is_lead else 0.4,
+                   alpha=0.95, zorder=4 if is_lead else 3)
+    # ring the lead composition so the reservoir's operating point is locatable
+    for x, y, host, cation, is_lead in pts:
+        if is_lead:
+            ax.scatter(x, y, s=230, facecolor="none", edgecolor="0.1",
+                       linewidth=1.0, zorder=5)
+            ax.annotate("lead\nPEO 0.3/0.09", (x, y), textcoords="offset points",
+                        xytext=(8, 8), fontsize=6.8, color="0.1")
+            break
+    ax.set_xscale("log"); ax.set_yscale("log")
+    ax.set_xlabel("memristive switching window (on--off ratio)")
+    ax.set_ylabel(r"fading-memory time $\tau$ (s)")
+    ax.set_title(f"measured device palette (Ag, all chemistries; $n={len(pts)}$)",
+                 fontsize=9.5)
+    from matplotlib.lines import Line2D
+    hosts = [Line2D([0], [0], marker="o", color="none", markerfacecolor=c,
+                    markersize=7, markeredgecolor="0.2", label=h)
+             for h, c in host_col.items()]
+    cats = [Line2D([0], [0], marker=m, color="none", markerfacecolor="0.6",
+                   markersize=7, markeredgecolor="0.2", label=c)
+            for c, m in cat_mk.items()]
+    leg1 = ax.legend(handles=hosts, fontsize=7, loc="upper left",
+                     bbox_to_anchor=(1.02, 1.0), title="host", title_fontsize=7,
+                     borderaxespad=0.0)
+    ax.add_artist(leg1)
+    ax.legend(handles=cats, fontsize=7, loc="lower left", bbox_to_anchor=(1.02, 0.0),
+              title="cation", title_fontsize=7, borderaxespad=0.0)
+    fig.tight_layout()
+    p = os.path.join(FIGDIR, "palette.pdf"); fig.savefig(p); plt.close(fig)
+    print("wrote", p, f"| {len(pts)} devices")
+
+
 def main():
     os.makedirs(FIGDIR, exist_ok=True)
     fig_representative()
@@ -590,6 +695,7 @@ def main():
     fig_chemistry()
     fig_protocol()
     fig_design_space()
+    fig_palette()
 
 
 if __name__ == "__main__":

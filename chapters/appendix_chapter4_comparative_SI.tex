@@ -200,6 +200,32 @@ single-device \ce{Na+}/\ce{K+} chemistry points.
   \end{tabular}
 \end{table}
 
+\section{Realised Device Palette}\label{app:ch4_palette}
+
+The quantitative analyses of \cref{ch:comparative} are deliberately confined to
+the replicated silver \PEO{}/\LiTf{} composition spine. It is nonetheless useful
+to see the full set of behaviours the device family actually realises, because it
+is this realised spread --- not any single optimised cell --- that the temporal
+chapter treats as a computational resource. \Cref{fig:ch4_palette} places every
+silver device that carries both a measured switching window and a measured fading
+timescale (\(n=54\), all hosts, cations and anions; FILTERED-flagged and broken
+pixels removed; device medians) in a single window-versus-retention map. The map
+is descriptive only: the chemistry axes are illustrative (\cref{sec:ch4_chemistry})
+and no comparative claim is drawn from it. Two features are worth noting. The
+populated region spans more than an order of magnitude in both axes, so the
+substrate offers a broad palette of \((\text{window},\tau)\) operating points.
+And the lead composition is not an isolated point but a cluster of replicate
+devices spread over \(\tau\approx\SIrange{0.4}{20}{\second}\), the visual
+counterpart of the within-cell device-to-device scatter quantified in
+\cref{app:ch5_scatter}.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.82\linewidth]{../figures/chapter4/palette.pdf}
+  \caption[Realised device palette across the library]{Measured window-versus-retention palette of the silver device library (\(n=54\) devices with both a clean hysteresis window and a fading-memory fit, all chemistries). Colour encodes the ion-conductor host, marker encodes the salt cation; the lead \PEO{}~0.3/0.09 cell is ringed. The cloud spans over a decade in each axis, and the lead-cell replicates alone span \(\tau\approx\SIrange{0.4}{20}{\second}\). Descriptive overview only; the quantitative claims of \cref{ch:comparative} rest on the replicated composition spine, not on this map.}
+  \label{fig:ch4_palette}
+\end{figure}
+
 \section{Impedance: Equivalent Circuit and Per-Cell Values}\label{app:ch4_eis_detail}
 
 \paragraph{Equivalent-circuit model.} Beyond the model-free Nyquist-apex
