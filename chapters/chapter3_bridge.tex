@@ -95,7 +95,7 @@ The campaign record is qualitative; the claim that the platform degraded must be
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{../figures/chapter3/bridge_window_collapse.pdf}
-  \caption[Switching-window collapse at \texorpdfstring{$\sim$}{~}3\,V]{Switching-window collapse across the campaign on the standard \SY{}/\Hybrane{}/\LiTf{}/Ag corpus, read at the $\sim$\SI{3}{\volt} stratum where the window is expressed, one value per device. (a)~On--off ratio and (b)~normalized hysteresis area, both for devices fabricated before the NM\_v026 inflection ($\leq$Apr 2021) versus later. Boxes are quartiles; points are individual devices; the annotated $p$ is a two-sided Mann--Whitney test. The window collapses by roughly a factor of two in on--off ratio and an order of magnitude in area. Reproduced by \texttt{scripts/bridge\_figures.py} (F1).}
+  \caption[Switching-window collapse at \texorpdfstring{$\sim$}{~}3\,V]{Switching-window collapse across the campaign on the standard \SY{}/\Hybrane{}/\LiTf{}/Ag corpus, read at the $\sim$\SI{3}{\volt} stratum where the window is expressed, one value per device. (a)~On--off ratio and (b)~normalized hysteresis area, both for devices fabricated before the NM\_v026 inflection ($\leq$Apr 2021) versus later. Boxes are quartiles with the median annotated beside each box; points are individual devices; the bracket gives the two-sided Mann--Whitney $p$. The window collapses by roughly a factor of two in on--off ratio and an order of magnitude in area. Reproduced by \texttt{scripts/bridge\_figures.py} (F1).}
   \label{fig:bridge_window}
 \end{figure}
 
@@ -139,7 +139,7 @@ The campaign record is qualitative; the claim that the platform degraded must be
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{../figures/chapter3/bridge_mechanism.pdf}
-  \caption[Ohmic drift and the methodology that isolates it]{Mechanism and methodology. (a)~Per-device hysteresis area read at the matched $\sim$\SI{1.2}{\volt} band rises with fabrication date (log axis; Spearman $\rho=+0.57$ over all dates, strengthening to $+0.69$ when the recovery-tail batches, open diamonds, $\geq$2022-03, are dropped). \emph{Inset:} the number of pixels measured per device falls over the campaign ($\rho=-0.80$), which is why every statistic is computed per device rather than per pixel. (b)~Sweep amplitude is itself confounded with date: the matched $\sim$\SI{1.2}{\volt} conductivity probe and the $\sim$\SI{3}{\volt} window probe (shaded) are the two strata used throughout, never pooled. Reproduced by \texttt{scripts/bridge\_figures.py} (F2).}
+  \caption[Ohmic drift and the methodology that isolates it]{Mechanism and methodology. (a)~Per-device hysteresis area read at the matched $\sim$\SI{1.2}{\volt} band rises with fabrication date (Spearman $\rho=+0.57$ over all dates, strengthening to $+0.69$ when the recovery-tail batches, open diamonds, $\geq$2022-03, are dropped; the statistics use all $n=64$ devices, while the log axis cannot display the few non-positive areas). (b)~The number of pixels measured per device falls over the campaign ($\rho=-0.80$), which is why every statistic is computed per device rather than per pixel. (c)~Sweep amplitude is itself confounded with date: the matched $\sim$\SI{1.2}{\volt} conductivity probe and the $\sim$\SI{3}{\volt} window probe (shaded) are the two strata used throughout, never pooled. Reproduced by \texttt{scripts/bridge\_figures.py} (F2).}
   \label{fig:bridge_mechanism}
 \end{figure}
 
