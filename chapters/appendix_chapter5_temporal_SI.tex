@@ -65,6 +65,53 @@ device nodes rather than the read-out.
   \end{tabularx}
 \end{table}
 
+\section{Measured Device-to-Device Scatter}\label{app:ch5_scatter}
+
+The robustness analysis of \cref{sec:ch5_deploy} (\cref{fig:ch5_robustness})
+injects device-to-device variation as a multiplicative log-normal \emph{jitter} on
+each node's timescale, \(\tau_i=\tau\,e^{\varepsilon}\) with
+\(\varepsilon\sim\mathcal{N}(0,\sigma^2)\); the jitter magnitude \(\sigma\) is, by
+construction, the standard deviation of \(\ln\tau\) across nominally identical
+devices. That quantity is measured directly here, so the dotted ``measured
+scatter'' line in \cref{fig:ch5_robustness} is data-derived rather than assumed.
+
+The estimate uses the fading-memory time constants of every silver
+\PEO{}/\LiTf{} device (\(n=31\)). A naive spread taken across the whole
+\textsf{SY,~PEO,~LiTr} group conflates the \emph{deliberate} \PEO{}\,\(\times\)\,salt
+tuning sweep of \cref{ch:comparative} with random scatter and over-states it
+(\(\sigma\approx\num{1.59}\)); the meaningful quantity is the spread \emph{within}
+each fixed \PEO{}/salt cell, \(\sigma(\ln\tau)\approx\num{0.85}\)
+(\cref{tab:ch5_scatter}). This residual is genuine device-to-device variation: it
+is essentially unchanged after regressing out spin-coating speed and annealing
+(\(\approx\num{0.91}\)), and within-cell residuals show no monotonic dependence on
+film thickness (Spearman \(\rho\approx\num{0.14}\), \(n=31\), complete
+profilometry) or on device age (\(\rho\approx\num{0.05}\)). The measured value is
+roughly seven times the figure previously annotated on the robustness plot, and
+the heterogeneous bank retains its memory-capacity advantage at it
+(\cref{fig:ch5_robustness}), so the realised material diversity is, if anything,
+larger than the simulations assume. The audit is reproduced by
+\texttt{scripts/ch5\_scatter\_audit.py}.
+
+\begin{table}[t]
+  \centering
+  \caption[Measured device-to-device scatter of the fading-memory time]{Variance decomposition of \(\ln\tau\) for the silver \PEO{}/\LiTf{} spine (\(n=31\) devices). The within-cell value is the measured jitter \(\sigma\); the group-level value is reported only to show the confound it would introduce.}
+  \label{tab:ch5_scatter}
+  \footnotesize
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X r@{}}
+    \toprule
+    Estimate of \(\sigma(\ln\tau)\) & Value \\
+    \midrule
+    Across \textsf{SY,~PEO,~LiTr} group (conflates designed sweep) & \num{1.59} \\
+    \textbf{Within fixed \PEO{}/salt cell (= measured jitter)} & \textbf{\num{0.85}} \\
+    \quad after regressing out spin speed + anneal & \num{0.91} \\
+    Within-cell residual vs.\ film thickness (Spearman \(\rho\)) & \num{0.14} \\
+    Within-cell residual vs.\ device age (Spearman \(\rho\)) & \num{0.05} \\
+    Value previously annotated on \cref{fig:ch5_robustness} & \num{0.12} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
 \section{Continuous-Monitoring Stress Test}\label{app:ch5_robust}
 
 The deployment-robustness result of \cref{sec:ch5_robust} (\path{scripts/ch5_onset.py})
