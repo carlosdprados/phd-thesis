@@ -300,12 +300,15 @@ def make_figures(spectra):
     # (c) XRD, PEO/Li vs TMPE/Li vs ITO blank -> films are X-ray AMORPHOUS
     #     (substrate ITO peaks only): no long-range PEO crystallites, no salt
     #     phase. Disciplines (b): local order, not bulk crystallinity.
-    fig, (axL, axM, axR) = plt.subplots(1, 3, figsize=(13.2, 4.1))
+    fig, (axL, axM, axR) = plt.subplots(1, 3, figsize=(7.5, 2.8))
 
-    order = [("v126", "PEO/Li"), ("v127", "PEO/Na"), ("v128", "PEO/K"),
-             ("v129", "TMPE/Li"), ("v130", "TMPE/Na"), ("v131", "TMPE/K")]
-    colors = plt.cm.viridis(np.linspace(0, 0.88, len(order)))
-    for (dev, lab), c in zip(order, colors):
+    # host-family colour ramps: blues = linear PEO, reds = hyperbranched TMPE,
+    # darkest-to-lightest = Li/Na/K -- the no-cation-shift result is then read
+    # as 'the blues coincide and the reds coincide'
+    order = [("v126", "PEO/Li", "#16415F"), ("v127", "PEO/Na", "#276FBF"),
+             ("v128", "PEO/K", "#8FB8E0"), ("v129", "TMPE/Li", "#7C2120"),
+             ("v130", "TMPE/Na", "#C43C39"), ("v131", "TMPE/K", "#E69896")]
+    for dev, lab, c in order:
         if dev not in spectra:
             continue
         x, a, t, *_ = spectra[dev]
@@ -314,20 +317,27 @@ def make_figures(spectra):
         base = np.interp(xx, [xx[0], xx[-1]], [aa[0], aa[-1]])
         aa = aa - base
         aa = aa / np.nanmax(aa)
-        axL.plot(xx, aa, color=c, lw=1.3, label=lab)
+        axL.plot(xx, aa, color=c, lw=1.0)
     for ref, txt in [(1032, "free"), (1042, "CIP"), (1052, "aggr.")]:
         axL.axvline(ref, color="0.75", ls=":", lw=0.8)
-        axL.text(ref, 1.01, txt, rotation=90, fontsize=6, va="bottom",
+        axL.text(ref, 1.30, txt, rotation=90, fontsize=5.5, va="top",
                  ha="center", color="0.45")
     axL.set_xlim(1060, 1005)
-    axL.set_ylim(0, 1.12)
+    axL.set_ylim(0, 1.32)
+    # compact colour key (text, not a swatch legend): the result is read as
+    # 'all six bands coincide', so per-curve identification lives in the ramp
+    axL.text(0.97, 0.985, "PEO", transform=axL.transAxes, fontsize=6.5,
+             color="#276FBF", ha="right", va="top", fontweight="bold")
+    axL.text(0.97, 0.91, "TMPE", transform=axL.transAxes, fontsize=6.5,
+             color="#C43C39", ha="right", va="top", fontweight="bold")
+    axL.text(0.97, 0.835, "dark$\\to$light:\nLi$\\to$Na$\\to$K", transform=axL.transAxes,
+             fontsize=5.5, color="0.45", ha="right", va="top")
     axL.set_xlabel(r"wavenumber (cm$^{-1}$)")
     axL.set_ylabel(r"normalised $\nu_s$(SO$_3$) absorbance")
-    figstyle.panel(axL, "a", "ATR: triflate ion-association band")
-    axL.legend(fontsize=6.5, frameon=False, ncol=2)
+    figstyle.panel(axL, "a", "triflate ion association")
 
-    for dev, lab, c in [("v126", "PEO/Li (locally ordered)", COLORS["blue"]),
-                        ("v129", "TMPE/Li (amorphous)", COLORS["red"])]:
+    for dev, lab, c in [("v126", "PEO/Li\nlocally ordered", COLORS["blue"]),
+                        ("v129", "TMPE/Li\namorphous", COLORS["red"])]:
         if dev not in spectra:
             continue
         x, a, t, *_ = spectra[dev]
@@ -335,18 +345,24 @@ def make_figures(spectra):
         xx, aa = x[m], a[m]
         aa = aa - rubberband(xx, aa)
         aa = aa / np.nanmax(aa)
-        axM.plot(xx, aa, color=c, lw=1.2, label=lab)
+        axM.plot(xx, aa, color=c, lw=1.0)
     for ref in (843, 947, 962, 1060, 1116, 1145, 1242, 1280):
         axM.axvline(ref, color="0.85", ls=":", lw=0.6, zorder=0)
+    # direct host labels in the empty upper-left corner
+    axM.text(0.03, 0.97, "PEO/Li\nlocally ordered", transform=axM.transAxes,
+             fontsize=6.5, color=COLORS["blue"], va="top")
+    axM.text(0.03, 0.76, "TMPE/Li\namorphous", transform=axM.transAxes,
+             fontsize=6.5, color=COLORS["red"], va="top")
     axM.set_xlim(1300, 820)
     axM.set_xlabel(r"wavenumber (cm$^{-1}$)")
     axM.set_ylabel("normalised absorbance")
-    figstyle.panel(axM, "b", "ATR: host C-O-C local order (Li, film)")
-    axM.legend(fontsize=7, frameon=False)
+    figstyle.panel(axM, "b", "host C–O–C order (Li, film)")
 
-    # (c) XRD panel
+    # (c) XRD panel -- direct labels above each trace's right tail (a legend
+    # would sit on the offset traces)
     xrd = {"v126": ("PEO/Li", COLORS["blue"]), "v129": ("TMPE/Li", COLORS["red"])}
     off = 0.0
+    tails = []   # (label, colour, level of the trace near the right edge)
     for dev, (lab, c) in xrd.items():
         path = XRD_FILES.get(dev)
         if not path or not os.path.exists(path):
@@ -354,28 +370,36 @@ def make_figures(spectra):
         x, y = load_xy(path)
         norm = np.sum(y[(x >= 29.8) & (x <= 30.8)]) / 100.0
         m = (x >= 10) & (x <= 40)
-        axR.plot(x[m], y[m] / norm + off, color=c, lw=0.8, label=lab)
-        off += 1.6
+        axR.plot(x[m], y[m] / norm + off, color=c, lw=0.7)
+        tail = (x >= 37.0) & (x <= 39.5)
+        tails.append((lab, c, float(np.median(y[tail] / norm)) + off))
+        off += 2.0
     xb, yb = load_xy(XRD_BLANK)
     normb = np.sum(yb[(xb >= 29.8) & (xb <= 30.8)]) / 100.0
     mb = (xb >= 10) & (xb <= 40)
-    axR.plot(xb[mb], yb[mb] / normb + off, color="0.35", lw=0.8, label="ITO blank")
+    axR.plot(xb[mb], yb[mb] / normb + off, color="0.35", lw=0.7)
+    tailb = (xb >= 37.0) & (xb <= 39.5)
+    tails.append(("ITO blank", "0.35", float(np.median(yb[tailb] / normb)) + off))
+    for lab, c, lev in tails:
+        axR.text(39.3, lev + 0.62, lab, fontsize=6, color=c, ha="right",
+                 va="bottom")
     for pk in (21.5, 30.6, 35.5):
         axR.axvline(pk, color="0.6", ls="-", lw=0.5, zorder=0)
     for pk in (19.1, 23.3):
         axR.axvline(pk, color=COLORS["blue"], ls=":", lw=0.8, zorder=0)
-    axR.text(30.6, off + 1.7, "ITO", fontsize=6.5, color="0.4", ha="center")
-    axR.text(20.0, off + 1.7, "PEO\n(exp.)", fontsize=6, color=COLORS["blue"], ha="center")
+    # reference-line read-outs in a clear band above the tallest (gray) trace
+    label_y = float(np.nanmax(yb[mb] / normb)) + off + 0.35
+    axR.text(30.6, label_y, "ITO", fontsize=6, color="0.4", ha="center", va="bottom")
+    axR.text(20.0, label_y, "PEO (exp.)", fontsize=5.5, color=COLORS["blue"],
+             ha="center", va="bottom")
+    axR.set_ylim(-0.4, label_y + 0.75)
     axR.set_xlim(10, 40)
     axR.set_yticks([])
     axR.set_xlabel(r"$2\theta$ (deg, Cu-K$\alpha$)")
     axR.set_ylabel("intensity (ITO-norm., offset)")
-    figstyle.panel(axR, "c", "XRD: films are X-ray amorphous")
-    axR.legend(fontsize=7, frameon=False, loc="upper left")
+    figstyle.panel(axR, "c", "films are X-ray amorphous")
 
-    fig.suptitle("Microscopic corroboration of the chemistry axis: ATR + XRD "
-                 "(SY blend, 0.3/0.09, n=1 per chemistry)", fontsize=9.5)
-    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.tight_layout()
     p4 = os.path.join(FIGDIR, "iratr_chemistry.pdf")
     fig.savefig(p4)
     plt.close(fig)

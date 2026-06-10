@@ -91,7 +91,7 @@ def main():
         print(f"  {ion:7s} peak={xp:.0f} nm  A_peak={pk:.2f}  "
               f"onset(50%)={onset:.0f} nm = {1239.8/onset:.2f} eV")
 
-    fig, ax = plt.subplots(figsize=(5.6, 4.2))
+    fig, ax = plt.subplots(figsize=(4.8, 3.6))
     for ion in ["Li", "Na", "K", "no salt"]:
         if ion not in spectra:
             continue
@@ -101,16 +101,18 @@ def main():
         # normalise to the SY peak so only the band shape/edge is compared
         pk = yy[(xx > 400) & (xx < 540)].max()
         ls = "--" if ion == "no salt" else "-"
-        ax.plot(xx, yy / pk, color=c, lw=1.4, ls=ls, label=f"SY/TMPE/{ion}"
-                if ion != "no salt" else "SY/TMPE (no salt)")
+        ax.plot(xx, yy / pk, color=c, lw=1.4, ls=ls)
     ax.axvline(496, color="0.7", ls=":", lw=0.8)
-    ax.text(504, 0.10, "onset\n~2.50 eV", fontsize=7, color="0.4", ha="left")
+    ax.text(502, 0.93, "onset\n$\\approx$2.50 eV", fontsize=7, color="0.4", ha="left")
+    # direct labels: the three cation curves are superimposed (that is the
+    # result), so they are labelled once as a group
+    ax.text(0.03, 0.99, "SY/TMPE/{Li, Na, K}\n(superimposed)",
+            transform=ax.transAxes, fontsize=7.5, color=COLORS["blue"], va="top")
+    ax.text(0.03, 0.81, "SY/TMPE, no salt\n(dashed)",
+            transform=ax.transAxes, fontsize=7.5, color="0.45", va="top")
     ax.set_xlim(320, 620)
     ax.set_xlabel("wavelength (nm)")
     ax.set_ylabel("normalised absorbance (SY peak = 1)")
-    ax.set_title("UV-Vis: SY band edge is invariant to the cation\n"
-                 "(SY/TMPE, 0.3/0.09, n=1 per chemistry)", fontsize=9.5)
-    ax.legend(fontsize=7, frameon=False)
     secx = ax.secondary_xaxis("top", functions=(lambda w: 1239.8 / np.clip(w, 1, None),
                                                 lambda e: 1239.8 / np.clip(e, 1e-6, None)))
     secx.set_xlabel("energy (eV)", fontsize=8)
