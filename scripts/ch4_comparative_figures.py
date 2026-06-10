@@ -25,6 +25,7 @@ from scipy.optimize import curve_fit
 
 import matplotlib
 matplotlib.use("Agg")
+import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.colors import LogNorm
@@ -123,6 +124,46 @@ def thalf_grid():
 
 
 # ----------------------------------------------------------------------------
+# Shared 3x3 composition-grid heatmap row (one colormap family, white cell
+# separators, contrast-aware in-cell read-outs, slimmed colorbars)
+# ----------------------------------------------------------------------------
+def heat_row(fig, axes, panels):
+    for ax, (M, N, letter, title, fmt, islog) in zip(axes, panels):
+        Mm = np.ma.masked_invalid(M)
+        if islog:
+            vmin = np.nanmin(M[np.isfinite(M)]); vmax = np.nanmax(M[np.isfinite(M)])
+            im = ax.imshow(Mm, cmap="viridis", norm=LogNorm(vmin=max(vmin, 1e-2), vmax=vmax),
+                           aspect="auto")
+        else:
+            im = ax.imshow(Mm, cmap="viridis", aspect="auto")
+        figstyle.panel(ax, letter, title)
+        figstyle.box(ax)            # heatmaps keep all four spines
+        ax.tick_params(length=0)    # no tick marks on categorical axes
+        for k in (0.5, 1.5):        # thin white separators between cells
+            ax.axhline(k, color="white", lw=1.4)
+            ax.axvline(k, color="white", lw=1.4)
+        ax.set_xticks(range(len(SALT_LEVELS))); ax.set_xticklabels(SALT_LEVELS)
+        ax.set_yticks(range(len(PEO_LEVELS))); ax.set_yticklabels(PEO_LEVELS)
+        ax.set_xlabel("salt mass fraction")
+        if ax is axes[0]:
+            ax.set_ylabel("PEO mass fraction")
+        for i in range(len(PEO_LEVELS)):
+            for j in range(len(SALT_LEVELS)):
+                if np.isfinite(M[i, j]):
+                    # contrast-aware text colour (in log space on log panels)
+                    S = np.log10(np.clip(M, 1e-2, None)) if islog else M
+                    norm = (S[i, j] - np.nanmin(S)) / (np.nanmax(S) - np.nanmin(S) + 1e-12)
+                    tc = "white" if norm < 0.5 else "black"
+                    ax.text(j, i, fmt.format(M[i, j]) + f"\n$n{{=}}{int(N[i, j])}$",
+                            ha="center", va="center", color=tc, fontsize=7.5)
+                else:
+                    ax.text(j, i, "n/a", ha="center", va="center", color="0.5", fontsize=7)
+        cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+        cb.outline.set_visible(False)
+        cb.ax.tick_params(labelsize=6.5, length=2.5, width=0.6)
+
+
+# ----------------------------------------------------------------------------
 # Figure 1 — composition heatmaps
 # ----------------------------------------------------------------------------
 def fig_composition():
@@ -149,37 +190,12 @@ def fig_composition():
                 Mt[i, j], Nt[i, j] = th[(peo, salt)]
 
     panels = [
-        (Mr, Nr, "a", "on/off ratio", "viridis", "{:.1f}", False),
-        (Ma, Na, "b", "|normalised area|", "magma", "{:.2f}", False),
-        (Mt, Nt, "c", r"fading time $t_{1/2}$ (s)", "cividis", "{:.0f}", True),
+        (Mr, Nr, "a", "on/off ratio", "{:.1f}", False),
+        (Ma, Na, "b", r"normalised area $|A|$", "{:.2f}", False),
+        (Mt, Nt, "c", r"fading time $t_{1/2}$ (s)", "{:.0f}", True),
     ]
     fig, axes = plt.subplots(1, 3, figsize=(7.4, 2.7))
-    for ax, (M, N, letter, title, cmap, fmt, islog) in zip(axes, panels):
-        Mm = np.ma.masked_invalid(M)
-        if islog:
-            vmin = np.nanmin(M[np.isfinite(M)]); vmax = np.nanmax(M[np.isfinite(M)])
-            im = ax.imshow(Mm, cmap=cmap, norm=LogNorm(vmin=max(vmin, 1e-2), vmax=vmax), aspect="auto")
-        else:
-            im = ax.imshow(Mm, cmap=cmap, aspect="auto")
-        figstyle.panel(ax, letter, title)
-        figstyle.box(ax)            # heatmaps keep all four spines
-        ax.tick_params(length=0)    # no tick marks on categorical axes
-        ax.set_xticks(range(len(SALT_LEVELS))); ax.set_xticklabels(SALT_LEVELS)
-        ax.set_yticks(range(len(PEO_LEVELS))); ax.set_yticklabels(PEO_LEVELS)
-        ax.set_xlabel("salt mass fraction")
-        if ax is axes[0]:
-            ax.set_ylabel("PEO mass fraction")
-        for i in range(len(PEO_LEVELS)):
-            for j in range(len(SALT_LEVELS)):
-                if np.isfinite(M[i, j]):
-                    # contrast-aware text colour
-                    norm = (M[i, j] - np.nanmin(M)) / (np.nanmax(M) - np.nanmin(M) + 1e-12)
-                    tc = "white" if norm < 0.5 else "black"
-                    ax.text(j, i, fmt.format(M[i, j]) + f"\n$n{{=}}{int(N[i, j])}$",
-                            ha="center", va="center", color=tc, fontsize=7.5)
-                else:
-                    ax.text(j, i, "--", ha="center", va="center", color="0.5", fontsize=8)
-        fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+    heat_row(fig, axes, panels)
     fig.tight_layout()
     p = os.path.join(FIGDIR, "composition_heatmaps.pdf")
     fig.savefig(p); plt.close(fig)
@@ -216,36 +232,12 @@ def fig_potentiation():
 
     Ma, Na = grid(alpha); Mp, Np = grid(peak); Mt, Nt = grid(turn)
     panels = [
-        (Ma, Na, "a", r"growth exponent $\alpha$", "viridis", "{:.2f}", False),
-        (Mp, Np, "b", "peak ratio (dynamic range)", "magma", "{:.0f}", True),
-        (Mt, Nt, "c", "turnover fraction (%)", "cividis", "{:.0f}", False),
+        (Ma, Na, "a", r"growth exponent $\alpha$", "{:.2f}", False),
+        (Mp, Np, "b", "peak ratio (dynamic range)", "{:.0f}", True),
+        (Mt, Nt, "c", "turnover fraction (%)", "{:.0f}", False),
     ]
     fig, axes = plt.subplots(1, 3, figsize=(7.4, 2.7))
-    for ax, (M, N, letter, title, cmap, fmt, islog) in zip(axes, panels):
-        Mm = np.ma.masked_invalid(M)
-        if islog:
-            vmin = np.nanmin(M[np.isfinite(M)]); vmax = np.nanmax(M[np.isfinite(M)])
-            im = ax.imshow(Mm, cmap=cmap, norm=LogNorm(vmin=max(vmin, 1), vmax=vmax), aspect="auto")
-        else:
-            im = ax.imshow(Mm, cmap=cmap, aspect="auto")
-        figstyle.panel(ax, letter, title)
-        figstyle.box(ax)            # heatmaps keep all four spines
-        ax.tick_params(length=0)    # no tick marks on categorical axes
-        ax.set_xticks(range(len(SALT_LEVELS))); ax.set_xticklabels(SALT_LEVELS)
-        ax.set_yticks(range(len(PEO_LEVELS))); ax.set_yticklabels(PEO_LEVELS)
-        ax.set_xlabel("salt mass fraction")
-        if ax is axes[0]:
-            ax.set_ylabel("PEO mass fraction")
-        for i in range(len(PEO_LEVELS)):
-            for j in range(len(SALT_LEVELS)):
-                if np.isfinite(M[i, j]):
-                    norm = (M[i, j] - np.nanmin(M)) / (np.nanmax(M) - np.nanmin(M) + 1e-12)
-                    tc = "white" if norm < 0.5 else "black"
-                    ax.text(j, i, fmt.format(M[i, j]) + f"\n$n{{=}}{int(N[i, j])}$",
-                            ha="center", va="center", color=tc, fontsize=7.5)
-                else:
-                    ax.text(j, i, "--", ha="center", va="center", color="0.5", fontsize=8)
-        fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+    heat_row(fig, axes, panels)
     fig.tight_layout()
     p = os.path.join(FIGDIR, "potentiation_grid.pdf")
     fig.savefig(p); plt.close(fig)
@@ -264,31 +256,43 @@ def fig_chemistry():
     cation_tr = [3.8, 5.0, 6.7]            # TMPE/triflate v250/v251/v252, n=1 each (sec 13)
     cation_tfsi = [6.3, 7.0, 3.5]          # TMPE/TFSI v333-338, n=2 each (sec 14)
 
+    def bar_style(bars, colours):
+        """Nature-style bars: light fill, full-strength coloured edge."""
+        for b, c in zip(bars, colours):
+            b.set_facecolor(mcolors.to_rgba(c, 0.22))
+            b.set_edgecolor(c)
+            b.set_linewidth(1.1)
+
     fig, axes = plt.subplots(1, 3, figsize=(7.6, 2.9), sharey=True)
-    # --- panels 1-2: simple two-bar comparisons ---
+    # --- panels 1-2: simple two-bar comparisons (host blue/red, anion green/orange)
     for ax, letter, (title, data, colours) in zip(
             axes[:2], "ab",
-            [("host\n(Li-triflate)", host, [COLORS["blue"], COLORS["orange"]]),
-             ("anion\n(PEO host)", anion, [COLORS["blue"], COLORS["red"]])]):
+            [("host\n(Li-triflate)", host, [COLORS["blue"], COLORS["red"]]),
+             ("anion\n(PEO host)", anion, [COLORS["green"], COLORS["orange"]])]):
         labels = [d[0] for d in data]; vals = [d[1] for d in data]; ns = [d[2] for d in data]
         x = np.arange(len(data))
-        bars = ax.bar(x, vals, color=colours, width=0.62, edgecolor="0.2", linewidth=0.5)
+        bars = ax.bar(x, vals, width=0.62)
+        bar_style(bars, colours)
         ax.set_yscale("log"); figstyle.panel(ax, letter, title)
         ax.set_xticks(x); ax.set_xticklabels(labels, fontsize=8)
-        for b, v, n in zip(bars, vals, ns):
-            ax.text(b.get_x() + b.get_width() / 2, v * 1.08, f"{v:g}s\n$n{{=}}{n}$",
-                    ha="center", va="bottom", fontsize=7.5)
+        for b, v, n, c in zip(bars, vals, ns, colours):
+            ax.text(b.get_x() + b.get_width() / 2, v * 1.08,
+                    f"$\\mathbf{{{v:g}\\,s}}$\n$n{{=}}{n}$",
+                    ha="center", va="bottom", fontsize=7.5, color=c)
         ax.set_ylim(0.2, 60)
     # --- panel 3: cation, TMPE host, grouped by anion (shows the order inverting) ---
     ax = axes[2]
     cats = ["Li", "Na", "K"]; x = np.arange(3); w = 0.38
-    b1 = ax.bar(x - w / 2, cation_tr, w, color=COLORS["green"], edgecolor="0.2", linewidth=0.5, label="triflate ($n{=}1$)")
-    b2 = ax.bar(x + w / 2, cation_tfsi, w, color=COLORS["red"], edgecolor="0.2", linewidth=0.5, label="TFSI ($n{=}2$)")
+    b1 = ax.bar(x - w / 2, cation_tr, w, label="triflate ($n{=}1$)")
+    b2 = ax.bar(x + w / 2, cation_tfsi, w, label="TFSI ($n{=}2$)")
+    bar_style(b1, [COLORS["green"]] * 3)
+    bar_style(b2, [COLORS["orange"]] * 3)
     ax.set_yscale("log"); figstyle.panel(ax, "c", "cation\n(TMPE host)")
     ax.set_xticks(x); ax.set_xticklabels(cats, fontsize=8)
-    for bars, vals in [(b1, cation_tr), (b2, cation_tfsi)]:
+    for bars, vals, c in [(b1, cation_tr, COLORS["green"]), (b2, cation_tfsi, COLORS["orange"])]:
         for b, v in zip(bars, vals):
-            ax.text(b.get_x() + b.get_width() / 2, v * 1.06, f"{v:g}", ha="center", va="bottom", fontsize=7)
+            ax.text(b.get_x() + b.get_width() / 2, v * 1.06, f"{v:g}", ha="center",
+                    va="bottom", fontsize=7, color=c)
     ax.set_ylim(0.2, 60)
     ax.legend(frameon=False, fontsize=6.5, loc="upper center", ncol=1)
     axes[0].set_ylabel("fading-memory time (s)")
@@ -336,15 +340,31 @@ def fig_protocol():
     tt = np.logspace(np.log10(0.5), np.log10(300), 200)
 
     fig, ax = plt.subplots(figsize=(4.4, 3.2))
-    ax.scatter(t3, y3n, s=22, color=COLORS["blue"], label=fr"3 V write: $\tau={p3[1]:.1f}$ s", zorder=3)
+    ax.scatter(t3, y3n, s=22, color=COLORS["blue"], zorder=3)
     ax.plot(tt, expdecay(tt, *p3), color=COLORS["blue"], lw=1.2)
-    ax.scatter(t6, y6n, s=22, color=COLORS["red"], marker="s", label=fr"6 V write: $\tau={p6[1]:.1f}$ s", zorder=3)
+    ax.scatter(t6, y6n, s=22, color=COLORS["red"], marker="s", zorder=3)
     ax.plot(tt, expdecay(tt, *p6), color=COLORS["red"], lw=1.2)
     ax.set_xscale("log")
     ax.set_xlabel("delay time (s)")
     ax.set_ylabel("normalised conductance enhancement")
-    ax.set_title("device NM_v114 (R4): same device, two drive amplitudes")
-    ax.legend(fontsize=8)
+    # direct curve labels (same device, only the drive differs)
+    ax.text(0.03, 0.16, "3 V write / 1.5 V read\n" + fr"$\tau={p3[1]:.1f}$ s",
+            transform=ax.transAxes, color=COLORS["blue"], fontsize=7.5, va="bottom")
+    ax.text(0.97, 0.80, "6 V write / 3 V read\n" + fr"$\tau={p6[1]:.1f}$ s",
+            transform=ax.transAxes, color=COLORS["red"], fontsize=7.5,
+            va="bottom", ha="right")
+    # half-enhancement crossings: make the ~3x protocol shift directly readable
+    yh3 = expdecay(tt, *p3); yh6 = expdecay(tt, *p6)
+    try:
+        x3 = float(np.interp(-0.5, -yh3, tt))   # decreasing curves
+        x6 = float(np.interp(-0.5, -yh6, tt))
+        ax.axhline(0.5, color="0.75", lw=0.6, ls=":", zorder=1)
+        ax.annotate("", xy=(x6, 0.5), xytext=(x3, 0.5),
+                    arrowprops=dict(arrowstyle="->", color="0.35", lw=0.9))
+        ax.text(np.sqrt(x3 * x6), 0.53, fr"$\times{x6 / x3:.1f}$",
+                ha="center", va="bottom", fontsize=7.5, color="0.25")
+    except Exception:
+        pass
     fig.tight_layout()
     p = os.path.join(FIGDIR, "protocol_overlay.pdf")
     fig.savefig(p); plt.close(fig)
@@ -375,23 +395,27 @@ def fig_design_space():
     peo_col = {"0.15": COLORS["purple"], "0.3": COLORS["blue"],
                "0.6": COLORS["green"], "1.2": COLORS["red"]}
     salt_mk = {"0.045": "o", "0.09": "s", "0.18": "^"}
+    seen_peo, seen_salt = set(), set()
     fig, ax = plt.subplots(figsize=(5.4, 3.6))
     for d in both:
         peo, salt = meta[d]
+        seen_peo.add(peo); seen_salt.add(salt)
         ax.scatter(np.median(pul[d]), np.median(dec[d]),
                    c=peo_col.get(peo, "0.4"), marker=salt_mk.get(salt, "o"),
-                   s=42, edgecolor="0.2", linewidth=0.4, alpha=0.9)
+                   s=46, edgecolor="white", linewidth=0.6, alpha=0.95)
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel("potentiation dynamic range (peak ratio)")
     ax.set_ylabel("fading-memory time $t_{1/2}$ (s)")
-    ax.set_title("per-device design space (Ag, Li)")
     # Two encodings, both legends parked outside the data area (right margin):
-    # colour = PEO mass fraction, marker shape = salt mass fraction.
+    # colour = PEO mass fraction, marker shape = salt mass fraction. Only the
+    # levels actually present in the plotted device set are listed.
     from matplotlib.lines import Line2D
     ph = [Line2D([0], [0], marker="o", color="none", markerfacecolor=c, markersize=7,
-                 markeredgecolor="0.2", label=p) for p, c in peo_col.items()]
+                 markeredgecolor="white", label=p)
+          for p, c in peo_col.items() if p in seen_peo]
     sh = [Line2D([0], [0], marker=m, color="none", markerfacecolor="0.6", markersize=7,
-                 markeredgecolor="0.2", label=s) for s, m in salt_mk.items()]
+                 markeredgecolor="white", label=s)
+          for s, m in salt_mk.items() if s in seen_salt]
     leg1 = ax.legend(handles=ph, fontsize=7, loc="upper left", bbox_to_anchor=(1.02, 1.0),
                      title="PEO mass frac.", title_fontsize=7, borderaxespad=0.0)
     ax.add_artist(leg1)
@@ -476,14 +500,18 @@ def fig_representative():
     # is the loop *openness* (switching window), not absolute conductance --- the
     # high-PEO device carries more current but opens a narrower window.
     ax = axes[0]
-    for dev, lab, col in [("NM_v146", "PEO 0.3: wider window", COLORS["blue"]),
-                          ("NM_v144", "PEO 1.2: narrower", COLORS["red"])]:
+    for dev, lab, col in [("NM_v146", "PEO 0.3\nwider window", COLORS["blue"]),
+                          ("NM_v144", "PEO 1.2\nnarrower", COLORS["red"])]:
         V, I, rr = hyst_curve(dev)
         if V is not None and np.nanmax(np.abs(I)) > 0:
-            ax.plot(V, I / np.nanmax(I), color=col, lw=1.0, label=lab)
+            ax.plot(V, I / np.nanmax(I), color=col, lw=1.0)
+    # direct labels in the empty upper-left region, in curve colours
+    ax.text(0.04, 0.97, "PEO 0.3\nwider window", transform=ax.transAxes,
+            color=COLORS["blue"], fontsize=7, va="top")
+    ax.text(0.04, 0.74, "PEO 1.2\nnarrower", transform=ax.transAxes,
+            color=COLORS["red"], fontsize=7, va="top")
     ax.set_xlabel("voltage (V)"); ax.set_ylabel("current / peak current")
     figstyle.panel(ax, "a", "hysteresis loop (norm., salt 0.09)")
-    ax.legend(fontsize=7, loc="upper left")
 
     # (b) PULSES
     ax = axes[1]
@@ -496,7 +524,8 @@ def fig_representative():
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel("number of pulses $N$"); ax.set_ylabel("conductance ratio")
     figstyle.panel(ax, "b", "pulse potentiation")
-    ax.legend(fontsize=6.3, loc="lower right")
+    # the log-log growth fills the lower-right diagonal; upper-left is empty
+    ax.legend(fontsize=6.3, loc="upper left")
 
     # (c) DELAYTIME
     ax = axes[2]
@@ -512,16 +541,21 @@ def fig_representative():
                              float(np.median(t)), 0.7, max(y0.min(), 0.0)],
                              bounds=([0, 1e-2, 0.1, 0], [np.inf, 1e5, 2.0, np.inf]), maxfev=40000)
             tt = np.logspace(np.log10(t.min()), np.log10(t.max()), 200)
-            ax.plot(tt, _stretched(tt, *p), color=col, lw=1.1, label=lab)
-            # mark half-enhancement time
-            thalf = p[1] * (np.log(p[0] / (0.5 - p[3]))) ** (1.0 / p[2]) if (0.5 - p[3]) > 0 else np.nan
+            ax.plot(tt, _stretched(tt, *p), color=col, lw=1.1)
         except Exception:
-            ax.plot(t, y0, color=col, lw=1.0, label=lab)
+            ax.plot(t, y0, color=col, lw=1.0)
         ax.axhline(0.5, color="0.7", lw=0.6, ls=":")
     ax.set_xscale("log")
+    # direct labels in the empty upper-right corner, in curve colours, plus a
+    # read-out for the dotted half-enhancement level
+    ax.text(0.97, 0.97, "PEO 0.3: $t_{1/2}{\\approx}22$ s", transform=ax.transAxes,
+            color=COLORS["blue"], fontsize=6.8, ha="right", va="top")
+    ax.text(0.97, 0.88, "PEO 1.2: $t_{1/2}{\\approx}6$ s", transform=ax.transAxes,
+            color=COLORS["red"], fontsize=6.8, ha="right", va="top")
+    ax.text(0.98, 0.52, "$t_{1/2}$", transform=ax.get_yaxis_transform(),
+            color="0.5", fontsize=6.5, ha="right", va="bottom")
     ax.set_xlabel("delay time (s)"); ax.set_ylabel("normalised enhancement")
     figstyle.panel(ax, "c", "fading-memory decay")
-    ax.legend(fontsize=6.6, loc="upper right")
 
     fig.tight_layout()
     p = os.path.join(FIGDIR, "representative_curves.pdf")
@@ -554,7 +588,7 @@ def fig_heterogeneity():
     peo_order = ["0.3", "0.6", "1.2"]
     peo_col = {"0.3": COLORS["blue"], "0.6": COLORS["green"], "1.2": COLORS["red"]}
 
-    def swarm(ax, data, ylabel, logy=False):
+    def swarm(ax, data, ylabel, logy=False, fmt="{:.1f}"):
         rng = np.random.default_rng(0)
         for xi, peo in enumerate(peo_order):
             vals = [v for v, (p,) in data.values() if p == peo]
@@ -562,18 +596,23 @@ def fig_heterogeneity():
                 continue
             jit = rng.uniform(-0.13, 0.13, size=len(vals))
             ax.scatter(np.full(len(vals), xi) + jit, vals, s=34, color=peo_col[peo],
-                       edgecolor="0.2", linewidth=0.4, alpha=0.85, zorder=3)
-            ax.scatter([xi], [np.median(vals)], marker="_", s=900, color="0.15",
+                       edgecolor="white", linewidth=0.5, alpha=0.9, zorder=3)
+            m = np.median(vals)
+            ax.scatter([xi], [m], marker="_", s=900, color="0.15",
                        linewidth=1.8, zorder=4)
+            # direct median read-out beside the bar, in the group colour
+            ax.text(xi + 0.3, m, fmt.format(m), color=peo_col[peo], fontsize=7,
+                    ha="left", va="center", fontweight="bold")
         ax.set_xticks(range(len(peo_order))); ax.set_xticklabels(peo_order)
+        ax.set_xlim(-0.55, len(peo_order) - 0.3)
         ax.set_xlabel("PEO mass fraction"); ax.set_ylabel(ylabel)
         if logy:
             ax.set_yscale("log")
 
     fig, axes = plt.subplots(1, 2, figsize=(6.4, 2.9))
-    swarm(axes[0], th, "fading-memory time $t_{1/2}$ (s)", logy=True)
+    swarm(axes[0], th, "fading-memory time $t_{1/2}$ (s)", logy=True, fmt="{:.0f} s")
     figstyle.panel(axes[0], "a", "retention spread")
-    swarm(axes[1], al, r"growth exponent $\alpha$")
+    swarm(axes[1], al, r"growth exponent $\alpha$", fmt="{:.2f}")
     figstyle.panel(axes[1], "b", "potentiation-strength spread")
     fig.tight_layout()
     p = os.path.join(FIGDIR, "heterogeneity.pdf")
@@ -652,8 +691,8 @@ def fig_palette():
     for x, y, host, cation, is_lead in pts:
         ax.scatter(x, y, c=host_col[host], marker=cat_mk.get(cation, "o"),
                    s=86 if is_lead else 40,
-                   edgecolor="0.1" if is_lead else "0.3",
-                   linewidth=1.4 if is_lead else 0.4,
+                   edgecolor="0.1" if is_lead else "white",
+                   linewidth=1.4 if is_lead else 0.5,
                    alpha=0.95, zorder=4 if is_lead else 3)
     # ring the lead composition so the reservoir's operating point is locatable
     for x, y, host, cation, is_lead in pts:
@@ -661,20 +700,21 @@ def fig_palette():
             ax.scatter(x, y, s=230, facecolor="none", edgecolor="0.1",
                        linewidth=1.0, zorder=5)
             ax.annotate("lead\nPEO 0.3/0.09", (x, y), textcoords="offset points",
-                        xytext=(8, 8), fontsize=6.8, color="0.1")
+                        xytext=(9, 9), fontsize=6.8, color="0.1", zorder=6,
+                        bbox=dict(fc="white", ec="none", alpha=0.75, pad=0.4))
             break
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel("memristive switching window (on--off ratio)")
     ax.set_ylabel(r"fading-memory time $\tau$ (s)")
-    ax.set_title(f"measured device palette (Ag, all chemistries; $n={len(pts)}$)",
-                 fontsize=9.5)
     from matplotlib.lines import Line2D
+    seen_hosts = {h for _, _, h, _, _ in pts}
+    seen_cats = {c for _, _, _, c, _ in pts}
     hosts = [Line2D([0], [0], marker="o", color="none", markerfacecolor=c,
-                    markersize=7, markeredgecolor="0.2", label=h)
-             for h, c in host_col.items()]
+                    markersize=7, markeredgecolor="white", label=h)
+             for h, c in host_col.items() if h in seen_hosts]
     cats = [Line2D([0], [0], marker=m, color="none", markerfacecolor="0.6",
-                   markersize=7, markeredgecolor="0.2", label=c)
-            for c, m in cat_mk.items()]
+                   markersize=7, markeredgecolor="white", label=c)
+            for c, m in cat_mk.items() if c in seen_cats]
     leg1 = ax.legend(handles=hosts, fontsize=7, loc="upper left",
                      bbox_to_anchor=(1.02, 1.0), title="host", title_fontsize=7,
                      borderaxespad=0.0)
