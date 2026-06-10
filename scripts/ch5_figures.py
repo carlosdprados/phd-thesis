@@ -77,12 +77,32 @@ def fig_composition_sweep(cards, N=16, max_k=30):
     print("wrote", p)
 
 
-def fig_robustness(cards, N=24, jitters=(0.0, 0.06, 0.12, 0.20, 0.30, 0.40)):
+def measured_scatter(default=0.85):
+    """Data-derived device-to-device scatter sigma(ln tau), written by
+    scripts/ch5_scatter_audit.py to handouts/ch5_scatter_audit.csv. This is the
+    measured value of the `jitter` parameter (confound-checked against composition,
+    spin RPM, anneal, film thickness, aging). Falls back to the documented default
+    if the audit has not been run."""
+    path = os.path.join("handouts", "ch5_scatter_audit.csv")
+    try:
+        import csv
+        for row in csv.DictReader(open(path)):
+            if row["metric"] == "sigma_lnTau_within_cell":
+                return float(row["value"])
+    except (OSError, KeyError, ValueError):
+        pass
+    return default
+
+
+def fig_robustness(cards, N=24, jitters=(0.0, 0.12, 0.25, 0.40, 0.60, 0.85, 1.0)):
     """Total memory capacity versus injected device-to-device scatter (jitter), for
     the homogeneous and heterogeneous banks. Substantiates the claim that scatter
     is part of the computational substrate, not a yield problem: the heterogeneous
-    bank keeps its advantage across the whole realistic spread, and modest scatter
-    does not degrade -- and slightly aids -- recoverable memory."""
+    bank keeps its advantage across the whole realistic spread -- including at the
+    measured scatter (sigma(ln tau) from scripts/ch5_scatter_audit.py) -- and
+    modest scatter does not degrade, and slightly aids, recoverable memory."""
+    sigma = measured_scatter()
+    jitters = tuple(sorted(set(jitters) | {round(sigma, 2)}))
     fig, ax = plt.subplots(figsize=(4.6, 3.2))
     for het, col, mk, lab in [(False, COLORS["blue"], "o", "homogeneous"),
                               (True, COLORS["red"], "s", "heterogeneous")]:
@@ -93,9 +113,11 @@ def fig_robustness(cards, N=24, jitters=(0.0, 0.06, 0.12, 0.20, 0.30, 0.40)):
         means, sds = np.array(means), np.array(sds)
         ax.plot(jitters, means, mk + "-", ms=4, color=col, label=lab)
         ax.fill_between(jitters, means - sds, means + sds, color=col, alpha=0.18)
-    ax.axvline(0.12, ls=":", c="0.5", lw=0.9)
-    ax.text(0.125, ax.get_ylim()[0] + 0.3, "measured\nscatter", fontsize=6.6, color="0.45")
-    ax.set_xlabel("injected device-to-device scatter (jitter)")
+    ax.axvline(sigma, ls=":", c="0.5", lw=0.9)
+    ax.text(sigma - 0.02, ax.get_ylim()[0] + 0.3,
+            f"measured\nscatter\n($\\sigma\\!\\approx\\!{sigma:.2f}$)",
+            fontsize=6.6, color="0.45", ha="right")
+    ax.set_xlabel(r"device-to-device scatter (jitter, $\sigma$ of $\ln\tau$)")
     ax.set_ylabel("total memory capacity")
     ax.set_title(f"Robustness to device scatter (N={N})", fontsize=9.5)
     ax.legend(frameon=False, fontsize=8)
