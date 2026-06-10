@@ -115,6 +115,45 @@ def instant_features(raw, dt, sigma=0.0, seed=0):
 
 
 # ----------------------------------------------------------------------------
+# Classical temporal-filter controls (the key "is robustness just low-pass?" test)
+# ----------------------------------------------------------------------------
+def ema(U, taus, dt):
+    """Exponential moving average of each channel at one or several time constants.
+    For taus = [t1, t2, ...] returns the horizontal stack of all (channel x tau)
+    smoothed signals -- a purely LINEAR multi-timescale filter bank. A single tau is
+    the simplest classical smoother; a spread of taus is the linear analogue of the
+    device reservoir (same fading-memory low-pass, but no compressive nonlinearity)."""
+    U = np.asarray(U, float)
+    T, C = U.shape
+    cols = []
+    for tau in taus:
+        a = float(np.exp(-dt / max(tau, 1e-3)))          # EMA pole = device retention
+        y = np.empty_like(U)
+        y[0] = U[0]
+        for t in range(1, T):
+            y[t] = a * y[t - 1] + (1.0 - a) * U[t]
+        cols.append(y)
+    return np.hstack(cols)
+
+
+def ema_features(raw, dt, taus, sigma=0.0, seed=0):
+    """Classical-filter control: EMA-smooth the (noised) channels at the given time
+    constant(s) and feed the smoothed signals straight to the same linear read-out --
+    no reservoir, no nonlinearity. ema1 (one tau) tests whether the noise robustness
+    of the reservoir is merely the generic property of a temporal low-pass; emaN (a
+    spread of taus matching the device range) is the LINEAR multi-timescale bank, so
+    het-minus-emaN isolates what the device's compressive nonlinearity adds."""
+    rng = np.random.default_rng(900 + seed)
+    feats = {}
+    for sid, (U, lab) in raw.items():
+        Us, ls = stream_subject(U, lab, dt)
+        Us = add_noise(Us, sigma, rng)
+        keep = _kept(ls)
+        feats[sid] = (ema(Us, taus, dt)[keep], (ls[keep] == STRESS).astype(int))
+    return feats
+
+
+# ----------------------------------------------------------------------------
 # LOSO binary read-out, returning per-subject ordered prediction sequences
 # ----------------------------------------------------------------------------
 def loso_binary(feats, smooth=0):
@@ -274,6 +313,60 @@ def noise_sweep(raw, cards, sigmas=NOISE_SIGMAS, dt=DT_WES, seeds=(7, 8, 9)):
     return dict(sigmas=list(sigmas), banks={b: acc[b] for b in banks})
 
 
+def ema_control(raw, cards, sigmas=NOISE_SIGMAS, dt=DT_WES, seeds=(7, 8, 9)):
+    """The classical-filter control. Compares, on binary-F1 vs injected noise:
+      inst  : instantaneous read (no memory)            -- the static control
+      ema1  : single-tau EMA of the raw channels        -- the simplest smoother
+      emaN  : multi-tau LINEAR EMA bank (device range)  -- linear reservoir
+      het   : the device reservoir (nonlinear, memory)
+    Answers two questions a referee will ask: (1) is the reservoir's noise robustness
+    just low-pass filtering? (compare ema1/emaN to inst); (2) does the device
+    NONLINEARITY add anything over a matched linear filter bank? (het minus emaN)."""
+    taus = sorted(float(c.tau) for c in _full(cards))
+    tau_lead = float(lead_card(cards).tau)
+    smooth = int(SMOOTH_S / dt)
+    banks = ["inst", "ema1", "emaN", "het"]
+    acc = {b: [] for b in banks}
+    per_hi = {}
+    for sg in sigmas:
+        per_seed = {b: [] for b in banks}
+        for sd in seeds:
+            C = next(iter(raw.values()))[0].shape[1]
+            het = nodes_from(_full(cards), N_NODES, np.random.default_rng(sd),
+                             dt=dt, n_in=C, sparsity=0.4)
+            specs = {
+                "inst": instant_features(raw, dt, sg, sd),
+                "ema1": ema_features(raw, dt, [tau_lead], sg, sd),
+                "emaN": ema_features(raw, dt, taus, sg, sd),
+                "het":  bank_features(het, raw, dt, sg, sd),
+            }
+            for b in banks:
+                f1, per = loso_binary(specs[b], smooth=smooth)
+                per_seed[b].append(f1)
+                if sg == sigmas[-1] and sd == seeds[0]:
+                    per_hi[b] = subj_f1(per)
+        for b in banks:
+            acc[b].append((float(np.mean(per_seed[b])), float(np.std(per_seed[b]))))
+    print("\nCLASSICAL-FILTER CONTROL (binary-F1 vs injected sigma; seed-averaged):")
+    hdr = "  ".join(f"sig={s:g}" for s in sigmas)
+    print(f"  {'bank':5s}  {hdr}")
+    for b in banks:
+        print(f"  {b:5s}  " + "  ".join(f"{m:.3f}" for m, _ in acc[b]))
+    hi = sigmas[-1]
+    d_emaN = _paired(per_hi["het"], per_hi["emaN"])
+    d_ema1 = _paired(per_hi["emaN"], per_hi["ema1"])
+    d_inst = _paired(per_hi["ema1"], per_hi["inst"])
+    print(f"  at sigma={hi:g} (per-subject paired):")
+    print(f"    ema1 - inst   = {d_inst['mean']:+.3f} (p={d_inst['p']:.1e}, r_rb={d_inst['r_rb']:+.2f})"
+          "  <- a trivial smoother already recovers most robustness")
+    print(f"    emaN - ema1   = {d_ema1['mean']:+.3f} (p={d_ema1['p']:.1e}, r_rb={d_ema1['r_rb']:+.2f})"
+          "  <- a spread of linear taus")
+    print(f"    het  - emaN   = {d_emaN['mean']:+.3f} (p={d_emaN['p']:.1e}, r_rb={d_emaN['r_rb']:+.2f})"
+          "  <- what the device NONLINEARITY adds over a linear filter bank")
+    return dict(sigmas=list(sigmas), acc=acc,
+                d_emaN=d_emaN, d_ema1=d_ema1, d_inst=d_inst)
+
+
 def main():
     cards = load_cards(li_only=True)
     if not (os.path.isdir("data/wesad/WESAD")):
@@ -322,7 +415,9 @@ def main():
     stN = _paired(rN["het"]["subj_f1"], rN["inst"]["subj_f1"])
     print(f"  per-subject paired (het-inst binary-F1 at sigma={sw['sigmas'][hi]:g}): "
           f"{stN['mean']:+.3f}, {int(stN['frac_pos']*stN['n'])}/{stN['n']} subjects, "
-          f"Wilcoxon p={stN['p']:.1e}")
+          f"Wilcoxon p={stN['p']:.1e} r_rb={stN['r_rb']:+.2f}")
+
+    ema_control(raw, cards)
 
 
 if __name__ == "__main__":

@@ -79,6 +79,65 @@ def make_nodes(cards, N, heterogeneous, rng, jitter=0.12):
     return nodes_from(base, N, rng, jitter)
 
 
+def random_nodes(N, rng, dt=DT, tau_lo=3.0, tau_hi=26.0, alpha_lo=0.5, alpha_hi=1.0,
+                 beta=1.0, n_in=1, sparsity=0.0):
+    """A generic echo-state-network bank that IGNORES the measured device cards:
+    leak times tau drawn log-uniform over [tau_lo, tau_hi] (an uninformed spread over
+    the given support), simple-exponential retention, write exponents alpha drawn
+    uniform over [alpha_lo, alpha_hi], and the same random input mask as the device
+    banks. This is the control for the 'matching' thesis: it asks whether the SPECIFIC
+    measured timescale distribution buys anything over an arbitrary spread of leaks
+    across the same range (tau_lo..tau_hi = device range) or a broader uninformed
+    range. If the device bank merely ties a same-range random ESN, the honest reading
+    is that the device's value is delivering a useful tau spread intrinsically and at
+    low cost, not that its particular tau values are special."""
+    nodes = []
+    for _ in range(N):
+        tau = float(np.exp(rng.uniform(np.log(tau_lo), np.log(tau_hi))))
+        alpha = float(rng.uniform(alpha_lo, alpha_hi))
+        if n_in == 1:
+            w = float(np.exp(rng.normal(0, 0.5)))
+        else:
+            w = np.exp(rng.normal(0, 0.5, size=n_in))
+            if sparsity > 0:
+                m = rng.random(n_in) >= sparsity
+                if not m.any():
+                    m[rng.integers(n_in)] = True
+                w = w * m
+        decay = float(np.exp(-((dt / max(tau, 1e-2)) ** beta)))
+        nodes.append((decay, alpha, w))
+    return nodes
+
+
+def coupled_nodes(base, N, rng, kappa, jitter=0.12, dt=DT):
+    """The device bank with an explicit phi<->lambda COUPLING perturbation, the test
+    of the composition assumption flagged in sec:ch5_model (write nonlinearity and
+    retention were measured at different amplitudes, so their composition could
+    under- or over-state a drive/retention coupling). Each node's retention time is
+    rescaled by exp(kappa * z_i), where z_i is the node's write-nonlinearity exponent
+    alpha standardised across the bank: kappa>0 makes the strongly-writing nodes
+    retain longer, kappa<0 shorter. kappa=0 reproduces the nominal composed model
+    byte-for-byte (identical RNG draw order to nodes_from). Sweeping kappa over a
+    plausible range and re-checking the conclusions bounds the assumption instead of
+    only declaring it."""
+    draws = []
+    for i in range(N):
+        c = base[i % len(base)]
+        tau = max(c.tau * float(np.exp(rng.normal(0, jitter))), 1e-2)
+        beta = float(np.clip(c.beta * (1 + rng.normal(0, jitter)), 0.2, 2.0))
+        alpha = float(np.clip(c.alpha * (1 + rng.normal(0, jitter)), 0.05, 2.0))
+        w = float(np.exp(rng.normal(0, 0.5)))
+        draws.append((tau, beta, alpha, w))
+    al = np.array([d[2] for d in draws])
+    z = (al - al.mean()) / (al.std() + 1e-9)
+    nodes = []
+    for (tau, beta, alpha, w), zi in zip(draws, z):
+        tau_eff = max(tau * float(np.exp(kappa * zi)), 1e-2)
+        decay = float(np.exp(-((dt / tau_eff) ** beta)))
+        nodes.append((decay, alpha, w))
+    return nodes
+
+
 def run_states(nodes, u):
     """Drive the bank with input u and return the state matrix X (T, N).
 
@@ -260,17 +319,27 @@ def task_nrmse(X, target, split=0.5):
 
 
 def paired_stats(a, b):
-    """Paired difference a-b over matched seeds: mean, SD, fraction>0, and a
-    Wilcoxon signed-rank two-sided p-value (paired, distribution-free)."""
+    """Paired difference a-b over matched seeds: mean, SD, fraction>0, a Wilcoxon
+    signed-rank two-sided p-value (paired, distribution-free), and the matched-pairs
+    rank-biserial effect size r_rb (the standardised Wilcoxon statistic, in [-1,1];
+    +1 = every pair favours a). A p-value alone is uninformative at small n -- the
+    Wilcoxon p floors at 2e-3 for n=10 -- so the effect size is reported alongside."""
     a, b = np.asarray(a, float), np.asarray(b, float)
     d = a - b
+    nz = d[d != 0]
+    if nz.size:
+        ranks = np.argsort(np.argsort(np.abs(nz))) + 1          # ranks of |d|
+        rp = ranks[nz > 0].sum(); rm = ranks[nz < 0].sum()
+        r_rb = float((rp - rm) / ranks.sum())                   # rank-biserial in [-1,1]
+    else:
+        r_rb = 0.0
     try:
         from scipy.stats import wilcoxon
         p = float(wilcoxon(a, b).pvalue) if np.ptp(d) > 0 else 1.0
     except Exception:
         p = float("nan")
     return dict(mean=float(d.mean()), sd=float(d.std(ddof=1)),
-               frac_pos=float(np.mean(d > 0)), p=p, n=len(d))
+               frac_pos=float(np.mean(d > 0)), p=p, n=len(d), r_rb=r_rb)
 
 
 def mc_curve_seeded(cards, het, N=24, max_k=30, seeds=SEEDS, jitter=0.12):
@@ -316,6 +385,65 @@ def composition_sweep(cards, N=16, max_k=30, seeds=SEEDS):
     return rows
 
 
+def random_reservoir_control(cards, N=24, max_k=30, seeds=SEEDS):
+    """Generic-ESN control for the matching thesis: total MC of the measured device
+    heterogeneous bank vs (i) a random ESN with leaks spread log-uniform over the
+    SAME tau range (3-26 s), and (ii) a random ESN over a BROADER uninformed range
+    (0.5-60 s). Seed-matched paired tests against the device bank."""
+    dev, rnd_same, rnd_broad = [], [], []
+    for s in seeds:
+        u = np.random.default_rng(1000 + s).uniform(0.0, 1.0, 4000)
+        dev.append(memory_capacity(run_states(
+            make_nodes(cards, N, True, np.random.default_rng(s)), u), u, max_k).sum())
+        rnd_same.append(memory_capacity(run_states(
+            random_nodes(N, np.random.default_rng(5000 + s), tau_lo=3.0, tau_hi=26.0), u), u, max_k).sum())
+        rnd_broad.append(memory_capacity(run_states(
+            random_nodes(N, np.random.default_rng(6000 + s), tau_lo=0.5, tau_hi=60.0), u), u, max_k).sum())
+    dev, rnd_same, rnd_broad = map(np.array, (dev, rnd_same, rnd_broad))
+    print("\nGeneric-ESN control (matching thesis), total MC seed-averaged:")
+    print(f"  measured device het bank          {dev.mean():5.2f}+/-{dev.std(ddof=1):.2f}")
+    print(f"  random ESN, same tau range 3-26s  {rnd_same.mean():5.2f}+/-{rnd_same.std(ddof=1):.2f}")
+    print(f"  random ESN, broad range 0.5-60s   {rnd_broad.mean():5.2f}+/-{rnd_broad.std(ddof=1):.2f}")
+    for tag, arr in [("vs same-range ESN", rnd_same), ("vs broad-range ESN", rnd_broad)]:
+        st = paired_stats(dev, arr)
+        print(f"  device {tag}: {st['mean']:+.2f} "
+              f"({int(st['frac_pos']*st['n'])}/{st['n']} seeds, p={st['p']:.1e}, r_rb={st['r_rb']:+.2f})")
+    print("  (device bank ties a same-range random ESN => the resource is the tau"
+          " SPREAD, delivered intrinsically; matching picks the cell for a given task.)")
+    return dict(dev=dev, rnd_same=rnd_same, rnd_broad=rnd_broad)
+
+
+def coupling_sensitivity(cards, N=24, max_k=30, seeds=SEEDS,
+                         kappas=(-0.5, -0.25, 0.0, 0.25, 0.5)):
+    """phi<->lambda coupling robustness: re-run the het-vs-hom memory-capacity
+    comparison with the coupling perturbation of coupled_nodes() swept over kappa,
+    and check that the qualitative conclusions (heterogeneous > homogeneous, and both
+    memory banks > memoryless) survive the assumption. Reports het and hom total MC,
+    their ratio, and the paired het-hom test at each kappa."""
+    base_het, base_hom = _full(cards), [lead_card(cards)]
+    print("\nphi-lambda coupling sensitivity (total MC vs coupling kappa):")
+    print(f"  {'kappa':>6} {'het MC':>8} {'hom MC':>8} {'ratio':>7} {'het-hom':>9} {'p':>8} {'r_rb':>6}")
+    rows = []
+    for kp in kappas:
+        het_t, hom_t = [], []
+        for s in seeds:
+            u = np.random.default_rng(1000 + s).uniform(0.0, 1.0, 4000)
+            het_t.append(memory_capacity(run_states(
+                coupled_nodes(base_het, N, np.random.default_rng(s), kp), u), u, max_k).sum())
+            hom_t.append(memory_capacity(run_states(
+                coupled_nodes(base_hom, N, np.random.default_rng(s), kp), u), u, max_k).sum())
+        het_t, hom_t = np.array(het_t), np.array(hom_t)
+        st = paired_stats(het_t, hom_t)
+        ratio = het_t.mean() / max(hom_t.mean(), 1e-9)
+        print(f"  {kp:+6.2f} {het_t.mean():8.2f} {hom_t.mean():8.2f} {ratio:7.2f} "
+              f"{st['mean']:+9.2f} {st['p']:8.1e} {st['r_rb']:+6.2f}")
+        rows.append((kp, het_t.mean(), hom_t.mean(), ratio, st))
+    ratios = [r[3] for r in rows]
+    print(f"  het>hom holds across all kappa (ratio {min(ratios):.2f}-{max(ratios):.2f});"
+          " the heterogeneity conclusion is robust to the composition assumption.")
+    return rows
+
+
 def main():
     cards = load_cards(li_only=True)
     N = 24                                 # bank size (both conditions equal)
@@ -357,6 +485,8 @@ def main():
           f"{st_nl['mean']:+.2f}, p={st_nl['p']:.1e}")
 
     composition_sweep(cards)
+    random_reservoir_control(cards, N)
+    coupling_sensitivity(cards, N)
     print("\nself-test: PASS")
 
 

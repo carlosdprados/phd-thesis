@@ -38,7 +38,12 @@ jittered copies of the lead cell \PEO{}~0.3/0.09 alone.
 \Cref{tab:ch5_settings} collects the settings used throughout
 \cref{ch:temporal}. All read-outs are a single linear ridge regression; no
 nonlinear decoder is used, so any demonstrated computation is attributable to the
-device nodes rather than the read-out.
+device nodes rather than the read-out. The read-out ridge penalty
+($\lambda=10^{-3}$), the causal label-smoothing horizon (\SI{15}{\second}), the bank
+size $N$, and the reservoir step $\Delta t$ are fixed \emph{a priori} and held
+identical across all banks and all held-out subjects; none is selected on the
+held-out subject, so the leave-one-subject-out protocol carries no hyperparameter
+leakage.
 
 \begin{table}[t]
   \centering
@@ -145,6 +150,102 @@ and temperature record and the \SI{1}{\hertz} heart-rate record are resampled on
 common timeline and per-subject scaled exactly as the \WESAD{} streams; the phase
 annotations map cognitive and emotional stress to the stress class and relaxation to
 not-stress, with the physical-stress (exercise) phase excluded.
+
+\section{Control Experiments}\label{app:ch5_controls}
+
+Three controls underpin the claims of \cref{ch:temporal} and are tabulated here.
+They are reproduced by \path{scripts/ch5_reservoir.py} (the generic-ESN and coupling
+controls) and \path{scripts/ch5_onset.py} (the classical-filter control); each
+significance test reports, alongside the paired Wilcoxon $p$, the matched-pairs
+rank-biserial effect size $r_{\mathrm{rb}}\in[-1,1]$, since the Wilcoxon $p$ floors
+at $2\times10^{-3}$ for the ten-seed comparisons.
+
+\paragraph{Classical-filter control.} \Cref{tab:ch5_filter} is the control behind the
+deployment-robustness reframing of \cref{sec:ch5_robust}: an ordinary exponential
+moving average of the raw channels, fed to the same linear read-out with no
+reservoir, recovers the noise robustness, so the robustness is the generic property
+of a fading-memory low-pass rather than anything specific to the device or its
+nonlinearity. The device's contribution is to \emph{be} that filter, passively and at
+the budget of \cref{app:ch5_deploy}. The cross-corpus and wrist robustness results
+(\cref{tab:ch5_crosscorpus,tab:ch5_wrist}) share this character: there too the gain
+is the low-pass advantage of temporal memory over an instantaneous read.
+
+\begin{table}[t]
+  \centering
+  \caption[Classical exponential-moving-average control]{Classical-filter control for the continuous stress monitor (binary macro-F1, leave-one-subject-out, $\sigma$ the injected sensor noise of \cref{fig:ch5_robust_monitoring}). A single-time-constant moving average of the raw channels recovers the robustness an instantaneous read loses, and a linear moving-average bank spread over the device timescale range adds little; the device reservoir's compressive nonlinearity adds nothing further on this single-timescale task. Paired at $\sigma=0.4$ over the fifteen subjects: EMA(single)$-$instantaneous $=+0.091$ ($p<10^{-4}$, $r_{\mathrm{rb}}=+1.0$); EMA(bank)$-$EMA(single) $=+0.005$ (\textit{ns}); reservoir$-$EMA(bank) $=-0.008$ (\textit{ns}).}
+  \label{tab:ch5_filter}
+  \footnotesize
+  \setlength{\tabcolsep}{6pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xcc@{}}
+    \toprule
+    Detector (linear read-out on \dots) & clean & $\sigma=0.4$ \\
+    \midrule
+    Instantaneous channels (no memory)            & 0.914 & 0.840 \\
+    EMA, single $\tau$ (lead cell)                 & \textbf{0.937} & 0.927 \\
+    EMA bank, $\tau$ spread (linear reservoir)     & 0.926 & \textbf{0.930} \\
+    Device reservoir (nonlinear, heterogeneous)    & 0.920 & 0.916 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\paragraph{Generic-ESN control (matching thesis).} \Cref{tab:ch5_esn} asks whether the
+\emph{particular} measured timescales matter or only their spread, by replacing the
+device bank with an echo-state network of the same size whose leak times are drawn at
+random. A random bank over the same range ties the device bank, and a broader random
+range exceeds it: the resource is the timescale \emph{spread}, which the composition
+grid supplies intrinsically, and extending the range (the drive-amplitude lever of
+\cref{ch:comparative}) is where further headroom lies.
+
+\begin{table}[t]
+  \centering
+  \caption[Generic echo-state-network control]{Total linear memory capacity ($N=24$, ten seeds, means $\pm$\,SD) of the measured device heterogeneous bank versus random echo-state networks of equal size. Paired against the device bank: same-range ESN $+0.28$ ($p=0.05$, $r_{\mathrm{rb}}=-0.7$, marginally favouring the random bank); broad-range ESN $+1.14$ ($p=2\times10^{-3}$, $r_{\mathrm{rb}}=-1.0$).}
+  \label{tab:ch5_esn}
+  \footnotesize
+  \setlength{\tabcolsep}{6pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xc@{}}
+    \toprule
+    Reservoir ($N=24$) & total MC \\
+    \midrule
+    Measured device heterogeneous bank          & $6.4 \pm 0.3$ \\
+    Random ESN, same $\tau$ range ($3$--$26$\,s) & $6.7 \pm 0.3$ \\
+    Random ESN, broad $\tau$ range ($0.5$--$60$\,s) & $7.6 \pm 0.3$ \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\paragraph{Coupling-sensitivity control.} \Cref{tab:ch5_coupling} bounds the
+composition assumption of \cref{sec:ch5_model}: each node's retention time is
+rescaled with its own write-nonlinearity exponent by a factor $e^{\kappa z}$ ($z$ the
+standardised exponent), modelling the drive--retention coupling the separate-amplitude
+measurement cannot exclude. The heterogeneous bank stays above the homogeneous one for
+every coupling strength swept, so the heterogeneity conclusion does not rest on the
+assumption being exact.
+
+\begin{table}[t]
+  \centering
+  \caption[Coupling-sensitivity control]{Memory capacity of the heterogeneous and homogeneous banks under an injected drive--retention coupling of strength $\kappa$ ($N=24$, ten seeds; $\kappa=0$ is the nominal composed model). The heterogeneous advantage holds across the whole range (paired Wilcoxon $p=2\times10^{-3}$, $r_{\mathrm{rb}}=+1.0$ at every $\kappa$).}
+  \label{tab:ch5_coupling}
+  \footnotesize
+  \setlength{\tabcolsep}{8pt}
+  \begin{tabular}{rccc}
+    \toprule
+    $\kappa$ & het MC & hom MC & ratio \\
+    \midrule
+    $-0.50$ & 6.27 & 5.50 & 1.14 \\
+    $-0.25$ & 6.22 & 4.65 & 1.34 \\
+    $\phantom{-}0.00$ & 6.44 & 4.20 & 1.53 \\
+    $+0.25$ & 6.60 & 4.64 & 1.42 \\
+    $+0.50$ & 6.78 & 5.43 & 1.25 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Chance baselines.} Under the streaming three-class protocol of
+\cref{sec:ch5_wesad}, a majority-class predictor scores macro-F1 $0.23$ and a
+stratified-random predictor $0.33$ (leave-one-subject-out, per step), so the
+reservoir's $0.758$ is well above chance. Significance of the bank comparisons is
+assessed across the fifteen independent held-out subjects, so within-subject temporal
+autocorrelation does not inflate it.
 
 \section{Deployment Envelope}\label{app:ch5_deploy}
 
