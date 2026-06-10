@@ -538,7 +538,11 @@ def fig_iv_hyst() -> None:
         )
 
     fig, ax = plt.subplots(figsize=(5.7, 3.7))
-    cmap = plt.get_cmap("viridis", 10)
+    # Truncate viridis so the last sweeps stay legible on white (the top ~15%
+    # of the map is a pale yellow with almost no contrast at 1 pt linewidth).
+    base = plt.get_cmap("viridis")
+    sweep_colors = base(np.linspace(0.02, 0.86, 10))
+    cmap = matplotlib.colors.ListedColormap(sweep_colors)
 
     def forward_current_at(curve: int, target_v: float) -> float:
         points = sorted(by_curve[curve])
@@ -551,32 +555,50 @@ def fig_iv_hyst() -> None:
         points = sorted(by_curve[curve])
         v = np.array([p[1] for p in points])
         i = np.array([p[2] for p in points])
-        ax.plot(v, i, lw=1.05, color=cmap(curve), alpha=0.95)
+        ax.plot(v, i, lw=1.05, color=sweep_colors[curve], alpha=0.95)
 
     i_first = forward_current_at(0, 1.0)
     i_last = forward_current_at(9, 1.0)
     on_off = i_last / i_first
 
+    # Sweep-direction arrows on the outermost loop (forward up, return down).
+    points = sorted(by_curve[9])
+    v9 = np.array([p[1] for p in points])
+    i9 = np.array([p[2] for p in points])
+    top = int(np.argmax(v9))
+    for seg_v, seg_i, anchor in (
+        (v9[: top + 1], i9[: top + 1], 0.45),   # forward branch, arrow to the right
+        (v9[top:], i9[top:], 0.95),             # return branch, arrow to the left
+    ):
+        k = int(np.argmin(np.abs(seg_v - anchor)))
+        k2 = min(k + 3, len(seg_v) - 1)
+        ax.annotate(
+            "",
+            xy=(seg_v[k2], seg_i[k2]),
+            xytext=(seg_v[k], seg_i[k]),
+            arrowprops=dict(arrowstyle="-|>", lw=0, mutation_scale=11,
+                            color=sweep_colors[9], shrinkA=0, shrinkB=0),
+        )
+
     ax.axhline(0, color="0.5", lw=0.6)
     ax.axvline(0, color="0.5", lw=0.6)
     ax.set_xlabel("voltage (V)")
     ax.set_ylabel(r"current ($\mu$A)")
-    ax.set_title("ten successive positive sweeps")
-    ax.text(0.05, 0.94, r"0 $\rightarrow$ 1.2 V $\rightarrow$ 0" + "\n" + r"0.25 V s$^{-1}$",
-            transform=ax.transAxes, va="top", fontsize=8)
-    ax.annotate(
-        rf"$\times${on_off:.0f} on/off at 1 V",
-        xy=(1.0, i_last),
-        xytext=(0.32, i_last * 0.98),
-        arrowprops=dict(arrowstyle="-|>", lw=0.8, color="0.3"),
-        va="center",
-        fontsize=8,
-    )
+    ax.set_title("ten successive positive sweeps", loc="left")
+    ax.text(0.04, 0.94, r"0 $\rightarrow$ 1.2 V $\rightarrow$ 0" + "\n" + r"0.25 V s$^{-1}$, 10 s between cycles",
+            transform=ax.transAxes, va="top", fontsize=7.8, color="0.25")
+    # Read-point markers tie the on/off figure of merit to the data directly.
+    ax.plot([1.0, 1.0], [i_first, i_last], color="0.35", lw=0.8, ls=(0, (2, 2)), zorder=1)
+    ax.plot([1.0, 1.0], [i_first, i_last], marker="o", ms=4.2, mfc="white",
+            mec="0.2", mew=0.9, ls="none", zorder=6)
+    ax.text(1.0, i_last + 0.058, rf"$\times${on_off:.0f} at the 1 V read",
+            ha="right", va="bottom", fontsize=8, color="0.15")
     style_axes(ax)
-    sm = cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=1, vmax=10))
+    sm = cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=0.5, vmax=10.5))
     cbar = fig.colorbar(sm, ax=ax, fraction=0.05, pad=0.03)
-    cbar.set_label("sweep")
+    cbar.set_label("sweep number")
     cbar.set_ticks([1, 5, 10])
+    cbar.outline.set_linewidth(0.6)
     save(fig, "iv_hyst.pdf")
 
 
@@ -602,18 +624,25 @@ def pulse_trace_from_raw(pixel: str = "L5") -> tuple[np.ndarray, np.ndarray, np.
 
 def fig_potentiation_depression() -> None:
     pulse_no, voltage, conductance_us = pulse_trace_from_raw("L5")
-    norm = conductance_us / conductance_us[0] * 100.0
+    ratio = conductance_us / conductance_us[0]
 
     fig, ax = plt.subplots(figsize=(4.9, 3.15))
     pos = voltage > 0
     neg = voltage < 0
-    ax.plot(pulse_no[pos], norm[pos], "o-", ms=2.4, lw=1.0, color=COLORS["green"], label="+1 V potentiation")
-    ax.plot(pulse_no[neg], norm[neg], "o-", ms=2.4, lw=1.0, color=COLORS["orange"], label="-2 V depotentiation")
+    ax.axvspan(0, 50.5, color=COLORS["green"], alpha=0.05, lw=0)
+    ax.axvspan(50.5, 101, color=COLORS["orange"], alpha=0.06, lw=0)
+    ax.plot(pulse_no[pos], ratio[pos], "o-", ms=2.4, lw=1.0, color=COLORS["green"])
+    ax.plot(pulse_no[neg], ratio[neg], "o-", ms=2.4, lw=1.0, color=COLORS["orange"])
     ax.axvline(50.5, color="0.55", lw=0.8, ls="--")
+    ax.text(13, 14.4, "+1 V\npotentiation", ha="center", va="center",
+            fontsize=8, color=COLORS["green"])
+    ax.text(84, 9.2, r"$-$2 V" + "\ndepotentiation", ha="center", va="center",
+            fontsize=8, color=COLORS["orange"])
+    ax.set_xlim(-2, 103)
+    ax.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
     ax.set_xlabel("write-pulse index")
-    ax.set_ylabel(r"peak conductance, normalised (%)")
-    ax.set_title("reversible pulse-driven tuning")
-    ax.legend(frameon=False, loc="upper right")
+    ax.set_ylabel(r"peak conductance ratio, $G/G_0$")
+    ax.set_title("reversible pulse-driven tuning", loc="left")
     style_axes(ax)
     save(fig, "potentiation_depression.pdf")
 
@@ -622,27 +651,29 @@ def fig_pulse_number() -> None:
     path = DEVICE_055 / "DayX_NmbPls" / "Day8" / "MasterTable.txt"
     fieldnames, rows = read_table(path)
     pixels = fieldnames[1:]
-    n = []
-    values = []
-    for row in rows:
-        vals = [fnum(row[p]) for p in pixels]
-        vals = [v for v in vals if math.isfinite(v)]
-        if vals:
-            n.append(fnum(row["Number of pulses"]))
-            values.append(vals)
-
-    x = np.array(n)
-    means = np.array([np.mean(v) for v in values]) * 100.0
-    stds = np.array([np.std(v, ddof=1) if len(v) > 1 else 0 for v in values]) * 100.0
+    n = np.array([fnum(row["Number of pulses"]) for row in rows])
+    per_pixel = {p: np.array([fnum(row[p]) for row in rows]) * 100.0 for p in pixels}
+    stack = np.column_stack(list(per_pixel.values()))
+    keep = np.isfinite(n) & np.any(np.isfinite(stack), axis=1)
+    n = n[keep]
+    stack = stack[keep]
+    per_pixel = {p: per_pixel[p][keep] for p in pixels}
+    means = np.nanmean(stack, axis=1)
 
     fig, ax = plt.subplots(figsize=(4.9, 3.15))
-    ax.fill_between(x, means - stds, means + stds, color=COLORS["blue"], alpha=0.18, linewidth=0)
-    ax.plot(x, means, "o-", ms=3.0, lw=1.2, color=COLORS["blue"], label="mean across five pixels")
+    for p in pixels:
+        y = per_pixel[p]
+        ok = np.isfinite(y)
+        ax.plot(n[ok], y[ok], lw=0.8, color="0.62", alpha=0.85, zorder=1)
+    ax.plot(n, means, "o-", ms=3.0, lw=1.4, color=COLORS["blue"], zorder=3)
     ax.set_xscale("log")
     ax.set_xlabel(r"number of write pulses, $N_{\mathrm{pulses}}$")
     ax.set_ylabel(r"$(G_f/G_0)\times 100$ (%)")
-    ax.set_title("pulse-number response")
-    ax.text(0.05, 0.92, r"band: $\pm$1 SD", transform=ax.transAxes, fontsize=8)
+    ax.set_title("pulse-number response", loc="left")
+    ax.text(0.05, 0.93, "five individual pixels", transform=ax.transAxes,
+            fontsize=7.8, color="0.45")
+    ax.text(0.05, 0.85, "mean", transform=ax.transAxes, fontsize=7.8,
+            color=COLORS["blue"])
     style_axes(ax)
     save(fig, "pulse_number.pdf")
 
@@ -655,20 +686,30 @@ def fig_retention() -> None:
         ("3 V, 10 pulses (longer-lived)", 1.05, 3.30, 4.73, "0.15"),
     ]
 
+    label_pos = {  # hand-placed so no label touches a neighbouring curve
+        "1 V, 10 pulses (STM)": (0.155, 121, "left", "top"),
+        "1 V, 50 pulses (STM)": (0.155, 207, "left", "bottom"),
+        "3 V, 10 pulses (longer-lived)": (4.0, 305, "left", "center"),
+    }
+
     fig, ax = plt.subplots(figsize=(5.7, 3.6))
     for label, r_inf, amp, tau, color in traces:
         y = (r_inf + amp * np.exp(-t / tau)) * 100.0
-        ax.plot(t, y, "o-", lw=1.2, ms=3.0, color=color, label=label)
-        tt = np.linspace(0.15, 60, 260)
+        ax.plot(t, y, "o", ms=3.2, color=color, zorder=3)
+        tt = np.geomspace(0.15, 60, 260)
         yy = (r_inf + amp * np.exp(-tt / tau)) * 100.0
-        ax.plot(tt, yy, lw=1.0, color=color, alpha=0.55)
+        ax.plot(tt, yy, lw=1.2, color=color, alpha=0.85, zorder=2)
+        lx, ly, ha, va = label_pos[label]
+        ax.text(lx, ly, label + rf",  $\tau \approx {tau:.1f}$ s",
+                ha=ha, va=va, fontsize=7.6, color=color)
     ax.axhline(105, color="0.55", lw=0.8, ls="--")
     ax.set_xscale("log")
     ax.set_xlabel(r"waiting time, $t_{\mathrm{wait}}$ (s)")
     ax.set_ylabel(r"$(G_f/G_0)\times 100$ (%)")
-    ax.set_title("retention fit reconstruction")
-    ax.legend(frameon=False, loc="upper right")
-    ax.text(0.04, 0.1, "dashed line: 5% above baseline", transform=ax.transAxes, fontsize=7.8)
+    ax.set_title("retention fit reconstruction", loc="left")
+    ax.set_ylim(82, 445)
+    ax.text(55, 93, "5% above baseline", ha="right", va="center",
+            fontsize=7.4, color="0.4")
     style_axes(ax)
     save(fig, "retention.pdf")
 
