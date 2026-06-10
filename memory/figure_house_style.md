@@ -20,6 +20,16 @@ all four spines for heatmaps/imshow; `keepspine(ax2,"right")` re-adds a twin/
 secondary axis spine after the global de-spine (needed for EPSC trace, EIS t½,
 UV-Vis energy axis).
 
+2026-06-10 **Ch5 Nature-polish pass** (scripts/ch5_figures.py + ch5_physio_context.py,
+all 8 figures): adopted the Ch4 conventions — **light-fill bars** (`to_rgba(c,0.22)`
+fill + full-strength coloured edge, via a local `style_bars` helper), **white marker
+edges** on every line/scatter, **left-aligned single-panel titles** (`set_title(...,
+loc="left")`, no more centred). Fixed the `ipc_capacity` collision (centred title +
+legend + N-bound text + p all overlapped → left title, legend top-right, N=24 bound
+labelled once at left, paired-p as a significance bracket over the bar totals).
+`mc_curve` dropped its boxed legend for direct colour-matched MC read-outs in the
+empty upper-right. Numbers unchanged. Commit 07728d1.
+
 Applied to **all matplotlib figures in Ch2, Ch3 (bridge), Ch4, Ch5**. Bugs fixed
 along the way (were rendering literally — scripts don't use usetex): `(\%)`→`(%)`,
 `NM\_v114`→`NM_v114`, `on--off`→`on/off`, ATR `\&`; ASCII `->` arrows. Redrawn:
