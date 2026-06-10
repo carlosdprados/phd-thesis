@@ -37,7 +37,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from matplotlib.patches import Circle, FancyArrowPatch, Rectangle
+from matplotlib.patches import Circle, FancyArrowPatch, Polygon, Rectangle
 
 import figstyle
 
@@ -304,6 +304,50 @@ def fig_composite_chemistry() -> None:
     save(fig, "composite_chemistry.pdf")
 
 
+def _shade(hex_color: str, factor: float) -> tuple[float, float, float]:
+    """Lighten (factor>1) or darken (factor<1) a hex colour."""
+    h = hex_color.lstrip("#")
+    rgb = np.array([int(h[i : i + 2], 16) for i in (0, 2, 4)], dtype=float) / 255.0
+    if factor >= 1.0:
+        out = rgb + (1.0 - rgb) * (factor - 1.0)
+    else:
+        out = rgb * factor
+    return tuple(np.clip(out, 0.0, 1.0))
+
+
+def _iso_slab(ax, x0, y0, w, h, depth, color, label=None, alpha: float = 1.0,
+              edgecolor: str = "0.25", lw: float = 0.75, zorder: int = 1):
+    """Draw one isometric slab and return its face patches for clipping."""
+    ox, oy = depth
+    front = [(x0, y0), (x0 + w, y0), (x0 + w, y0 + h), (x0, y0 + h)]
+    top = [
+        (x0, y0 + h),
+        (x0 + w, y0 + h),
+        (x0 + w + ox, y0 + h + oy),
+        (x0 + ox, y0 + h + oy),
+    ]
+    right = [
+        (x0 + w, y0),
+        (x0 + w + ox, y0 + oy),
+        (x0 + w + ox, y0 + h + oy),
+        (x0 + w, y0 + h),
+    ]
+    patches = {
+        "top": Polygon(top, closed=True, facecolor=_shade(color, 1.16), edgecolor=edgecolor,
+                       lw=lw, alpha=alpha, joinstyle="round", zorder=zorder + 2),
+        "right": Polygon(right, closed=True, facecolor=_shade(color, 0.82), edgecolor=edgecolor,
+                         lw=lw, alpha=alpha, joinstyle="round", zorder=zorder + 1),
+        "front": Polygon(front, closed=True, facecolor=color, edgecolor=edgecolor,
+                         lw=lw, alpha=alpha, joinstyle="round", zorder=zorder),
+    }
+    for face in ("top", "right", "front"):
+        ax.add_patch(patches[face])
+    if label:
+        ax.text(x0 + w / 2, y0 + h / 2, label, ha="center", va="center",
+                fontsize=8.0, color="0.15", zorder=zorder + 4)
+    return patches
+
+
 def fig_device_schematic() -> None:
     fig, (axL, axR) = plt.subplots(
         1, 2, figsize=(7.4, 3.65), gridspec_kw={"width_ratios": [1.02, 1.18], "wspace": 0.04}
@@ -313,12 +357,12 @@ def fig_device_schematic() -> None:
         ax.set_ylim(0, 9)
         ax.axis("off")
 
-    # ---- (a) vertical thin-film stack ------------------------------------
+    # ---- (a) translucent isometric device stack --------------------------
     palette = {
         "glass": "#E3E9EF",
         "ito": "#73BFAE",
-        "composite": "#F5D36A",
-        "active_bg": "#FBF6E1",
+        "active": "#9DD7E6",
+        "active_bg": "#FBF8E8",
         "ag": "#BFC4CA",
         "edge": "#30343B",
     }
@@ -326,85 +370,91 @@ def fig_device_schematic() -> None:
     axL.text(0.10, 8.55, "a", fontsize=11, weight="bold")
     axL.text(0.90, 8.57, "two-terminal vertical device", ha="left", va="top", fontsize=8.8, weight="bold", color="0.12")
 
-    def draw_rect(ax, xy, width, height, face, label=None, label_color="0.12", lw=0.75, zorder=1):
-        patch = Rectangle(xy, width, height, facecolor=face, edgecolor=edge, lw=lw, zorder=zorder)
-        ax.add_patch(patch)
-        if label:
-            ax.text(
-                xy[0] + width / 2,
-                xy[1] + height / 2,
-                label,
-                ha="center",
-                va="center",
-                fontsize=7.9,
-                color=label_color,
-                zorder=zorder + 1,
-            )
-        return patch
-
-    x0, y0, w = 1.0, 1.35, 7.2
-    glass_h, ito_h, active_h, ag_h = 0.80, 0.34, 2.25, 0.48
+    depth = (1.16, 0.70)
+    x0, y0, w = 0.55, 1.05, 4.55
+    glass_h, ito_h, active_h, ag_h = 0.72, 0.46, 2.75, 0.58
     y_glass = y0
     y_ito = y_glass + glass_h
     y_active = y_ito + ito_h
     y_ag = y_active + active_h
-    ag_w, ag_x = 3.35, x0 + 1.95
+    ox, oy = depth
 
-    draw_rect(axL, (x0, y_glass), w, glass_h, palette["glass"], "glass substrate", "0.28")
-    draw_rect(axL, (x0 + 0.25, y_ito), w - 0.50, ito_h, palette["ito"], "ITO", "white")
-    active_patch = draw_rect(axL, (x0 + 0.25, y_active), w - 0.50, active_h, palette["active_bg"], lw=0.85)
-    draw_rect(axL, (ag_x, y_ag), ag_w, ag_h, palette["ag"], "Ag", "0.18")
+    _iso_slab(axL, x0 - 0.10, y_glass, w + 0.20, glass_h, depth, palette["glass"],
+              "glass", alpha=1.0, edgecolor=edge, zorder=1)
+    _iso_slab(axL, x0, y_ito, w, ito_h, depth, palette["ito"],
+              "ITO", alpha=0.96, edgecolor="#357F70", zorder=4)
+    active = _iso_slab(axL, x0, y_active, w, active_h, depth, palette["active"],
+                       alpha=0.46, edgecolor="#27879A", lw=0.85, zorder=7)
 
-    # Projection of the top pad through the active layer defines the 2-T junction.
-    for x in (ag_x, ag_x + ag_w):
-        axL.plot([x, x], [y_ito, y_ag], color="0.35", lw=0.75, ls=(0, (2.2, 2.2)), zorder=3)
+    # Internal active-layer detail, visible through the translucent composite.
+    xs = np.linspace(x0 + 0.25, x0 + w - 0.25, 220)
+    for k, col in enumerate(["#69A84E", "#D4A42B", "#87A64D"]):
+        y_mid = y_active + 0.68 + 0.60 * k
+        line, = axL.plot(xs, y_mid + 0.08 * np.sin((xs - x0) * 2.2 + 0.9 * k),
+                         color=col, lw=1.05, alpha=0.92, zorder=12)
+        line.set_clip_path(active["front"])
 
-    xs = np.linspace(x0 + 0.55, x0 + w - 0.55, 240)
-    for k, col in enumerate(["#C99A22", "#B89550", "#8E8F47"]):
-        y_mid = y_active + 0.58 + 0.40 * k
-        line, = axL.plot(xs, y_mid + 0.08 * np.sin(2.1 * xs + 0.8 * k), color=col, lw=1.1, alpha=0.85, zorder=2)
-        line.set_clip_path(active_patch)
-    for fx, fy, txt, fc, tc in [
-        (2.15, y_active + 0.58, r"OTf$^-$", "#D65C58", "white"),
-        (3.95, y_active + 1.43, r"Li$^+$", "#4D91C8", "white"),
-        (6.45, y_active + 0.88, r"OTf$^-$", "#D65C58", "white"),
-        (7.10, y_active + 1.72, r"Li$^+$", "#4D91C8", "white"),
+    # A few particles on the right/top faces give the block volume rather than
+    # a flat decorated face.
+    for fx, fy, txt, fc, fs in [
+        (1.05, y_active + 0.55, r"OTf$^-$", "#D65C58", 4.7),
+        (1.45, y_active + 1.66, r"Li$^+$", "#3C93C9", 5.0),
+        (2.20, y_active + 0.94, r"OTf$^-$", "#D65C58", 4.7),
+        (2.74, y_active + 1.96, r"Li$^+$", "#3C93C9", 5.0),
+        (3.35, y_active + 0.63, r"Li$^+$", "#3C93C9", 5.0),
+        (4.24, y_active + 1.38, r"OTf$^-$", "#D65C58", 4.7),
     ]:
-        axL.add_patch(Circle((fx, fy), 0.21, facecolor=fc, edgecolor="white", lw=0.5, zorder=4))
-        axL.text(fx, fy, txt, ha="center", va="center", fontsize=5.1, color=tc, zorder=5)
+        ion = Circle((fx, fy), 0.18, facecolor=fc, edgecolor="white", lw=0.45, alpha=0.96, zorder=14)
+        ion.set_clip_path(active["front"])
+        axL.add_patch(ion)
+        label = axL.text(fx, fy, txt, ha="center", va="center", fontsize=fs, color="white", zorder=15)
+        label.set_clip_path(active["front"])
+
+    for fx, fy, fc in [
+        (x0 + w + 0.26, y_active + 0.75, "#3C93C9"),
+        (x0 + w + 0.63, y_active + 1.36, "#D65C58"),
+        (x0 + w + 0.86, y_active + 2.08, "#3C93C9"),
+        (x0 + w + 0.34, y_active + 2.45, "#D65C58"),
+    ]:
+        ion = Circle((fx, fy), 0.14, facecolor=fc, edgecolor="white", lw=0.4, alpha=0.78, zorder=13)
+        ion.set_clip_path(active["right"])
+        axL.add_patch(ion)
+
     axL.text(
         x0 + w / 2,
         y_active + active_h - 0.38,
         "SY / Hybrane / LiOTf\nactive composite",
         ha="center",
         va="center",
-        fontsize=7.3,
-        color="0.13",
-        zorder=5,
+        fontsize=7.2,
+        color="#176CA6",
+        weight="bold",
+        zorder=16,
     )
+    _iso_slab(axL, x0, y_ag, w, ag_h, depth, palette["ag"],
+              "Ag", alpha=0.96, edgecolor=edge, zorder=18)
 
     top = y_ag + ag_h
-    axL.add_patch(FancyArrowPatch((ag_x, top + 0.45), (ag_x + ag_w, top + 0.45),
+    axL.add_patch(FancyArrowPatch((x0 + 0.35, top + oy + 0.46), (x0 + w + ox - 0.35, top + oy + 0.46),
                                   arrowstyle="<->", mutation_scale=8, lw=0.75, color="0.30"))
-    axL.text(ag_x + ag_w / 2, top + 0.68, r"junction area $0.0825$ cm$^2$",
+    axL.text(x0 + (w + ox) / 2, top + oy + 0.68, r"junction area $0.0825$ cm$^2$",
              ha="center", va="bottom", fontsize=7.3, color="0.28")
 
-    dim_x = x0 + w + 0.55
-    axL.add_patch(FancyArrowPatch((dim_x, y_active), (dim_x, y_ag), arrowstyle="<->",
+    dim_x = x0 + w + ox + 0.42
+    axL.add_patch(FancyArrowPatch((dim_x, y_active + oy * 0.35), (dim_x, y_ag + oy * 0.35), arrowstyle="<->",
                                   mutation_scale=8, lw=0.75, color="0.35"))
-    axL.text(dim_x + 0.22, (y_active + y_ag) / 2, "209 nm", ha="left", va="center", fontsize=7.5, color="0.25")
-    axL.plot([dim_x - 0.10, dim_x + 0.10], [(y_ag + top) / 2, (y_ag + top) / 2], color="0.35", lw=0.75)
-    axL.text(dim_x + 0.22, (y_ag + top) / 2, "100 nm", ha="left", va="center", fontsize=7.5, color="0.25")
+    axL.text(dim_x + 0.22, (y_active + y_ag) / 2 + oy * 0.35, "209 nm", ha="left", va="center", fontsize=7.5, color="0.25")
+    axL.text(dim_x + 0.22, (y_ag + top) / 2 + oy * 0.35, "100 nm", ha="left", va="center", fontsize=7.5, color="0.25")
 
-    contact_x = ag_x + ag_w / 2
-    axL.plot([contact_x, contact_x], [top, top + 1.08], color=COLORS["red"], lw=0.9)
-    axL.add_patch(Circle((contact_x, top + 1.13), 0.07, facecolor=COLORS["red"], edgecolor=COLORS["red"]))
-    axL.text(contact_x + 1.05, top + 1.08, r"Ag: $+V$", ha="left", va="center", fontsize=8.1, color=COLORS["red"])
-    ground_y = y_glass - 0.35
-    axL.plot([x0 + 1.0, x0 + 1.0], [y_ito, ground_y + 0.20], color="0.25", lw=0.8)
+    contact_x = x0 + w / 2 + ox * 0.55
+    axL.plot([contact_x, contact_x], [top + oy, top + oy + 0.72], color=COLORS["red"], lw=0.9)
+    axL.add_patch(Circle((contact_x, top + oy + 0.77), 0.07, facecolor=COLORS["red"], edgecolor=COLORS["red"]))
+    axL.text(contact_x + 0.32, top + oy + 0.75, r"Ag: $+V$", ha="left", va="center", fontsize=8.0, color=COLORS["red"])
+    ground_y = y_glass - 0.34
+    axL.plot([x0 + 0.55, x0 + 0.55], [y_ito, ground_y + 0.20], color="0.25", lw=0.8)
     for i, ww in enumerate([0.50, 0.34, 0.18]):
-        axL.plot([x0 + 1.0 - ww / 2, x0 + 1.0 + ww / 2], [ground_y - 0.09 * i, ground_y - 0.09 * i], color="0.25", lw=0.8)
-    axL.text(x0 + 1.55, ground_y - 0.02, "ITO: 0 V", ha="left", va="center", fontsize=8.1, color="0.25")
+        axL.plot([x0 + 0.55 - ww / 2, x0 + 0.55 + ww / 2], [ground_y - 0.09 * i, ground_y - 0.09 * i], color="0.25", lw=0.8)
+    axL.text(x0 + 1.08, ground_y - 0.02, "ITO: 0 V", ha="left", va="center", fontsize=8.0, color="0.25")
 
     # ---- (b) two-regime ion-migration mechanism -------------------------
     axR.text(0.18, 8.55, "b", fontsize=11, weight="bold")
