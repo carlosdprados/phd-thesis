@@ -310,11 +310,20 @@ def make_figure(rows, path=FIG_PATH):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
     import figstyle
 
     os.makedirs(os.path.dirname(path), exist_ok=True)
     figstyle.apply()
     COLORS = figstyle.COLORS
+
+    def style_bars(bars, colors, alpha=0.22):
+        if not isinstance(colors, (list, tuple)):
+            colors = [colors] * len(list(bars))
+        for b, c in zip(bars, colors):
+            b.set_facecolor(mcolors.to_rgba(c, alpha))
+            b.set_edgecolor(c)
+            b.set_linewidth(1.1)
 
     order = [
         ("instantaneous", "instantaneous input", "#b0b0b0"),
@@ -339,9 +348,8 @@ def make_figure(rows, path=FIG_PATH):
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.6, 3.1),
                                  gridspec_kw={"width_ratios": [1.1, 1.2]})
     x = np.arange(len(order))
-    a1.bar(x, means, yerr=errs, color=[c for _, _, c in order],
-           edgecolor="0.2", linewidth=0.5, width=0.65, capsize=3,
-           error_kw={"lw": 0.8})
+    b1 = a1.bar(x, means, yerr=errs, width=0.65, capsize=3, error_kw={"lw": 0.8})
+    style_bars(b1, [c for _, _, c in order])
     a1.set_xticks(x)
     a1.set_xticklabels([lab for _, lab, _ in order], fontsize=7.2,
                        rotation=22, ha="right", rotation_mode="anchor")
@@ -358,8 +366,8 @@ def make_figure(rows, path=FIG_PATH):
         for group in groups:
             gv = _condition_seed_means([r for r in rows if r["condition"] == cond], group)
             vals.append(float(np.mean(list(gv.values()))))
-        a2.bar(gx + (j - 1) * width, vals, width=width, color=group_colors[j],
-               edgecolor="0.2", linewidth=0.5, label=group_text[j])
+        gb = a2.bar(gx + (j - 1) * width, vals, width=width, label=group_text[j])
+        style_bars(gb, group_colors[j])
     a2.set_xticks(gx)
     a2.set_xticklabels(group_labels)
     a2.set_ylim(0.62, 0.83)

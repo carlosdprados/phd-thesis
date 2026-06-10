@@ -16,6 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 
 from ch5_reservoir import (load_cards, make_nodes, run_states, memory_capacity,
                            nodes_from, _full, narma10, task_nrmse,
@@ -29,23 +30,42 @@ figstyle.apply()
 COLORS = figstyle.COLORS
 
 
+def style_bars(bars, colors, alpha=0.22):
+    """Nature-style bars: light fill, full-strength coloured edge (cf. Ch4)."""
+    if not isinstance(colors, (list, tuple)):
+        colors = [colors] * len(list(bars))
+    for b, c in zip(bars, colors):
+        b.set_facecolor(mcolors.to_rgba(c, alpha))
+        b.set_edgecolor(c)
+        b.set_linewidth(1.1)
+
+
 def fig_mc_curve(cards, N=24, max_k=30):
     hom_m, hom_sd, hom_tot = mc_curve_seeded(cards, False, N, max_k)
     het_m, het_sd, het_tot = mc_curve_seeded(cards, True, N, max_k)
     st = paired_stats(het_tot, hom_tot)
     k = np.arange(1, max_k + 1)
     fig, ax = plt.subplots(figsize=(4.6, 3.2))
-    ax.plot(k, hom_m, "o-", ms=3, color=COLORS["blue"],
-            label=f"homogeneous (MC$={hom_tot.mean():.1f}\\pm{hom_tot.std(ddof=1):.1f}$)")
-    ax.fill_between(k, hom_m - hom_sd, hom_m + hom_sd, color=COLORS["blue"], alpha=0.18)
-    ax.plot(k, het_m, "s-", ms=3, color=COLORS["red"],
-            label=f"heterogeneous (MC$={het_tot.mean():.1f}\\pm{het_tot.std(ddof=1):.1f}$)")
-    ax.fill_between(k, het_m - het_sd, het_m + het_sd, color=COLORS["red"], alpha=0.18)
+    ax.plot(k, hom_m, "o-", ms=3.5, color=COLORS["blue"], mec="white", mew=0.5,
+            label="homogeneous", zorder=3)
+    ax.fill_between(k, hom_m - hom_sd, hom_m + hom_sd, color=COLORS["blue"], alpha=0.16)
+    ax.plot(k, het_m, "s-", ms=3.5, color=COLORS["red"], mec="white", mew=0.5,
+            label="heterogeneous", zorder=3)
+    ax.fill_between(k, het_m - het_sd, het_m + het_sd, color=COLORS["red"], alpha=0.16)
     ax.set_xlabel(f"delay $k$ (lags of $\\Delta t={DT:g}$ s)")
     ax.set_ylabel("memory capacity MC$_k$")
-    ax.set_title(f"Memory capacity vs lag (N={N} nodes)")
-    ax.legend(frameon=False, fontsize=8, title=f"Wilcoxon $p={st['p']:.1e}$",
-              title_fontsize=7)
+    ax.set_title(f"Memory capacity vs lag (N = {N} nodes)", loc="left")
+    ax.set_xlim(0, max_k + 0.5)
+    # Direct, colour-matched totals in the upper-right (the curves have decayed
+    # to near zero there), with the paired test underneath -- no boxed legend.
+    ax.text(0.97, 0.93, f"heterogeneous   MC = {het_tot.mean():.1f} $\\pm$ {het_tot.std(ddof=1):.1f}",
+            transform=ax.transAxes, ha="right", va="top", color=COLORS["red"],
+            fontsize=8, fontweight="bold")
+    ax.text(0.97, 0.83, f"homogeneous   MC = {hom_tot.mean():.1f} $\\pm$ {hom_tot.std(ddof=1):.1f}",
+            transform=ax.transAxes, ha="right", va="top", color=COLORS["blue"],
+            fontsize=8, fontweight="bold")
+    ax.text(0.97, 0.72, f"Wilcoxon $p = {st['p']:.0e}$", transform=ax.transAxes,
+            ha="right", va="top", color="0.4", fontsize=7)
     fig.tight_layout()
     p = os.path.join(FIGDIR, "mc_curve.pdf"); fig.savefig(p); plt.close(fig)
     print(f"wrote {p}  (hom {hom_tot.mean():.2f}, het {het_tot.mean():.2f}, "
@@ -63,11 +83,11 @@ def fig_composition_sweep(cards, N=16, max_k=30):
     x = np.arange(len(rows))
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.4, 3.0))
     cols = [COLORS["orange"] if r[5] else COLORS["blue"] for r in rows]
-    ek = dict(ecolor="0.3", capsize=2, error_kw={"lw": 0.8})
-    a1.bar(x, mcs, yerr=mcsd, color=cols, edgecolor="0.2", linewidth=0.5, **ek)
+    ek = dict(ecolor="0.35", capsize=2, error_kw={"lw": 0.8})
+    b1 = a1.bar(x, mcs, yerr=mcsd, **ek); style_bars(b1, cols)
     a1.set_xticks(x); a1.set_xticklabels(labels, rotation=45, ha="right", fontsize=7)
     a1.set_ylabel("total memory capacity"); figstyle.panel(a1, "a", "MC by composition")
-    a2.bar(x, nrs, yerr=nrsd, color=cols, edgecolor="0.2", linewidth=0.5, **ek)
+    b2 = a2.bar(x, nrs, yerr=nrsd, **ek); style_bars(b2, cols)
     a2.set_xticks(x); a2.set_xticklabels(labels, rotation=45, ha="right", fontsize=7)
     a2.set_ylabel("NARMA-10 NRMSE (lower better)"); figstyle.panel(a2, "b", "NARMA-10 by composition")
     fig.text(0.5, -0.04, "PEO / salt mass fraction (orange = lead cell 0.3/0.09); "
@@ -111,16 +131,17 @@ def fig_robustness(cards, N=24, jitters=(0.0, 0.12, 0.25, 0.40, 0.60, 0.85, 1.0)
             _, _, tot = mc_curve_seeded(cards, het, N, jitter=j)
             means.append(tot.mean()); sds.append(tot.std(ddof=1))
         means, sds = np.array(means), np.array(sds)
-        ax.plot(jitters, means, mk + "-", ms=4, color=col, label=lab)
-        ax.fill_between(jitters, means - sds, means + sds, color=col, alpha=0.18)
+        ax.plot(jitters, means, mk + "-", ms=4.5, color=col, mec="white", mew=0.5,
+                label=lab, zorder=3)
+        ax.fill_between(jitters, means - sds, means + sds, color=col, alpha=0.16)
     ax.axvline(sigma, ls=":", c="0.5", lw=0.9)
     ax.text(sigma - 0.02, ax.get_ylim()[0] + 0.3,
             f"measured\nscatter\n($\\sigma\\!\\approx\\!{sigma:.2f}$)",
             fontsize=6.6, color="0.45", ha="right")
     ax.set_xlabel(r"device-to-device scatter (jitter, $\sigma$ of $\ln\tau$)")
     ax.set_ylabel("total memory capacity")
-    ax.set_title(f"Robustness to device scatter (N={N})", fontsize=9.5)
-    ax.legend(frameon=False, fontsize=8)
+    ax.set_title(f"Robustness to device scatter (N = {N})", loc="left")
+    ax.legend(frameon=False, fontsize=8, loc="center right")
     fig.tight_layout()
     p = os.path.join(FIGDIR, "robustness.pdf"); fig.savefig(p); plt.close(fig)
     print(f"wrote {p}")
@@ -139,23 +160,34 @@ def fig_ipc(cards, N=24):
     lin = [hom["linear"][0], het["linear"][0]]
     nl = [hom["nonlinear"][0], het["nonlinear"][0]]
     tot_sd = [hom["total"][1], het["total"][1]]
-    ax.bar(x, lin, width=0.6, color=COLORS["blue"], edgecolor="0.2", linewidth=0.5,
-           label="linear (degree 1)")
-    ax.bar(x, nl, width=0.6, bottom=lin, color=COLORS["orange"], edgecolor="0.2",
-           linewidth=0.5, label="nonlinear (degree 2)")
+    bl = ax.bar(x, lin, width=0.62, label="linear (degree 1)")
+    style_bars(bl, COLORS["blue"])
+    bn = ax.bar(x, nl, width=0.62, bottom=lin, label="nonlinear (degree 2)")
+    style_bars(bn, COLORS["orange"])
     tot = [a + b for a, b in zip(lin, nl)]
-    ax.errorbar(x, tot, yerr=tot_sd, fmt="none", ecolor="0.2", capsize=3, lw=0.8)
-    ax.axhline(N, ls="--", c="0.5", lw=0.8)
-    ax.text(1.45, N - 0.6, f"$N={N}$ bound", ha="right", fontsize=7, color="0.4")
+    ax.errorbar(x, tot, yerr=tot_sd, fmt="none", ecolor="0.25", capsize=3, lw=0.8)
+    # capacity is bounded above by the node count N: show the ceiling discreetly
+    # and label it once, at the left end, clear of the bars.
+    ax.axhline(N, ls="--", c="0.55", lw=0.8)
+    ax.text(-0.45, N - 0.5, f"$N = {N}$ capacity bound", ha="left", va="top",
+            fontsize=7, color="0.45")
+    # direct, colour-matched segment read-outs (dark text on the light fills)
     for xi, (l, n) in enumerate(zip(lin, nl)):
-        ax.text(xi, l / 2, f"{l:.1f}", ha="center", va="center", color="white", fontsize=8)
-        ax.text(xi, l + n / 2, f"{n:.1f}", ha="center", va="center", color="white", fontsize=8)
+        ax.text(xi, l / 2, f"{l:.1f}", ha="center", va="center",
+                color=COLORS["blue"], fontsize=8, fontweight="bold")
+        ax.text(xi, l + n / 2, f"{n:.1f}", ha="center", va="center",
+                color=COLORS["orange"], fontsize=8, fontweight="bold")
+    # paired significance as a bracket spanning the two totals
+    ytop = max(tot) + max(tot_sd) + 1.2
+    ax.plot([0, 0, 1, 1], [ytop - 0.4, ytop, ytop, ytop - 0.4], lw=0.8, c="0.3")
+    ax.text(0.5, ytop + 0.1, f"$p = {st['p']:.0e}$", ha="center", va="bottom",
+            fontsize=7.2, color="0.3")
     ax.set_xticks(x); ax.set_xticklabels(["homogeneous", "heterogeneous"])
+    ax.set_xlim(-0.6, 1.6)
     ax.set_ylabel("information-processing capacity")
     ax.set_ylim(0, N + 1)
-    ax.set_title("Linear vs nonlinear capacity", fontsize=9.5)
-    ax.legend(frameon=False, fontsize=7.6, loc="upper left",
-              title=f"total het$-$hom $p={st['p']:.1e}$", title_fontsize=6.8)
+    ax.set_title("Linear vs nonlinear capacity", loc="left")
+    ax.legend(frameon=False, fontsize=7.6, loc="upper right")
     fig.tight_layout()
     p = os.path.join(FIGDIR, "ipc_capacity.pdf"); fig.savefig(p); plt.close(fig)
     print(f"wrote {p}  (hom tot {hom['total'][0]:.2f}, het tot {het['total'][0]:.2f})")
@@ -204,7 +236,8 @@ def fig_tau_coverage(cards):
         ax.plot([c.tau, c.tau], [0.4, y0 + 0.4], color=col,
                 lw=1.4 if is_lead else 0.6, alpha=0.55 if is_lead else 0.25,
                 zorder=0)
-        ax.plot(c.tau, ytick, "o", ms=7 if is_lead else 5, color=col, zorder=3)
+        ax.plot(c.tau, ytick, "o", ms=7.5 if is_lead else 5.5, color=col,
+                mec="white", mew=0.6, zorder=3)
         ax.plot([c.tau, lx], [ytick - 0.18, y_lab + 0.30], color=col,
                 lw=0.5, alpha=0.45, zorder=1)
         ax.annotate(f"{c.peo}/{c.salt}", (lx, y_lab), ha="center", va="top",
@@ -218,7 +251,7 @@ def fig_tau_coverage(cards):
     ax.set_ylim(-2.9, y0 + 1.0)
     ax.set_yticks([])
     ax.set_xlabel("characteristic timescale (s)")
-    ax.set_title("device fading-memory times vs affective-signal bands", fontsize=9.5)
+    ax.set_title("device fading-memory times vs affective-signal bands", loc="left")
     # mark the uncovered tonic gap (annotation sits in the band region, not on labels)
     gap_lo = max(c.tau for c in full) * 1.05
     ax.axvspan(gap_lo, 60, color="0.85", alpha=0.35, zorder=-1)
@@ -282,8 +315,8 @@ def fig_wesad(cards, seeds=range(5)):
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.6, 3.2),
                                  gridspec_kw={"width_ratios": [1, 1.7]})
     # panel (a)
-    a1.bar([0, 1], [f1A_res, f1A_stat], color=[COLORS["orange"], "#b0b0b0"],
-           edgecolor="0.2", linewidth=0.5, width=0.6)
+    ba = a1.bar([0, 1], [f1A_res, f1A_stat], width=0.6)
+    style_bars(ba, [COLORS["orange"], "#8c8c8c"])
     a1.set_xticks([0, 1]); a1.set_xticklabels(["device\nreservoir", "static\nbaseline"])
     a1.set_ylim(0, 1); a1.set_ylabel("LOSO macro-F1")
     figstyle.panel(a1, "a", "Demo A: window binary\nstress/baseline (EDA)")
@@ -296,10 +329,10 @@ def fig_wesad(cards, seeds=range(5)):
               "homogeneous\n(memory, 1$\\tau$)", "heterogeneous\n(memory, $\\tau$ spread)"]
     vals = [f1_inst, mem0.mean(), hom.mean(), het.mean()]
     errs = [0, mem0.std(), hom.std(), het.std()]
-    cols = ["#b0b0b0", "#8c8c8c", COLORS["blue"], COLORS["red"]]
+    cols = ["#9c9c9c", "#6f6f6f", COLORS["blue"], COLORS["red"]]
     x = np.arange(4)
-    a2.bar(x, vals, yerr=errs, color=cols, edgecolor="0.2", linewidth=0.5,
-           width=0.62, capsize=3, error_kw={"lw": 0.8})
+    bb = a2.bar(x, vals, yerr=errs, width=0.62, capsize=3, error_kw={"lw": 0.8})
+    style_bars(bb, cols)
     a2.set_xticks(x); a2.set_xticklabels(labels, fontsize=7.2)
     a2.set_ylim(0.6, 0.81); a2.set_ylabel("LOSO macro-F1")
     figstyle.panel(a2, "b", "Demo B: streaming 3-class affect tracking")
@@ -311,8 +344,9 @@ def fig_wesad(cards, seeds=range(5)):
     _step(0, 1, 0.752, f"+dim {mem0.mean()-f1_inst:+.3f}")
     _step(1, 2, 0.770, f"+memory {hom.mean()-mem0.mean():+.3f}")
     _step(2, 3, 0.788, f"+heterog {het.mean()-hom.mean():+.3f} (ns)")
-    for xi, v in zip(x, vals):
-        a2.text(xi, 0.61, f"{v:.3f}", ha="center", fontsize=7, color="white")
+    for xi, v, c in zip(x, vals, cols):
+        a2.text(xi, 0.607, f"{v:.3f}", ha="center", va="bottom", fontsize=7,
+                color=c, fontweight="bold")
     fig.tight_layout()
     p = os.path.join(FIGDIR, "wesad_affect.pdf"); fig.savefig(p); plt.close(fig)
     print(f"wrote {p}  (Demo A res {f1A_res:.3f}/static {f1A_stat:.3f}; "
@@ -343,8 +377,9 @@ def fig_robust_monitoring(cards):
     for b, (col, mk, lab) in style.items():
         m = np.array([v for v, _ in sw["banks"][b]["f1"]])
         s = np.array([e for _, e in sw["banks"][b]["f1"]])
-        a1.plot(sig, m, mk + "-", ms=4, color=col, label=lab)
-        a1.fill_between(sig, m - s, m + s, color=col, alpha=0.15)
+        a1.plot(sig, m, mk + "-", ms=4.5, color=col, mec="white", mew=0.5,
+                label=lab, zorder=3)
+        a1.fill_between(sig, m - s, m + s, color=col, alpha=0.14)
     a1.set_xlabel("injected sensor-noise $\\sigma$ (channels $\\in[0,1]$)")
     a1.set_ylabel("binary stress-detection macro-F1")
     figstyle.panel(a1, "a", "robustness to sensor noise")
@@ -355,7 +390,8 @@ def fig_robust_monitoring(cards):
     xi = np.array([si[k] for k in keys]); yi = np.array([sh[k] for k in keys])
     lo = min(xi.min(), yi.min()) - 0.03; hi = max(xi.max(), yi.max()) + 0.03
     a2.plot([lo, hi], [lo, hi], "--", c="0.6", lw=0.9)
-    a2.scatter(xi, yi, s=22, color=COLORS["red"], edgecolor="0.2", linewidth=0.4, zorder=3)
+    a2.scatter(xi, yi, s=26, color=COLORS["red"], edgecolor="white", linewidth=0.5,
+               alpha=0.95, zorder=3)
     a2.set_xlim(lo, hi); a2.set_ylim(lo, hi); a2.set_aspect("equal")
     a2.set_xlabel("instantaneous F1"); a2.set_ylabel("heterogeneous F1")
     n_above = int(np.sum(yi > xi))
