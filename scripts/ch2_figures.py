@@ -720,14 +720,18 @@ def fig_epsc_summary() -> None:
     colors = [COLORS["green"], COLORS["green"], COLORS["orange"], COLORS["orange"]]
 
     fig, ax = plt.subplots(figsize=(4.9, 3.1))
-    bars = ax.bar(states, ratios, color=colors, edgecolor="0.25", linewidth=0.7)
+    bars = ax.bar(states, ratios, width=0.62, color=colors, edgecolor="0.25", linewidth=0.7)
     ax.axhline(0, color="0.25", lw=0.8)
     ax.set_ylabel(r"signed current ratio, $R_n=I_{S_n}/I_{S_0}$")
-    ax.set_title("EPSC state readout")
+    ax.set_title("EPSC state readout", loc="left")
     for bar, ratio in zip(bars, ratios):
         va = "bottom" if ratio >= 0 else "top"
         offset = 0.55 if ratio >= 0 else -0.55
         ax.text(bar.get_x() + bar.get_width() / 2, ratio + offset, f"{ratio:.2f}", ha="center", va=va, fontsize=8)
+    ax.text(0.5, -10.5, "after +2 V writes", ha="center", va="center",
+            fontsize=7.6, color=COLORS["green"])
+    ax.text(2.5, 10.5, r"after $-$2.5 V writes", ha="center", va="center",
+            fontsize=7.6, color=COLORS["orange"])
     ax.set_ylim(-20, 18)
     style_axes(ax)
     save(fig, "epsc_summary.pdf")
@@ -770,32 +774,68 @@ def fig_stdp_summary() -> None:
     x, mean, sd = load_stdp_master()
     lx, ly, rx, ry = load_stdp_fit()
     fig, ax = plt.subplots(figsize=(4.9, 3.1))
+    # Quadrant tints: causal pairs potentiate, anti-causal pairs depress.
+    ax.fill_between([-0.68, 0], 0, 30, color=COLORS["green"], alpha=0.06, lw=0)
+    ax.fill_between([0, 0.68], -31, 0, color=COLORS["orange"], alpha=0.07, lw=0)
     ax.errorbar(x, mean, yerr=sd, fmt="o", ms=3.0, lw=0.8, capsize=2, color=COLORS["purple"], ecolor="0.6")
-    ax.plot(lx, ly, color=COLORS["green"], lw=1.2, label="fit, causal branch")
-    ax.plot(rx, ry, color=COLORS["orange"], lw=1.2, label="fit, anti-causal branch")
+    ax.plot(lx, ly, color=COLORS["green"], lw=1.2)
+    ax.plot(rx, ry, color=COLORS["orange"], lw=1.2)
     ax.axhline(0, color="0.35", lw=0.8)
     ax.axvline(0, color="0.35", lw=0.8)
+    ax.text(-0.64, 25.5, "causal (pre before post):\npotentiation", ha="left",
+            va="top", fontsize=7.6, color=COLORS["green"])
+    ax.text(0.64, -26.0, "anti-causal (post before pre):\ndepression", ha="right",
+            va="bottom", fontsize=7.6, color=COLORS["orange"])
+    ax.set_xlim(-0.68, 0.68)
+    ax.set_ylim(-31, 30)
     ax.set_xlabel(r"timing delay, $\Delta t$ (s)")
     ax.set_ylabel(r"$\Delta G$ (%)")
-    ax.set_title("STDP timing kernel")
-    ax.legend(frameon=False, loc="upper right")
+    ax.set_title("STDP timing kernel", loc="left")
     style_axes(ax)
     save(fig, "stdp_summary.pdf")
 
 
 def fig_read_write_wait_protocol() -> None:
     fig, ax = plt.subplots(figsize=(6.2, 2.25))
-    t = np.array([0, 0.15, 0.15, 0.55, 0.55, 1.65, 1.65, 2.65, 2.65, 2.8])
-    v = np.array([0.5, 0.5, 0, 0, 1.0, 1.0, 0, 0, 0.5, 0.5])
-    ax.plot(t, v, drawstyle="steps-post", color=COLORS["blue"], lw=1.5)
-    for xpos, label in [(0.075, "read\n$G_0$"), (1.1, "write train\n$N$ pulses"), (2.15, "wait\n$t_{wait}$"), (2.725, "read\n$G_f$")]:
-        ax.text(xpos, 1.18, label, ha="center", va="bottom", fontsize=8)
+
+    # Build the waveform as (start, stop, level) segments: a read pulse, a
+    # train of discrete write pulses (with an ellipsis standing in for the
+    # rest of the train), an open-circuit wait, and a final read pulse.
+    segments = [(0.0, 0.15, 0.5), (0.15, 0.45, 0.0)]
+    t_cursor = 0.45
+    for _ in range(4):
+        segments += [(t_cursor, t_cursor + 0.13, 1.0), (t_cursor + 0.13, t_cursor + 0.23, 0.0)]
+        t_cursor += 0.23
+    gap_start = t_cursor                       # ellipsis gap inside the train
+    t_cursor += 0.28
+    segments += [(gap_start, t_cursor, 0.0),
+                 (t_cursor, t_cursor + 0.13, 1.0), (t_cursor + 0.13, 1.85, 0.0),
+                 (1.85, 2.65, 0.0), (2.65, 2.80, 0.5)]
+    t = [s for seg in segments for s in seg[:2]]
+    v = [seg[2] for seg in segments for _ in range(2)]
+    write_end = 1.85
+
+    phases = [
+        (0.0, 0.15, COLORS["blue"], "read\n$G_0$"),
+        (0.45, write_end, COLORS["orange"], "write train, $N$ pulses\n$V_{\\mathrm{write}}$"),
+        (write_end, 2.65, "0.45", "wait\n$t_{\\mathrm{wait}}$"),
+        (2.65, 2.80, COLORS["blue"], "read\n$G_f$"),
+    ]
+    for x0, x1, color, label in phases:
+        ax.axvspan(x0, x1, color=color, alpha=0.08, lw=0)
+        ax.text((x0 + x1) / 2, 1.18, label, ha="center", va="bottom",
+                fontsize=8, color=color if color != "0.45" else "0.35")
+
+    ax.plot(t, v, color="0.2", lw=1.4, solid_joinstyle="miter")
+    ax.text(gap_start + 0.14, 0.5, r"$\cdots$", ha="center", va="center",
+            fontsize=11, color="0.2")
     ax.set_ylim(-0.12, 1.72)
     ax.set_xlim(-0.05, 2.95)
     ax.set_xlabel("protocol time")
     ax.set_ylabel("voltage")
+    ax.set_xticks([])
     ax.set_yticks([0, 0.5, 1.0])
-    ax.set_yticklabels(["0", r"$V_{read}$", r"$V_{write}$"])
+    ax.set_yticklabels(["0", r"$V_{\mathrm{read}}$", r"$V_{\mathrm{write}}$"])
     style_axes(ax)
     save(fig, "read_write_wait_protocol.pdf")
 
@@ -821,6 +861,11 @@ def fig_full_epsc_trace() -> None:
 
     fig, ax1 = plt.subplots(figsize=(6.4, 3.0))
     ax2 = ax1.twinx()
+    # Tinted stripes mark the write events (green: positive, orange: negative).
+    for start, stop, vv, _, label in events:
+        if not label:
+            col = COLORS["green"] if vv > 0 else COLORS["orange"]
+            ax1.axvspan(start, stop, color=col, alpha=0.30, lw=0)
     ax1.plot(t, v, drawstyle="steps-post", color=COLORS["blue"], lw=1.2, label="voltage")
     ax2.plot(t, r, drawstyle="steps-post", color=COLORS["red"], lw=1.2, label=r"$I/I_{S0}$")
     ax1.axhline(0, color="0.7", lw=0.7)
@@ -853,8 +898,8 @@ def fig_stdp_waveforms() -> None:
         pre = triangular(t, 0.0, 1.2, 1.55)
         post = -triangular(t, delay, 1.2, 1.55)
         total = pre + post
-        ax.plot(t, pre, color=COLORS["green"], lw=0.9, label="pre")
-        ax.plot(t, post, color=COLORS["orange"], lw=0.9, label="post")
+        ax.plot(t, pre, color=COLORS["green"], lw=0.9, label="pre-spike")
+        ax.plot(t, post, color=COLORS["orange"], lw=0.9, label="post-spike")
         ax.plot(t, total, color="0.15", lw=1.3, label="sum")
         ax.axhline(0, color="0.65", lw=0.6)
         ax.axvline(0, color="0.75", lw=0.6, ls=":")
@@ -862,7 +907,9 @@ def fig_stdp_waveforms() -> None:
         ax.set_xlabel("time (s)")
         style_axes(ax)
     axes[0].set_ylabel("voltage (V)")
-    axes[-1].legend(frameon=False, loc="upper right")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, ncol=3, frameon=False, loc="lower center",
+               bbox_to_anchor=(0.5, 0.965), fontsize=7.5)
     save(fig, "stdp_waveforms.pdf")
 
 
