@@ -14,6 +14,11 @@ data exist in CSV/text form:
 Panels not recoverable as complete raw CSV traces are reconstructed from the
 published protocol/fit summaries cited in Chapter 2 and labelled as such in the
 thesis captions.
+
+The composite-chemistry panel is a thesis-native schematic redraw of the
+published component panel: LiOTf is explicit, while the polymers are motif-level
+representations because PDY-132 and Hybrane are not monodisperse small
+molecules.
 """
 
 from __future__ import annotations
@@ -30,7 +35,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from matplotlib.patches import Circle, FancyArrowPatch, Rectangle
+from matplotlib.patches import Circle, FancyArrowPatch, Polygon, Rectangle
 
 import figstyle
 
@@ -101,6 +106,179 @@ def style_axes(ax: plt.Axes) -> None:
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.tick_params(direction="out", length=3, width=0.8)
+
+
+def _bond(ax: plt.Axes, p0, p1, lw: float = 1.0, color: str = "0.15", **kwargs) -> None:
+    ax.plot([p0[0], p1[0]], [p0[1], p1[1]], color=color, lw=lw, solid_capstyle="round", **kwargs)
+
+
+def _double_bond(ax: plt.Axes, p0, p1, offset: float = 0.035, lw: float = 0.9, color: str = "0.15") -> None:
+    p0 = np.array(p0, dtype=float)
+    p1 = np.array(p1, dtype=float)
+    v = p1 - p0
+    n = np.array([-v[1], v[0]], dtype=float)
+    norm = np.linalg.norm(n)
+    if norm:
+        n = n / norm * offset
+    _bond(ax, p0 + n, p1 + n, lw=lw, color=color)
+    _bond(ax, p0 - n, p1 - n, lw=lw, color=color)
+
+
+def _benzene(ax: plt.Axes, center, radius: float = 0.36, angle: float = math.pi / 6,
+             color: str = "0.15", lw: float = 1.0) -> list[tuple[float, float]]:
+    cx, cy = center
+    pts = [
+        (cx + radius * math.cos(angle + i * math.pi / 3),
+         cy + radius * math.sin(angle + i * math.pi / 3))
+        for i in range(6)
+    ]
+    ax.add_patch(Polygon(pts, closed=True, fill=False, edgecolor=color, lw=lw, joinstyle="miter"))
+    ax.add_patch(Circle((cx, cy), radius * 0.42, fill=False, edgecolor=color, lw=lw * 0.75))
+    return pts
+
+
+def fig_composite_chemistry() -> None:
+    """Thesis-native redraw of the chemical-composition panel from the paper.
+
+    The salt is drawn explicitly. The two polymers are necessarily motif-level
+    depictions: PDY-132 is a statistical PPV copolymer, and Hybrane DEO750 8500
+    is a commercial hyperbranched polyester-amide rather than a monodisperse
+    small molecule.
+    """
+    red = "#B23A48"
+    blue = COLORS["blue"]
+    green = COLORS["green"]
+    yellow = "#E5B62F"
+
+    fig = plt.figure(figsize=(7.4, 5.7))
+    gs = fig.add_gridspec(3, 1, height_ratios=[1.05, 1.18, 0.82], hspace=0.26)
+    ax_sy, ax_hy, ax_salt = [fig.add_subplot(gs[i, 0]) for i in range(3)]
+    for ax in (ax_sy, ax_hy, ax_salt):
+        ax.axis("off")
+
+    # ---- (a) Super Yellow / PDY-132 --------------------------------------
+    ax_sy.set_xlim(0, 10)
+    ax_sy.set_ylim(0, 2.7)
+    figstyle.panel(ax_sy, "a", "Super Yellow (PDY-132): PPV-family electronic pathway")
+
+    main = [(1.55, 1.25), (4.50, 1.25), (7.35, 1.25)]
+    for c in main:
+        _benzene(ax_sy, c, radius=0.42)
+
+    # Vinylene links between aryl repeat units.
+    _double_bond(ax_sy, (1.96, 1.25), (2.55, 1.25), offset=0.025)
+    _bond(ax_sy, (2.55, 1.25), (2.92, 1.25))
+    _double_bond(ax_sy, (5.00, 1.25), (5.56, 1.25), offset=0.025)
+    _bond(ax_sy, (5.56, 1.25), (5.93, 1.25))
+    _bond(ax_sy, (0.82, 1.25), (1.13, 1.25))
+    _double_bond(ax_sy, (7.76, 1.25), (8.34, 1.25), offset=0.025)
+    _bond(ax_sy, (8.34, 1.25), (8.66, 1.25))
+
+    # Alkoxy side chains, written as OR with R defined explicitly.
+    for p, label, ha, va in [
+        ((1.36, 1.93), "OR", "right", "bottom"),
+        ((1.25, 0.56), "RO", "right", "top"),
+        ((4.42, 2.38), "OR", "center", "bottom"),
+        ((7.66, 2.22), "OR", "left", "bottom"),
+    ]:
+        anchor = (p[0] + (0.18 if ha == "right" else -0.18 if ha == "left" else 0), p[1] - 0.16)
+        _bond(ax_sy, anchor, p, lw=0.85)
+        ax_sy.text(*p, label, ha=ha, va=va, fontsize=8.1, color="0.12")
+
+    # Pendant phenyl units corresponding to the two aryl-substituted comonomers.
+    _bond(ax_sy, (4.38, 1.67), (4.02, 2.03), lw=0.9)
+    _benzene(ax_sy, (4.02, 2.15), radius=0.29)
+    _bond(ax_sy, (7.24, 1.66), (7.66, 1.96), lw=0.9)
+    _benzene(ax_sy, (7.86, 2.10), radius=0.29)
+
+    ax_sy.text(2.18, 0.45, "$x$", fontsize=8.2, ha="center")
+    ax_sy.text(3.35, 1.25, "co", fontsize=7.2, ha="center", va="center", color="0.45")
+    ax_sy.text(5.18, 0.45, "$y$", fontsize=8.2, ha="center")
+    ax_sy.text(6.35, 1.25, "co", fontsize=7.2, ha="center", va="center", color="0.45")
+    ax_sy.text(8.10, 0.45, "$z$", fontsize=8.2, ha="center")
+    ax_sy.text(
+        9.75, 0.42,
+        r"$R =$ 3,7-dimethyloctyl" + "\n" + r"(branched $C_{10}H_{21}$)",
+        ha="right",
+        va="bottom",
+        fontsize=7.4,
+        color="0.25",
+    )
+
+    # ---- (b) Hybrane DEO750 8500 -----------------------------------------
+    ax_hy.set_xlim(0, 10)
+    ax_hy.set_ylim(0, 3.1)
+    figstyle.panel(ax_hy, "b", "Hybrane DEO750 8500: hyperbranched polyester-amide ion host")
+
+    # A representative branch motif: ester/amide/ether donors are highlighted,
+    # without implying a monodisperse molecular formula.
+    branches = [
+        [(5.0, 1.75), (4.25, 2.25), (3.20, 2.38), (2.20, 2.15), (1.25, 2.45)],
+        [(5.0, 1.75), (5.80, 2.32), (6.95, 2.44), (8.00, 2.22), (8.85, 2.50)],
+        [(4.75, 1.35), (3.80, 1.05), (2.75, 1.03), (1.65, 0.75)],
+        [(5.25, 1.35), (6.20, 1.03), (7.25, 1.05), (8.35, 0.75)],
+        [(5.0, 1.15), (4.55, 0.62), (3.55, 0.40), (2.40, 0.36)],
+        [(5.0, 1.15), (5.45, 0.62), (6.45, 0.40), (7.60, 0.36)],
+    ]
+    for pts in branches:
+        for p0, p1 in zip(pts, pts[1:]):
+            _bond(ax_hy, p0, p1, lw=1.0, color="0.23")
+
+    donor_positions = [
+        (4.25, 2.25, "O"), (3.20, 2.38, "O"), (5.80, 2.32, "O"), (6.95, 2.44, "O"),
+        (3.80, 1.05, "O"), (6.20, 1.03, "O"), (4.55, 0.62, "O"), (5.45, 0.62, "O"),
+        (4.62, 1.80, "N"), (5.38, 1.80, "N"), (4.72, 1.18, "N"), (5.28, 1.18, "N"),
+    ]
+    for x, y, atom in donor_positions:
+        col = red if atom == "O" else blue
+        ax_hy.add_patch(Circle((x, y), 0.13, facecolor="white", edgecolor=col, lw=0.9, zorder=3))
+        ax_hy.text(x, y, atom, ha="center", va="center", fontsize=7.2, color=col, zorder=4)
+
+    for x, y, txt in [
+        (2.62, 2.66, r"$C(=O)O$"), (7.43, 2.68, r"$C(=O)O$"),
+        (2.86, 1.31, r"$C(=O)N$"), (7.12, 1.31, r"$C(=O)N$"),
+        (3.35, 0.68, r"$(OCH_2CH_2)_n$"), (6.70, 0.68, r"$(OCH_2CH_2)_n$"),
+    ]:
+        ax_hy.text(x, y, txt, fontsize=7.4, ha="center", va="center", color="0.18")
+    for x, y in [(1.20, 2.72), (8.80, 2.78), (1.55, 0.54), (8.45, 0.54)]:
+        ax_hy.text(x, y, r"$C_{12}H_{23}$", fontsize=7.0, ha="center", va="center", color="0.32")
+
+    # ---- (c) Lithium triflate --------------------------------------------
+    ax_salt.set_xlim(0, 10)
+    ax_salt.set_ylim(0, 2.3)
+    figstyle.panel(ax_salt, "c", "Lithium triflate (LiOTf): mobile-ion source")
+
+    # Exact connectivity of triflate lithium salt, drawn as an ion pair.
+    C = (3.85, 1.16)
+    S = (4.75, 1.16)
+    Otop = (4.75, 1.86)
+    Obot = (4.75, 0.46)
+    Or = (5.55, 1.16)
+    Li = (6.35, 1.16)
+    for F in [(3.15, 1.68), (3.02, 1.16), (3.15, 0.64)]:
+        _bond(ax_salt, C, F, lw=0.9)
+        ax_salt.text(*F, "F", ha="center", va="center", fontsize=9.0, color=green)
+    _bond(ax_salt, C, S, lw=1.0)
+    _double_bond(ax_salt, S, Otop, offset=0.025)
+    _double_bond(ax_salt, S, Obot, offset=0.025)
+    _bond(ax_salt, S, Or, lw=1.0)
+    _bond(ax_salt, (5.77, 1.16), (6.04, 1.16), lw=0.75, color="0.55", linestyle=(0, (2, 2)))
+    for pos, atom, col in [(C, "C", "0.12"), (S, "S", yellow), (Otop, "O", red), (Obot, "O", red), (Or, "O$^-$", red)]:
+        ax_salt.text(*pos, atom, ha="center", va="center", fontsize=9.0, color=col, weight="bold")
+    ax_salt.add_patch(Circle(Li, 0.24, facecolor="#E8F1FB", edgecolor=blue, lw=1.0))
+    ax_salt.text(*Li, "Li$^+$", ha="center", va="center", fontsize=8.0, color=blue, weight="bold")
+
+    ax_salt.text(1.0, 1.2, r"$\mathrm{LiCF_3SO_3}$", ha="left", va="center", fontsize=11, color="0.12")
+    ax_salt.text(
+        9.65, 1.14,
+        "selected formulation:\nSY : Hybrane : LiOTf\n= 1 : 0.30 : 0.09 by mass",
+        ha="right",
+        va="center",
+        fontsize=7.8,
+        color="0.22",
+    )
+
+    save(fig, "composite_chemistry.pdf")
 
 
 def _shade(hex_color: str, factor: float) -> tuple[float, float, float]:
@@ -637,6 +815,7 @@ def fig_morphology_stability_support() -> None:
 
 
 def main() -> None:
+    fig_composite_chemistry()
     fig_device_schematic()
     fig_iv_hyst()
     fig_potentiation_depression()
