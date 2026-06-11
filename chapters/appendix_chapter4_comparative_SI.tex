@@ -295,7 +295,7 @@ the dissolved salt are required for the memristive response.
 
 \begin{table}[t]
   \centering
-  \caption[Electrode-contrast per-cell metrics]{Per-cell behavioural metrics by top electrode (active silver vs inert gold), at the lead composition \num{0.3}/\num{0.09}. On--off and normalised loop area from HYST; \(V_{\mathrm{act}}\) activation voltage (V); peak ratio and \(\alpha\) from PULSES; \(t_{1/2}\) from DELAYTIME (s). Em-dash: no clean decay/fit at that cell. ``none'' rows are host-free or salt-free negative controls.}
+  \caption[Electrode-contrast per-cell metrics]{Per-cell behavioural metrics by top electrode (active silver vs inert gold), at the lead composition \num{0.3}/\num{0.09}, under the canonical positive-polarity protocols. On--off and normalised loop area from HYST; \(V_{\mathrm{act}}\) activation voltage (V); peak ratio and \(\alpha\) from PULSES; \(t_{1/2}\) from DELAYTIME (s). Em-dash: no clean decay/fit at that cell. \(\dagger\): no positive-protocol decay exists, but the negative-polarity corpus supplies the missing retention measurement under a different protocol (\(-5\)~V write, \(-2.25\)~V sparse read): model-free half-decay medians Li\(^{+}\) \SI{2.2}{\second} (\(n=5\)), Na\(^{+}\) \SI{2.4}{\second} (\(n=11\)), K\(^{+}\) \SI{0.7}{\second} (\(n=12\)); see \cref{app:ch4_gold_dynamics}. ``none'' rows are host-free or salt-free negative controls.}
   \label{tab:ch4_electrode_by_cell}
   \footnotesize
   \setlength{\tabcolsep}{4pt}
@@ -306,11 +306,11 @@ the dissolved salt are required for the memristive response.
     PEO/Li/OTf  & Ag & 3.25 & 0.33 & 2.38 & 123.5 & 0.89 & 19.2 \\
     PEO/Li/OTf  & Au & 2.00 & 0.12 & 2.74 & 29.4  & 0.45 & 87.2 \\
     TMPE/Li/OTf & Ag & 3.82 & 0.32 & 4.18 & 53.7  & 0.33 & 3.7 \\
-    TMPE/Li/OTf & Au & 1.29 & 0.07 & 3.61 & 1.9   & 0.17 & --- \\
+    TMPE/Li/OTf & Au & 1.29 & 0.07 & 3.61 & 1.9   & 0.17 & \(\dagger\) \\
     TMPE/Na/OTf & Ag & 5.54 & 0.30 & 3.26 & 497.9 & 1.23 & 3.9 \\
-    TMPE/Na/OTf & Au & 1.47 & 0.11 & 6.39 & ---   & ---  & --- \\
+    TMPE/Na/OTf & Au & 1.47 & 0.11 & 6.39 & ---   & ---  & \(\dagger\) \\
     TMPE/K/OTf  & Ag & 7.01 & 0.41 & 3.10 & 237.5 & 1.19 & 5.2 \\
-    TMPE/K/OTf  & Au & 1.43 & 0.06 & 5.86 & ---   & ---  & --- \\
+    TMPE/K/OTf  & Au & 1.43 & 0.06 & 5.86 & ---   & ---  & \(\dagger\) \\
     TMPE/Na/TFSI& Ag & 1.76 & 0.10 & 2.38 & 25.1  & 0.46 & --- \\
     Hy/Li/OTf   & Ag & 1.41 & 0.06 & 1.61 & 25.2  & 0.39 & --- \\
     none/Li/OTf & Ag & 0.99 & 0.00 & 1.07 & ---   & ---  & --- \\
@@ -319,6 +319,97 @@ the dissolved salt are required for the memristive response.
     \bottomrule
   \end{tabular}
 \end{table}
+
+\section{The Gold-Electrode Negative-Polarity Dynamics Corpus}\label{app:ch4_gold_dynamics}
+
+This section documents the provenance, validation, and per-protocol results of the
+negative-polarity measurement campaigns behind the polarity findings of
+\cref{sec:ch4_electrode} and the single-run drive--retention measurements cited in
+\cref{sec:ch4_protocol}. Reproduction: \texttt{scripts/uncat\_au\_tmpe\_audit.py}
+(parser, waveform classifier, per-file inventory) and
+\texttt{scripts/uncat\_au\_tmpe\_findings.py} (analyses); per-file tables in
+\texttt{handouts/uncat\_inventory.csv} and \texttt{handouts/uncat\_findings\_*.csv};
+a full audit record in \texttt{handouts/28\_uncategorized\_au\_tmpe\_audit.md}.
+
+\paragraph{Provenance.} The corpus comprises eight dated campaign folders
+(2025-01-23 to 2025-02-21) stored outside the curated archive layout, holding
+\num{356} raw files of which \num{349} parse as standard Keithley source-meter
+dumps (three comma-separated rows: current, voltage, time; acquisition cadences
+matching the instrument's NPLC settings; \SI{1}{\milli\ampere} compliance). All
+campaigns sit on the Au/\TMPE{}(\num{0.3})/triflate(\num{0.09}) generation, one
+salt per campaign (\ce{Li}, \ce{Na}, \ce{K} triflate). The January campaign is
+identified at file level: its contents are byte-identical to the catalogued
+folder of device NM\_v316 (TMPE/\LiTf{}/Au, \num{3000} rpm, \SI{90}{\celsius}
+\SI{3}{\hour}, glovebox-stored and measured), which it duplicates and extends.
+The February campaigns exist only in this corpus and are assigned to the same
+generation by chemistry, recipe, and measurement date (most plausibly the
+catalogued NaTr, KTr, and LiTr substrates of late 2024, then \(\sim\!2\)--\(3\)
+months old); their exact substrate identities are not documented. One recovered
+file is the measurement script itself, which fixes the relaxation protocol
+exactly: \(-5\)~\si{\volt}/\SI{0.02}{\second} pulse packets at a
+\(-2.25\)~\si{\volt} inter-pulse level, applied until a \(\sim\!\SI{600}{\second}\)
+stabilisation window elapses, then single-point \(-2.25\)~\si{\volt} reads after
+exponentially spaced delays (\SIrange{0.075}{30}{\second}) with the source at
+high impedance between reads.
+
+\paragraph{Validation.} Four consistency checks tie the corpus to the catalogued
+archive. (i)~File format, acquisition cadences, and compliance match the
+instrument configuration of the curated raw data. (ii)~Parsing the catalogued
+positive- and negative-going sweeps of the same generation (\num{90} sweeps,
+v296--v316) with the same code reproduces the negative-over-positive response
+asymmetry in direction and magnitude, and the uncategorized sweeps agree with the
+catalogued on--off values at matched (fast) sweep rate --- the large windows
+appear only at slow rate, which the catalogued protocol never probed.
+(iii)~Driven positively, the corpus reproduces the weak gold response of
+\cref{tab:ch4_electrode_by_cell}. (iv)~The only polarity-inverted measurements
+are the two sessions whose folder notes document physically reversed wiring;
+they are excluded from all asymmetry statistics.
+
+\paragraph{Per-protocol results.} \Cref{tab:ch4_gold_dynamics} summarises the
+corpus by protocol class and cation. Beyond the headline numbers of
+\cref{sec:ch4_electrode}: constant-bias holds bracket the activation threshold
+between \(-1.5\) and \(-2.5\)~\si{\volt} in every campaign (current decaying
+below it, growing \(10\)--\(3000\times\) above it, with \(63\%\)-rise times of
+tens to hundreds of seconds); potentiation--depression runs show deep, fast
+depression by positive pulses (final-to-peak read ratios of
+\(0.002\)--\(0.05\) at \(\pm4\)--\(5\)~\si{\volt}); and \num{17} files touch
+the \SI{1}{\milli\ampere} compliance ceiling (concentrated in the
+strongest \ce{K} trains) and are flagged in the inventory and excluded from the
+potentiation statistics. The decay fits bound the stretch exponent to
+\(\beta\in(0,1]\) and are accompanied by a model-free half-decay time; the table
+reports the latter.
+
+\begin{table}[t]
+  \centering
+  \caption[Gold negative-polarity corpus, per-cation summary]{Per-cation summary
+  of the gold/\TMPE{}/triflate negative-polarity corpus (medians; illustrative
+  tier). Window: on--off ratio of the slowest \(-3\)~\si{\volt} sweeps versus the
+  fastest. Potentiation: read-current enhancement at the matched protocol
+  (\(-5\)~\si{\volt} pulses, \(-2.25\)~\si{\volt} read), compliance-saturated
+  runs excluded. \(t_{50}\): model-free half-decay of the sparse-read relaxation
+  (drop \(>30\%\), non-zero read). Kohlrausch \(\beta\) range over clean fits.}
+  \label{tab:ch4_gold_dynamics}
+  \footnotesize
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{lrrrrr}
+    \toprule
+    Cation & window (slow/fast, \(-3\)~V) & potentiation & \(n\) & \(t_{50}\) (s) & \(\beta\) \\
+    \midrule
+    \ce{Li+} & \(\approx\!22\)/\(\approx\!23\)   & \(233\times\) & 6  & 2.2 (\(n=5\))  & 0.33--0.44 \\
+    \ce{Na+} & \(\approx\!15\)/\(\approx\!8\)    & \(48\times\)  & 12 & 2.4 (\(n=11\)) & 0.33--0.43 \\
+    \ce{K+}  & \(\approx\!1.9\)/\(\approx\!0.9\) & \(40\times\)  & 15 & 0.7 (\(n=12\)) & 0.15--1.0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Bounds.} The corpus is single-composition (\num{0.3}/\num{0.09}
+throughout), spans one or two substrates per cation, is uncurated, and mixes
+protocol variants; the February substrate identities are inferred; the
+supra-threshold negative read makes the decay times protocol-specific
+(comparable to the silver delay-time values in order of magnitude only); and
+device age at measurement differs between the January (days~1--6) and February
+(months-old) campaigns. Accordingly, every statement drawn from it in the main
+text is illustrative, and no cation ordering is claimed.
 
 \section{Significance of the Composition Gradient}\label{app:ch4_gradient}
 
