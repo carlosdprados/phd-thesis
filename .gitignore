@@ -26,3 +26,6 @@ data/
 # Python
 __pycache__/
 *.pyc
+
+# Regenerable QA thumbnails from scripts/uncat_au_tmpe_audit.py
+figures/uncat_qa/
