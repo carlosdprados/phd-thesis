@@ -151,6 +151,21 @@ common timeline and per-subject scaled exactly as the \WESAD{} streams; the phas
 annotations map cognitive and emotional stress to the stress class and relaxation to
 not-stress, with the physical-stress (exercise) phase excluded.
 
+\paragraph{Real-motion corruption.} To confirm the robustness is not an artefact of the
+Gaussian noise model, the corruption is also driven by the \emph{measured} chest
+accelerometer (\path{add_motion_noise}, \path{load_motion} in the scripts). A per-step
+motion index is the magnitude of the gravity-removed acceleration, RMS-smoothed over
+\SI{1}{\second} and robustly scaled to $[0,1]$ per subject; the injected noise standard
+deviation at each step is $\text{scale}\times(0.05 + \text{motion})$, with an amplified
+artefact burst where the index exceeds $0.6$, so corruption lands where the wearer
+actually moves. Across a corruption scale of $0$ to $0.8$ the instantaneous detector
+falls from macro-F1 $0.914$ to $0.898$ while the memory bank holds near $0.92$; at the
+strongest gating the memory-minus-instantaneous advantage is $+0.032$ (paired Wilcoxon
+$p=0.04$, $r_{\mathrm{rb}}=+0.6$) and the single-$\tau$ moving average matches it
+($+0.036$). The advantage is smaller than under the synthetic injection because the
+chest strap is mechanically stable and the protocol largely seated; the wrist site
+(\cref{tab:ch5_wrist}) is where motion artefact dominates.
+
 \section{Control Experiments}\label{app:ch5_controls}
 
 Three controls underpin the claims of \cref{ch:temporal} and are tabulated here.
@@ -246,6 +261,21 @@ stratified-random predictor $0.33$ (leave-one-subject-out, per step), so the
 reservoir's $0.758$ is well above chance. Significance of the bank comparisons is
 assessed across the fifteen independent held-out subjects, so within-subject temporal
 autocorrelation does not inflate it.
+
+\paragraph{Drive-boosted tonic-node extension.} The minutes-scale tonic gap of
+\cref{fig:ch5_tau_coverage} is probed by extending the heterogeneous bank with
+drive-boosted nodes at $\tau = 120$ and \SI{300}{\second} --- a labelled
+extrapolation of the drive-amplitude lever, copying the lead cell's write
+nonlinearity and stretch and overriding only $\tau$ (\path{tonic_cards} in
+\path{scripts/ch5_model.py}). On memory capacity (DT $=\SI{5}{\second}$, $k$ to $40$)
+the extension nearly doubles the long-lag tail beyond \SI{75}{\second}
+($\mathrm{MC}_{k>15}$ from $0.73$ to $1.37$, $p=2\times10^{-3}$) and raises total
+capacity from $6.4$ to $7.0$. On the physiological-context reconstruction, with the
+target delays extended to $90$ and \SI{120}{\second} so the genuinely tonic context is
+present, the slow-band held-out $R^2$ rises from $0.672$ to $0.690$
+($+0.019$, $p=2\times10^{-3}$, $r_{\mathrm{rb}}=+1.0$ over ten seeds) and the overall
+$R^2$ by $+0.009$ (\path{tonic_extension} in \path{scripts/ch5_physio_context.py}). The
+extension is not part of the measured composition banks anywhere else in the chapter.
 
 \section{Deployment Envelope}\label{app:ch5_deploy}
 

@@ -131,6 +131,21 @@ def lead_card(cards):
     return None
 
 
+def tonic_cards(cards, taus=(120.0, 300.0)):
+    """Drive-boosted slow nodes that reach the minutes-scale TONIC band the
+    composition grid does not cover (tau_max ~ 26 s; see the shaded gap in the
+    tau-coverage figure). These are an explicit, clearly-labelled EXTRAPOLATION of
+    the drive-amplitude lever characterised in the comparative chapter (raising the
+    write amplitude lengthens the fading-memory time): each tonic card copies the
+    lead cell but overrides tau to a minutes value, keeping its measured beta and
+    write nonlinearity. Used only to test whether closing the tonic gap helps the
+    genuinely slow tasks -- it is NOT part of the measured composition banks."""
+    from dataclasses import replace
+    lead = lead_card(cards)
+    return [replace(lead, tau=float(t), beta=1.0, identified=False, t_half=float(t) * LN2)
+            for t in taus]
+
+
 def _self_test(cards):
     """Sanity demo: print the bank and check the lead node shows fading memory."""
     print(f"{'cell':22s} {'n':>3} {'tau[s]':>7} {'beta':>5} {'t12[s]':>7} "

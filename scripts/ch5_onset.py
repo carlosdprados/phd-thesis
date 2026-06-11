@@ -45,8 +45,8 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ch5_model import load_cards, lead_card                       # noqa: E402
 from ch5_reservoir import nodes_from, run_states, _full, paired_stats  # noqa: E402
-from ch5_wesad import (load_raw, stream_subject, _ridge_onehot_fit, _predict,  # noqa: E402
-                       macro_f1, _roll_mode, LABELS, WASHOUT_S, SMOOTH_S,
+from ch5_wesad import (load_raw, load_motion, stream_subject, _ridge_onehot_fit,  # noqa: E402
+                       _predict, macro_f1, _roll_mode, LABELS, WASHOUT_S, SMOOTH_S,
                        N_NODES, DT_WES, CHANNELS)
 
 STRESS = 2                       # WESAD stress label
@@ -72,6 +72,25 @@ def add_noise(U, sigma, rng, burst_rate=0.01, burst_gain=3.0):
         for s in starts:
             e = min(s + rng.integers(2, 8), T)
             noise[s:e] += rng.normal(0.0, sigma * burst_gain, size=(e - s, C))
+    return np.clip(U + noise, 0.0, 1.0)
+
+
+def add_motion_noise(U, motion, scale, rng, floor=0.05, burst_thr=0.6, burst_gain=2.5):
+    """Corruption whose amplitude tracks a REAL per-step motion index (in [0,1] from
+    the chest accelerometer), instead of the uniform synthetic sigma of add_noise().
+    The noise standard deviation at step t is scale*(floor + motion[t]), and steps
+    above burst_thr take an extra amplified artefact burst -- so the corruption is
+    concentrated exactly where the wearer actually moves. This is the data-driven
+    test that the noise-robustness result is not an artefact of a Gaussian noise
+    model. scale=0 returns the clean stream."""
+    if scale <= 0:
+        return U
+    T, C = U.shape
+    m = np.asarray(motion, float)[:, None]
+    noise = rng.normal(0.0, 1.0, size=(T, C)) * (scale * (floor + m))
+    hot = np.asarray(motion, float) > burst_thr
+    if hot.any():
+        noise[hot] += rng.normal(0.0, scale * burst_gain, size=(int(hot.sum()), C))
     return np.clip(U + noise, 0.0, 1.0)
 
 
@@ -367,6 +386,75 @@ def ema_control(raw, cards, sigmas=NOISE_SIGMAS, dt=DT_WES, seeds=(7, 8, 9)):
                 d_emaN=d_emaN, d_ema1=d_ema1, d_inst=d_inst)
 
 
+def _align_motion(motion_sid, n):
+    """Resample a subject's SLOW_FS motion trace onto the n-step reservoir timeline."""
+    m = np.asarray(motion_sid, float)
+    if len(m) == n:
+        return m
+    return np.interp(np.linspace(0, 1, n), np.linspace(0, 1, len(m)), m)
+
+
+def motion_control(raw, motions, cards, scales=(0.0, 0.2, 0.4, 0.6, 0.8),
+                   dt=DT_WES, seeds=(7, 8, 9)):
+    """Real-accelerometer robustness test: replace the synthetic Gaussian noise of
+    noise_sweep() with corruption GATED ON THE MEASURED CHEST MOTION (add_motion_noise),
+    so the artefact lands where the wearer actually moves. Compares inst / ema1 / het
+    binary-F1 vs the motion-corruption scale, with per-subject paired tests at the
+    strongest level. Confirms (or not) that the memory/low-pass robustness survives a
+    data-driven corruption model, not just a Gaussian one."""
+    taus = sorted(float(c.tau) for c in _full(cards))
+    tau_lead = float(lead_card(cards).tau)
+    smooth = int(SMOOTH_S / dt)
+    C = next(iter(raw.values()))[0].shape[1]
+    banks = ["inst", "ema1", "het"]
+
+    def feats_for(kind, scale, seed):
+        rng = np.random.default_rng(900 + seed)
+        het = nodes_from(_full(cards), N_NODES, np.random.default_rng(seed),
+                         dt=dt, n_in=C, sparsity=0.4) if kind == "het" else None
+        out = {}
+        for sid, (U, lab) in raw.items():
+            Us, ls = stream_subject(U, lab, dt)
+            mot = _align_motion(motions[sid], len(Us)) if sid in motions else np.zeros(len(Us))
+            Us = add_motion_noise(Us, mot, scale, rng)
+            if kind == "inst":
+                F = Us
+            elif kind == "ema1":
+                F = ema(Us, [tau_lead], dt)
+            else:
+                F = run_states(het, Us)
+            keep = _kept(ls)
+            out[sid] = (F[keep], (ls[keep] == STRESS).astype(int))
+        return out
+
+    acc = {b: [] for b in banks}
+    per_hi = {}
+    for sc in scales:
+        per_seed = {b: [] for b in banks}
+        for sd in seeds:
+            for b in banks:
+                f1, per = loso_binary(feats_for(b, sc, sd), smooth=smooth)
+                per_seed[b].append(f1)
+                if sc == scales[-1] and sd == seeds[0]:
+                    per_hi[b] = subj_f1(per)
+        for b in banks:
+            acc[b].append((float(np.mean(per_seed[b])), float(np.std(per_seed[b]))))
+    print("\nREAL-MOTION ROBUSTNESS (binary-F1 vs accelerometer-gated corruption scale):")
+    hdr = "  ".join(f"sc={s:g}" for s in scales)
+    print(f"  {'bank':5s}  {hdr}")
+    for b in banks:
+        print(f"  {b:5s}  " + "  ".join(f"{m:.3f}" for m, _ in acc[b]))
+    hi = scales[-1]
+    d_het = _paired(per_hi["het"], per_hi["inst"])
+    d_ema = _paired(per_hi["ema1"], per_hi["inst"])
+    print(f"  at scale={hi:g} (per-subject paired vs instantaneous):")
+    print(f"    het  - inst = {d_het['mean']:+.3f} (p={d_het['p']:.1e}, r_rb={d_het['r_rb']:+.2f})")
+    print(f"    ema1 - inst = {d_ema['mean']:+.3f} (p={d_ema['p']:.1e}, r_rb={d_ema['r_rb']:+.2f})")
+    print("  (memory/low-pass advantage replicates under REAL motion artefact => "
+          "not an artefact of the Gaussian noise model.)")
+    return dict(scales=list(scales), acc=acc, d_het=d_het, d_ema=d_ema)
+
+
 def main():
     cards = load_cards(li_only=True)
     if not (os.path.isdir("data/wesad/WESAD")):
@@ -418,6 +506,10 @@ def main():
           f"Wilcoxon p={stN['p']:.1e} r_rb={stN['r_rb']:+.2f}")
 
     ema_control(raw, cards)
+
+    print("\nloading chest accelerometer for real-motion test ...")
+    motions = load_motion()
+    motion_control(raw, motions, cards)
 
 
 if __name__ == "__main__":

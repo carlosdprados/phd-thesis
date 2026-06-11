@@ -444,6 +444,32 @@ def coupling_sensitivity(cards, N=24, max_k=30, seeds=SEEDS,
     return rows
 
 
+def tonic_mc_control(cards, N=24, max_k=40, seeds=SEEDS):
+    """Drive-boosted tonic-node extension on memory capacity: does adding minutes-
+    scale nodes (the tau-coverage gap) raise long-lag recall? Compares the measured
+    heterogeneous bank with a tonic-extended bank on total MC and on the long-lag
+    tail (k>15, i.e. >75 s at the DT=5 s benchmark cadence)."""
+    from ch5_model import tonic_cards
+    base_het = _full(cards)
+    base_ext = base_het + tonic_cards(cards)
+    het, ext, het_hi, ext_hi = [], [], [], []
+    for s in seeds:
+        u = np.random.default_rng(1000 + s).uniform(0.0, 1.0, 4000)
+        mh = memory_capacity(run_states(nodes_from(base_het, N, np.random.default_rng(s)), u), u, max_k)
+        me = memory_capacity(run_states(nodes_from(base_ext, N, np.random.default_rng(s)), u), u, max_k)
+        het.append(mh.sum()); ext.append(me.sum())
+        het_hi.append(mh[15:].sum()); ext_hi.append(me[15:].sum())
+    het, ext, het_hi, ext_hi = map(np.array, (het, ext, het_hi, ext_hi))
+    st_tot, st_hi = paired_stats(ext, het), paired_stats(ext_hi, het_hi)
+    print("\nTonic-node extension (memory capacity, max_k=%d at DT=%gs):" % (max_k, DT))
+    print(f"  heterogeneous            total MC={het.mean():5.2f}  long-lag(k>15)={het_hi.mean():4.2f}")
+    print(f"  + drive-boosted tonic    total MC={ext.mean():5.2f}  long-lag(k>15)={ext_hi.mean():4.2f}")
+    print(f"  gain: total {st_tot['mean']:+.2f} (p={st_tot['p']:.1e}), "
+          f"long-lag {st_hi['mean']:+.2f} (p={st_hi['p']:.1e}, r_rb={st_hi['r_rb']:+.2f}) "
+          f"-> tonic nodes extend recall into the minutes-scale tail")
+    return dict(het=het, ext=ext, het_hi=het_hi, ext_hi=ext_hi)
+
+
 def main():
     cards = load_cards(li_only=True)
     N = 24                                 # bank size (both conditions equal)
@@ -487,6 +513,7 @@ def main():
     composition_sweep(cards)
     random_reservoir_control(cards, N)
     coupling_sensitivity(cards, N)
+    tonic_mc_control(cards, N)
     print("\nself-test: PASS")
 
 

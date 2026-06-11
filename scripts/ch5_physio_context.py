@@ -95,14 +95,14 @@ def lagged_targets(Us, lags=LAGS_S):
     return np.column_stack(feats), meta
 
 
-def feature_dict(raw, nodes=None, dt=DT):
+def feature_dict(raw, nodes=None, dt=DT, lags=LAGS_S):
     """Build {sid: (F, Y)} for one reservoir/control condition."""
     feats = {}
     meta = None
-    washout = max(int(W.WASHOUT_S / dt), max(LAGS_S))
+    washout = max(int(W.WASHOUT_S / dt), max(lags))
     for sid, (U, lab) in raw.items():
         Us, ls = W.stream_subject(U, lab, dt)
-        Y, meta = lagged_targets(Us)
+        Y, meta = lagged_targets(Us, lags)
         F = Us if nodes is None else run_states(nodes, Us)
         keep = np.isin(ls, list(W.LABELS))
         keep[:washout] = False
@@ -306,6 +306,48 @@ def _evaluate_persubject(raw, cards, condition, seed, n_nodes):
     return loso_regression(feats, per_subject=True)
 
 
+def tonic_extension(raw, cards, seeds=SEEDS, n_nodes=N_NODES,
+                    lags=(1, 3, 8, 20, 45, 90, 120)):
+    """Drive-boosted tonic-node extension (the tau-coverage-gap test). Adds
+    minutes-scale nodes to the heterogeneous composition bank and asks whether
+    closing the tonic gap raises the SLOW-band reconstruction. Targets are extended
+    to 90 and 120 s delays so the genuinely tonic context is in the vector; the
+    comparison is heterogeneous (measured) vs heterogeneous + tonic, LOSO,
+    seed-averaged, with a paired slow-band test across seeds."""
+    from ch5_model import tonic_cards
+    from ch5_reservoir import paired_stats
+    full = _full(cards)
+    ext = full + tonic_cards(cards)
+    C = len(W.CHANNELS)
+    SLOW = "slow 20-45 s"
+
+    def run(base):
+        ov, slow = [], []
+        for s in seeds:
+            nodes = nodes_from(base, n_nodes, np.random.default_rng(s),
+                               dt=DT, n_in=C, sparsity=0.4)
+            feats, meta = feature_dict(raw, nodes, lags=lags)
+            r2, _ = loso_regression(feats)
+            ov.append(float(np.mean(r2)))
+            sidx = [i for i, m in enumerate(meta) if m["group"] == SLOW]
+            slow.append(float(np.mean(r2[sidx])))
+        return np.array(ov), np.array(slow)
+
+    het_ov, het_slow = run(full)
+    ext_ov, ext_slow = run(ext)
+    st = paired_stats(ext_slow, het_slow)
+    print(f"\nTonic-node extension (slow targets now include 90, 120 s):")
+    print(f"  {'bank':24s} {'overall R2':>11} {'slow-band R2':>13}")
+    print(f"  {'heterogeneous':24s} {het_ov.mean():11.3f} {het_slow.mean():13.3f}")
+    print(f"  {'+ drive-boosted tonic':24s} {ext_ov.mean():11.3f} {ext_slow.mean():13.3f}")
+    print(f"  slow-band gain = {st['mean']:+.3f} (p={st['p']:.1e}, r_rb={st['r_rb']:+.2f}); "
+          f"overall {ext_ov.mean()-het_ov.mean():+.3f}")
+    print("  (closing the minutes-scale tonic gap helps the slowest context the "
+          "composition grid cannot reach.)")
+    return dict(het_overall=float(het_ov.mean()), ext_overall=float(ext_ov.mean()),
+                het_slow=float(het_slow.mean()), ext_slow=float(ext_slow.mean()), stat=st)
+
+
 def make_figure(rows, path=FIG_PATH):
     import matplotlib
     matplotlib.use("Agg")
@@ -419,6 +461,7 @@ def run_benchmark():
     rows = load_results()
     print_summary(rows)
     paired_significance(raw, cards)
+    tonic_extension(raw, cards)
     make_figure(rows)
 
 

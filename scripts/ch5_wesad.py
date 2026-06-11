@@ -106,6 +106,48 @@ def hr_from_ecg(ecg, fs=ECG_FS, fs_out=SLOW_FS):
     return np.interp(tg, t_pk[1:], hr, left=hr[0], right=hr[-1])
 
 
+def _subject_motion(pkl_path, fs=ECG_FS, fs_out=SLOW_FS):
+    """Real motion index from the chest tri-axial accelerometer: the magnitude of the
+    gravity-removed acceleration, RMS-smoothed over ~1 s, resampled to fs_out and
+    robustly scaled to [0,1] per subject. This is the DATA-DRIVEN corruption driver
+    for the motion-gated robustness test (sec:ch5_robust), replacing the synthetic
+    Gaussian noise model with the artefact pattern the wearer actually generates."""
+    with open(pkl_path, "rb") as fh:
+        d = pickle.load(fh, encoding="latin1")
+    acc = np.asarray(d["signal"]["chest"]["ACC"], float)     # (N,3) @ 700 Hz
+    mag = np.linalg.norm(acc, axis=1)
+    w = max(int(fs), 1)                                       # ~1 s window
+    base = np.convolve(mag, np.ones(w) / w, mode="same")     # gravity / slow drift
+    dyn = np.abs(mag - base)                                  # dynamic acceleration
+    energy = np.sqrt(np.convolve(dyn * dyn, np.ones(w) / w, mode="same"))
+    m = _resample(energy, fs, fs_out)
+    lo, hi = np.percentile(m, 5), np.percentile(m, 95)
+    return np.clip((m - lo) / (hi - lo + 1e-9), 0.0, 1.0)
+
+
+def load_motion(cache=True):
+    """Return {sid: motion (T,) at SLOW_FS, in [0,1]} from the chest accelerometer.
+    Cached separately from the physiological streams (ACC is not a model channel)."""
+    cache_path = os.path.join(os.path.dirname(WESAD_DIR), f"_cache_motion_{SLOW_FS:g}hz.npz")
+    out = {}
+    if cache and os.path.exists(cache_path):
+        z = np.load(cache_path, allow_pickle=True)
+        for k in z.files:
+            out[k] = z[k]
+        print(f"  (loaded {len(out)} motion traces from cache)")
+    else:
+        for pkl in sorted(glob.glob(os.path.join(WESAD_DIR, "S*", "S*.pkl"))):
+            sid = os.path.basename(pkl).split(".")[0]
+            try:
+                out[sid] = _subject_motion(pkl)
+            except Exception as e:
+                print(f"  ! skip motion {sid}: {e}")
+        if cache and out:
+            np.savez_compressed(cache_path, **out)
+            print(f"  (cached {len(out)} motion traces -> {cache_path})")
+    return out
+
+
 def _scale_subject(U):
     """Per-subject, per-channel robust scaling to ~[0,1] (5th-95th percentile):
     preserves relative level ACROSS the session (tonic shifts survive) while making
