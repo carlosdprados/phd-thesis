@@ -134,7 +134,7 @@ the dynamics track composition. The full join and statistics are reproduced by
 \paragraph{Other fabrication variables are held constant or crossed.} The full
 per-device fabrication record was audited to confirm that the composition trends
 are not driven by some other processing variable. Across the silver composition
-grid the principal process levers are held \emph{constant}: the annealing
+grid the principal process variables are held \emph{constant}: the annealing
 temperature (\SI{75}{\celsius}, no second stage), the electrode (\SI{100}{\nano\meter}
 silver, evaporated by the same operator), the semiconductor loading, the solvent,
 and --- which matters for a hygroscopic polyether --- storage \emph{and} measurement
@@ -157,7 +157,7 @@ compensation at all. The full column-by-column audit is recorded in
 behind the heatmaps of \cref{sec:ch4_composition} and the design space of
 \cref{fig:ch4_design_space}. Each row is a composition cell; values are medians
 over the screened devices in the cell, with the device count \(n\) given so that
-the replicated \ce{Li+} composition spine is distinguished from the
+the replicated \ce{Li+} composition series is distinguished from the
 single-device \ce{Na+}/\ce{K+} chemistry points.
 
 \begin{table}[t]
@@ -216,7 +216,7 @@ single-device \ce{Na+}/\ce{K+} chemistry points.
 \section{Realised Device Palette}\label{app:ch4_palette}
 
 The quantitative analyses of \cref{ch:comparative} are deliberately confined to
-the replicated silver \PEO{}/\LiTf{} composition spine. It is nonetheless useful
+the replicated silver \PEO{}/\LiTf{} composition series. It is nonetheless useful
 to see the full set of behaviours the device family actually realises, because it
 is this realised spread --- not any single optimised cell --- that the temporal
 chapter treats as a computational resource. \Cref{fig:ch4_palette} places every
@@ -235,7 +235,7 @@ counterpart of the within-cell device-to-device scatter quantified in
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.82\linewidth]{../figures/chapter4/palette.pdf}
-  \caption[Realised device palette across the library]{Measured window-versus-retention palette of the silver device library (\(n=54\) devices with both a clean hysteresis window and a fading-memory fit, all chemistries). Colour encodes the ion-conductor host, marker encodes the salt cation; the lead \PEO{}~0.3/0.09 cell is ringed. The cloud spans over a decade in each axis, and the lead-cell replicates alone span \(\tau\approx\SIrange{0.4}{20}{\second}\). Descriptive overview only; the quantitative claims of \cref{ch:comparative} rest on the replicated composition spine, not on this map.}
+  \caption[Realised device palette across the library]{Measured window-versus-retention palette of the silver device library (\(n=54\) devices with both a clean hysteresis window and a fading-memory fit, all chemistries). Colour encodes the ion-conductor host, marker encodes the salt cation; the lead \PEO{}~0.3/0.09 cell is ringed. The cloud spans over a decade in each axis, and the lead-cell replicates alone span \(\tau\approx\SIrange{0.4}{20}{\second}\). Descriptive overview only; the quantitative claims of \cref{ch:comparative} rest on the replicated composition series, not on this map.}
   \label{fig:ch4_palette}
 \end{figure}
 
@@ -324,7 +324,7 @@ the dissolved salt are required for the memristive response.
 
 The composition trends of \cref{sec:ch4_composition} are reported in the main text
 as cell medians. This section attaches a significance test and a non-parametric
-uncertainty to them, on the replicated Ag/\ce{Li} \SY{}/\PEO{}/\LiTf{} spine. For
+uncertainty to them, on the replicated Ag/\ce{Li} \SY{}/\PEO{}/\LiTf{} series. For
 each descriptor we compute the Spearman rank correlation with the \PEO{} fraction
 across individual devices, with a two-sided permutation \(p\)-value
 (\num{20000} relabellings; \cref{tab:ch4_gradient}). The fading-memory time
@@ -339,7 +339,7 @@ potentiation trends are indicative.
 
 \begin{table}[t]
   \centering
-  \caption[Significance of the composition gradient]{Per-device Spearman rank correlation of each descriptor with the \PEO{} mass fraction (Ag/\ce{Li} composition spine), with a two-sided permutation \(p\)-value. Only the fading-memory time clears \(p<0.05\).}
+  \caption[Significance of the composition gradient]{Per-device Spearman rank correlation of each descriptor with the \PEO{} mass fraction (Ag/\ce{Li} composition series), with a two-sided permutation \(p\)-value. Only the fading-memory time clears \(p<0.05\).}
   \label{tab:ch4_gradient}
   \footnotesize
   \setlength{\tabcolsep}{8pt}
@@ -379,7 +379,7 @@ slope --- rather than on the growth magnitude.
 
 \begin{table}[t]
   \centering
-  \caption[Factorial decomposition of the composition axes]{Two-way decomposition of each log-descriptor into \(\log\PEO{}\), \(\log\mathrm{salt}\), and their interaction (Ag/\ce{Li} spine; centred predictors; permutation \(p\)). \PEO{} is the only significant axis, on the fading-memory time, and no interaction term is significant --- the two axes act near-orthogonally.}
+  \caption[Factorial decomposition of the composition axes]{Two-way decomposition of each log-descriptor into \(\log\PEO{}\), \(\log\mathrm{salt}\), and their interaction (Ag/\ce{Li} series; centred predictors; permutation \(p\)). \PEO{} is the only significant axis, on the fading-memory time, and no interaction term is significant --- the two axes act near-orthogonally.}
   \label{tab:ch4_factorial}
   \footnotesize
   \setlength{\tabcolsep}{5pt}
@@ -403,7 +403,7 @@ prediction on a quantity the peak-normalised dynamics discard: if added
 ion-transport polymer simply interrupted the electronic network, the
 \emph{absolute} on-state conductance should \emph{fall} with \PEO{}. It does the
 opposite. The on-state conductance (HYST conductance at the sweep maximum, device
-medians, \(n=47\) Ag spine devices) \emph{rises} steeply and monotonically with
+medians, \(n=47\) Ag series devices) \emph{rises} steeply and monotonically with
 \PEO{} --- Spearman \(\rho=+0.65\) (\(p<10^{-4}\)), a log--log slope of
 \(\approx+3.6\), and more than three orders of magnitude from \PEO{}~\num{0.15} to
 \num{1.2} (\cref{fig:ch4_percolation}). Because film thickness rises with \PEO{}
@@ -423,7 +423,7 @@ relaxation, not electronic percolation.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.62\linewidth]{../figures/chapter4/percolation.pdf}
-  \caption[Absolute on-state conductance rises with \PEO{}]{Absolute on-state conductance (HYST, conductance at the sweep maximum; device medians, Ag spine, \(n=47\), coloured by salt) against \PEO{} fraction, log--log. The conductance rises steeply with \PEO{} (\(\rho=+0.65\), \(p<10^{-4}\), slope \(\approx+3.6\), dashed) --- the opposite of the prediction of an electronic-percolation \emph{dilution}, and the basis for the rising-floor reading of the window contraction in \cref{sec:ch4_discussion}.}
+  \caption[Absolute on-state conductance rises with \PEO{}]{Absolute on-state conductance (HYST, conductance at the sweep maximum; device medians, Ag series, \(n=47\), coloured by salt) against \PEO{} fraction, log--log. The conductance rises steeply with \PEO{} (\(\rho=+0.65\), \(p<10^{-4}\), slope \(\approx+3.6\), dashed) --- the opposite of the prediction of an electronic-percolation \emph{dilution}, and the basis for the rising-floor reading of the window contraction in \cref{sec:ch4_discussion}.}
   \label{fig:ch4_percolation}
 \end{figure}
 
@@ -432,7 +432,7 @@ relaxation, not electronic percolation.
 Section~\ref{sec:ch4_eis} notes that the EIS resistance \emph{scale} tracks the
 fading-memory time across composition, while the small-signal apex \emph{frequency}
 does not: the Nyquist-apex \(RC\) time is
-\(\tau_{RC}=1/(2\pi f_{\mathrm{apex}})\approx\SI{0.12}{\second}\) (Ag spine,
+\(\tau_{RC}=1/(2\pi f_{\mathrm{apex}})\approx\SI{0.12}{\second}\) (Ag series,
 \SI{0}{\volt} DC, \(n=26\)), more than an order of magnitude shorter than the
 seconds-long \(t_{1/2}\). This section shows the gap is not a contradiction but a
 small-signal/large-signal capacitance ratio, so the two land at the same
@@ -451,7 +451,7 @@ lowest measured frequency does not reach the full DC plateau, this is a
 \emph{lower bound}. The predicted large-signal relaxation is then
 \(\tau_{\mathrm{large}}\approx\tau_{RC}\,(C_{\mathrm{chem}}/C_{\mathrm{geo}})
 \gtrsim\SI{3.9}{\second}\), squarely inside the observed \(t_{1/2}\) range of
-\SIrange{2}{22}{\second} and within a factor of two of the spine median
+\SIrange{2}{22}{\second} and within a factor of two of the series median
 (\SI{6.6}{\second}). The independently measured capacitance enhancement thus
 accounts for the timescale separation quantitatively, upgrading the impedance
 corroboration of \cref{sec:ch4_eis} from same-direction to same-magnitude.
@@ -462,14 +462,14 @@ A physical reservoir requires elements that are diverse \emph{across} the bank b
 \emph{individually reproducible}. The chapter documents the diversity at length;
 this section quantifies the reproducibility. The fading-memory protocol measured a
 single junction per device, so a population-level repeat-\emph{decay}
-reproducibility cannot be estimated --- only one spine device carries two
+reproducibility cannot be estimated --- only one series device carries two
 junctions, and there the model-free \(t_{1/2}\) agrees to
 \(\sigma(\ln t_{1/2})\approx0.19\); broader repeat-decay statistics are a stated
 gap (\cref{sec:ch4_limitations}). The steady-state switching window, however, is
 recorded over several sweeps per junction (median \(\approx5\)), giving a
 genuine population-level within-device reproducibility: the sweep-to-sweep scatter
 of the on--off ratio is \(\sigma(\ln R_{\mathrm{on/off}})\approx0.14\) across
-\num{165} spine junctions, i.e.\ each junction reproduces its switching window to
+\num{165} series junctions, i.e.\ each junction reproduces its switching window to
 \(\approx\SI{15}{\percent}\). This within-device scatter is far smaller than the
 across-composition span the bank exploits (\(\Delta\ln t_{1/2}\approx2.1\),
 \cref{app:ch4_resource}), so a device's behaviour is a stable signature relative
@@ -479,7 +479,7 @@ to the diversity the substrate spans --- the premise \cref{ch:temporal} relies o
 
 The chapter treats the spread of fading-memory times as a resource rather than
 noise. This section makes the claim a number. The cell-median \(t_{1/2}\) spans
-\(\Delta\ln t_{1/2}\approx2.1\) across the composition spine (from
+\(\Delta\ln t_{1/2}\approx2.1\) across the composition series (from
 \(\approx\SI{2.7}{\second}\) to \(\approx\SI{22}{\second}\)), while the
 device-to-device scatter \emph{within} a cell is
 \(\sigma_{\mathrm{within}}(\ln t_{1/2})\approx0.29\) on the robust model-free
