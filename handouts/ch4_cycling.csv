@@ -1,0 +1,4 @@
+quantity,value,n
+within_device_sweep_sigma_ln_onoff,0.139,165
+across_device_within_cell_sigma_ln_onoff,0.159,9
+within_device_decay_sigma_ln_thalf,0.192,1

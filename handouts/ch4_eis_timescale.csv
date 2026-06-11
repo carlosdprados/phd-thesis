@@ -1,0 +1,8 @@
+quantity,value,unit
+tau_RC_apex_median,0.1175,s
+t_half_median,6.59,s
+C_chem_over_C_geo_measured,33.0,ratio
+C_chem_over_C_geo_needed,56.1,ratio
+tau_large_predicted,3.88,s
+n_eis_devices,26,count
+n_lowf_devices,26,count

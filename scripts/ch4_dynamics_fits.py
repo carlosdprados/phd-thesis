@@ -144,8 +144,13 @@ def main():
         A0 = max(y.max() - y.min(), 1e-3); C0 = max(y.min(), 0.0)
         tau = beta = floor = r2 = float("nan")
         try:
+            # Kohlrausch stretch exponent is constrained to 0 < beta <= 1: beta > 1
+            # is a *compressed* exponential, which is not a distribution of activation
+            # barriers and contradicts Eq. (4.1). Cells whose unbounded fit wanted
+            # beta > 1 pin at beta = 1 (simple exponential), i.e. near-undispersed
+            # relaxation rather than a spurious "stretched" reading.
             p, _ = curve_fit(stretched, t, y, p0=[A0, float(np.median(t)), 0.7, C0],
-                             bounds=([0, 1e-2, 0.1, 0], [np.inf, 1e5, 2.0, np.inf]), maxfev=40000)
+                             bounds=([0, 1e-2, 0.1, 0], [np.inf, 1e5, 1.0, np.inf]), maxfev=40000)
             yhat = stretched(t, *p); r2 = float(1 - np.sum((y - yhat) ** 2) / max(np.sum((y - y.mean()) ** 2), 1e-12))
             tau, beta, floor = float(p[1]), float(p[2]), float(p[3])
         except Exception:

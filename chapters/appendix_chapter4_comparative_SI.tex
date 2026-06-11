@@ -68,6 +68,7 @@ raw-to-summary trail underlying these screened descriptors.
     \Cref{fig:ch4_uvvis} & \path{scripts/ch4_uvvis.py} & 2025 \SY{}/\TMPE{} cation-series UV-Vis spectra; assessment in \path{handouts/18_uvvis_assessment.md}. \\
     \Cref{fig:ch4_eis} & \path{scripts/ch4_eis.py} & \SI{0}{\volt}-DC impedance descriptors from the experimental database, joined to \path{handouts/ch4_decay_by_cell.csv}; per-cell output in \path{handouts/ch4_eis_by_cell.csv}. \\
     \Cref{fig:ch4_electrode} & \path{scripts/ch4_electrode.py} & Silver-versus-gold metrics in \path{handouts/ch4_electrode_by_cell.csv}; audit in \path{handouts/19_electrode_au_assessment.md}. \\
+    \Cref{fig:ch4_percolation} & \path{scripts/ch4_rigor.py} & On-state conductance from \path{DEVICES_HYST_PIXEL_INFO}; gradient/factorial/bootstrap, EIS timescale bridge, reproducibility and heterogeneity-resource statistics in \path{handouts/ch4_gradient_stats.csv}, \path{ch4_cell_ci.csv}, \path{ch4_factorial.csv}, \path{ch4_percolation.csv}, \path{ch4_eis_timescale.csv}, \path{ch4_cycling.csv}, \path{ch4_heterogeneity_resource.csv}. \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -92,9 +93,21 @@ eight-to-thirteen-point decay curves often under-constrain \(\beta\) and \(\tau\
 jointly, so the fitted \(\tau\) is reported only where the fit is well identified,
 and the model-free half-enhancement time \(t_{1/2}\) is used as the primary
 timescale; where both are available they agree (\cref{tab:ch4_decay_by_cell}).
-Fitted \(\beta\) values lie predominantly in \numrange{0.6}{0.9}, i.e. genuinely
-stretched relaxation, consistent with the heterogeneous distribution of
-activation barriers invoked in \cref{ch:poc}.
+The stretch exponent is constrained to the physical Kohlrausch range
+\(0<\beta\le1\) of \cref{eq:ch4_kohlrausch}: an unconstrained fit occasionally
+returns \(\beta>1\) (a \emph{compressed} exponential, which does not correspond
+to a distribution of activation barriers), and such cells are instead pinned at
+\(\beta=1\), i.e.\ a near-undispersed simple-exponential relaxation, rather than
+reported as a spurious stretched fit. Fitted \(\beta\) values then lie
+predominantly in \numrange{0.6}{0.9}, i.e.\ genuinely stretched relaxation
+consistent with the heterogeneous distribution of activation barriers invoked in
+\cref{ch:poc}, with the most ion-rich cells (high \PEO{}, high salt) approaching
+\(\beta=1\) --- a narrower barrier distribution, as expected when ionic transport
+dominates. The intra-device disorder implied by the stretch and the
+device-to-device heterogeneity \(\sigma(\ln\tau)\) of \cref{app:ch5_scatter} are
+related rather than independent: the relaxation-time spread implied by the median
+stretch is comparable in magnitude to the measured inter-device scatter
+(\cref{app:ch4_resource}), so the same barrier-distribution width underlies both.
 
 \section{Film-Thickness and Fabrication Confound Audits}\label{app:ch4_confounds}
 
@@ -164,7 +177,7 @@ single-device \ce{Na+}/\ce{K+} chemistry points.
     \ce{Li+} & 0.6/0.09  & 3 & 3.5  & 0.02 & 1 & 3.0  & 0.61 \\
     \ce{Li+} & 0.6/0.18  & 2 & 5.5  & 0.04 & 2 & 4.6  & 0.61 \\
     \ce{Li+} & 1.2/0.045 & 3 & 2.7  & 0.13 & 0 & --- & --- \\
-    \ce{Li+} & 1.2/0.09  & 3 & 6.0  & 0.09 & 2 & 6.9  & 1.08 \\
+    \ce{Li+} & 1.2/0.09  & 3 & 6.0  & 0.09 & 2 & 6.7  & 0.91 \\
     \ce{Li+} & 1.2/0.18  & 3 & 9.0  & 0.13 & 3 & 10.0 & 0.87 \\
     \midrule
     \ce{Na+} & 0.3/0.09  & 1 & 24.0 & 0.42 & 0 & --- & --- \\
@@ -306,3 +319,185 @@ the dissolved salt are required for the memristive response.
     \bottomrule
   \end{tabular}
 \end{table}
+
+\section{Significance of the Composition Gradient}\label{app:ch4_gradient}
+
+The composition trends of \cref{sec:ch4_composition} are reported in the main text
+as cell medians. This section attaches a significance test and a non-parametric
+uncertainty to them, on the replicated Ag/\ce{Li} \SY{}/\PEO{}/\LiTf{} spine. For
+each descriptor we compute the Spearman rank correlation with the \PEO{} fraction
+across individual devices, with a two-sided permutation \(p\)-value
+(\num{20000} relabellings; \cref{tab:ch4_gradient}). The fading-memory time
+\(t_{1/2}\) --- the descriptor that matters for \cref{ch:temporal} --- carries a
+clearly significant \PEO{} gradient (\(\rho=-0.52\), \(p=0.009\), \(n=25\)). The
+remaining descriptors fall in the same direction but are only marginal at this
+sample size (\(p\approx0.06\text{--}0.07\)): the per-device gradient is genuinely
+weaker and noisier than the cell medians alone suggest, and we report it as
+suggestive rather than established. This is the honest counterpart to the median
+heatmaps --- the timescale trend is statistically secure, the window and
+potentiation trends are indicative.
+
+\begin{table}[t]
+  \centering
+  \caption[Significance of the composition gradient]{Per-device Spearman rank correlation of each descriptor with the \PEO{} mass fraction (Ag/\ce{Li} composition spine), with a two-sided permutation \(p\)-value. Only the fading-memory time clears \(p<0.05\).}
+  \label{tab:ch4_gradient}
+  \footnotesize
+  \setlength{\tabcolsep}{8pt}
+  \begin{tabular}{lrrr}
+    \toprule
+    Descriptor & \(n\) & Spearman \(\rho\) (vs \PEO{}) & permutation \(p\) \\
+    \midrule
+    Fading-memory time \(t_{1/2}\) & 25 & \(-0.52\) & \(0.009\) \\
+    Growth exponent \(\alpha\)     & 28 & \(-0.36\) & \(0.065\) \\
+    Peak conductance ratio         & 28 & \(-0.34\) & \(0.073\) \\
+    On--off ratio                  & 47 & \(-0.28\) & \(0.060\) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+A non-parametric bootstrap (\num{20000} device-level resamples per cell) gives a
+\SI{95}{\percent} confidence interval on every cell median; the full set is in
+\path{handouts/ch4_cell_ci.csv}. The intervals are tight where the cell is well
+replicated and consistent (e.g.\ \PEO{}~\num{0.3}/salt~\num{0.09}:
+\(t_{1/2}=19.2\,[18.6,22.0]\,\si{\second}\)) and honestly wide where a cell mixes
+a long- and a short-retention device (e.g.\ \PEO{}~\num{0.3}/salt~\num{0.045}:
+\(15.8\,[3.3,36.7]\,\si{\second}\)), which is the right-skew already flagged in
+\cref{sec:ch4_composition} made quantitative.
+
+\paragraph{Two composition axes act near-orthogonally.} To test the main-text
+reading that \PEO{} sets the strength and memory while salt sets the saturation,
+each log-descriptor was regressed on \(\log\PEO{}\), \(\log\mathrm{salt}\), and
+their (centred) interaction, with permutation \(p\)-values per term
+(\cref{tab:ch4_factorial}). The fading-memory time is governed by \PEO{} alone
+(\(b_{\PEO{}}=-0.92\), \(p=0.001\)) with no significant salt or interaction term,
+so the two axes do not interact detectably at this power: a clean,
+near-orthogonal control. The potentiation descriptors are noisier (\(R^2\le0.2\))
+and no term is individually significant, consistent with the salt axis acting on
+\emph{saturation} --- the turnover fraction and \(N_{\mathrm{peak}}\) of
+\cref{tab:ch4_pulses_by_cell}, a categorical effect not captured by a log-linear
+slope --- rather than on the growth magnitude.
+
+\begin{table}[t]
+  \centering
+  \caption[Factorial decomposition of the composition axes]{Two-way decomposition of each log-descriptor into \(\log\PEO{}\), \(\log\mathrm{salt}\), and their interaction (Ag/\ce{Li} spine; centred predictors; permutation \(p\)). \PEO{} is the only significant axis, on the fading-memory time, and no interaction term is significant --- the two axes act near-orthogonally.}
+  \label{tab:ch4_factorial}
+  \footnotesize
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{lrrrrr}
+    \toprule
+    Descriptor & \(b_{\PEO{}}\,(p)\) & \(b_{\mathrm{salt}}\,(p)\) & \(b_{\mathrm{int}}\,(p)\) & \(R^2\) & \(n\) \\
+    \midrule
+    \(\log t_{1/2}\)     & \(-0.92\,(0.001)\) & \(+0.38\,(0.26)\) & \(+0.61\,(0.22)\) & \(0.47\) & 25 \\
+    \(\alpha\)           & \(-0.15\,(0.14)\)  & \(-0.10\,(0.38)\) & \(+0.19\,(0.30)\) & \(0.19\) & 28 \\
+    \(\log(\text{peak})\)& \(-0.89\,(0.14)\)  & \(-0.13\,(0.84)\) & \(+1.02\,(0.33)\) & \(0.15\) & 28 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Absolute Conductance Tests the Dilution Picture}\label{app:ch4_percolation}
+
+The working mechanism of \cref{sec:ch4_discussion} initially read the window
+contraction at high \PEO{} as a \emph{dilution} of the \SY{}
+electronic-percolation network. That picture makes a direct, falsifiable
+prediction on a quantity the peak-normalised dynamics discard: if added
+ion-transport polymer simply interrupted the electronic network, the
+\emph{absolute} on-state conductance should \emph{fall} with \PEO{}. It does the
+opposite. The on-state conductance (HYST conductance at the sweep maximum, device
+medians, \(n=47\) Ag spine devices) \emph{rises} steeply and monotonically with
+\PEO{} --- Spearman \(\rho=+0.65\) (\(p<10^{-4}\)), a log--log slope of
+\(\approx+3.6\), and more than three orders of magnitude from \PEO{}~\num{0.15} to
+\num{1.2} (\cref{fig:ch4_percolation}). Because film thickness rises with \PEO{}
+(\cref{app:ch4_confounds}), a geometric effect would push the conductance the
+other way, so the rise is if anything understated.
+
+The dilution reading is therefore wrong in its literal form, and the corrected
+mechanism is the one carried in the revised \cref{sec:ch4_discussion}: the
+ion-rich phase contributes a parallel, weakly switchable conduction path that
+\emph{raises the conductance floor}. Since the on--off ratio nonetheless falls
+with \PEO{}, the off-state conductance must rise even faster than the on-state, so
+the window contracts not because the network is diluted but because its baseline
+is lifted toward the on-level. The fading-memory and potentiation trends are
+unaffected by this correction --- they were always read in terms of ionic
+relaxation, not electronic percolation.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.62\linewidth]{../figures/chapter4/percolation.pdf}
+  \caption[Absolute on-state conductance rises with \PEO{}]{Absolute on-state conductance (HYST, conductance at the sweep maximum; device medians, Ag spine, \(n=47\), coloured by salt) against \PEO{} fraction, log--log. The conductance rises steeply with \PEO{} (\(\rho=+0.65\), \(p<10^{-4}\), slope \(\approx+3.6\), dashed) --- the opposite of the prediction of an electronic-percolation \emph{dilution}, and the basis for the rising-floor reading of the window contraction in \cref{sec:ch4_discussion}.}
+  \label{fig:ch4_percolation}
+\end{figure}
+
+\section{Reconciling the Impedance and Fading-Memory Timescales}\label{app:ch4_timescale}
+
+Section~\ref{sec:ch4_eis} notes that the EIS resistance \emph{scale} tracks the
+fading-memory time across composition, while the small-signal apex \emph{frequency}
+does not: the Nyquist-apex \(RC\) time is
+\(\tau_{RC}=1/(2\pi f_{\mathrm{apex}})\approx\SI{0.12}{\second}\) (Ag spine,
+\SI{0}{\volt} DC, \(n=26\)), more than an order of magnitude shorter than the
+seconds-long \(t_{1/2}\). This section shows the gap is not a contradiction but a
+small-signal/large-signal capacitance ratio, so the two land at the same
+\emph{magnitude}.
+
+The apex \(RC\) is set by the geometric capacitance
+\(C_{\mathrm{geo}}=1/(2\pi f_{\mathrm{apex}}Z^{\mathrm{apex}}_{\mathrm{real}})\).
+The forgetting of a \emph{written} state, by contrast, is the relaxation of a
+displaced ionic profile and is governed by the much larger chemical/double-layer
+capacitance \(C_{\mathrm{chem}}\) of the ion-rich film. Measuring
+\(C_{\mathrm{chem}}\) independently from the low-frequency branch of the same
+spectra (\(C_{\mathrm{lf}}=-1/(2\pi f Z_{\mathrm{imag}})\) at the lowest measured
+frequency) gives a capacitance enhancement
+\(C_{\mathrm{lf}}/C_{\mathrm{geo}}\approx33\) (median, \(n=26\)) --- and since the
+lowest measured frequency does not reach the full DC plateau, this is a
+\emph{lower bound}. The predicted large-signal relaxation is then
+\(\tau_{\mathrm{large}}\approx\tau_{RC}\,(C_{\mathrm{chem}}/C_{\mathrm{geo}})
+\gtrsim\SI{3.9}{\second}\), squarely inside the observed \(t_{1/2}\) range of
+\SIrange{2}{22}{\second} and within a factor of two of the spine median
+(\SI{6.6}{\second}). The independently measured capacitance enhancement thus
+accounts for the timescale separation quantitatively, upgrading the impedance
+corroboration of \cref{sec:ch4_eis} from same-direction to same-magnitude.
+
+\section{Within-Device Reproducibility}\label{app:ch4_reproducibility}
+
+A physical reservoir requires elements that are diverse \emph{across} the bank but
+\emph{individually reproducible}. The chapter documents the diversity at length;
+this section quantifies the reproducibility. The fading-memory protocol measured a
+single junction per device, so a population-level repeat-\emph{decay}
+reproducibility cannot be estimated --- only one spine device carries two
+junctions, and there the model-free \(t_{1/2}\) agrees to
+\(\sigma(\ln t_{1/2})\approx0.19\); broader repeat-decay statistics are a stated
+gap (\cref{sec:ch4_limitations}). The steady-state switching window, however, is
+recorded over several sweeps per junction (median \(\approx5\)), giving a
+genuine population-level within-device reproducibility: the sweep-to-sweep scatter
+of the on--off ratio is \(\sigma(\ln R_{\mathrm{on/off}})\approx0.14\) across
+\num{165} spine junctions, i.e.\ each junction reproduces its switching window to
+\(\approx\SI{15}{\percent}\). This within-device scatter is far smaller than the
+across-composition span the bank exploits (\(\Delta\ln t_{1/2}\approx2.1\),
+\cref{app:ch4_resource}), so a device's behaviour is a stable signature relative
+to the diversity the substrate spans --- the premise \cref{ch:temporal} relies on.
+
+\section{Heterogeneity as a Computational Resource}\label{app:ch4_resource}
+
+The chapter treats the spread of fading-memory times as a resource rather than
+noise. This section makes the claim a number. The cell-median \(t_{1/2}\) spans
+\(\Delta\ln t_{1/2}\approx2.1\) across the composition spine (from
+\(\approx\SI{2.7}{\second}\) to \(\approx\SI{22}{\second}\)), while the
+device-to-device scatter \emph{within} a cell is
+\(\sigma_{\mathrm{within}}(\ln t_{1/2})\approx0.29\) on the robust model-free
+timescale, rising to \(\approx0.85\) on the fit-noisier single-exponential
+\(\tau\) cited in \cref{app:ch5_scatter}. Taking a two-\(\sigma\) separation as the
+criterion for two timescales to be distinguishable, the bank provides
+\(N_{\mathrm{eff}}=1+\Delta\ln t_{1/2}/(2\sigma_{\mathrm{within}})\approx2.2\)
+(using the conservative \(\sigma=0.85\)) to \(\approx4.6\) (using the model-free
+\(\sigma=0.29\)) resolvably distinct memory bands selectable by composition. The
+resource is therefore modest but real: a handful of cleanly separated timescales,
+not a continuum, which is why \cref{ch:temporal} assembles a \emph{bank} of
+compositions rather than tuning a single optimum.
+
+\paragraph{Single-device and inter-device disorder are linked.} The stretched
+exponent provides an independent read on dispersion: the median single-device
+stretch corresponds to a barrier-distribution width \(1-\beta\approx0.36\), of the
+same order as the within-cell device-to-device \(\sigma(\ln t_{1/2})\). The
+disorder seen \emph{within} one device's relaxation and the spread \emph{between}
+sibling devices are thus comparable in magnitude, consistent with both arising
+from the same heterogeneous distribution of local activation barriers rather than
+from independent causes.
