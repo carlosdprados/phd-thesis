@@ -411,6 +411,177 @@ device age at measurement differs between the January (days~1--6) and February
 (months-old) campaigns. Accordingly, every statement drawn from it in the main
 text is illustrative, and no cation ordering is claimed.
 
+\section{The Gold-Electrode Lock-in Frequency-Sweep Corpus}\label{app:ch4_lockin}
+
+This section documents the provenance, measurement decode, and quantitative
+findings of the lock-in frequency-sweep corpus behind the frequency-domain
+results of \cref{sec:ch4_electrode}. Reproduction:
+\texttt{scripts/lockin\_au\_tmpe\_audit.py} (filename parser, per-file
+metrics, QA panels) and \texttt{scripts/lockin\_au\_tmpe\_findings.py}
+(analyses L1--L5); per-file tables in \texttt{handouts/lockin\_manifest.csv},
+\texttt{handouts/lockin\_metrics.csv}, and
+\texttt{handouts/lockin\_findings\_*.csv}; a full audit record in
+\texttt{handouts/29\_lockin\_au\_tmpe\_audit.md}.
+
+\paragraph{Provenance.} The corpus comprises \num{549} lock-in sweeper exports
+(plus \num{439} binary siblings) taken between 2025-03-04 and 2025-03-26 on a
+single Au/\TMPE{}/triflate batch: the device-age field in every filename
+equals the measurement date minus 2025-03-03, so the batch has a single,
+self-consistent fabrication (top-electrode) date and is tracked from day 1 to
+day 23. Twelve pixels on three substrates were measured, one substrate per
+triflate salt (\ce{Li}, \ce{Na}, \ce{K}). The substrates are not catalogued in
+the device library --- the experimenter's own labels carry an ``unknown''
+prefix --- but by chemistry, recipe, and date they are most plausibly the
+electrode-free UV-Vis trio of 2025-02-26 (\cref{fig:ch4_uvvis}) after Au
+evaporation, or unlogged siblings of that batch; this identification is
+unproven, the same caveat class as the February campaigns of
+\siCompRef{app:ch4_gold_dynamics}.
+
+\paragraph{Measurement and decode.} A Zurich Instruments MFLI drives
+\(V_\mathrm{off} + V_\mathrm{pk}\sin(2\pi f t)\) through the junction into an
+external series capacitor to ground (\(C_\mathrm{ext}=\SI{4}{\nano\farad}\)
+standard; a \SIrange{0.286}{2}{\nano\farad} series on one pixel; a
+``\SI{2.5}{\pico\farad}'' day-1/2 configuration with no external capacitor,
+loaded by the instrument's \SI{10}{\mega\ohm} input); the voltage at the
+junction--capacitor node is demodulated at the drive frequency, and the
+transfer ratio is \(|H| = V_\mathrm{out,RMS}/(V_\mathrm{pk}/\sqrt{2})\), the
+normalisation used by the corpus' own visualisation script. Sweeps descend
+from \SI{500}{\kilo\hertz} to \SI{1}{\hertz} in three captures
+(\num{100}+\num{97}+\num{200} points, \(\sim\!\SI{1}{\second}\) per point);
+the \num{110} ``500k--1Hz'' files are \emph{derived} merges of the three
+captures (produced by the corpus' \texttt{combine\_freq.py}; frequency-sorted,
+timer running backwards) and are excluded from all statistics to avoid double
+counting. Of the four recorded demodulator channels, demodulator~4 is the
+output fundamental used throughout; demodulator~2 duplicates it through a
+different demodulator filter; demodulator~3 behaves as a DC monitor of the
+output node (magnitude = DC value, sign carried by its phase); demodulator~1
+is an auxiliary current channel, unused here. A \SI{50}{\hertz} mains glitch
+is visible in most captures and lies on none of the probe frequencies used
+below.
+
+\paragraph{L1 --- divider validation.} On unkK2-L5 (day 3, \SI{0.5}{Vpk},
+\SI{10}{\kilo\hertz}), stepping \(C_\mathrm{ext}\) through
+\numlist{0.286;0.5;0.667;1;1.3;1.66;2;4}~\si{\nano\farad} moves \(|H|\) from
+\num{0.830} to \num{0.423}, and the implied device capacitance
+\(C_\mathrm{dev} = C_\mathrm{ext}|H|/(1-|H|)\) stays within
+\SIrange{1.4}{2.9}{\nano\farad} (median \SI{2.35}{\nano\farad}). The residual
+monotone trend of \(C_\mathrm{dev}\) with \(C_\mathrm{ext}\) is the expected
+signature of a lossy (constant-phase-like) rather than ideal dielectric; the
+divider model is therefore taken as validated at the factor level, not as an
+exact calibration.
+
+\paragraph{L2 --- the passive band is linear.} At zero offset and
+\(f\gtrsim\SI{10}{\hertz}\) the junction is a passive dielectric:
+across the \numrange{0.5}{2.4}~Vpk amplitude series the plateau \(|H|\) at
+\SI{1}{\kilo\hertz} and \SI{10}{\kilo\hertz} changes by a median
+\SIrange{0.17}{0.29}{\percent} (maximum \SI{8}{\percent}; \num{9}
+device-days). The effective capacitance at \SI{1}{\kilo\hertz} is
+\SI{2.32}{\nano\farad} (\ce{Li}), \SI{2.93}{\nano\farad} (\ce{Na}), and
+\SI{3.19}{\nano\farad} (\ce{K}) by substrate ---
+\(\approx\)\SIrange{28}{39}{\nano\farad\per\centi\meter\squared}
+at the \SI{8.25e-2}{\centi\meter\squared} junction area, an equivalent
+thickness of \(\sim\!\SIrange{150}{290}{\nano\meter}\) at \(\varepsilon_r =
+5\)--\(10\), consistent with the spin recipe --- with a pixel-to-pixel spread
+\emph{within} each substrate of \(\approx\!\SI{1}{\percent}\). The
+substrate-to-substrate differences are not assigned to the cation: substrate
+and salt are fully confounded (one substrate per salt).
+
+\paragraph{L3 --- bias-activated low-frequency gain.}
+\Cref{tab:ch4_lockin_gain} gives the day-23 offset series on unkLi2-L3
+(\num{11} offsets, \SI{0.25}{Vpk}): the fundamental-frequency transfer at
+\SIrange{1}{2}{\hertz} rises monotonically with \(|V_\mathrm{off}|\), from
+\(|H|\approx0.5\) unbiased to \(\approx\!18\) at \(\pm\SI{2.5}{\volt}\),
+while \(|H|\) at \SI{10}{\hertz} stays near unity and the
+\(\geq\!\SI{1}{\kilo\hertz}\) plateau does not move (offset and zero-offset
+files give plateau medians \num{0.422} and \num{0.423}). Across the corpus
+the prevalence of gain (\(|H|_{2\,\mathrm{Hz}}>1\)) rises from
+\SI{7}{\percent} of zero-offset captures (\(n=46\); the band is noisy but
+not amplifying) through \SI{72}{\percent} at \(|V_\mathrm{off}|=\SI{1.4}{\volt}\)
+(\(n=18\)) to \SI{100}{\percent} at \(|V_\mathrm{off}|\geq\SI{2.4}{\volt}\)
+(\(n=20\)), with medians \num{0.46}, \num{1.25}, \num{2.78}, \num{6.69},
+and \num{17.3} at \(|V_\mathrm{off}| = 0\), \num{1.4}, \num{2.0}, \num{2.4},
+\SI{2.5}{\volt}. The \SI{200}{\hertz} boundary point, captured twice per
+condition minutes apart, repeats to a median \SI{1.2}{\percent} (\(n=95\)),
+so the gain values are not acquisition noise. Because \(|H|>1\) at the drive
+frequency is impossible for a passive divider into a passive load, the biased
+junction is an \emph{active} element at these frequencies: the drive slowly
+modulates the ionic conductance, and that modulation mixes the DC bias up to
+the fundamental, transferring power from the bias into the signal band. The
+conclusion is robust to the demodulator amplitude convention (a worst-case
+\(\sqrt{2}\) would reduce \(\approx\!18\) to \(\approx\!13\)). Across
+\num{32} matched \(\pm\) pairs the gain is close to polarity-symmetric, with
+a median \SI{11}{\percent} positive-offset excess (Wilcoxon \(p=0.013\)) ---
+far weaker than the DC potentiation asymmetry of
+\siCompRef{app:ch4_gold_dynamics}.
+
+\begin{table}[t]
+  \centering
+  \caption[Lock-in day-23 bias series]{Day-23 offset series on unkLi2-L3
+  (\SI{0.25}{Vpk}, \(C_\mathrm{ext}=\SI{4}{\nano\farad}\), 200--1~Hz capture):
+  fundamental-frequency transfer ratio \(|H|\) at four probe frequencies and
+  the DC monitor at the output node. Offsets were measured in the order
+  \(0\to+2.5\) then \(-0.5\to-2.5\); the later-measured negative branch is not
+  systematically elevated, so the near-symmetry is not a session-drift
+  artefact.}
+  \label{tab:ch4_lockin_gain}
+  \footnotesize
+  \setlength{\tabcolsep}{5.5pt}
+  \begin{tabular}{rrrrrr}
+    \toprule
+    \(V_\mathrm{off}\) (V) & \(|H|_{1\,\mathrm{Hz}}\) & \(|H|_{2\,\mathrm{Hz}}\) & \(|H|_{5\,\mathrm{Hz}}\) & \(|H|_{10\,\mathrm{Hz}}\) & DC out (V) \\
+    \midrule
+    \(-2.5\) & 17.2 & 16.7 & 7.5 & 1.28 & \(-3.46\) \\
+    \(-2.0\) & 13.1 & 13.4 & 5.9 & 1.01 & \(-2.82\) \\
+    \(-1.5\) & 12.9 &  9.3 & 3.9 & 1.23 & \(-1.93\) \\
+    \(-1.0\) &  6.1 &  6.6 & 3.1 & 1.07 & \(-1.38\) \\
+    \(-0.5\) &  5.4 &  2.1 & 1.6 & 0.90 & \(-0.45\) \\
+    \(0.0\)  &  1.7 &  0.5 & 1.0 & 0.97 & \(+0.02\) \\
+    \(+0.5\) &  3.7 &  1.9 & 2.3 & 1.12 & \(+0.41\) \\
+    \(+1.0\) &  8.6 &  6.9 & 1.9 & 1.07 & \(+1.44\) \\
+    \(+1.5\) &  9.7 & 10.0 & 5.2 & 1.03 & \(+2.10\) \\
+    \(+2.0\) & 16.1 & 13.8 & 4.6 & 0.83 & \(+2.89\) \\
+    \(+2.5\) & 17.1 & 17.9 & 6.1 & 1.82 & \(+3.71\) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{L4 --- ageing.} The passive plateau is stable within pixel where
+days repeat: \ce{K} pixels move from \num{0.444} (day 3) to
+\numrange{0.450}{0.451} (day 9), \ce{Na} pixels stay within
+\(\pm\SI{2}{\percent}\) over the same week, while the \ce{Li} pixels rise by
+\(\approx\!\SI{15}{\percent}\) from day 4 (\numrange{0.35}{0.37}) to day 10
+(\(\approx\!\num{0.42}\)) and the day-23 pixel sits at \num{0.39}. One
+pixel-day deviates (unkK2-L5 day 4, plateau \num{0.55} at \(-17\) to
+\(-21^{\circ}\) phase): that pixel had served as the capacitor-series
+workhorse the previous day, so its elevated, resistive plateau is read as a
+conditioned (potentiated) state, not an artefact --- it is excluded from the
+plateau statistics above. Bias-activated gain is present at every age at
+which offsets were applied (days 4, 9/10, and 23), but the offset--amplitude
+protocol changed between sessions, so no matched-condition ageing comparison
+of the gain itself is possible.
+
+\paragraph{L5 --- DC monitor.} The DC component at the output node follows
+the offset linearly in magnitude and sign across the day-23 series
+(\cref{tab:ch4_lockin_gain}, last column; \(\approx\!1.4\times\) the offset
+in the export's convention), confirming that under bias the junction
+DC-conducts well below the \SI{10}{\mega\ohm} input impedance --- a
+\(\sim\!\si{\mega\ohm}\)-scale biased state, the same order as the
+constant-bias end states of the DC corpus
+(\siCompRef{app:ch4_gold_dynamics}). At zero offset the rectified DC is not
+significantly different from zero (median \SI{-0.18}{\volt}, \SI{61}{\percent}
+of \(n=46\) captures negative, binomial \(p=0.18\)).
+
+\paragraph{Bounds.} One batch, one substrate per salt (cation and substrate
+fully confounded), and one pixel for the day-23 series. The sweeps descend in
+frequency, so every low-frequency point follows minutes of conditioning under
+the same offset --- the gain states are conditioned steady states, not
+pristine ones, and the low-frequency points at \emph{zero} offset are visibly
+non-stationary (state drift during the point). Absolute \(|H|\) and DC
+values inherit the demodulator amplitude convention (at most a factor
+\(\sqrt{2}\); all gain and symmetry statements are ratios at fixed channel
+and unaffected); \(C_\mathrm{dev}\) is correspondingly approximate. The
+substrate identities are inferred, as stated under provenance.
+
 \section{Significance of the Composition Gradient}\label{app:ch4_gradient}
 
 The composition trends of \cref{sec:ch4_composition} are reported in the main text
