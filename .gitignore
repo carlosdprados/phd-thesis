@@ -29,3 +29,6 @@ __pycache__/
 
 # Regenerable QA thumbnails from scripts/uncat_au_tmpe_audit.py
 figures/uncat_qa/
+
+# Regenerable QA panels from scripts/lockin_au_tmpe_audit.py
+figures/lockin_qa/
