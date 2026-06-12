@@ -113,10 +113,32 @@ ageing claims.
 (e.g. −2 V VCONST → ~µA). At 0 offset: median −0.18 V, 61 % negative,
 binomial p = 0.18 (ns) — no significant self-rectification claimed.
 
+**L6 — thickness bounding for the cation-ordered capacitance (added
+2026-06-12, user-directed upgrade).** The C_dev ordering K 3.19 > Na 2.93 >
+Li 2.32 nF (1.4× span ≫ 1 % pixel spread, same-batch trio) was initially
+left unassigned (substrate ⟂ salt). The user argued — correctly — that the
+thesis already reports n=1–2 host/anion orderings at the illustrative tier,
+that the trio is same-batch, and that archive profilometry can bound the
+thickness channel. `DEVICES_PROFILOMETRY_STATS.csv` at the matched recipe
+(TMPE 0.3/salt 0.09/3000 rpm) shows: same-day cation trios differ
+**6–12 %** in thickness (2024-10-29: Li 153/K 162 nm — K *thicker*, the
+wrong direction to produce C_K > C_Li; 2025-05-14 TFSI trio: span 6 %),
+while explaining the C span by thickness alone needs Li ≈ **37 %** thicker.
+Same-salt solution-to-solution scatter does reach ~30 % (10/03 Li sextet),
+so thickness is not excluded, merely unprecedented in cation-correlated
+form. **Upgraded to a *candidate* dielectric cation effect** (εr rising
+Li→K, the direction weaker coordination suggests; the one cation-ordered
+observable in the archive — ATR/UV-Vis/dynamics all null, but those probe
+different physics, no contradiction). Decisive test: profilometry on the
+three substrates (they still exist). The **gain-magnitude ordering stays
+unclaimed** (conditioning shifts >20 % demonstrated; sessions differ by
+day/protocol). → `handouts/lockin_findings_thickness.csv`.
+
 ## 3. What was NOT claimed (and why)
 
-- **No cation ordering** in C_dev or gain: substrate ⟂ salt fully
-  confounded (one substrate each). Stated as such everywhere.
+- **No demonstrated cation effect**: the capacitance ordering is recorded
+  at *candidate* tier only (see L6; substrate ⟂ salt at n=1 each); the
+  gain-magnitude ordering is not claimed at all (state/session confounds).
 - **No "gain aging" trend**: offset–amplitude protocol changed between
   sessions (±1.4@1.4 d4 → ±2.0/2.4@0.8/0.4 d9/10 → ±0.25Vpk series d23).
 - **No self-oscillation claim**: demod-only data can't distinguish strong
@@ -147,7 +169,13 @@ binomial p = 0.18 (ns) — no significant self-rectification claimed.
   dynamics`) and `fig:ch4_uvvis`.
 - **Ch6**: limitations item extended (frequency-domain sibling caveat);
   nervetronic outlook sentence (programmable sub-10 Hz pre-amplifier =
-  single-device front-end).
+  single-device front-end); "Power the chemistry landscape" extended with
+  the candidate capacitance ordering as a concrete target for the
+  replicated cation series (2026-06-12).
+- **2026-06-12 upgrade**: Ch4 §4.8 ¶ gains the candidate-ordering sentence;
+  SI C.8 gains "A candidate cation-ordered capacitance" paragraph (with the
+  L6 profilometry bounding) and the εr estimate tightened to ≈5–7 at the
+  150–190 nm sibling thicknesses.
 - **Ch5**: untouched (its gold-corpus mentions concern the drive–retention
   coupling, which the lock-in does not parameterise).
 

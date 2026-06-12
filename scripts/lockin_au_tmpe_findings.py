@@ -14,6 +14,10 @@ plus targeted re-reads of the raw exports, and quantifies:
   L4  aging: passive plateau and zero-offset low-f transmission within pixel
       (offset-gain protocols differ across days -> descriptive only)
   L5  rectified DC at the output node (demod 3) vs offset
+  L6  thickness bounding for the cation-ordered capacitance: archive
+      profilometry of same-recipe TMPE/salt-0.09/3000-rpm substrates
+      (DATABASE/DEVICES_PROFILOMETRY_STATS.csv) sizes the film-thickness
+      channel that the one-substrate-per-salt design cannot exclude
 
 The 110 "500k-1Hz_400p-1s" files are *derived*: they are the output of the
 corpus' own combine_freq.py (frequency-sorted merge of the three piecewise
@@ -32,6 +36,7 @@ import pandas as pd
 
 RAW = ("../Nanomem_Devices_Library/Common/"
        "Au_TMPE_Li-Na-K_Lock-in-Amplifier_Freq_Sweeps/raw_data")
+DB = "../Nanomem_Devices_Library/DATABASE"
 OUT = "handouts"
 
 MET = pd.read_csv(os.path.join(OUT, "lockin_metrics.csv"))
@@ -240,9 +245,69 @@ def rectdc():
               f"{(z.dc_2 < 0).mean():.2f} (binomial p={bt.pvalue:.3f})")
 
 
+# ----------------------------------------------- L6 thickness bounding --
+def thickness():
+    """Size the film-thickness channel behind the cation-ordered C_dev.
+
+    The lock-in trio has no profilometry, so the archive's same-recipe
+    substrates (TMPE 0.3, salt 0.09, 3000 rpm) bound two quantities:
+    (a) the thickness difference between same-day cation trios, and
+    (b) the salt-uncorrelated solution-to-solution scatter within one salt.
+    Explaining C_dev(K)/C_dev(Li) = 1.37 by thickness alone would need the
+    Li film ~37 % thicker than the K film.
+    """
+    prof = pd.read_csv(os.path.join(DB, "DEVICES_PROFILOMETRY_STATS.csv"))
+    lib = pd.read_csv(os.path.join(DB, "DEVICES_LIBRARY.csv"), low_memory=False)
+    m = prof.merge(lib, on="device_name", how="left")
+    m = m[(m["Ion-Conducting Polymer Mass Ratio - TMPE"] == 0.3)
+          & (m["Spin Coating Rotational Speed [RPM]"] == 3000)].copy()
+    salts = ("LiTr", "NaTr", "KTr", "LiTFSI", "NaTFSI", "KTFSI")
+
+    def salt_of(r):
+        for s in salts:
+            v = r.get(f"Salt Mass Ratio - {s}")
+            if pd.notna(v) and v == 0.09:
+                return s
+        return None
+
+    m["salt"] = m.apply(salt_of, axis=1)
+    m = m.dropna(subset=["salt"])
+    m["t_nm"] = m["avg_thickness (nm)"]
+    tab = m[["device_name", "Date", "salt", "t_nm"]].sort_values("device_name")
+    tab.to_csv(os.path.join(OUT, "lockin_findings_thickness.csv"), index=False)
+
+    print("\n== L6 thickness bounding (matched recipe: TMPE 0.3 / salt 0.09 "
+          "/ 3000 rpm) ==")
+    print(tab.to_string(index=False))
+
+    print("\nsame-day cation trios (mean nm per salt):")
+    for date, g in m.groupby("Date"):
+        if g.salt.nunique() < 2:
+            continue
+        means = g.groupby("salt").t_nm.mean()
+        span = (means.max() - means.min()) / means.mean() * 100
+        print(f"  {date}: " + ", ".join(f"{s} {v:.0f}" for s, v in
+                                        means.items())
+              + f"  (cation span {span:.0f}%)")
+
+    print("\nsame-salt same-day spread (solution-to-solution channel):")
+    for (date, salt), g in m.groupby(["Date", "salt"]):
+        if len(g) < 2:
+            continue
+        span = (g.t_nm.max() - g.t_nm.min()) / g.t_nm.mean() * 100
+        if span > 10:
+            print(f"  {date} {salt} n={len(g)}: {g.t_nm.min():.0f}-"
+                  f"{g.t_nm.max():.0f} nm (span {span:.0f}%)")
+    print("\nto explain C_dev K/Li = 3.19/2.32 = 1.37 by thickness alone, "
+          "the Li film must be ~37% thicker than the K film on the same day;"
+          "\nno profilometry exists for the lock-in trio itself "
+          "(unkLi2/unkNa2/unkK2) -- measuring it is the decisive test.")
+
+
 if __name__ == "__main__":
     divider()
     linearity()
     gain()
     aging()
     rectdc()
+    thickness()
