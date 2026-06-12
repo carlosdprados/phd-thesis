@@ -136,8 +136,8 @@ the training and held-out streams so the comparison isolates each architecture's
 intrinsic noise tolerance. Robustness curves are seed-averaged over three bank/noise
 seeds; the per-subject significance test at $\sigma=0.4$ is a paired Wilcoxon
 signed-rank over the fifteen subjects. Reported metrics are the binary macro-F1, the
-pooled false-alarm rate (fraction of not-stress steps called stress), and --- for
-completeness, though they do not separate the banks --- the transition-window
+pooled false-alarm rate (fraction of not-stress steps called stress), and, for
+completeness (though they do not separate the banks), the transition-window
 macro-F1 (steps within $\pm\SI{20}{\second}$ of a label change) and the onset
 detection latency (time to the first $\geq\SI{5}{\second}$ sustained stress call after
 each onset).
@@ -264,7 +264,7 @@ autocorrelation does not inflate it.
 
 \paragraph{Drive-boosted tonic-node extension.} The minutes-scale tonic gap of
 \cref{fig:ch5_tau_coverage} is probed by extending the heterogeneous bank with
-drive-boosted nodes at $\tau = 120$ and \SI{300}{\second} --- a labelled
+drive-boosted nodes at $\tau = 120$ and \SI{300}{\second}, a labelled
 extrapolation of the drive-amplitude variable, copying the lead cell's write
 nonlinearity and stretch and overriding only $\tau$ (\path{tonic_cards} in
 \path{scripts/ch5_model.py}). On memory capacity (DT $=\SI{5}{\second}$, $k$ to $40$)
