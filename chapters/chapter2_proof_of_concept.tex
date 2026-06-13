@@ -102,7 +102,7 @@ The active layer uses a mass ratio of \SY{}:\Hybrane{}:\LiTf{} = 1:0.30:0.09, pr
 
 \subsection{Device Geometry: The Two-Terminal Vertical Structure}\label{subsec:device_geometry}
 
-The device adopts a vertical sandwich geometry, in which the active layer is placed between a bottom transparent electrode and a top metallic electrode (see \cref{fig:device_schematic}). This 2-T architecture is the simplest memristive configuration available: it contains no gate electrode and requires no transistor to address the device, in contrast to the \textit{three-terminal} (3-T) organic synaptic transistors discussed in \cref{subsec:organic_precedents}~\cite{Gkoupidenis2015, Xu2016, Gkoupidenis2017}.
+The device adopts a vertical sandwich geometry, in which the active layer is placed between a bottom transparent electrode and a top metallic electrode (see \cref{fig:device_schematic}). This 2-T architecture is the simplest memristive configuration: it has no gate electrode and needs no transistor to address the device, in contrast to the \textit{three-terminal} (3-T) organic synaptic transistors discussed in \cref{subsec:organic_precedents}~\cite{Gkoupidenis2015, Xu2016, Gkoupidenis2017}.
 
 \begin{figure}[htbp]
   \centering
@@ -111,7 +111,7 @@ The device adopts a vertical sandwich geometry, in which the active layer is pla
   \label{fig:device_schematic}
 \end{figure}
 
-The 2-T choice matters for two reasons. First, it reduces fabrication complexity, given that the device is made by a sequence of only three depositions (ITO substrate, spin-coated active layer, evaporated metal), which makes the same stack compatible with the comparative corpus of \Cref{ch:comparative}. Second, a 2-T device that shows coexisting \STM{} and \LTM{} without an independent gating signal shows that the memory physics is intrinsic to the active material, not supplied externally by a gate field acting on a separate channel.
+The 2-T choice matters for two reasons. First, it reduces fabrication complexity: the device is made by only three depositions (ITO substrate, spin-coated active layer, evaporated metal), which makes the same stack compatible with the comparative corpus of \Cref{ch:comparative}. Second, a 2-T device that shows coexisting \STM{} and \LTM{} without an independent gating signal shows that the memory physics is intrinsic to the active material, not supplied externally by a gate field acting on a separate channel.
 
 The bottom electrode is a pre-patterned layer of \ITO{} deposited on borosilicate glass. ITO combines optical transparency with adequate electronic conductance ($\sigma \approx \SI{e4}{\siemens\per\centi\metre}$)~\cite{Kim1999}, allowing optical inspection of the active layer and characterisation of the device stack by techniques such as UV-Vis spectroscopy and electroluminescence imaging. The work function of ITO ($\Phi_{\mathrm{ITO}} \approx \SI{4.7}{\electronvolt}$) is well matched to the ionisation potential of PPV-family semiconductors~\cite{Ramsdale2002}, facilitating hole injection into the active layer.
 
@@ -165,7 +165,7 @@ The conductance can be set to a specific value by applying a controlled number o
 
 A pulsed voltage protocol was applied: 50 consecutive write pulses of \SI{+1}{\volt} amplitude and \SI{0.1}{\second} duration, followed by 50 write pulses of \SI{-2}{\volt}. The conductance was monitored at the peak of each pulse (i.e., at the \SI{+1}{\volt} and \SI{-2}{\volt} levels, respectively). This protocol is analogous to the repeated pre-synaptic stimulation of a biological synapse and its subsequent inhibition.
 
-The results demonstrate that the conductance can be continuously potentiated from its initial value by more than \SI{200}{\percent} during the \SI{+1}{\volt} pulse train, and subsequently depotentiated back toward the initial value during the \SI{-2}{\volt} train. The potentiation and depression curves are smooth and monotonic, without any abrupt transitions. The full reversibility of the process (the conductance returns to a value near the initial level after the complete depression protocol) confirms that the underlying ionic redistribution is non-destructive and does not permanently alter the chemical composition or morphology of the active layer.
+The conductance is continuously potentiated from its initial value by more than \SI{200}{\percent} during the \SI{+1}{\volt} pulse train, and subsequently depotentiated back toward the initial value during the \SI{-2}{\volt} train. The potentiation and depression curves are smooth and monotonic, without any abrupt transitions. The full reversibility of the process (the conductance returns to a value near the initial level after the complete depression protocol) confirms that the underlying ionic redistribution is non-destructive and does not permanently alter the chemical composition or morphology of the active layer.
 
 The energy cost of each synaptic event (one write pulse of \SI{1}{\volt}, \SI{0.1}{\second}) can be estimated from the average current during the pulse. The resulting energy per event is approximately \SI{50}{\nano\joule}, or approximately \SI{6}{\femto\joule\per\micro\metre\squared} of device area (the \SI{0.0825}{\square\centi\metre} junction). This value is consistent with those reported for organic synaptic devices operating in the picojoule-to-nanojoule range~\cite{Xiao2016}, and comparable to the picojoule-to-nanojoule switching energies reported for inorganic memristive devices~\cite{YangStrukovStewart2013}.
 
@@ -207,7 +207,7 @@ Within this archived pulse-train dataset, the low-pulse-count response is reprod
 
 \subsection{Variable-Delay Depotentiation: Short- and Long-Term Retention}\label{subsec:stm_ltm}
 
-The third dynamical measurement carried through the thesis probes how a written conductance state fades once the drive is removed: the depotentiation of the device measured as a function of the delay before read-out. This is one of the most important characterisation protocols for neuromorphic devices, because it determines whether the device can emulate short-lived and longer-lived synaptic states on experimentally accessible timescales. In the artificial-synapse literature these regimes are commonly labelled \STM{} and \LTM{}; in the present system, the longer-lived regime remains on the sub-minute scale and should therefore be understood operationally, not as a claim of indefinitely persistent storage.
+The third dynamical measurement carried through the thesis probes how a written conductance state fades once the drive is removed: the depotentiation of the device measured as a function of the delay before read-out. This protocol determines whether the device can emulate short-lived and longer-lived synaptic states on experimentally accessible timescales. In the artificial-synapse literature these regimes are commonly labelled \STM{} and \LTM{}; in the present system, the longer-lived regime remains on the sub-minute scale and should therefore be understood operationally, not as a claim of indefinitely persistent storage.
 
 The measurement reuses the pulsed read--write protocol of \cref{subsec:pulse_potentiation}, with the waiting time $t_{\mathrm{wait}}$ now the swept variable and the pulse number held fixed. \Cref{fig:retention} shows the dependence of $\Delta G$ on $t_{\mathrm{wait}}$ for three excitation conditions: (i) $V_{\mathrm{write}} = \SI{1}{\volt}$, $N_{\mathrm{pulses}} = 10$ (STM, blue); (ii) $V_{\mathrm{write}} = \SI{1}{\volt}$, $N_{\mathrm{pulses}} = 50$ (STM, red); and (iii) $V_{\mathrm{write}} = \SI{3}{\volt}$, $N_{\mathrm{pulses}} = 10$ (LTM, black).
 
@@ -235,7 +235,7 @@ The molecular mechanism underlying the STM/LTM distinction is discussed in detai
 
 \subsection{Excitatory Post-Synaptic Current}\label{subsec:epsc}
 
-The \EPSC{} measurement is a standard protocol in the field of artificial synaptic devices, designed to quantify the number and stability of distinguishable conductance states accessible to the device~\cite{Kim2018, VanDeBurgt2018}. The protocol employed here closely mimics the biological experiment in which a patch-clamped neuron is subjected to a defined sequence of pre-synaptic inputs and the post-synaptic current is monitored.
+The \EPSC{} measurement is a standard protocol for artificial synaptic devices, quantifying the number and stability of distinguishable conductance states accessible to the device~\cite{Kim2018, VanDeBurgt2018}. The protocol employed here closely mimics the biological experiment in which a patch-clamped neuron is subjected to a defined sequence of pre-synaptic inputs and the post-synaptic current is monitored.
 
 The measurement protocol is as follows (\cref{fig:epsc}):
 \begin{enumerate}
@@ -296,7 +296,7 @@ where $A_{\pm}$ and $\tau_{\pm}$ are the branch-specific amplitude and time cons
   \label{fig:extended_synapse_summary}
 \end{figure}
 
-The result that the obtained learning rule corresponds to \textit{asymmetric Hebbian} STDP reflects the specific voltage waveform design, the stated definition of \(\Delta t\), and the polarity conventions of the electrode configuration. Different waveform designs or an opposite sign convention would be expected to produce differently labelled STDP kernels, offering an additional degree of tunability in the design of hardware neural network architectures built from these devices.
+That the learning rule is \textit{asymmetric Hebbian} reflects the specific voltage waveform design, the stated definition of \(\Delta t\), and the polarity conventions of the electrode configuration. Different waveform designs or an opposite sign convention would be expected to produce differently labelled STDP kernels, offering an additional degree of tunability in the design of hardware neural network architectures built from these devices.
 
 
 %% ------------------------------------------------------------
@@ -336,7 +336,7 @@ Two distinct notions of device longevity must be kept separate. \emph{Cycling en
 
 The devices reported here were characterised at regular intervals over a period of two weeks (\SI{{\sim}300}{\hour}) after fabrication, without encapsulation, while stored in ambient air at room temperature. The key metrics monitored were the baseline conductance $G_0$, the maximum achievable conductance change $\Delta G_{\mathrm{max}}$, and the STM retention time $\tau_S$; the supporting stability record is collected in \chTwoSIRef{app:ch2_morphology_stability}.
 
-The results show that all three metrics remain within \SI{20}{\percent} of their initial values over the full two-week measurement period~\cite{PradoSocorro2022}. This stability compares favourably with other organic memristive devices reported in the literature, which typically exhibit significant degradation within hours to days under ambient conditions~\cite{Shih2016}. The enhanced stability is attributed to the solid-state nature of the composite: unlike devices based on liquid electrolytes or gel polymers, the Hybrane matrix provides a mechanically cohesive environment that protects the ions from evaporation and the polymer films from delamination, consistent with the stability of related Hybrane-based LEC blends~\cite{Mardegan2021}.
+All three metrics remain within \SI{20}{\percent} of their initial values over the full two-week measurement period~\cite{PradoSocorro2022}. This stability compares favourably with other organic memristive devices reported in the literature, which typically exhibit significant degradation within hours to days under ambient conditions~\cite{Shih2016}. The enhanced stability is attributed to the solid-state nature of the composite: unlike devices based on liquid electrolytes or gel polymers, the Hybrane matrix provides a mechanically cohesive environment that protects the ions from evaporation and the polymer films from delamination, consistent with the stability of related Hybrane-based LEC blends~\cite{Mardegan2021}.
 
 \subsection{Device-to-Device Reproducibility}\label{subsec:reproducibility}
 
