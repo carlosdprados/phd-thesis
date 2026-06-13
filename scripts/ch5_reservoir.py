@@ -413,18 +413,76 @@ def random_reservoir_control(cards, N=24, max_k=30, seeds=SEEDS):
     return dict(dev=dev, rnd_same=rnd_same, rnd_broad=rnd_broad)
 
 
+def _spearman(a, b):
+    """Spearman rank correlation (numpy-only; the file avoids a scipy dependency)."""
+    a, b = np.asarray(a, float), np.asarray(b, float)
+    ra = np.argsort(np.argsort(a)).astype(float)
+    rb = np.argsort(np.argsort(b)).astype(float)
+    ra -= ra.mean(); rb -= rb.mean()
+    den = np.sqrt((ra * ra).sum() * (rb * rb).sum())
+    return float((ra * rb).sum() / den) if den > 0 else 0.0
+
+
+def _realized_dr_rho(base, N, kappa, seeds=SEEDS, jitter=0.12, dt=DT):
+    """The across-node write->retention rank correlation actually induced in the
+    heterogeneous bank at coupling strength kappa: Spearman(alpha_i, tau_eff_i),
+    the simulation analogue of the MEASURED Au/TMPE coupling (handout 28, F7:
+    Spearman(potentiation-depth, t50) = +0.46). Repeats the draw logic of
+    coupled_nodes() (the realized rho is a property of the mechanism, stable across
+    seeds, so it need not be byte-aligned with the MC draws) and averages over seeds.
+    Used to ANCHOR kappa to data instead of sweeping an arbitrary range."""
+    rhos = []
+    for s in seeds:
+        rng = np.random.default_rng(7000 + s)
+        tau = np.array([max(base[i % len(base)].tau * float(np.exp(rng.normal(0, jitter))), 1e-2)
+                        for i in range(N)])
+        al = np.array([float(np.clip(base[i % len(base)].alpha * (1 + rng.normal(0, jitter)),
+                                     0.05, 2.0)) for i in range(N)])
+        z = (al - al.mean()) / (al.std() + 1e-9)
+        tau_eff = np.maximum(tau * np.exp(kappa * z), 1e-2)
+        rhos.append(_spearman(al, tau_eff))
+    return float(np.mean(rhos))
+
+
+def _kappa_for_rho(base, N, rho_target, seeds=SEEDS, lo=0.0, hi=2.0):
+    """Invert _realized_dr_rho: the kappa whose induced across-node write->retention
+    correlation matches rho_target. Monotone in kappa, so a bisection suffices."""
+    flo = _realized_dr_rho(base, N, lo, seeds) - rho_target
+    fhi = _realized_dr_rho(base, N, hi, seeds) - rho_target
+    if flo * fhi > 0:                       # target outside [lo,hi] -> clamp
+        return lo if abs(flo) < abs(fhi) else hi
+    for _ in range(40):
+        mid = 0.5 * (lo + hi)
+        fm = _realized_dr_rho(base, N, mid, seeds) - rho_target
+        if flo * fm <= 0:
+            hi = mid
+        else:
+            lo, flo = mid, fm
+    return 0.5 * (lo + hi)
+
+
+# Measured drive->retention coupling, Au/TMPE negative-polarity corpus (handout 28,
+# F7): Spearman(potentiation-depth, t50) = +0.46 (n=28, p=0.015). 95% CI via Fisher-z
+# (SE = 1/sqrt(n-3) = 0.2): rho in [0.10, 0.71]. Transferred as an order-of-magnitude
+# anchor only -- a different host (TMPE), electrode (Au) and polarity (negative) -- in
+# keeping with the thesis's use of this corpus as directional confirmation, not as a
+# parameter source for the silver PEO/LiOTf banks.
+F7_RHO, F7_RHO_LO, F7_RHO_HI = 0.46, 0.10, 0.71
+
+
 def coupling_sensitivity(cards, N=24, max_k=30, seeds=SEEDS,
                          kappas=(-0.5, -0.25, 0.0, 0.25, 0.5)):
     """phi<->lambda coupling robustness: re-run the het-vs-hom memory-capacity
     comparison with the coupling perturbation of coupled_nodes() swept over kappa,
     and check that the qualitative conclusions (heterogeneous > homogeneous, and both
     memory banks > memoryless) survive the assumption. Reports het and hom total MC,
-    their ratio, and the paired het-hom test at each kappa."""
+    their ratio, and the paired het-hom test at each kappa. The sweep is then ANCHORED
+    to the one direct measurement of this coupling (Au/TMPE F7, rho=+0.46): kappa is
+    calibrated so the simulated across-node write->retention correlation matches it,
+    turning the bound from an arbitrary range into a data-referenced operating point."""
     base_het, base_hom = _full(cards), [lead_card(cards)]
-    print("\nphi-lambda coupling sensitivity (total MC vs coupling kappa):")
-    print(f"  {'kappa':>6} {'het MC':>8} {'hom MC':>8} {'ratio':>7} {'het-hom':>9} {'p':>8} {'r_rb':>6}")
-    rows = []
-    for kp in kappas:
+
+    def _het_hom_mc(kp):
         het_t, hom_t = [], []
         for s in seeds:
             u = np.random.default_rng(1000 + s).uniform(0.0, 1.0, 4000)
@@ -432,7 +490,13 @@ def coupling_sensitivity(cards, N=24, max_k=30, seeds=SEEDS,
                 coupled_nodes(base_het, N, np.random.default_rng(s), kp), u), u, max_k).sum())
             hom_t.append(memory_capacity(run_states(
                 coupled_nodes(base_hom, N, np.random.default_rng(s), kp), u), u, max_k).sum())
-        het_t, hom_t = np.array(het_t), np.array(hom_t)
+        return np.array(het_t), np.array(hom_t)
+
+    print("\nphi-lambda coupling sensitivity (total MC vs coupling kappa):")
+    print(f"  {'kappa':>6} {'het MC':>8} {'hom MC':>8} {'ratio':>7} {'het-hom':>9} {'p':>8} {'r_rb':>6}")
+    rows = []
+    for kp in kappas:
+        het_t, hom_t = _het_hom_mc(kp)
         st = paired_stats(het_t, hom_t)
         ratio = het_t.mean() / max(hom_t.mean(), 1e-9)
         print(f"  {kp:+6.2f} {het_t.mean():8.2f} {hom_t.mean():8.2f} {ratio:7.2f} "
@@ -441,7 +505,26 @@ def coupling_sensitivity(cards, N=24, max_k=30, seeds=SEEDS,
     ratios = [r[3] for r in rows]
     print(f"  het>hom holds across all kappa (ratio {min(ratios):.2f}-{max(ratios):.2f});"
           " the heterogeneity conclusion is robust to the composition assumption.")
-    return rows
+
+    # ---- data anchor: kappa calibrated to the measured Au/TMPE coupling (F7) ----
+    k_star = _kappa_for_rho(base_het, N, F7_RHO, seeds)
+    k_lo = _kappa_for_rho(base_het, N, F7_RHO_LO, seeds)
+    k_hi = _kappa_for_rho(base_het, N, F7_RHO_HI, seeds)
+    print("\n  measured-coupling anchor (Au/TMPE F7, rho_target=%.2f, 95%% CI %.2f-%.2f):"
+          % (F7_RHO, F7_RHO_LO, F7_RHO_HI))
+    print(f"  {'kappa*':>6} {'het MC':>8} {'hom MC':>8} {'ratio':>7} {'het-hom':>9} {'p':>8} {'r_rb':>6}")
+    anchor = []
+    for tag, kp in [("CI-lo", k_lo), ("rho=.46", k_star), ("CI-hi", k_hi)]:
+        het_t, hom_t = _het_hom_mc(kp)
+        st = paired_stats(het_t, hom_t)
+        ratio = het_t.mean() / max(hom_t.mean(), 1e-9)
+        rho_chk = _realized_dr_rho(base_het, N, kp, seeds)
+        print(f"  {kp:+6.2f} {het_t.mean():8.2f} {hom_t.mean():8.2f} {ratio:7.2f} "
+              f"{st['mean']:+9.2f} {st['p']:8.1e} {st['r_rb']:+6.2f}   [{tag}, rho={rho_chk:+.2f}]")
+        anchor.append((tag, kp, het_t.mean(), hom_t.mean(), ratio, st))
+    print(f"  measured coupling maps to kappa*={k_star:+.2f} (CI {k_lo:+.2f}..{k_hi:+.2f}); "
+          "het>hom holds at the data-anchored operating point, not only across an arbitrary sweep.")
+    return dict(sweep=rows, anchor=anchor, k_star=k_star, k_ci=(k_lo, k_hi))
 
 
 def tonic_mc_control(cards, N=24, max_k=40, seeds=SEEDS):

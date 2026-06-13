@@ -234,11 +234,26 @@ rescaled with its own write-nonlinearity exponent by a factor $e^{\kappa z}$ ($z
 standardised exponent), modelling the drive--retention coupling the separate-amplitude
 measurement cannot exclude. The heterogeneous bank stays above the homogeneous one for
 every coupling strength swept, so the heterogeneity conclusion does not rest on the
-assumption being exact.
+assumption being exact. The sweep is then \emph{anchored to data}. The gold/\TMPE{}
+negative-polarity corpus of \cref{ch:comparative} supplies the only direct measurement
+of this coupling: across $28$ single-run potentiation\,$+$\,relaxation traces the
+write-depth and the forgetting time are rank-correlated at $\rho=+0.46$ ($p=0.015$;
+$95\%$ CI $0.10$--$0.71$ by Fisher's $z$). Calibrating $\kappa$ so the simulated
+across-node write--retention correlation matches that figure fixes the data-anchored
+operating point. The nominal composed cards already carry a baseline correlation of
+$\rho=+0.32$ (cells that write more strongly also retain longer), so reproducing the
+measurement needs only a modest extra coupling, $\kappa^{\star}=+0.18$ (CI
+$0.00$--$0.63$), at which the heterogeneous advantage is undiminished (capacity ratio
+$1.45$, paired Wilcoxon $p=2\times10^{-3}$; the ratio stays above $1.18$ across the whole
+measured CI). The figure is transferred as an order-of-magnitude anchor only -- a
+different host, electrode, and polarity -- but it converts the bound from an arbitrary
+range into a data-referenced point and independently confirms the \emph{sign} of the
+coupling the composed model assumes. The calibration ($\kappa$-for-$\rho$ bisection)
+is reproduced by \path{scripts/ch5_reservoir.py}.
 
 \begin{table}[t]
   \centering
-  \caption[Coupling-sensitivity control]{Memory capacity of the heterogeneous and homogeneous banks under an injected drive--retention coupling of strength $\kappa$ ($N=24$, ten seeds; $\kappa=0$ is the nominal composed model). The heterogeneous advantage holds across the whole range (paired Wilcoxon $p=2\times10^{-3}$, $r_{\mathrm{rb}}=+1.0$ at every $\kappa$).}
+  \caption[Coupling-sensitivity control]{Memory capacity of the heterogeneous and homogeneous banks under an injected drive--retention coupling of strength $\kappa$ ($N=24$, ten seeds; $\kappa=0$ is the nominal composed model, which already carries a baseline across-node write--retention rank correlation $\rho=+0.32$). \emph{Upper block:} an arbitrary symmetric sweep; the heterogeneous advantage holds throughout (paired Wilcoxon $p=2\times10^{-3}$, $r_{\mathrm{rb}}=+1.0$ at every $\kappa$). \emph{Lower block ($\dagger$):} the data-anchored point, $\kappa^{\star}=+0.18$, calibrated so the simulated correlation reproduces the measured Au/TMPE coupling ($\rho=+0.46$; \cref{ch:comparative}); the advantage is undiminished there.}
   \label{tab:ch5_coupling}
   \footnotesize
   \setlength{\tabcolsep}{8pt}
@@ -246,11 +261,13 @@ assumption being exact.
     \toprule
     $\kappa$ & het MC & hom MC & ratio \\
     \midrule
-    $-0.50$ & 6.27 & 5.50 & 1.14 \\
+    $-0.50$ & 6.31 & 5.50 & 1.15 \\
     $-0.25$ & 6.22 & 4.65 & 1.34 \\
-    $\phantom{-}0.00$ & 6.44 & 4.20 & 1.53 \\
-    $+0.25$ & 6.60 & 4.64 & 1.42 \\
-    $+0.50$ & 6.78 & 5.43 & 1.25 \\
+    $\phantom{-}0.00$ & 6.43 & 4.20 & 1.53 \\
+    $+0.25$ & 6.57 & 4.64 & 1.42 \\
+    $+0.50$ & 6.75 & 5.43 & 1.24 \\
+    \midrule
+    $+0.18^{\dagger}$ & 6.49 & 4.46 & 1.45 \\
     \bottomrule
   \end{tabular}
 \end{table}
