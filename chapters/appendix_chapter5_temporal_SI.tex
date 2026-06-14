@@ -16,7 +16,7 @@ with the per-cell tables of \cref{app:ch4_celltables}, it makes the in-silico
 results reproducible without consulting the analysis scripts
 (\path{scripts/ch5_figures.py}, \path{scripts/ch5_physio_context.py},
 \path{scripts/ch5_onset.py}, \path{scripts/ch5_deployment.py},
-\path{scripts/ch5_noneeg.py}).
+\path{scripts/ch5_noneeg.py}, \path{scripts/ch5_case.py}).
 
 \section{Parameter-Card Sourcing}\label{app:ch5_cards}
 
@@ -328,6 +328,58 @@ $N\,K$ multiply--accumulates per step at an assumed \SI{1}{\pico\joule} per oper
     Average power (1\,Hz, always-on) & $\approx\SIrange{1.2}{2.4}{\micro\watt}$ ($N{=}24$--48) & --- \\
     Read-out compute & $NK$ MACs/step ($<\SI{1}{\nano\joule}$) & --- \\
     Operating regime & sub-kHz (affect is sub-Hz) & --- \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\section{Continuous Affect: CASE Protocol and Results}\label{app:ch5_case}
+
+\Cref{tab:ch5_case} gives the full continuous valence/arousal result behind
+\cref{sec:ch5_case} (\path{scripts/ch5_case.py}). The \CASE{} corpus
+\cite{Sharma2019CASE} (open access; figshare \texttt{10.6084/m9.figshare.8869157})
+provides, for thirty subjects, a continuous joystick annotation of valence and
+arousal (range $[0.5,9.5]$, \SI{20}{\hertz}) synchronised with eight physiological
+channels at \SI{1}{\kilo\hertz}. We use the four slow channels that match the device
+band and the \WESAD{} set -- electrodermal activity, respiration, skin temperature,
+and a heart rate recovered from the electrocardiogram by the same robust R-peak
+detector used for \WESAD{} -- resampled to the $\Delta t=\SI{1}{\second}$ reservoir
+cadence over the eight emotional videos (the blue baseline clips are excluded),
+per-subject robustly scaled exactly as the \WESAD{} streams. The reservoir state is
+reset and a \SI{10}{\second} washout dropped at each video boundary. The read-out is a
+single linear ridge regression predicting valence and arousal jointly,
+leave-one-subject-out, scored by Lin's concordance correlation coefficient (CCC)
+\cite{Lin1989CCC}, $\mathrm{CCC}=2\,\mathrm{cov}(y,\hat y)/[\sigma_y^2+\sigma_{\hat y}^2+(\mu_y-\mu_{\hat y})^2]$.
+
+Two classical controls bound the device. The \emph{EMA} rows replace the reservoir
+with an exponential moving average of the raw channels fed to the same read-out: a
+single time constant (lead cell), and a bank spread over the device timescale range
+(\SIrange{3}{26}{\second}). The \emph{per-channel} device bank gives each node a
+single-channel input mask instead of the random multi-channel mask -- the
+apples-to-apples device analogue of the linear EMA bank -- so the device-minus-EMA
+gap isolates the compressive nonlinearity rather than the mask. Paired Wilcoxon tests
+over the thirty held-out subjects (mean CCC per subject, seed-averaged):
+$\tau$-spread $-$ single-$\tau$ (EMA) $=+0.176$ ($27/30$, $p=1.6\times10^{-7}$,
+$r_{\mathrm{rb}}=+0.94$); memory $-$ instantaneous $=+0.079$ ($24/30$,
+$p=1.2\times10^{-4}$); per-channel device $-$ EMA bank $=-0.047$ ($p=6.6\times10^{-3}$);
+heterogeneous $-$ homogeneous device $=+0.005$ ($p=0.18$, \textit{ns}).
+
+\begin{table}[t]
+  \centering
+  \caption[Continuous valence/arousal on CASE]{Held-out concordance correlation coefficient (CCC) for continuous valence and arousal on \CASE{}~\cite{Sharma2019CASE} ($N=48$ nodes, leave-one-subject-out, linear ridge read-out; reservoir/memoryless rows are means over ten bank seeds). A single timescale barely beats the instantaneous read; a \emph{spread} of timescales (the linear $\tau$-spread EMA bank, bold) nearly doubles it. The device banks capture much of that spread but, on this smooth regression, trail the clean linear filter; the per-channel device recovers part of the gap that the random cross-channel mask costs.}
+  \label{tab:ch5_case}
+  \footnotesize
+  \setlength{\tabcolsep}{7pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xccc@{}}
+    \toprule
+    Read-out features & CCC valence & CCC arousal & CCC mean \\
+    \midrule
+    Instantaneous (no memory)            & 0.178 & 0.320 & 0.249 \\
+    Memoryless bank                      & 0.232 & 0.375 & 0.304 \\
+    EMA, single $\tau$ (classical)       & 0.170 & 0.290 & 0.230 \\
+    \textbf{EMA bank, $\tau$ spread (classical)} & \textbf{0.311} & \textbf{0.516} & \textbf{0.413} \\
+    Device, homogeneous (lead $\tau$)    & 0.240 & 0.433 & 0.337 \\
+    Device, heterogeneous (mixed mask)   & 0.247 & 0.440 & 0.344 \\
+    Device, heterogeneous (per-channel)  & 0.258 & 0.458 & 0.358 \\
     \bottomrule
   \end{tabularx}
 \end{table}
