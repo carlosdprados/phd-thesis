@@ -45,15 +45,22 @@
 %% ============================================================
 \begin{document}
 
-%% ---- Front matter: contents listings ----
-%%  Lowercase-roman page numbering for the preliminary listings,
+%% ---- Front matter ----
+%%  Lowercase-roman page numbering for all preliminary pages,
 %%  switched to arabic at the start of the body. \cleardoublepage
-%%  keeps each listing and the first body page on a recto (odd)
-%%  page in this twoside layout. The contents listings carry no
-%%  running header, so plain pagestyle is used for them.
+%%  keeps each section on a recto (odd) page in this twoside layout.
 \pagenumbering{roman}
 \setcounter{page}{1}
 
+%% Title page carries no number or running header.
+\include{chapters/frontmatter_titlepage}
+
+%% Preliminary prose pages (acknowledgements, abstracts, publications).
+\include{chapters/frontmatter_acknowledgements}
+\include{chapters/frontmatter_abstract}
+\include{chapters/frontmatter_publications}
+
+%% Contents listings carry no running header, so plain pagestyle is used.
 {\cleardoublepage\pagestyle{plain}
  \tableofcontents
  \cleardoublepage
@@ -63,10 +70,13 @@
  \phantomsection\addcontentsline{toc}{chapter}{\listtablename}
  \listoftables}
 
+%% List of abbreviations, after the contents listings.
+\include{chapters/frontmatter_abbreviations}
+
 \cleardoublepage
 \pagenumbering{arabic}
 
-%% ---- Front matter ----
+%% ---- Motivation / objectives roadmap ----
 \include{chapters/frontmatter_motivation}
 
 %% ---- Chapters ----

@@ -1,0 +1,178 @@
+%% ============================================================
+%%  Front matter — Abstract / Resumen / Resum
+%%
+%%  Author      : Carlos David Prado-Socorro
+%%  Institution : ICMol, Universitat de València
+%%
+%%  Trilingual abstract: English (main), Spanish (Resumen) and
+%%  Valencian/Catalan (Resum). The Spanish and Catalan pages are
+%%  wrapped in babel otherlanguage environments so they hyphenate
+%%  correctly; English remains the document's main language.
+%% ============================================================
+
+%% ---- Standalone preamble (skipped when \include'd from thesis.tex) ----
+\ifdefined\thesismode\else
+  \documentclass[12pt, twoside]{report}
+  \usepackage{thesis-format}
+  \addbibresource{../bibliography/references.bib}
+  \begin{document}
+\fi
+
+%% ============================================================
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+\markboth{Abstract}{Abstract}
+%% ============================================================
+
+The energy and latency of modern computing are increasingly dominated by the
+movement of data between separate memory and processing units rather than by
+arithmetic itself. One physical response is to compute with devices whose
+internal dynamics carry and transform information, as the biological synapse
+does. This thesis develops a \emph{volatile organic memristive device} (a
+two-terminal element made from an ion-containing polymer--electrolyte composite)
+and argues that its defining property, a conductance that retains a decaying
+record of recent electrical history, is not a defect but a computational
+resource: a controlled \emph{fading memory} that makes the device a physical
+leaky integrator for temporal computing.
+
+The argument is built on four levels of evidence. First, a fully characterised
+proof-of-concept Super~Yellow/Hybrane/lithium-triflate device reproduces the
+complete synaptic measurement suite (current--voltage hysteresis, potentiation
+and depression, an excitatory post-synaptic current, distinguishable short- and
+long-term retention, and spike-timing-dependent plasticity), interpreted through
+the mobility asymmetry between the triflate anion and the lithium cation. Second,
+a campaign-scale reproducibility collapse of the Hybrane fabrication line is
+diagnosed across the fabrication archive and resolved by switching to a
+poly(ethylene oxide) host, yielding a fabrication-record methodology and an
+automated feature pipeline. Third, on the PEO platform composition is
+established as a replicated, quantitative control that tunes the fading-memory
+time over roughly 2--20\,s, while host, anion and cation substitutions are
+reported as a sample-limited survey; the hypothesised \ce{Li+} > \ce{Na+} >
+\ce{K+} cation ordering is explicitly not supported by the data. Fourth, compact
+behavioural models fitted to the measured dynamics drive reservoir-computing
+simulations: a heterogeneous composition bank raises the linear memory capacity
+by a factor of $1.54$ and the information-processing capacity from $7.1$ to
+$11.6$, classifies stress on the WESAD corpus (leave-one-subject-out macro-F1 of
+$0.894$ binary and $0.758$ three-class), and improves continuous
+valence/arousal tracking on the CASE corpus.
+
+The unifying result is a single, evidence-graded design rule: the chemistry of a
+polymer--electrolyte composite sets its fading-memory timescale, and a
+heterogeneous bank of such timescales is a resource for computing on time. The
+device should therefore be benchmarked not against non-volatile memory but
+against temporal and event-driven neuromorphic hardware, where controlled
+forgetting is the active ingredient rather than a defect to be suppressed.
+
+%% ============================================================
+\begin{otherlanguage}{spanish}
+\chapter*{Resumen}
+\addcontentsline{toc}{chapter}{Resumen}
+\markboth{Resumen}{Resumen}
+%% ============================================================
+
+El consumo energético y la latencia de la computación moderna están cada vez más
+dominados por el movimiento de datos entre unidades de memoria y de
+procesamiento separadas, más que por la propia aritmética. Una respuesta física
+consiste en computar con dispositivos cuya dinámica interna transporta y
+transforma la información, como hace la sinapsis biológica. Esta tesis desarrolla
+un \emph{dispositivo memristivo orgánico volátil} (un elemento de dos terminales
+fabricado a partir de un compósito polímero--electrolito con iones móviles) y
+sostiene que su propiedad definitoria, una conductancia que conserva un registro
+decreciente de su historia eléctrica reciente, no es un defecto sino un recurso
+computacional: una \emph{memoria evanescente} controlada que convierte al
+dispositivo en un integrador con fugas físico para la computación temporal.
+
+El argumento se construye sobre cuatro niveles de evidencia. Primero, un
+dispositivo de prueba de concepto Super~Yellow/Hybrane/triflato de litio,
+completamente caracterizado, reproduce el conjunto completo de medidas sinápticas
+(histéresis corriente--voltaje, potenciación y depresión, corriente
+postsináptica excitatoria, retención a corto y largo plazo distinguibles, y
+plasticidad dependiente del tiempo de disparo), interpretadas mediante la
+asimetría de movilidad entre el anión triflato y el catión litio. Segundo, un
+colapso de reproducibilidad a escala de campaña en la línea de fabricación de
+Hybrane se diagnostica a través del archivo de fabricación y se resuelve
+cambiando a una matriz de poli(óxido de etileno), lo que da lugar a una
+metodología de registro de fabricación y a una tubería automatizada de
+extracción de características. Tercero, en la plataforma de PEO la composición se
+establece como el único control cuantitativo replicado, que ajusta el tiempo de
+memoria evanescente entre aproximadamente 2 y 20\,s, mientras que las
+sustituciones de matriz, anión y catión se presentan como un estudio limitado por
+el tamaño muestral; el orden catiónico hipotético \ce{Li+} > \ce{Na+} > \ce{K+}
+no se ve respaldado por los datos. Cuarto, modelos de comportamiento compactos
+ajustados a la dinámica medida alimentan simulaciones de computación de
+reservorio: un banco heterogéneo de composiciones aumenta la capacidad de
+memoria lineal en un factor de $1{,}54$ y la capacidad de procesamiento de
+información de $7{,}1$ a $11{,}6$, clasifica el estrés en el corpus WESAD
+(macro-F1 de $0{,}894$ binario y $0{,}758$ de tres clases con validación
+dejando-un-sujeto-fuera) y mejora el seguimiento continuo de
+valencia/activación en el corpus CASE.
+
+El resultado unificador es una única regla de diseño graduada por evidencia: la
+química de un compósito polímero--electrolito fija su escala temporal de memoria
+evanescente, y un banco heterogéneo de tales escalas constituye un recurso para
+computar sobre el tiempo. El dispositivo debe compararse, por tanto, no con una
+memoria no volátil sino con el hardware neuromórfico temporal y dirigido por
+eventos, donde el olvido controlado es el ingrediente activo y no un defecto que
+suprimir.
+
+\end{otherlanguage}
+
+%% ============================================================
+\begin{otherlanguage}{catalan}
+\chapter*{Resum}
+\addcontentsline{toc}{chapter}{Resum}
+\markboth{Resum}{Resum}
+%% ============================================================
+
+El consum energètic i la latència de la computació moderna estan cada vegada més
+dominats pel moviment de dades entre unitats de memòria i de processament
+separades, més que per la mateixa aritmètica. Una resposta física consisteix a
+computar amb dispositius la dinàmica interna dels quals transporta i transforma
+la informació, com fa la sinapsi biològica. Aquesta tesi desenvolupa un
+\emph{dispositiu memristiu orgànic volàtil} (un element de dos terminals fabricat
+a partir d'un compòsit polímer--electròlit amb ions mòbils) i defensa que la seua
+propietat definitòria, una conductància que conserva un registre decreixent de la
+seua història elèctrica recent, no és un defecte sinó un recurs computacional:
+una \emph{memòria evanescent} controlada que converteix el dispositiu en un
+integrador amb fugues físic per a la computació temporal.
+
+L'argument es construeix sobre quatre nivells d'evidència. Primer, un dispositiu
+de prova de concepte Super~Yellow/Hybrane/triflat de liti, completament
+caracteritzat, reprodueix el conjunt complet de mesures sinàptiques (histèresi
+corrent--voltatge, potenciació i depressió, corrent postsinàptic excitatori,
+retenció a curt i llarg termini distingibles, i plasticitat dependent del temps
+de dispar), interpretades mitjançant l'asimetria de mobilitat entre l'anió
+triflat i el catió liti. Segon, un col·lapse de reproductibilitat a escala de
+campanya en la línia de fabricació de Hybrane es diagnostica a través de l'arxiu
+de fabricació i es resol canviant a una matriu de poli(òxid d'etilè), la qual
+cosa dóna lloc a una metodologia de registre de fabricació i a una canonada
+automatitzada d'extracció de característiques. Tercer, en la plataforma de PEO la
+composició s'estableix com l'únic control quantitatiu replicat, que ajusta el
+temps de memòria evanescent entre aproximadament 2 i 20\,s, mentre que les
+substitucions de matriu, anió i catió es presenten com un estudi limitat per la
+grandària mostral; l'ordre catiònic hipotètic \ce{Li+} > \ce{Na+} > \ce{K+} no
+es veu confirmat per les dades. Quart, models de comportament compactes ajustats
+a la dinàmica mesurada alimenten simulacions de computació de reservori: un banc
+heterogeni de composicions augmenta la capacitat de memòria lineal en un factor
+de $1{,}54$ i la capacitat de processament d'informació de $7{,}1$ a $11{,}6$,
+classifica l'estrès en el corpus WESAD (macro-F1 de $0{,}894$ binari i $0{,}758$
+de tres classes amb validació deixant-un-subjecte-fora) i millora el seguiment
+continu de valència/activació en el corpus CASE.
+
+El resultat unificador és una única regla de disseny graduada per evidència: la
+química d'un compòsit polímer--electròlit fixa la seua escala temporal de memòria
+evanescent, i un banc heterogeni d'aquestes escales constitueix un recurs per a
+computar sobre el temps. El dispositiu, per tant, s'ha de comparar no amb una
+memòria no volàtil sinó amb el maquinari neuromòrfic temporal i dirigit per
+esdeveniments, on l'oblit controlat és l'ingredient actiu i no un defecte a
+suprimir.
+
+\end{otherlanguage}
+
+%% ---- Standalone close (skipped when \include'd from thesis.tex) ----
+\ifdefined\thesismode
+  \let\thesisstandaloneclose\relax
+\else
+  \def\thesisstandaloneclose{\end{document}}
+\fi
+\thesisstandaloneclose

@@ -37,6 +37,14 @@
 \RequirePackage{lmodern}
 \RequirePackage{microtype}
 
+%% --- Languages ---
+%%  English is the main language; Spanish and Catalan are loaded only so the
+%%  Resumen / Resum front-matter pages hyphenate correctly. shorthands=off
+%%  disables babel's active-character shortcuts (".", "~", "<", ">") so the
+%%  Spanish module cannot clash with siunitx/amsmath in the body. Loaded
+%%  before hyperref, as babel requires.
+\RequirePackage[shorthands=off, main=english, spanish, catalan]{babel}
+
 %% --- Page geometry ---
 %%  Trim: 17 cm wide x 24 cm tall, per UV recommendations.
 %%  Margins: asymmetric to accommodate a bound, double-sided
@@ -88,6 +96,7 @@
 \RequirePackage{booktabs}
 \RequirePackage{array}
 \RequirePackage{tabularx}
+\RequirePackage{longtable}
 \RequirePackage{multirow}
 \RequirePackage{rotating}
 \RequirePackage{caption}

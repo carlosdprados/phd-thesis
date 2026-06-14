@@ -1,0 +1,56 @@
+%% ============================================================
+%%  Front matter — Acknowledgements
+%%
+%%  Author      : Carlos David Prado-Socorro
+%%  Institution : ICMol, Universitat de València
+%%
+%%  >>> TODO (personalise before submission) <<<
+%%  Acknowledgements are personal. The text below is a neutral
+%%  scaffold that names the roles a thesis normally thanks
+%%  (supervisors, group, collaborators, funding, family); replace
+%%  the bracketed placeholders and the wording with your own.
+%% ============================================================
+
+%% ---- Standalone preamble (skipped when \include'd from thesis.tex) ----
+\ifdefined\thesismode\else
+  \documentclass[12pt, twoside]{report}
+  \usepackage{thesis-format}
+  \addbibresource{../bibliography/references.bib}
+  \begin{document}
+\fi
+
+%% ============================================================
+\chapter*{Acknowledgements}
+\addcontentsline{toc}{chapter}{Acknowledgements}
+\markboth{Acknowledgements}{Acknowledgements}
+%% ============================================================
+
+This thesis is the product of several years of work that would not have been
+possible without the people and institutions that supported it.
+
+I am deeply grateful to my supervisor[s] \textbf{[supervisor name(s)]} for their
+guidance, their scientific judgement, and their patience throughout this work,
+and for the freedom to follow the project where the data led, including through
+the reproducibility crisis that reshaped its direction.
+
+I thank the members of the \textbf{Instituto de Ciencia Molecular (ICMol)} at the
+Universitat de Val\`encia for the day-to-day environment in which this research was
+carried out: for shared instruments and expertise, for the fabrication and
+characterisation know-how passed on at the bench, and for many useful
+discussions. My thanks also go to the co-authors of the published work on which
+\cref{ch:poc} is built, and to everyone who contributed to building and curating
+the experimental archive that underpins the quantitative chapters.
+
+I gratefully acknowledge the financial support that made this work possible
+\textbf{[funding bodies / grant numbers]}.
+
+Finally, I thank my family and friends for their constant support and
+encouragement \textbf{[personalise]}.
+
+%% ---- Standalone close (skipped when \include'd from thesis.tex) ----
+\ifdefined\thesismode
+  \let\thesisstandaloneclose\relax
+\else
+  \def\thesisstandaloneclose{\end{document}}
+\fi
+\thesisstandaloneclose

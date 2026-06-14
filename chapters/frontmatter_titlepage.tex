@@ -1,0 +1,91 @@
+%% ============================================================
+%%  Front matter — Title page
+%%
+%%  Author      : Carlos David Prado-Socorro
+%%  Institution : ICMol, Universitat de València
+%%
+%%  Doctoral-thesis cover page following the Universitat de
+%%  València layout. The fields below are collected as macros so
+%%  the few institution-specific items are edited in one place.
+%%
+%%  >>> TODO (confirm before submission) <<<
+%%    * \thesistitle    — the officially registered thesis title
+%%    * \thesissupervisors — supervisor name(s) / director(s)
+%%    * \thesisprogramme — exact doctoral-programme name
+%%    * \thesisdate      — official deposit / defence date
+%%  The values below are sensible drafts derived from the thesis
+%%  content, not verified against the registration record.
+%% ============================================================
+
+%% ---- Standalone preamble (skipped when \include'd from thesis.tex) ----
+\ifdefined\thesismode\else
+  \documentclass[12pt, twoside]{report}
+  \usepackage{thesis-format}
+  \addbibresource{../bibliography/references.bib}
+  \begin{document}
+\fi
+
+%% ---- Editable title-page fields ----
+\providecommand{\thesistitle}{Volatile Organic Memristive Devices for
+  Temporal Computing: Compositional Control of Fading Memory in
+  Polymer--Electrolyte Composites}
+\providecommand{\thesisauthor}{Carlos David Prado-Socorro}
+\providecommand{\thesissupervisors}{Prof.\ Eugenio Coronado \\
+  Dr.\ Salvador Cardona-Serra} % TODO confirm supervisor(s)
+\providecommand{\thesisprogramme}{Doctoral Programme in Nanoscience and
+  Nanotechnology} % TODO confirm exact programme name
+\providecommand{\thesisinstitute}{Instituto de Ciencia Molecular (ICMol)}
+\providecommand{\thesisuniversity}{Universitat de Val\`encia}
+\providecommand{\thesisdate}{2026} % TODO confirm deposit/defence date
+
+%% ============================================================
+\begin{titlepage}
+\centering
+\thispagestyle{empty}
+
+\vspace*{1.0cm}
+
+{\large\scshape \thesisuniversity\par}
+\vspace{0.2cm}
+{\large \thesisinstitute\par}
+\vspace{0.3cm}
+{\large \thesisprogramme\par}
+
+\vfill
+
+\rule{\linewidth}{0.4pt}\par
+\vspace{0.8cm}
+{\LARGE\bfseries \thesistitle \par}
+\vspace{0.8cm}
+\rule{\linewidth}{0.4pt}\par
+
+\vfill
+
+{\normalsize Doctoral thesis presented by\par}
+\vspace{0.3cm}
+{\Large \thesisauthor\par}
+\vspace{0.3cm}
+{\normalsize in partial fulfilment of the requirements for the degree of\par}
+\vspace{0.15cm}
+{\normalsize\itshape Doctor of Philosophy (PhD)\par}
+
+\vfill
+
+{\normalsize Supervised by\par}
+\vspace{0.2cm}
+{\large \thesissupervisors\par}
+
+\vfill
+
+{\normalsize \thesisdate\par}
+
+\vspace*{1.0cm}
+\end{titlepage}
+
+%% ---- Standalone close (skipped when \include'd from thesis.tex) ----
+\ifdefined\thesismode
+  \let\thesisstandaloneclose\relax
+\else
+  \def\thesisstandaloneclose{\end{document}}
+\fi
+\thesisstandaloneclose

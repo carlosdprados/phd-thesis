@@ -1,0 +1,58 @@
+%% ============================================================
+%%  Front matter — List of Publications
+%%
+%%  Author      : Carlos David Prado-Socorro
+%%  Institution : ICMol, Universitat de València
+%%
+%%  Outputs arising from the work in this thesis.
+%%
+%%  >>> TODO (confirm before submission) <<<
+%%    * Patent entry: fill in the official title, application/
+%%      grant number, inventors, and date. The placeholder below
+%%      records that a patent exists (see project records) but its
+%%      bibliographic details are not verified here.
+%% ============================================================
+
+%% ---- Standalone preamble (skipped when \include'd from thesis.tex) ----
+\ifdefined\thesismode\else
+  \documentclass[12pt, twoside]{report}
+  \usepackage{thesis-format}
+  \addbibresource{../bibliography/references.bib}
+  \begin{document}
+\fi
+
+%% ============================================================
+\chapter*{List of Publications}
+\addcontentsline{toc}{chapter}{List of Publications}
+\markboth{List of Publications}{List of Publications}
+%% ============================================================
+
+The following outputs arose directly from the work presented in this thesis.
+
+\section*{Peer-reviewed articles}
+
+\sloppy
+\begin{enumerate}
+  \item C.~D. Prado-Socorro, S.~Gim\'enez-Santamarina, L.~Mardegan,
+        L.~Escalera-Moreno, H.~J. Bolink, S.~Cardona-Serra and E.~Coronado,
+        ``Polymer-Based Composites for Engineering Organic Memristive Devices,''
+        \textit{Advanced Electronic Materials} \textbf{8}, 2101192 (2022).
+        \mbox{DOI: 10.1002/aelm.202101192.}
+        \\[2pt]
+        \textit{This article is the basis of \cref{ch:poc}.}
+\end{enumerate}
+
+\section*{Patents}
+
+\begin{enumerate}
+  \item \textbf{[Patent title]}, \textbf{[inventors]}, \textbf{[application/grant
+        number]}, \textbf{[date]}. % TODO confirm bibliographic details
+\end{enumerate}
+
+%% ---- Standalone close (skipped when \include'd from thesis.tex) ----
+\ifdefined\thesismode
+  \let\thesisstandaloneclose\relax
+\else
+  \def\thesisstandaloneclose{\end{document}}
+\fi
+\thesisstandaloneclose

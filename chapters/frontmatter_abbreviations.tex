@@ -1,0 +1,90 @@
+%% ============================================================
+%%  Front matter — List of Abbreviations
+%%
+%%  Author      : Carlos David Prado-Socorro
+%%  Institution : ICMol, Universitat de València
+%%
+%%  Alphabetical glossary of the acronyms, materials, and symbols
+%%  used recurrently in the thesis. Kept as a plain longtable
+%%  (no glossaries package) so it needs no extra build pass.
+%% ============================================================
+
+%% ---- Standalone preamble (skipped when \include'd from thesis.tex) ----
+\ifdefined\thesismode\else
+  \documentclass[12pt, twoside]{report}
+  \usepackage{thesis-format}
+  \addbibresource{../bibliography/references.bib}
+  \begin{document}
+\fi
+
+%% ============================================================
+\chapter*{List of Abbreviations}
+\addcontentsline{toc}{chapter}{List of Abbreviations}
+\markboth{List of Abbreviations}{List of Abbreviations}
+%% ============================================================
+
+\begingroup
+\setlength{\parskip}{0pt}
+\renewcommand{\arraystretch}{1.25}
+
+\begin{longtable}{@{}p{0.20\linewidth}@{\hspace{1em}}p{0.74\linewidth}@{}}
+\toprule
+\textbf{Abbreviation} & \textbf{Meaning} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Abbreviation} & \textbf{Meaning} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+
+ATR(-FTIR) & Attenuated total reflectance (Fourier-transform infrared spectroscopy) \\
+CASE       & Continuously Annotated Signals of Emotion (affective corpus) \\
+CCC        & Concordance correlation coefficient \\
+CMOS       & Complementary metal--oxide--semiconductor \\
+DRAM       & Dynamic random-access memory \\
+EIS        & Electrochemical impedance spectroscopy \\
+ENODe      & Electrochemical neuromorphic organic device \\
+EPSC       & Excitatory post-synaptic current \\
+HSAB       & Hard--soft acid--base (theory) \\
+IPC        & Information-processing capacity \\
+ITO        & Indium tin oxide \\
+I--V       & Current--voltage (characteristic) \\
+KOTf       & Potassium triflate (potassium trifluoromethanesulfonate) \\
+LiOTf      & Lithium triflate (lithium trifluoromethanesulfonate) \\
+LOSO       & Leave-one-subject-out (cross-validation) \\
+LTM        & Long-term memory \\
+MC         & (Linear) memory capacity \\
+NaOTf      & Sodium triflate (sodium trifluoromethanesulfonate) \\
+NARMA      & Nonlinear autoregressive moving average (benchmark task) \\
+OTf        & Triflate, \ce{CF3SO3-} (trifluoromethanesulfonate) \\
+PEO        & Poly(ethylene oxide) \\
+RC         & Reservoir computing \\
+ReRAM      & Resistive random-access memory \\
+SI         & Supporting information \\
+SRAM       & Static random-access memory \\
+STDP       & Spike-timing-dependent plasticity \\
+STM        & Short-term memory \\
+SY         & Super~Yellow (PDY-132 poly(\textit{p}-phenylene-vinylene) semiconductor) \\
+$T_g$      & Glass-transition temperature \\
+TFSI       & Bis(trifluoromethanesulfonyl)imide \\
+TMPE       & Trimethylolpropane ethoxylate (hyperbranched polyether host) \\
+UV--Vis    & Ultraviolet--visible (spectroscopy) \\
+VFT        & Vogel--Fulcher--Tammann (relaxation) \\
+WESAD      & Wearable Stress and Affect Detection (physiological corpus) \\
+XRD        & X-ray diffraction \\
+1T1M       & One-transistor--one-memristor (array cell) \\
+$\tau_S,\tau_L$ & Short- and long-term fading-memory time constants \\
+$\beta$    & Stretched-exponential (Kohlrausch) exponent \\
+\end{longtable}
+
+\endgroup
+
+%% ---- Standalone close (skipped when \include'd from thesis.tex) ----
+\ifdefined\thesismode
+  \let\thesisstandaloneclose\relax
+\else
+  \def\thesisstandaloneclose{\end{document}}
+\fi
+\thesisstandaloneclose
