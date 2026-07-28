@@ -24,25 +24,23 @@
 \markboth{Abstract}{Abstract}
 %% ============================================================
 
-The energy and latency of modern computing are increasingly dominated by the
-movement of data between separate memory and processing units rather than by
-arithmetic itself. One physical response is to compute with devices whose
-internal dynamics carry and transform information, as the biological synapse
-does. This thesis develops a \emph{volatile organic memristive device} (a
-two-terminal element made from an ion-containing polymer--electrolyte composite)
-and argues that its defining property, a conductance that retains a decaying
-record of recent electrical history, is a computational resource rather than a
-shortcoming: a controlled \emph{fading memory} that makes the device a physical
-leaky integrator for temporal computing.
+Data movement between separate memory and processing units accounts for an
+increasing share of the energy and latency of modern computing. One physical
+approach is to use device dynamics to store and transform temporal state. This
+thesis develops a \emph{volatile organic memristive device}: a two-terminal
+element made from an ion-containing polymer--electrolyte composite whose
+conductance retains a decaying record of recent electrical history. The work
+evaluates this controlled \emph{fading memory} as physical leaky integration for
+temporal computing.
 
-The thesis first demonstrates the complete synaptic measurement suite in a
+The thesis first applies a set of synaptic measurements to a
 proof-of-concept Super~Yellow/Hybrane/lithium-triflate device: current--voltage
 hysteresis, potentiation and depression, an excitatory post-synaptic current,
 distinguishable short- and long-term retention, and spike-timing-dependent
 plasticity. These responses are interpreted through the mobility asymmetry
 between the triflate anion and the lithium cation. The fabrication archive then
-reveals a campaign-scale reproducibility collapse of the Hybrane line. Changing
-to a poly(ethylene oxide) host resolves the collapse and leads to a
+shows a campaign-scale loss of reproducibility in the Hybrane line. Changing
+to a poly(ethylene oxide) host restores a usable switching window and leads to a
 fabrication-record methodology and an automated feature pipeline. On the PEO
 platform, a replicated composition series tunes the fading-memory time over
 roughly 2--20\,s. Host, anion and cation substitutions remain a sample-limited
@@ -56,10 +54,10 @@ three-class), and improves continuous valence/arousal tracking on the CASE
 corpus (a $+0.176$ gain in concordance correlation from the spread of
 timescales).
 
-Together, the results show that composition tunes fading memory in the
-replicated PEO/lithium-triflate series, while mixed-composition banks broaden
-temporal memory in simulation. These devices are therefore better compared with
-temporal and event-driven neuromorphic hardware than with non-volatile memories.
+In the replicated PEO/lithium-triflate series, composition tunes fading memory.
+Mixed-composition banks broaden temporal memory in simulation. Because the
+device response relaxes over seconds, temporal and event-driven neuromorphic
+hardware provides the relevant reference class.
 
 %% ============================================================
 \begin{otherlanguage}{spanish}
@@ -68,28 +66,27 @@ temporal and event-driven neuromorphic hardware than with non-volatile memories.
 \markboth{Resumen}{Resumen}
 %% ============================================================
 
-El consumo energético y la latencia de la computación moderna están cada vez más
-dominados por el movimiento de datos entre unidades de memoria y de
-procesamiento separadas, más que por la propia aritmética. Una respuesta física
-consiste en computar con dispositivos cuya dinámica interna transporta y
-transforma la información, como hace la sinapsis biológica. Esta tesis desarrolla
-un \emph{dispositivo memristivo orgánico volátil} (un elemento de dos terminales
-fabricado a partir de un compósito polímero--electrolito con iones móviles) y
-sostiene que su propiedad definitoria, una conductancia que conserva un registro
-decreciente de su historia eléctrica reciente, no es un defecto sino un recurso
-computacional: una \emph{memoria evanescente} controlada que convierte al
-dispositivo en un integrador con fugas físico para la computación temporal.
+El movimiento de datos entre unidades separadas de memoria y procesamiento
+representa una proporción creciente del consumo energético y la latencia de la
+computación moderna. Una estrategia física consiste en utilizar la dinámica del
+dispositivo para almacenar y transformar un estado temporal. Esta tesis
+desarrolla un \emph{dispositivo memristivo orgánico volátil}: un elemento de dos
+terminales fabricado a partir de un compósito polímero--electrolito con iones
+móviles cuya conductancia conserva un registro decreciente de su historia
+eléctrica reciente. El trabajo evalúa esta \emph{memoria evanescente} controlada
+como integración física con fugas para la computación temporal.
 
-La tesis demuestra primero el conjunto completo de medidas sinápticas en un
+La tesis aplica primero un conjunto de medidas sinápticas a un
 dispositivo de prueba de concepto Super~Yellow/Hybrane/triflato de litio:
 histéresis corriente--voltaje, potenciación y depresión, corriente postsináptica
 excitatoria, retención a corto y largo plazo distinguibles, y plasticidad
 dependiente del tiempo de disparo. Estas respuestas se interpretan mediante la
 asimetría de movilidad entre el anión triflato y el catión litio. A continuación,
-el archivo de fabricación revela un colapso de reproducibilidad a escala de
+el archivo de fabricación muestra una pérdida de reproducibilidad a escala de
 campaña en la línea de Hybrane. El cambio a una matriz de poli(óxido de etileno)
-resuelve el colapso y da lugar a una metodología de registro de fabricación y a
-una canalización automatizada de extracción de características. En la plataforma
+restaura una ventana de conmutación utilizable y da lugar a una metodología de
+registro de fabricación y a una canalización automatizada de extracción de
+características. En la plataforma
 de PEO, una serie de composiciones replicada ajusta el tiempo de memoria
 evanescente entre aproximadamente 2 y 20\,s. Las sustituciones de matriz, anión y
 catión siguen siendo un estudio limitado por el tamaño muestral, y los datos no
@@ -103,11 +100,10 @@ clases con validación dejando-un-sujeto-fuera) y mejora el seguimiento continuo
 de valencia/activación en el corpus CASE (una ganancia de $+0{,}176$ en
 correlación de concordancia procedente de la diversidad de escalas temporales).
 
-En conjunto, los resultados muestran que la composición ajusta la memoria
-evanescente en la serie replicada PEO/triflato de litio, mientras que los bancos
-de composiciones mixtas amplían la memoria temporal en simulación. Por ello,
-estos dispositivos se comparan mejor con hardware neuromórfico temporal y
-dirigido por eventos que con memorias no volátiles.
+En la serie replicada PEO/triflato de litio, la composición ajusta la memoria
+evanescente. Los bancos de composiciones mixtas amplían la memoria temporal en
+simulación. Como la respuesta del dispositivo se relaja en segundos, el hardware
+neuromórfico temporal y dirigido por eventos constituye la referencia pertinente.
 
 \end{otherlanguage}
 
@@ -118,28 +114,27 @@ dirigido por eventos que con memorias no volátiles.
 \markboth{Resum}{Resum}
 %% ============================================================
 
-El consum energètic i la latència de la computació moderna estan cada vegada més
-dominats pel moviment de dades entre unitats de memòria i de processament
-separades, més que per la mateixa aritmètica. Una resposta física consisteix a
-computar amb dispositius la dinàmica interna dels quals transporta i transforma
-la informació, com fa la sinapsi biològica. Aquesta tesi desenvolupa un
-\emph{dispositiu memristiu orgànic volàtil} (un element de dos terminals fabricat
-a partir d'un compòsit polímer--electròlit amb ions mòbils) i defensa que la seua
-propietat definitòria, una conductància que conserva un registre decreixent de la
-seua història elèctrica recent, no és un defecte sinó un recurs computacional:
-una \emph{memòria evanescent} controlada que converteix el dispositiu en un
-integrador amb fugues físic per a la computació temporal.
+El moviment de dades entre unitats separades de memòria i de processament
+representa una proporció creixent del consum energètic i la latència de la
+computació moderna. Una estratègia física consisteix a utilitzar la dinàmica del
+dispositiu per a emmagatzemar i transformar un estat temporal. Aquesta tesi
+desenvolupa un \emph{dispositiu memristiu orgànic volàtil}: un element de dos
+terminals fabricat a partir d'un compòsit polímer--electròlit amb ions mòbils la
+conductància del qual conserva un registre decreixent de la seua història
+elèctrica recent. El treball avalua aquesta \emph{memòria evanescent} controlada
+com a integració física amb fugues per a la computació temporal.
 
-La tesi demostra primer el conjunt complet de mesures sinàptiques en un
+La tesi aplica primer un conjunt de mesures sinàptiques a un
 dispositiu de prova de concepte Super~Yellow/Hybrane/triflat de liti: histèresi
 corrent--voltatge, potenciació i depressió, corrent postsinàptic excitatori,
 retenció a curt i llarg termini distingibles, i plasticitat dependent del temps
 de dispar. Aquestes respostes s'interpreten mitjançant l'asimetria de mobilitat
-entre l'anió triflat i el catió liti. A continuació, l'arxiu de fabricació revela
-un col·lapse de reproductibilitat a escala de campanya en la línia de Hybrane. El
-canvi a una matriu de poli(òxid d'etilè) resol el col·lapse i dóna lloc a una
-metodologia de registre de fabricació i a una canalització automatitzada
-d'extracció de característiques. En la plataforma de PEO, una sèrie de
+entre l'anió triflat i el catió liti. A continuació, l'arxiu de fabricació mostra
+una pèrdua de reproductibilitat a escala de campanya en la línia de Hybrane. El
+canvi a una matriu de poli(òxid d'etilè) restaura una finestra de commutació
+utilitzable i dóna lloc a una metodologia de registre de fabricació i a una
+canalització automatitzada d'extracció de característiques. En la plataforma de
+PEO, una sèrie de
 composicions replicada ajusta el temps de memòria evanescent entre aproximadament
 2 i 20\,s. Les substitucions de matriu, anió i catió continuen sent un estudi
 limitat per la grandària mostral, i les dades no confirmen l'ordre catiònic
@@ -153,11 +148,10 @@ millora el seguiment continu de valència/activació en el corpus CASE (un guany
 $+0{,}176$ en correlació de concordança procedent de la diversitat d'escales
 temporals).
 
-En conjunt, els resultats mostren que la composició ajusta la memòria evanescent
-en la sèrie replicada PEO/triflat de liti, mentre que els bancs de composicions
-mixtes amplien la memòria temporal en simulació. Per tant, aquests dispositius es
-comparen millor amb maquinari neuromòrfic temporal i dirigit per esdeveniments
-que amb memòries no volàtils.
+En la sèrie replicada PEO/triflat de liti, la composició ajusta la memòria
+evanescent. Els bancs de composicions mixtes amplien la memòria temporal en
+simulació. Com que la resposta del dispositiu es relaxa en segons, el maquinari
+neuromòrfic temporal i dirigit per esdeveniments constitueix la referència pertinent.
 
 \end{otherlanguage}
 
