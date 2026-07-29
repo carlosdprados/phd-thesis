@@ -58,8 +58,8 @@ leakage.
     Node model & $x^{(i)}_n=\lambda_i x^{(i)}_{n-1}+[\max(w_i u_n,0)]^{\alpha_i}$ (\cref{sec:ch5_model}) \\
     Read-out & single linear ridge regression \\
     Bank size $N$ & 24 (benchmarks); 48 (physiology/affect) \\
-    Seeds & 10 random input/bank seeds; means $\pm$ SD reported \\
-    Significance tests & paired Wilcoxon signed-rank over seeds (or subjects) \\
+    Algorithmic variability & 10 random input/bank seeds; means $\pm$ SD and sign consistency reported; seeds are not inferential replicates \\
+    Inferential unit & independent held-out subject for \WESAD{}/\CASE{}; independently fabricated device for experimental comparisons \\
     Memory capacity & $\mathrm{MC}_k$ summed over lags, random uniform input \cite{Jaeger2002STM} \\
     NARMA & NARMA-10 system identification, NRMSE \cite{AtiyaParlos2000} \\
     Information-processing capacity & degree-1 (linear) + degree-2 (nonlinear), bounded by $N$ \cite{Dambre2012} \\
@@ -170,10 +170,11 @@ chest strap is mechanically stable and the protocol largely seated; the wrist si
 
 Three controls underpin the claims of \cref{ch:temporal} and are tabulated here.
 They are reproduced by \path{scripts/ch5_reservoir.py} (the generic-ESN and coupling
-controls) and \path{scripts/ch5_onset.py} (the classical-filter control); each
-significance test reports, alongside the paired Wilcoxon $p$, the matched-pairs
-rank-biserial effect size $r_{\mathrm{rb}}\in[-1,1]$, since the Wilcoxon $p$ floors
-at $2\times10^{-3}$ for the ten-seed comparisons.
+controls) and \path{scripts/ch5_onset.py} (the classical-filter control). For
+seed-only controls, matched means, standard deviations, effect differences, and
+sign consistency describe algorithmic sensitivity; no population-level $p$-value is
+assigned. Paired Wilcoxon tests and rank-biserial effects are retained only where the
+pairs are independent held-out subjects.
 
 \paragraph{Classical-filter control.} \Cref{tab:ch5_filter} is the control behind the
 deployment-robustness reframing of \cref{sec:ch5_robust}: an ordinary exponential
@@ -213,7 +214,7 @@ grid supplies intrinsically, and extending the range (the drive-amplitude variab
 
 \begin{table}[t]
   \centering
-  \caption[Generic echo-state-network control]{Total linear memory capacity ($N=24$, ten seeds, means $\pm$\,SD) of the measured device heterogeneous bank versus random echo-state networks of equal size. Paired against the device bank: same-range ESN $+0.28$ ($p=0.05$, $r_{\mathrm{rb}}=-0.7$, marginally favouring the random bank); broad-range ESN $+1.14$ ($p=2\times10^{-3}$, $r_{\mathrm{rb}}=-1.0$).}
+  \caption[Generic echo-state-network control]{Total linear memory capacity ($N=24$, ten matched seeds, means $\pm$\,SD) of the measured device heterogeneous bank versus random echo-state networks of equal size. Relative to the device bank, the same-range ESN differs by $+0.28$ on average and the broad-range ESN by $+1.14$ (positive in all ten seed pairs). These are algorithmic-sensitivity comparisons, not population-level significance tests.}
   \label{tab:ch5_esn}
   \footnotesize
   \setlength{\tabcolsep}{6pt}
@@ -244,7 +245,7 @@ operating point. The nominal composed cards already carry a baseline correlation
 $\rho=+0.32$ (cells that write more strongly also retain longer), so reproducing the
 measurement needs only a modest extra coupling, $\kappa^{\star}=+0.18$ (CI
 $0.00$--$0.63$), at which the heterogeneous advantage is undiminished (capacity ratio
-$1.45$, paired Wilcoxon $p=2\times10^{-3}$; the ratio stays above $1.18$ across the whole
+$1.45$, positive in all ten seed pairs; the ratio stays above $1.18$ across the whole
 measured CI). The figure is transferred as an order-of-magnitude anchor only -- a
 different host, electrode, and polarity -- but it converts the bound from an arbitrary
 range into a data-referenced point and independently confirms the \emph{sign} of the
@@ -253,7 +254,7 @@ is reproduced by \path{scripts/ch5_reservoir.py}.
 
 \begin{table}[t]
   \centering
-  \caption[Coupling-sensitivity control]{Memory capacity of the heterogeneous and homogeneous banks under an injected drive--retention coupling of strength $\kappa$ ($N=24$, ten seeds; $\kappa=0$ is the nominal composed model, which already carries a baseline across-node write--retention rank correlation $\rho=+0.32$). \emph{Upper block:} an arbitrary symmetric sweep; the heterogeneous advantage holds throughout (paired Wilcoxon $p=2\times10^{-3}$, $r_{\mathrm{rb}}=+1.0$ at every $\kappa$). \emph{Lower block ($\dagger$):} the data-anchored point, $\kappa^{\star}=+0.18$, calibrated so the simulated correlation reproduces the measured Au/TMPE coupling ($\rho=+0.46$; \cref{ch:comparative}); the advantage is undiminished there.}
+  \caption[Coupling-sensitivity control]{Memory capacity of the heterogeneous and homogeneous banks under an injected drive--retention coupling of strength $\kappa$ ($N=24$, ten seeds; $\kappa=0$ is the nominal composed model, which already carries a baseline across-node write--retention rank correlation $\rho=+0.32$). \emph{Upper block:} an arbitrary symmetric sweep; the heterogeneous advantage is positive in all ten seed pairs at every $\kappa$. \emph{Lower block ($\dagger$):} the data-anchored point, $\kappa^{\star}=+0.18$, calibrated so the simulated correlation reproduces the measured Au/TMPE coupling ($\rho=+0.46$; \cref{ch:comparative}); the advantage is undiminished there. Seed consistency describes sensitivity, not experimental replication.}
   \label{tab:ch5_coupling}
   \footnotesize
   \setlength{\tabcolsep}{8pt}
@@ -286,11 +287,11 @@ extrapolation of the drive-amplitude variable, copying the lead cell's write
 nonlinearity and stretch and overriding only $\tau$ (\path{tonic_cards} in
 \path{scripts/ch5_model.py}). On memory capacity (DT $=\SI{5}{\second}$, $k$ to $40$)
 the extension nearly doubles the long-lag tail beyond \SI{75}{\second}
-($\mathrm{MC}_{k>15}$ from $0.73$ to $1.37$, $p=2\times10^{-3}$) and raises total
+($\mathrm{MC}_{k>15}$ from $0.73$ to $1.37$, positive in all ten seed pairs) and raises total
 capacity from $6.4$ to $7.0$. On the physiological-context reconstruction, with the
 target delays extended to $90$ and \SI{120}{\second} so the genuinely tonic context is
 present, the slow-band held-out $R^2$ rises from $0.672$ to $0.690$
-($+0.019$, $p=2\times10^{-3}$, $r_{\mathrm{rb}}=+1.0$ over ten seeds) and the overall
+($+0.019$, positive in all ten seed pairs) and the overall
 $R^2$ by $+0.009$ (\path{tonic_extension} in \path{scripts/ch5_physio_context.py}). The
 extension is not part of the measured composition banks anywhere else in the chapter.
 
