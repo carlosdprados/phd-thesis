@@ -4,7 +4,7 @@
 
 \chapter{Supporting Information for Chapter 2}\label{app:ch2_si}
 
-This appendix gathers the detailed experimental information and supporting evidence for the proof-of-concept device of \cref{ch:poc}. The main chapter retains the evidence needed to assess the device-level claim; the material collected here records the supporting methods, protocol details, and auxiliary measurements.
+This appendix gathers the detailed experimental information and supporting evidence for the proof-of-concept platform of \cref{ch:poc}. The main chapter retains the evidence needed to assess the formulation-and-architecture claim; the material collected here records the specimen mapping, supporting methods, protocol details, and auxiliary measurements.
 
 \section{Materials and Fabrication Detail}\label{app:ch2_materials_fabrication}
 
@@ -41,6 +41,31 @@ The top Ag electrode was thermally evaporated in the glovebox through a shadow m
 \section{Electrical Protocol Detail}\label{app:ch2_electrical_protocols}
 
 Electrical measurements used a Keithley 2450 SourceMeter connected to a custom probe station and controlled through Keithley TestScript Builder. Unless noted otherwise, measurements were carried out under nitrogen, with voltage applied to the Ag top electrode relative to the grounded ITO bottom electrode.
+
+\subsection{Assay-to-Specimen Map}\label{app:ch2_assay_specimens}
+
+The proof-of-concept claim concerns one formulation and device architecture, not one physical junction carrying every assay. \Cref{tab:ch2_assay_specimens} records the finest specimen identity recoverable from the local archive and the published supporting information. A crossbar ``junction'' or ``pixel'' is one ITO/active-layer/Ag overlap; several junctions share a fabricated substrate and therefore are not independent device or batch replicates.
+
+\begin{table}[htbp]
+  \centering
+  \caption[Assay-to-specimen map for the proof-of-concept evidence]{Assay-to-specimen map for the Chapter 2 evidence. ``Published summary'' indicates that the numerical result is recoverable from Ref.~\cite{PradoSocorro2022}, but the local archive does not resolve the physical specimen identifier.}
+  \label{tab:ch2_assay_specimens}
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{p{0.18\linewidth} p{0.28\linewidth} X}
+    \toprule
+    \textbf{Assay} & \textbf{Recovered evidence unit} & \textbf{Supported inference} \\
+    \midrule
+    I--V hysteresis & One junction, NM\_v025 & Representative analogue hysteresis of the common formulation; no population estimate. \\
+    Pulse potentiation/depression & One junction (L5), NM\_v055 & Reversible pulse-protocol demonstration. \\
+    Pulse-number response & Five junctions, NM\_v055, Day 8 & Within-substrate junction spread; not independent-device or batch reproducibility. \\
+    STM/LTM retention & Three published fit traces; specimen ID unresolved & Existence and timescale of two protocol-defined retention regimes; no population estimate. \\
+    EPSC state sequence & Published state ratios; specimen ID unresolved & Four-state protocol demonstration; no population estimate. \\
+    STDP timing kernel & Five junctions, NM\_v055, Day 19 & Within-substrate mean timing response and junction spread. \\
+    Shelf stability & Published time series; specimen roster unresolved & Calendar stability over the reported interval; not cycling endurance or batch stability. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
 
 \subsection{Read--Write--Wait Measurement}\label{app:ch2_read_write_wait}
 
@@ -102,7 +127,7 @@ with \(\Delta t=t_{\mathrm{post}}-t_{\mathrm{pre}}\). Each spike waveform has ma
 
 \section{Morphology and Stability Support}\label{app:ch2_morphology_stability}
 
-The spin speed was selected from a \SIrange{500}{3000}{\rpm} optimisation~\cite{PradoSocorro2022}. Low speeds produced films that were too thick and less uniform; high speeds made the film thin enough for substrate roughness to matter. The main device used \SI{2000}{\rpm}, giving a \SI{209}{\nano\metre} active layer measured by contact profilometry across a masked step edge with an Ambios XP-1 profilometer.
+The spin speed was selected from a \SIrange{500}{3000}{\rpm} optimisation~\cite{PradoSocorro2022}. Low speeds produced films that were too thick and less uniform; high speeds made the film thin enough for substrate roughness to matter. The selected fabrication condition used \SI{2000}{\rpm}, giving a \SI{209}{\nano\metre} active layer measured by contact profilometry across a masked step edge with an Ambios XP-1 profilometer.
 
 Surface topography was characterised by tapping-mode AFM using a Bruker Dimension Icon instrument, a silicon probe with resonant frequency \SI{300}{\kilo\hertz} and force constant \SI{40}{\newton\per\metre}, and a scan rate of \SI{0.6}{\hertz}. The AFM images showed smooth films with RMS roughness of \SIrange{1}{3}{\nano\metre} over the investigated spin-speed range~\cite{PradoSocorro2022}. The absence of large phase-separated features supports the reading of the active layer as a homogeneous polymer-electrolyte composite at the scale relevant to the vertical junction.
 
@@ -111,7 +136,7 @@ Ambient shelf stability was assessed for approximately two weeks (\(\sim\)\SI{30
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{../figures/chapter2/morphology_stability_support.pdf}
-  \caption[Morphology and shelf-stability support]{Supporting morphology and shelf-stability summary for the Chapter 2 device family. The processing condition used in the main device gives a \SI{209}{\nano\metre} active layer; tapping-mode AFM reports \SIrange{1}{3}{\nano\metre} RMS roughness across the investigated spin-speed window; and the ambient shelf-stability metrics remain within a \SI{20}{\percent} envelope over approximately \SI{300}{\hour}. Compiled from the supporting measurements reported in Ref.~\cite{PradoSocorro2022}; this is not a cycling-endurance result.}
+  \caption[Morphology and shelf-stability support]{Supporting morphology and shelf-stability summary for the Chapter 2 device family. The selected processing condition gives a \SI{209}{\nano\metre} active layer; tapping-mode AFM reports \SIrange{1}{3}{\nano\metre} RMS roughness across the investigated spin-speed window; and the ambient shelf-stability metrics remain within a \SI{20}{\percent} envelope over approximately \SI{300}{\hour}. Compiled from the supporting measurements reported in Ref.~\cite{PradoSocorro2022}; this is not a cycling-endurance result.}
   \label{fig:ch2_si_morphology_stability}
 \end{figure}
 
@@ -142,7 +167,7 @@ The electrochemical doping (ECD) model, formulated by Pei \textit{et al.}~\cite{
 
 \subsection{Resolution of the Two Models}
 
-The prolonged LEC-community debate over the relative validity of the ED and ECD models was resolved by van~Reenen \textit{et al.}~\cite{vanReenen2010}, who showed both to be correct in different limits: the ED model when injection is strongly barrier-limited (low-conductance semiconductor, large electrode work-function mismatch), the ECD model when injection is ohmic (high-conductance semiconductor, small mismatch). A device may operate in the ED regime at early times, before significant ionic redistribution, and transition toward the ECD regime as the double layers build up. The working interpretation adopted for the present device (ED with the fast triflate-driven response, ECD with the slow \ce{Li+}-driven response) is stated in \cref{sec:mechanism}.
+The prolonged LEC-community debate over the relative validity of the ED and ECD models was resolved by van~Reenen \textit{et al.}~\cite{vanReenen2010}, who showed both to be correct in different limits: the ED model when injection is strongly barrier-limited (low-conductance semiconductor, large electrode work-function mismatch), the ECD model when injection is ohmic (high-conductance semiconductor, small mismatch). A device may operate in the ED regime at early times, before significant ionic redistribution, and transition toward the ECD regime as the double layers build up. The working interpretation adopted for the present platform (ED with the fast triflate-driven response, ECD with the slow \ce{Li+}-driven response) is stated in \cref{sec:mechanism}.
 
 \section{Historical Comparison at the Time of Publication}\label{app:ch2_comparison}
 
@@ -171,6 +196,6 @@ The prolonged LEC-community debate over the relative validity of the ED and ECD 
   \end{tabular}
 \end{sidewaystable}
 
-Two combinations not represented in the comparison set at the time stand out. The first is the coexistence of \STM{} and \LTM{} in a single 2-T device that is also fully reversible. Of the prior reports, Liu and co-workers~\cite{Liu2016} comes closest, with tunable short- to long-term transitions in a 2-T structure; the redox route, however, modifies the active layer irreversibly at each cycle, precluding practical cyclic operation~\cite{Heremans2011}. The present device reaches comparable \STM{}/\LTM{} functionality with full reversibility (conductance returns to \(G_0\) after the reset protocol). The second is STDP in a fully reversible 2-T architecture: the earlier organic STDP demonstrations~\cite{Gkoupidenis2015, Kim2018, Seo2019} were all 3-T with a gate supplying the timing rule, whereas here the rule emerges from the superposition of pre- and postsynaptic pulses at the single Ag terminal.
+Two combinations not represented in the comparison set at the time stand out. The first is that the same 2-T formulation and architecture support both \STM{}- and \LTM{}-labelled regimes while remaining fully reversible. Of the prior reports, Liu and co-workers~\cite{Liu2016} comes closest, with tunable short- to long-term transitions in a 2-T structure; the redox route, however, modifies the active layer irreversibly at each cycle, precluding practical cyclic operation~\cite{Heremans2011}. The present platform reaches comparable \STM{}/\LTM{} functionality with full reversibility (conductance returns to \(G_0\) after the reset protocol). The second is STDP in a fully reversible 2-T architecture: the earlier organic STDP demonstrations~\cite{Gkoupidenis2015, Kim2018, Seo2019} were all 3-T with a gate supplying the timing rule, whereas here the rule emerges from the superposition of pre- and postsynaptic pulses at the Ag terminal.
 
 The remaining axes summarise the operating regime rather than a competitive claim. The ambient shelf lifetime (about \SI{300}{\hour} unencapsulated) exceeds most comparable unencapsulated organic memristive devices by roughly an order of magnitude~\cite{Shih2016}; cycling endurance, not characterised here, is where mature inorganic platforms reach \(>10^{10}\) cycles~\cite{IelminiWong2018}. The energy per synaptic event (about \SI{50}{\nano\joule}) is consistent with other organic ionic devices~\cite{Xiao2016} but higher than the picojoule budgets of dedicated CMOS neuromorphic hardware~\cite{IndiveriLiu2015,Horowitz2014} and of the best inorganic memristors~\cite{YangStrukovStewart2013}, reflecting the lower switching speed and larger area of this proof-of-concept device; area scaling toward the \(\sim\)\SI{100}{\nano\metre\squared} inorganic regime would close much of that gap.

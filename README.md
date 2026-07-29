@@ -50,7 +50,7 @@ The comparative chapter keeps that HSAB argument as qualitative framing, but the
 | Chapter | Focus | Status |
 | --- | --- | --- |
 | 1. Introduction | Computing bottlenecks, synaptic inspiration, memristors, organic materials, and the polymer-electrolyte strategy | Draft available |
-| 2. Proof of concept | A fully characterised `SY/Hybrane/LiOTf` two-terminal device with analogue switching, short- and long-term retention, EPSC-like response, and STDP | Draft available |
+| 2. Proof of concept | A characterised `SY/Hybrane/LiOTf` two-terminal platform with assay-level specimen mapping for analogue switching, retention, EPSC-like response, and STDP | Draft available |
 | 3. Reproducibility and provenance bridge | Diagnoses the `Hybrane` reproducibility collapse, documents the fabrication-provenance methodology, and motivates the transition to the `PEO` platform | Draft available |
 | 4. Comparative study | How **composition** (the `PEO/LiOTf` grid) tunes volatile dynamics — switching, potentiation, and fading memory — and how electrolyte **chemistry** shifts them further as sample-limited side evidence | Draft available |
 | 5. Temporal computing | Data-driven reservoir simulations from Chapter 4 parameter cards: memory-capacity/NARMA benchmarks, WESAD physiological temporal-context reconstruction, and scoped WESAD affective-classification demonstrations | Draft available |
