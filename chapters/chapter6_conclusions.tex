@@ -74,13 +74,31 @@ The results answer the three questions posed in \cref{ch:intro}.
 \section{Benchmarking Against the Right Reference Class}\label{sec:concl_benchmark}
 %% ------------------------------------------------------------
 
-Because the device state relaxes over seconds, temporal and event-driven neuromorphic systems provide the relevant reference class~\cite{Roy2019,IndiveriLiu2015,Tanaka2019}. Non-volatile DRAM, SRAM, and crossbar ReRAM serve different storage functions.
+Because the device state relaxes over seconds, temporal and event-driven neuromorphic systems provide the relevant reference class~\cite{Roy2019,IndiveriLiu2015,Tanaka2019}. Non-volatile DRAM, SRAM, and crossbar ReRAM serve different storage functions. Current physical-reservoir comparisons must also separate the physical node, input encoding, output layer, and network architecture~\cite{Liang2024PhysicalRC}; task scores from different layers and protocols are not a common leaderboard.
 
-\paragraph{Against physical reservoirs.} Physical reservoir computing has been demonstrated in dynamic memristors~\cite{Du2017,Zhong2021}, organic electrochemical devices~\cite{Cucchi2021}, and delay-coupled single nodes~\cite{Appeltant2011}. These systems require fading memory and nonlinearity~\cite{Tanaka2019,Maass2002LSM}. The present devices have measured fading memory, while the fitted models have nonzero nonlinear information-processing capacity. Their sub-kilohertz response overlaps many physiological and environmental signals without time rescaling. Composition changes the fading-memory time over \SIrange{2}{20}{\second}, and the corresponding heterogeneous model bank broadens memory capacity by a factor of $1.54$.
+\paragraph{Against physical reservoirs.} Physical reservoir computing has been demonstrated in dynamic memristors~\cite{Du2017,Zhong2021}, organic electrochemical devices~\cite{Cucchi2021}, and delay-coupled single nodes~\cite{Appeltant2011}. More recent systems add direct electrical tuning in two-terminal oxide devices~\cite{Lee2025TunableRC}, gate- and wavelength-controlled organic transistor dynamics~\cite{Gao2024GroupedRC}, and an organic electrochemical reservoir with a physical device read-out~\cite{Han2025ReconfigurableOECT}. These systems require fading memory and nonlinearity~\cite{Tanaka2019,Maass2002LSM}. The present devices have measured fading memory, while the fitted models have nonzero nonlinear information-processing capacity. Their sub-kilohertz response overlaps many physiological and environmental signals without time rescaling. Composition changes the fading-memory time over \SIrange{2}{20}{\second}, and the corresponding heterogeneous model bank broadens memory capacity by a factor of $1.54$.
 
 \paragraph{Against organic neuromorphic devices.} Much of organic neuromorphic electronics targets linear, symmetric, non-volatile conductance updates for weight storage, as in the ENODe family~\cite{VanDeBurgt2017,VanDeBurgt2018,Fuller2019}. The devices studied here use ion-relaxation timescales for temporal processing and are compared with ionic and electrolyte-gated organic neuromorphic systems~\cite{Gkoupidenis2017,Cucchi2021}.
 
-\paragraph{Placement in context.} The application scores are in silico and do not establish the performance of a wired array. The simulated reservoir contains independent, non-recurrent nodes; its absolute \NARMA{} errors are high and its capacities remain below the node-count bound. Recurrent or delay-feedback connectivity could raise these values. The present evidence shows what the fitted device dynamics can support under this architecture, not the performance of a fabricated reservoir.
+\begin{sidewaystable}
+  \centering
+  \caption[Recent reference points for tunable physical reservoirs]{Recent directly relevant reference points for tunable physical reservoirs. Temporal ranges are the values reported under each study's own extraction protocol; tasks, read-outs, and metrics differ, so the table calibrates scope rather than ranking performance. ``Physical'' means that measured device states formed the reservoir; it does not imply that every input/output operation was analogue or on-chip.}
+  \label{tab:concl_sota}
+  \footnotesize
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabularx}{0.95\textheight}{@{}>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    Study & Node and terminals & Tuning handle & Reported temporal range & Reservoir evidence and task scope \\
+    \midrule
+    This thesis & \SY{}/\PEO{}/\LiTf{} organic composite; two-terminal & \PEO{}/salt composition; drive amplitude & \SIrange{2}{20}{\second} across the replicated composition grid & Single-node dynamics measured; heterogeneous banks and \WESAD{}/\CASE{} tasks simulated; no wired reservoir \\
+    Gao et al.\ (2024)~\cite{Gao2024GroupedRC} & Organic vertical field-effect transistor; three-terminal optoelectronic & Input wavelength and gate bias & \SIrange{0.005}{13.2}{\second} with optical input and gate bias & Physical grouped-reservoir states; image recognition and time-series prediction \\
+    Han et al.\ (2025)~\cite{Han2025ReconfigurableOECT} & Solid-electrolyte OECT; three-terminal & Ethylene-glycol content selects volatile or non-volatile operation & No common fitted-$\tau$ range reported & Physical reservoir and physical device read-out; three-class human-activity classification \\
+    Lee et al.\ (2025)~\cite{Lee2025TunableRC} & Pt/\ce{HfO2}/TiN memristor; two-terminal & Inter-pulse base voltage & Fitted $\tau$: \SI{0.92}{\milli\second} to \SI{123}{\milli\second}; inputs \SIrange{0.14}{100}{\milli\second} & Physical reservoir states; N-MNIST classification and Mackey--Glass prediction \\
+    \bottomrule
+  \end{tabularx}
+\end{sidewaystable}
+
+\paragraph{Placement and evidence boundary.} The experimentally supported claim is that composition tunes seconds-scale fading memory in this two-terminal organic platform. The computational claim is that banks of behavioural models fitted to those measurements can support the reported benchmarks and physiological tasks. The application scores are in silico and do not establish the performance of a wired array; nor is priority claimed for a first tunable two-terminal reservoir. The simulated reservoir contains independent, non-recurrent nodes; its absolute \NARMA{} errors are high and its capacities remain below the node-count bound. Recurrent or delay-feedback connectivity could raise these values. The evidence chain therefore ends at measured dynamics plus model-based task validation; the missing end-to-end test is a fabricated, composition-diverse reservoir under the same tasks.
 
 %% ------------------------------------------------------------
 \section{Limitations of the Evidence Base}\label{sec:concl_limitations}
