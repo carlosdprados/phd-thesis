@@ -30,27 +30,18 @@ In many modern workloads, moving data between separate processing and memory uni
 
 The devices studied here are \emph{volatile organic memristive devices}: two-terminal elements made from ion-containing polymer composites whose conductance retains a decaying record of recent electrical activity. Their relaxation is treated as a device function. A controlled decay makes each device a physical \emph{leaky integrator}, while devices with different decay times form a substrate for \emph{temporal} (reservoir-style) computing on time-varying signals. The thesis tests two linked propositions: composition controls the timescale in the replicated PEO/lithium-triflate series, and behavioural models fitted to the measured dynamics can perform temporal computations.
 
-The thesis proceeds through four stages:
-
-\begin{itemize}
-  \item \textbf{A fully characterised exemplar (Chapter~2).} A single proof-of-concept Super~Yellow/Hybrane/lithium-triflate device is characterised with the complete synaptic measurement suite (current--voltage hysteresis, potentiation and depression, excitatory post-synaptic current, separated short- and long-term retention, and spike-timing-dependent plasticity) and given a mechanistic interpretation in terms of cation--anion mobility asymmetry.
-  \item \textbf{A campaign-scale reproducibility and fabrication-record layer (Chapter~3).} The subsequent loss of reproducibility in the Hybrane devices is analysed across the fabrication archive, separating finished-device shelf stability from batch-scale supply reproducibility and motivating the switch to PEO. The same fabrication record and feature pipeline then become the methodological basis for the quantitative chapters.
-  \item \textbf{A replicated composition series with a sample-limited chemical survey (Chapter~4).} A poly(ethylene oxide)-based corpus is built under a common protocol. The composition series is \emph{replicated}; host, anion, and cation substitutions are sample-limited and are not read as material laws. In particular, the \ce{Li+}\,>\,\ce{Na+}\,>\,\ce{K+} cation ordering is treated as a hypothesis to be tested.
-  \item \textbf{An in-silico temporal-computing demonstration from measured dynamics (Chapter~5).} Compact behavioural models extracted from the Chapter~4 measurements are evaluated with linear read-outs on benchmark and physiological tasks. Comparisons with homogeneous, memoryless, and linear-filter controls establish when a spread of timescales improves performance.
-\end{itemize}
+The work begins with a fully characterised Super~Yellow/Hybrane/lithium-triflate exemplar and then follows the loss of reproducibility that prompted a change to PEO. On the PEO platform, a replicated composition series tests how formulation controls the dynamics; the smaller host, anion, and cation series remain chemical hypotheses rather than material laws. Behavioural models fitted to these measurements are then evaluated on benchmark and physiological temporal-computing tasks.
 
 \section*{Open Questions and Objectives}
 \label{subsec:open_questions}
 
-Three groups of questions organise the work.
+\paragraph{Realising and understanding an exemplar.} Can a fully reversible two-terminal organic memristive platform be made from a solution-processed polymer-electrolyte composite using standard organic-electronic fabrication? Can that common formulation and architecture support analogue switching, distinguishable short- and long-term memory, an excitatory post-synaptic current response, and spike-timing-dependent plasticity? Can the fast and slow memory components be explained by the composite's cation--anion mobility asymmetry?
 
-\emph{First, realising and understanding an exemplar.} Can a fully reversible two-terminal organic memristive platform be made from a solution-processed polymer-electrolyte composite using standard organic-electronic fabrication? Can that common formulation and architecture support analogue switching, distinguishable short- and long-term memory, an excitatory post-synaptic current response, and spike-timing-dependent plasticity? Can the fast and slow memory components be explained by the composite's cation--anion mobility asymmetry?
+\paragraph{Composition as the quantitative control variable.} Within a common host and a common alkali-metal triflate family, how do the device dynamics depend on composition when the polymer-to-semiconductor and salt-to-semiconductor mass fractions are varied around a reference formulation? This composition dependence is the axis the thesis sets out to \emph{replicate}. Host, anion, and cation substitutions pose hypotheses about the same dynamics, in particular whether moving the cation along the \ce{Li+}, \ce{Na+}, \ce{K+} series shifts the measured fading-memory timescale as coordination chemistry suggests.
 
-\emph{Second, composition as the quantitative control variable.} Within a common host and a common alkali-metal triflate family, how do the device dynamics depend on composition when the polymer-to-semiconductor and salt-to-semiconductor mass fractions are varied around a reference formulation? This composition dependence is the axis the thesis sets out to \emph{replicate}. Host, anion, and cation substitutions pose hypotheses about the same dynamics, in particular whether moving the cation along the \ce{Li+}, \ce{Na+}, \ce{K+} series shifts the measured fading-memory timescale as coordination chemistry suggests.
+\paragraph{Utility for temporal computing.} Can the volatile response of these devices be exploited for temporal computation? Can composition supply task-matched fading-memory timescales, while sample-limited chemistry and device-to-device spread populate a heterogeneous bank? Does measured variability broaden the computational response?
 
-\emph{Third, utility for temporal computing.} Can the volatile response of these devices be exploited for temporal computation? Can composition supply task-matched fading-memory timescales, while sample-limited chemistry and device-to-device spread populate a heterogeneous bank? Does measured variability broaden the computational response?
-
-These questions translate into six ordered objectives:
+These questions motivate six objectives:
 
 \begin{enumerate}
   \item \label{subsec:objectives} Design, fabricate, and characterise a proof-of-concept two-terminal organic memristive device based on a Super~Yellow, Hybrane, and lithium-triflate composite, processed from a single solution onto a standard ITO/composite/Ag stack, and demonstrate the basic memristive and synaptic functionality in a single platform.
@@ -64,19 +55,9 @@ These questions translate into six ordered objectives:
 \section*{Structure of the Thesis}
 \label{subsec:outline}
 
-The thesis is organised in six chapters that follow this objective list.
+Chapter~1 develops the conceptual and materials background, from the limits of conventional computing to the polymer-electrolyte composite used in the experimental work. Chapter~2 presents the Super~Yellow/Hybrane/lithium-triflate proof of concept and its complete synaptic measurement suite; it is based on Prado-Socorro et al.~\cite{PradoSocorro2022}. Chapter~3 reconstructs the later loss of reproducibility, the change to a PEO host, and the fabrication-record methodology adopted for the remaining devices.
 
-\paragraph{Chapter~1: Introduction.} Provides the conceptual and materials background, moving from the limits of conventional computing, through the biological synapse and the memristor, to the polymer-electrolyte composite adopted as the device strategy for the rest of the thesis.
-
-\paragraph{Chapter~2: Proof of Concept.} Reports the Super~Yellow, Hybrane, and lithium-triflate device. It is the only device in the thesis for which the complete synaptic suite is treated as primary evidence, and it isolates the cation--host coordination chemistry that the comparative work then tests. The chapter is built on Prado-Socorro et al.~\cite{PradoSocorro2022}.
-
-\paragraph{Chapter~3: Reproducibility, Degradation, and the Fabrication-Record Methodology.} Documents the loss of reproducibility that ended the Hybrane fabrication line and motivated the switch to a PEO host. Under explicit controls (per-device weighting, a standard-protocol corpus, sweep-amplitude matching), it quantifies the reduction of the Hybrane switching window over successive batches, offers a moisture-driven hydrolytic-aging hypothesis for the host stock, and introduces the per-device fabrication record, the normalized characterization procedure, and the automated feature pipeline used in the remaining chapters.
-
-\paragraph{Chapter~4: Compositional and Chemical Control.} Reformulates the proof-of-concept architecture on a PEO host loaded with alkali-metal triflates. Its quantitative core is the replicated PEO/lithium-triflate composition grid; host, anion, and cation substitutions are surveyed at smaller sample sizes. All claims rely on the same three common measurements.
-
-\paragraph{Chapter~5: Data-Driven Temporal Computing.} Turns the experimental measurements into temporal-computing functionality. Compact behavioural models extracted from the Chapter~4 dynamics drive reservoir-computing simulations: memory-capacity and NARMA-style benchmarks, WESAD physiological-context reconstruction, and affective-computing demonstrations across three corpora (WESAD stress classification, CASE continuous valence/arousal, and a PhysioNet Non-EEG cross-corpus replication), alongside homogeneous, memoryless, and linear-filter controls.
-
-\paragraph{Chapter~6: Conclusions and Outlook.} Brings together the device-chemistry axis and the application axis, benchmarks the work against temporal, reservoir, and event-driven neuromorphic hardware, and states the limitations of the evidence base.
+Chapter~4 tests composition on a replicated PEO/lithium-triflate grid and surveys the smaller host, anion, and cation series with the same three dynamical measurements. Chapter~5 fits behavioural models to those measurements and evaluates them on memory, system-identification, physiological-context, and affective-computing tasks. Chapter~6 compares the work with temporal and event-driven neuromorphic hardware, sets the limits of the evidence, and identifies the experiments still required.
 
 %% ---- Standalone close (skipped when \include'd from thesis.tex) ----
 \ifdefined\thesismode
