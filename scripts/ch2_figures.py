@@ -12,8 +12,9 @@ data exist in CSV/text form:
 - NM_v055 DayX_STDP/Day19 for the STDP curve.
 
 Panels not recoverable as complete raw CSV traces are reconstructed from the
-published protocol/fit summaries cited in Chapter 2 and labelled as such in the
-thesis captions.
+published protocol summaries cited in Chapter 2 and labelled as such in the
+thesis captions. STDP branch fits and example applied waveforms are recomputed
+from the local five-junction archive rather than copied from its stale fit file.
 
 The composite-chemistry panel is a thesis-native schematic redraw of the
 published component panel: LiOTf is explicit, while the polymers are motif-level
@@ -38,6 +39,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.patches import Circle, FancyArrowPatch, Polygon, Rectangle
+from scipy.optimize import curve_fit
 
 import figstyle
 
@@ -45,6 +47,7 @@ import figstyle
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT.parent / "Nanomem_Devices_Library"
 FIGDIR = ROOT / "figures" / "chapter2"
+HANDOUT_DIR = ROOT / "handouts"
 
 DEVICE_055 = (
     DATA
@@ -752,39 +755,114 @@ def load_stdp_master() -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     return np.array(x), np.array(mean), np.array(sd)
 
 
-def load_stdp_fit() -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    path = DEVICE_055 / "DayX_STDP" / "Day19" / "Fitting.txt"
-    left_x, left_y, right_x, right_y = [], [], [], []
-    with path.open() as fh:
-        next(fh)
-        for line in fh:
-            parts = line.rstrip("\n").split("\t")
-            while len(parts) < 4:
-                parts.append("")
-            if parts[0].strip() and parts[1].strip():
-                left_y.append(float(parts[0]))
-                left_x.append(float(parts[1]))
-            if parts[2].strip() and parts[3].strip():
-                right_y.append(float(parts[2]))
-                right_x.append(float(parts[3]))
-    return np.array(left_x), np.array(left_y), np.array(right_x), np.array(right_y)
+def _stdp_model(delay_abs: np.ndarray, amplitude: float, tau: float, offset: float) -> np.ndarray:
+    return amplitude * np.exp(-delay_abs / tau) + offset
+
+
+def fit_stdp_branch(
+    delay: np.ndarray,
+    response: np.ndarray,
+    branch: str,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Fit one branch of the within-substrate mean STDP kernel.
+
+    The positive magnitude is fitted for both branches and then restored to the
+    measured sign. The zero-delay point is excluded because it belongs to
+    neither timing order. Returned parameters are signed amplitude, tau in
+    seconds, and signed offset.
+    """
+    if branch not in {"potentiation", "depression"}:
+        raise ValueError(f"Unknown STDP branch: {branch}")
+    sign = 1.0 if branch == "potentiation" else -1.0
+    zero_tol = 1e-12
+    mask = delay < -zero_tol if branch == "potentiation" else delay > zero_tol
+    x = np.abs(delay[mask])
+    y = sign * response[mask]
+    params, covariance = curve_fit(
+        _stdp_model,
+        x,
+        y,
+        p0=(30.0, 0.1, 0.0),
+        bounds=((0.0, 0.001, -20.0), (100.0, 2.0, 20.0)),
+        maxfev=100_000,
+    )
+    params[[0, 2]] *= sign
+    return params, covariance
+
+
+def stdp_fit_summary(
+    delay: np.ndarray,
+    junction_responses: np.ndarray,
+    bootstrap_draws: int = 5_000,
+    seed: int = 20260820,
+) -> dict[str, dict[str, float]]:
+    """Fit the mean kernel and quantify within-substrate junction uncertainty."""
+    mean = np.mean(junction_responses, axis=1)
+    rng = np.random.default_rng(seed)
+    summary: dict[str, dict[str, float]] = {}
+    for branch in ("potentiation", "depression"):
+        params, _ = fit_stdp_branch(delay, mean, branch)
+        zero_tol = 1e-12
+        mask = delay < -zero_tol if branch == "potentiation" else delay > zero_tol
+        predicted = params[0] * np.exp(-np.abs(delay[mask]) / params[1]) + params[2]
+        rmse = float(np.sqrt(np.mean((mean[mask] - predicted) ** 2)))
+        tau_draws = []
+        for _ in range(bootstrap_draws):
+            columns = rng.integers(0, junction_responses.shape[1], junction_responses.shape[1])
+            boot_mean = np.mean(junction_responses[:, columns], axis=1)
+            try:
+                tau_draws.append(fit_stdp_branch(delay, boot_mean, branch)[0][1])
+            except (RuntimeError, ValueError):
+                continue
+        low, high = np.quantile(tau_draws, (0.025, 0.975))
+        summary[branch] = {
+            "amplitude_pct": float(params[0]),
+            "tau_ms": float(params[1] * 1_000.0),
+            "offset_pct": float(params[2]),
+            "rmse_pct": rmse,
+            "bootstrap_tau_low_ms": float(low * 1_000.0),
+            "bootstrap_tau_high_ms": float(high * 1_000.0),
+            "n_junctions": int(junction_responses.shape[1]),
+        }
+    return summary
+
+
+def write_stdp_fit_summary(summary: dict[str, dict[str, float]]) -> None:
+    HANDOUT_DIR.mkdir(parents=True, exist_ok=True)
+    path = HANDOUT_DIR / "ch2_stdp_fit.csv"
+    fields = ["branch", *next(iter(summary.values())).keys()]
+    with path.open("w", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fields)
+        writer.writeheader()
+        for branch, values in summary.items():
+            writer.writerow({"branch": branch, **values})
+    print(f"wrote {path.relative_to(ROOT)}")
 
 
 def fig_stdp_summary() -> None:
     x, mean, sd = load_stdp_master()
-    lx, ly, rx, ry = load_stdp_fit()
+    path = DEVICE_055 / "DayX_STDP" / "Day19" / "MasterTable.txt"
+    fieldnames, rows = read_table(path)
+    stack = np.array([[fnum(row[p]) for p in fieldnames[1:]] for row in rows], dtype=float)
+    summary = stdp_fit_summary(x, stack)
+    write_stdp_fit_summary(summary)
     fig, ax = plt.subplots(figsize=(4.9, 3.1))
     # Quadrant tints: causal pairs potentiate, anti-causal pairs depress.
     ax.fill_between([-0.68, 0], 0, 30, color=COLORS["green"], alpha=0.06, lw=0)
     ax.fill_between([0, 0.68], -31, 0, color=COLORS["orange"], alpha=0.07, lw=0)
     ax.errorbar(x, mean, yerr=sd, fmt="o", ms=3.0, lw=0.8, capsize=2, color=COLORS["purple"], ecolor="0.6")
-    ax.plot(lx, ly, color=COLORS["green"], lw=1.2)
-    ax.plot(rx, ry, color=COLORS["orange"], lw=1.2)
+    for branch, color, signed_x in (
+        ("potentiation", COLORS["green"], np.linspace(-0.6, -0.001, 240)),
+        ("depression", COLORS["orange"], np.linspace(0.001, 0.6, 240)),
+    ):
+        fit = summary[branch]
+        fitted = fit["amplitude_pct"] * np.exp(-np.abs(signed_x) / (fit["tau_ms"] / 1_000.0)) + fit["offset_pct"]
+        ax.plot(signed_x, fitted, color=color, lw=1.2)
     ax.axhline(0, color="0.35", lw=0.8)
     ax.axvline(0, color="0.35", lw=0.8)
-    ax.text(-0.64, 25.5, "causal (pre before post):\npotentiation", ha="left",
+    ax.text(-0.64, 25.5, f"causal: potentiation\n$\\tau={summary['potentiation']['tau_ms']:.0f}$ ms", ha="left",
             va="top", fontsize=7.6, color=COLORS["green"])
-    ax.text(0.64, -26.0, "anti-causal (post before pre):\ndepression", ha="right",
+    ax.text(0.64, -26.0, f"anti-causal: depression\n$\\tau={summary['depression']['tau_ms']:.0f}$ ms", ha="right",
             va="bottom", fontsize=7.6, color=COLORS["orange"])
     ax.set_xlim(-0.68, 0.68)
     ax.set_ylim(-31, 30)
@@ -885,31 +963,42 @@ def fig_full_epsc_trace() -> None:
     save(fig, "full_epsc_trace.pdf")
 
 
-def triangular(t: np.ndarray, center: float, width: float, amp: float) -> np.ndarray:
-    y = np.maximum(0.0, 1.0 - np.abs(t - center) / (width / 2.0))
-    return amp * y
+def load_stdp_waveforms(pixel: str = "L5") -> dict[float, tuple[np.ndarray, np.ndarray]]:
+    """Return each measured STDP cycle as local time and applied junction voltage."""
+    path = DEVICE_055 / "DayX_STDP" / "Day19" / pixel / "D1_all.txt"
+    lines = path.read_text().splitlines()
+    if len(lines) < 3:
+        raise ValueError(f"Expected current, voltage, and time rows in {path}")
+    # Some archived files end with a fourth instrument prompt line ("TSP>").
+    lines = lines[:3]
+    voltage = np.array([float(v) for v in re.split(r"[,\s]+", lines[1]) if v])
+    time = np.array([float(v) for v in re.split(r"[,\s]+", lines[2]) if v])
+    if len(voltage) != len(time):
+        raise ValueError(f"Voltage/time length mismatch in {path}")
+
+    delay, _, _ = load_stdp_master()
+    starts = np.r_[0, np.flatnonzero(np.diff(time) > 100.0) + 1]
+    stops = np.r_[starts[1:], len(time)]
+    if len(starts) != len(delay):
+        raise ValueError(f"Expected {len(delay)} STDP cycles, found {len(starts)}")
+    return {
+        float(d): (time[a:b] - time[a], voltage[a:b])
+        for d, a, b in zip(delay, starts, stops)
+    }
 
 
 def fig_stdp_waveforms() -> None:
-    delays = [-0.30, 0.05, 0.60]
+    selected = [-0.30, 0.05, 0.60]
+    waveforms = load_stdp_waveforms()
     fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.65), sharey=True)
-    t = np.linspace(-1.0, 1.0, 600)
-    for ax, delay, letter in zip(axes, delays, "abc"):
-        pre = triangular(t, 0.0, 1.2, 1.55)
-        post = -triangular(t, delay, 1.2, 1.55)
-        total = pre + post
-        ax.plot(t, pre, color=COLORS["green"], lw=0.9, label="pre-spike")
-        ax.plot(t, post, color=COLORS["orange"], lw=0.9, label="post-spike")
-        ax.plot(t, total, color="0.15", lw=1.3, label="sum")
+    for ax, delay, letter in zip(axes, selected, "abc"):
+        t, total = waveforms[delay]
+        ax.plot(t, total, "o-", ms=2.1, color="0.15", lw=1.15, label="applied voltage")
         ax.axhline(0, color="0.65", lw=0.6)
-        ax.axvline(0, color="0.75", lw=0.6, ls=":")
         figstyle.panel(ax, letter, rf"$\Delta t={delay:+.2f}$ s")
         ax.set_xlabel("time (s)")
         style_axes(ax)
     axes[0].set_ylabel("voltage (V)")
-    handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, ncol=3, frameon=False, loc="lower center",
-               bbox_to_anchor=(0.5, 0.965), fontsize=7.5)
     save(fig, "stdp_waveforms.pdf")
 
 
