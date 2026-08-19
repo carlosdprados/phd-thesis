@@ -20,6 +20,14 @@ import csv, os, collections
 import numpy as np
 from scipy.optimize import curve_fit
 
+from ch4_common import (
+    clean,
+    curation_for,
+    load_curation_registry,
+    load_filter_flags,
+    row_is_excluded,
+)
+
 DB = "../Nanomem_Devices_Library/DATABASE"
 OUT = "handouts"
 
@@ -30,7 +38,7 @@ def load(f):
 
 
 def G(r, k):
-    return (r.get(k) or "").strip()
+    return clean(r.get(k))
 
 
 def fnum(x):
@@ -46,21 +54,8 @@ def med(v):
 
 
 def load_curation():
-    """PNG-derived human QA: (device, measurement_type) -> (verdict, kept_points_set_or_None)."""
-    cur = {}
-    path = os.path.join(OUT, "ch4_png_qa_curation.csv")
-    if not os.path.exists(path):
-        return cur
-    for r in csv.DictReader(open(path)):
-        dn, mt = G(r, "device_name"), G(r, "measurement_type")
-        v, kp = G(r, "verdict"), G(r, "kept_points")
-        if not dn or not mt:
-            continue
-        kept = None
-        if v == "clean" and kp and kp != "all":
-            kept = set(float(x) for x in kp.split(";") if x.strip())
-        cur[(dn, mt)] = (v, kept)
-    return cur
+    """PNG-derived QA keyed by device, measurement, day, and pixel."""
+    return load_curation_registry(os.path.join(OUT, "ch4_png_qa_curation.csv"))
 
 
 def main():
@@ -68,7 +63,7 @@ def main():
     #   - chemistry landscape (other cations/hosts/anions): manifest candidates only;
     #   - composition spine (PEO/LiTr/Ag): ALL such devices, not just manifest
     #     candidates, so the curation-salvaged low-concentration row (e.g. v151,
-    #     PEO mass-fraction 0.15) enriches the PEO axis. Devices without PULSES/
+    #     PEO/SY mass ratio 0.15) enriches the PEO axis. Devices without PULSES/
     #     DELAYTIME data, FILTERED-flagged curves, and curation 'discard' verdicts
     #     are filtered downstream, so broadening here is safe.
     man = list(csv.DictReader(open(os.path.join(OUT, "ch4_device_manifest_DRAFT.csv"))))
@@ -84,48 +79,64 @@ def main():
         if (is_cand and r["electrode"] == "Ag") or is_peo_litr_ag:
             cell[r["device_id"]] = (r["cation"], r["peo_mass_fraction"], r["salt_mass_fraction"], r["stratum"])
 
-    flags = set()
-    for r in load("FILTERED_DEVICES.csv"):
-        flags.add((G(r, "device_name"), G(r, "day"), G(r, "pixel"), G(r, "measurement_type")))
+    flags = load_filter_flags(os.path.join(DB, "FILTERED_DEVICES.csv"))
 
-    curation = load_curation()  # PNG-derived per-device verdicts + hand-picked points
+    curation = load_curation()  # PNG-derived curve verdicts + hand-picked points
 
-    # DELAYTIME read-voltage screen: keep only devices measured at 2.0 V
+    # DELAYTIME read-voltage screen: keep only clean junctions measured at 2.0 V.
     rv2 = set()
     for r in load("DEVICES_DELAYTIME_PIXEL_INFO.csv"):
+        if row_is_excluded(
+            r,
+            "DELAYTIME",
+            flags,
+            curation,
+            broken_fields=("is pixel broken",),
+        ):
+            continue
         if G(r, "reading voltage (V)") == "2.0":
-            rv2.add(G(r, "device_name"))
+            rv2.add((G(r, "device_name"), G(r, "day"), G(r, "pixel")))
+
+    pulse_excluded = set()
+    for r in load("DEVICES_PULSES_PIXEL_INFO.csv"):
+        if row_is_excluded(
+            r,
+            "PULSES",
+            flags,
+            curation,
+            broken_fields=("is pixel broken",),
+        ):
+            pulse_excluded.add((G(r, "device_name"), G(r, "day"), G(r, "pixel")))
 
     # ---------- DELAYTIME: stretched-exponential fit per (device,pixel) ----------
     def stretched(t, A, tau, beta, C):
         return A * np.exp(-((t / tau) ** beta)) + C
 
     dly = load("DEVICES_DELAYTIME_CURVE_INFO.csv")
-    grp = collections.defaultdict(list)  # (dev,pixel) -> [(t,ratio)]
+    grp = collections.defaultdict(list)  # (dev,day,pixel) -> [(t,ratio)]
     for r in dly:
         dn = G(r, "device_name")
-        if dn not in cell or dn not in rv2:
+        curve_key = (dn, G(r, "day"), G(r, "pixel"))
+        if dn not in cell or curve_key not in rv2:
             continue
-        cur = curation.get((dn, "DELAYTIME"))
-        if cur and cur[0] == "discard":
+        if row_is_excluded(r, "DELAYTIME", flags, curation):
             continue
-        if (dn, G(r, "day"), G(r, "pixel"), "DELAYTIME") in flags:
-            continue
+        cur = curation_for(curation, dn, "DELAYTIME", curve_key[1], curve_key[2])
         t, y = fnum(G(r, "delay time (s)")), fnum(G(r, "ratio"))
         if t and t > 0 and y is not None:
             if cur and cur[0] == "clean" and cur[1] is not None and t not in cur[1]:
                 continue  # keep only hand-picked points
-            grp[(dn, G(r, "pixel"))].append((t, y))
+            grp[curve_key].append((t, y))
 
     decay_rows = []
-    for (dn, px), pts in grp.items():
+    for (dn, day, px), pts in grp.items():
         pts = sorted(set(pts))
         t = np.array([p[0] for p in pts]); y = np.array([p[1] for p in pts])
         # Hand-curated 'clean' curves are trusted down to 5 points (the reviewer
         # already vetted them); uncurated curves still need >=6 to fit. Either way
         # the stretched-exp tau is only *reported* when 'identified' (R2>=0.95),
         # so sparse curves contribute the model-free t_half but not a fitted tau.
-        ccur = curation.get((dn, "DELAYTIME"))
+        ccur = curation_for(curation, dn, "DELAYTIME", day, px)
         min_n = 5 if (ccur and ccur[0] == "clean") else 6
         if len(t) < min_n:
             continue
@@ -160,7 +171,7 @@ def main():
         # overfitting, so such curves report the model-free t_half only.
         identified = int(np.isfinite(tau) and 0.5 <= tau <= 1000 and r2 >= 0.95 and len(t) >= 6)
         c, peo, salt, strat = cell[dn]
-        decay_rows.append(dict(device_id=dn, pixel=px, cation=c, peo=peo, salt=salt, stratum=strat,
+        decay_rows.append(dict(device_id=dn, day=day, pixel=px, cation=c, peo=peo, salt=salt, stratum=strat,
                                r1=round(r1, 2), r60=(round(r60, 2) if np.isfinite(r60) else ""),
                                retention60=(round(r60 / r1, 3) if np.isfinite(r60) and r1 else ""),
                                t_half_s=(round(thalf, 2) if np.isfinite(thalf) else ""),
@@ -169,7 +180,7 @@ def main():
                                r2=(round(r2, 4) if np.isfinite(r2) else ""), identified=identified, n=len(t)))
 
     with open(os.path.join(OUT, "ch4_decay_fits.csv"), "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=["device_id", "pixel", "cation", "peo", "salt", "stratum",
+        w = csv.DictWriter(fh, fieldnames=["device_id", "day", "pixel", "cation", "peo", "salt", "stratum",
                                            "r1", "r60", "retention60", "t_half_s", "tau_s", "beta", "r2", "identified", "n"])
         w.writeheader(); [w.writerow(x) for x in decay_rows]
 
@@ -180,19 +191,20 @@ def main():
         dn = G(r, "device_name")
         if dn not in cell:
             continue
-        cur = curation.get((dn, "PULSES"))
-        if cur and cur[0] == "discard":
+        curve_key = (dn, G(r, "day"), G(r, "pixel"))
+        if curve_key in pulse_excluded:
             continue
-        if (dn, G(r, "day"), G(r, "pixel"), "PULSES") in flags:
+        if row_is_excluded(r, "PULSES", flags, curation):
             continue
+        cur = curation_for(curation, dn, "PULSES", curve_key[1], curve_key[2])
         N, y = fnum(G(r, "number of pulses")), fnum(G(r, "ratio"))
         if N and N > 0 and y is not None:
             if cur and cur[0] == "clean" and cur[1] is not None and N not in cur[1]:
                 continue
-            pg[(dn, G(r, "pixel"))].append((N, y))
+            pg[curve_key].append((N, y))
 
     pulse_rows = []
-    for (dn, px), pts in pg.items():
+    for (dn, day, px), pts in pg.items():
         pts = sorted(set(pts))
         N = np.array([p[0] for p in pts]); y = np.array([p[1] for p in pts])
         if len(N) < 5:
@@ -203,12 +215,12 @@ def main():
         mask = (N <= npeak) & (y > 0)
         gexp = float(np.polyfit(np.log10(N[mask]), np.log10(y[mask]), 1)[0]) if mask.sum() >= 3 else float("nan")
         c, peo, salt, strat = cell[dn]
-        pulse_rows.append(dict(device_id=dn, pixel=px, cation=c, peo=peo, salt=salt, stratum=strat,
+        pulse_rows.append(dict(device_id=dn, day=day, pixel=px, cation=c, peo=peo, salt=salt, stratum=strat,
                                onset_N=onset, peak_ratio=round(peak, 2), N_peak=npeak,
                                turnover=turnover, growth_exp=round(gexp, 3) if np.isfinite(gexp) else "", n=len(N)))
 
     with open(os.path.join(OUT, "ch4_pulse_descriptors.csv"), "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=["device_id", "pixel", "cation", "peo", "salt", "stratum",
+        w = csv.DictWriter(fh, fieldnames=["device_id", "day", "pixel", "cation", "peo", "salt", "stratum",
                                            "onset_N", "peak_ratio", "N_peak", "turnover", "growth_exp", "n"])
         w.writeheader(); [w.writerow(x) for x in pulse_rows]
 

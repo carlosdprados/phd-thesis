@@ -7,16 +7,17 @@ This script does NOT touch the headline figures. It produces the statistical
 back-matter requested in the jury-strengthening pass, all from data already in
 the archive:
 
-  [1] Composition-spine SIGNIFICANCE + bootstrap CIs.
+  [1] Composition-spine SIGNIFICANCE + cell uncertainty.
       Per metric (t_half, growth exponent alpha, peak ratio, on-off ratio) on the
       replicated Ag/Li SY/PEO/LiTr spine: Spearman rho vs PEO with a permutation
-      p-value, and a non-parametric bootstrap 95 % CI on every cell median.
+      p-value, Holm family-wise correction, a batch-restricted sensitivity test,
+      and a non-parametric bootstrap 95 % CI where n >= 3 (observed range at n=2).
       ->  handouts/ch4_gradient_stats.csv, handouts/ch4_cell_ci.csv
 
   [2] PEO x salt FACTORIAL decomposition.
-      OLS of log-metric on log(PEO), log(salt) and their interaction, with
-      permutation p-values, to test whether the two composition axes act
-      near-orthogonally (PEO -> strength/memory, salt -> saturation).
+      OLS of log-metric on log(PEO), log(salt), their interaction, and acquisition
+      batch fixed effects, with conditional Freedman--Lane residual-permutation
+      p-values restricted within batch.
       ->  handouts/ch4_factorial.csv
 
   [3] PERCOLATION / dilution test of the mechanism.
@@ -50,6 +51,7 @@ quantitative core of Section 4.4. Chemistry/electrode axes are illustrative and
 are left out of these powered statistics by design.
 """
 import csv, os, sys
+from functools import lru_cache
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -57,6 +59,16 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import figstyle
+from ch4_common import (
+    freedman_lane_pvalues,
+    holm_adjust,
+    load_curation_registry,
+    load_filter_flags,
+    pearson,
+    perm_p_spearman,
+    row_is_excluded,
+    spearman,
+)
 figstyle.apply()
 COLORS = figstyle.COLORS
 
@@ -68,11 +80,13 @@ RNG = np.random.default_rng(20260611)
 
 
 # --------------------------------------------------------------------------- io
+@lru_cache(maxsize=None)
 def load(f):
     with open(os.path.join(DB, f), newline="") as fh:
         return list(csv.DictReader(fh))
 
 
+@lru_cache(maxsize=None)
 def loadh(f):
     with open(os.path.join(OUT, f), newline="") as fh:
         return list(csv.DictReader(fh))
@@ -89,31 +103,6 @@ def fnum(x):
 def med(v):
     v = [x for x in v if x is not None and np.isfinite(x)]
     return float(np.median(v)) if v else float("nan")
-
-
-def pearson(x, y):
-    x, y = np.asarray(x, float), np.asarray(y, float)
-    if len(x) < 3 or np.std(x) == 0 or np.std(y) == 0:
-        return float("nan")
-    return float(np.corrcoef(x, y)[0, 1])
-
-
-def spearman(x, y):
-    x, y = np.asarray(x, float), np.asarray(y, float)
-    return pearson(np.argsort(np.argsort(x)), np.argsort(np.argsort(y)))
-
-
-def perm_p_spearman(x, y, B=20000):
-    """Two-sided permutation p for Spearman rho (shuffle y vs x)."""
-    x, y = np.asarray(x, float), np.asarray(y, float)
-    obs = abs(spearman(x, y))
-    if not np.isfinite(obs):
-        return float("nan")
-    cnt = 0
-    for _ in range(B):
-        if abs(spearman(x, RNG.permutation(y))) >= obs - 1e-12:
-            cnt += 1
-    return (cnt + 1) / (B + 1)
 
 
 # ------------------------------------------------------- device composition meta
@@ -135,19 +124,57 @@ def is_spine(dn):
     return bool(m and m[2] == "Ag" and m[0] is not None and m[1] is not None)
 
 
+def is_replicated_grid(dn):
+    """Ag/Li substrate in the pre-specified 3 x 3 replicated composition grid."""
+    return (
+        is_spine(dn)
+        and meta[dn][0] in {0.3, 0.6, 1.2}
+        and meta[dn][1] in {0.045, 0.09, 0.18}
+    )
+
+
+batch_by_device = {
+    r["device_id"]: r.get("quarter") or "unknown"
+    for r in csv.DictReader(open(os.path.join(OUT, "ch4_device_manifest_DRAFT.csv")))
+}
+flags = load_filter_flags(os.path.join(DB, "FILTERED_DEVICES.csv"))
+curation = load_curation_registry(os.path.join(OUT, "ch4_png_qa_curation.csv"))
+
+
 # --------------------------------------------------------------------------- [1]
-# Per-device screened descriptors (Li spine only) from the curated tables.
+# Per-substrate screened descriptors (Li replicated grid only) from the curated
+# junction-level tables. Junctions are collapsed before inference so a substrate
+# with two measured junctions never counts twice.
+GRID_PEO = {0.3, 0.6, 1.2}
+GRID_SALT = {0.045, 0.09, 0.18}
+
+
 def spine_rows(fname, metric_cols):
-    out = []
+    grouped = {}
     for r in loadh(fname):
         if r.get("cation") != "Li":
             continue
         peo, salt = fnum(r.get("peo")), fnum(r.get("salt"))
-        if peo is None or salt is None:
+        if peo not in GRID_PEO or salt not in GRID_SALT:
             continue
-        rec = dict(device=r["device_id"], peo=peo, salt=salt)
+        rec = grouped.setdefault(
+            r["device_id"],
+            dict(
+                device=r["device_id"],
+                peo=peo,
+                salt=salt,
+                batch=batch_by_device.get(r["device_id"], "unknown"),
+                values={c: [] for c in metric_cols},
+            ),
+        )
         for c in metric_cols:
-            rec[c] = fnum(r.get(c))
+            value = fnum(r.get(c))
+            if value is not None:
+                rec["values"][c].append(value)
+    out = []
+    for rec in grouped.values():
+        values = rec.pop("values")
+        rec.update({c: (med(values[c]) if values[c] else None) for c in metric_cols})
         out.append(rec)
     return out
 
@@ -155,16 +182,22 @@ def spine_rows(fname, metric_cols):
 decay = spine_rows("ch4_decay_fits.csv", ["t_half_s", "tau_s", "beta", "retention60"])
 pulse = spine_rows("ch4_pulse_descriptors.csv", ["growth_exp", "peak_ratio", "turnover"])
 
-# on-off ratio per spine device from HYST (mean over pixels)
+# On--off ratio per spine substrate, recomputed from screened curves so the
+# gradient, heatmap, and cycling analysis share exactly the same exclusions.
 onoff = {}
-for r in load("DEVICES_HYST_PIXEL_INFO.csv"):
+for r in load("DEVICES_HYST_CURVE_INFO.csv"):
     dn = r.get("device_name")
-    if not is_spine(dn):
+    if not is_replicated_grid(dn):
         continue
-    v = fnum(r.get("on-off ratio mean"))
+    if row_is_excluded(
+        r, "HYST", flags, curation, broken_fields=("is broken",)
+    ):
+        continue
+    v = fnum(r.get("on-off ratio"))
     if v and v > 0:
         onoff.setdefault(dn, []).append(v)
-onoff_rows = [dict(device=dn, peo=meta[dn][0], salt=meta[dn][1], onoff=med(v))
+onoff_rows = [dict(device=dn, peo=meta[dn][0], salt=meta[dn][1],
+                   batch=batch_by_device.get(dn, "unknown"), onoff=med(v))
               for dn, v in onoff.items()]
 
 METRICS = {
@@ -178,9 +211,15 @@ METRICS = {
 def bootstrap_ci(vals, B=20000):
     vals = [v for v in vals if v is not None and np.isfinite(v)]
     if len(vals) < 2:
-        return (float("nan"), float("nan"))
+        return float("nan"), float("nan"), "not_estimable"
+    if len(vals) == 2:
+        return float(min(vals)), float(max(vals)), "observed_range"
     boots = [np.median(RNG.choice(vals, size=len(vals), replace=True)) for _ in range(B)]
-    return (float(np.percentile(boots, 2.5)), float(np.percentile(boots, 97.5)))
+    return (
+        float(np.percentile(boots, 2.5)),
+        float(np.percentile(boots, 97.5)),
+        "bootstrap_95",
+    )
 
 
 def cell_key(r):
@@ -191,32 +230,60 @@ grad_rows, cell_ci_rows = [], []
 for mkey, (label, rows, col, _log) in METRICS.items():
     xs = [r["peo"] for r in rows if r.get(col) is not None]
     ys = [r[col] for r in rows if r.get(col) is not None]
+    blocks = [r["batch"] for r in rows if r.get(col) is not None]
     rho = spearman(xs, ys)
-    p = perm_p_spearman(xs, ys)
+    p = perm_p_spearman(xs, ys, RNG)
+    batch_p = perm_p_spearman(xs, ys, RNG, blocks=blocks)
     grad_rows.append(dict(metric=mkey, n=len(xs), spearman_rho=round(rho, 3),
-                          perm_p=round(p, 5)))
+                          perm_p=round(p, 5), batch_perm_p=round(batch_p, 5)))
     # per-cell median + bootstrap CI
     cells = {}
     for r in rows:
         if r.get(col) is not None:
             cells.setdefault(cell_key(r), []).append(r[col])
     for k in sorted(cells):
-        lo, hi = bootstrap_ci(cells[k])
+        lo, hi, method = bootstrap_ci(cells[k])
         cell_ci_rows.append(dict(metric=mkey, peo=k[0], salt=k[1], n=len(cells[k]),
                                  median=round(float(np.median(cells[k])), 4),
+                                 interval_method=method,
                                  ci_lo=round(lo, 4), ci_hi=round(hi, 4)))
 
+for row, adjusted in zip(grad_rows, holm_adjust([r["perm_p"] for r in grad_rows])):
+    row["holm_p"] = round(float(adjusted), 5)
+
 with open(os.path.join(OUT, "ch4_gradient_stats.csv"), "w", newline="") as fh:
-    w = csv.DictWriter(fh, fieldnames=["metric", "n", "spearman_rho", "perm_p"])
+    w = csv.DictWriter(
+        fh,
+        fieldnames=[
+            "metric",
+            "n",
+            "spearman_rho",
+            "perm_p",
+            "holm_p",
+            "batch_perm_p",
+        ],
+    )
     w.writeheader(); [w.writerow(x) for x in grad_rows]
 with open(os.path.join(OUT, "ch4_cell_ci.csv"), "w", newline="") as fh:
-    w = csv.DictWriter(fh, fieldnames=["metric", "peo", "salt", "n", "median", "ci_lo", "ci_hi"])
+    w = csv.DictWriter(
+        fh,
+        fieldnames=[
+            "metric",
+            "peo",
+            "salt",
+            "n",
+            "median",
+            "interval_method",
+            "ci_lo",
+            "ci_hi",
+        ],
+    )
     w.writeheader(); [w.writerow(x) for x in cell_ci_rows]
 
 
 # --------------------------------------------------------------------------- [2]
 def ols_perm(rows, col, logy, B=20000):
-    """log-metric ~ logPEO + logSALT + logPEO:logSALT; permutation p per term."""
+    """Factorial model with conditional, batch-restricted Freedman--Lane tests."""
     d = [r for r in rows if r.get(col) is not None and r[col] > 0]
     lp = np.log(np.array([r["peo"] for r in d]))
     ls = np.log(np.array([r["salt"] for r in d]))
@@ -224,21 +291,22 @@ def ols_perm(rows, col, logy, B=20000):
     y = np.log(y) if logy else y
     # centre predictors so the interaction is near-orthogonal to the mains
     lp -= lp.mean(); ls -= ls.mean()
-    X = np.column_stack([np.ones_like(lp), lp, ls, lp * ls])
-
-    def fit(yy):
-        beta, *_ = np.linalg.lstsq(X, yy, rcond=None)
-        yhat = X @ beta
-        ss = 1 - np.sum((yy - yhat) ** 2) / max(np.sum((yy - yy.mean()) ** 2), 1e-12)
-        return beta, ss
-
-    beta, r2 = fit(y)
-    # permutation p for each term: shuffle y, refit, compare |coef|
-    cnt = np.zeros(4)
-    for _ in range(B):
-        bperm, _ = fit(RNG.permutation(y))
-        cnt += (np.abs(bperm) >= np.abs(beta) - 1e-12)
-    pvals = (cnt + 1) / (B + 1)
+    blocks = [r["batch"] for r in d]
+    batch_levels = sorted(set(blocks))
+    batch_dummies = [
+        np.asarray([block == level for block in blocks], dtype=float)
+        for level in batch_levels[1:]
+    ]
+    X = np.column_stack(
+        [np.ones_like(lp), lp, ls, lp * ls, *batch_dummies]
+    )
+    beta, pvals = freedman_lane_pvalues(
+        X, y, RNG, term_indices=(1, 2, 3), B=B, blocks=blocks
+    )
+    yhat = X @ beta
+    r2 = 1 - np.sum((y - yhat) ** 2) / max(
+        np.sum((y - y.mean()) ** 2), 1e-12
+    )
     return d, beta, pvals, r2
 
 
@@ -263,7 +331,11 @@ with open(os.path.join(OUT, "ch4_factorial.csv"), "w", newline="") as fh:
 gon = {}
 for r in load("DEVICES_HYST_PIXEL_INFO.csv"):
     dn = r.get("device_name")
-    if not is_spine(dn):
+    if not is_replicated_grid(dn):
+        continue
+    if row_is_excluded(
+        r, "HYST", flags, curation, broken_fields=("is broken",)
+    ):
         continue
     g = fnum(r.get("mean conductance at max v (uS)"))
     if g and g > 0:
@@ -274,7 +346,7 @@ perc = [dict(device=dn, peo=meta[dn][0], salt=meta[dn][1], g_on_uS=med(v))
 px = np.array([r["peo"] for r in perc])
 gy = np.array([r["g_on_uS"] for r in perc])
 rho_g = spearman(px, gy)
-p_g = perm_p_spearman(px, gy)
+p_g = perm_p_spearman(px, gy, RNG)
 # power law g ~ PEO^(-m): slope on log-log
 slope_g = np.polyfit(np.log(px), np.log(gy), 1)[0]
 with open(os.path.join(OUT, "ch4_percolation.csv"), "w", newline="") as fh:
@@ -316,7 +388,7 @@ for r in load("DEVICES_EIS_PIXEL_INFO.csv"):
     if fnum(r.get("DC Voltage (V)")) != 0.0:
         continue
     dn = r.get("device_name")
-    if not is_spine(dn):
+    if not is_replicated_grid(dn):
         continue
     f_apex = fnum(r.get("Freq at Max -Zimag (Hz)"))
     z_apex = fnum(r.get("Zreal at Max -Zimag (ohm)"))
@@ -377,7 +449,11 @@ with open(os.path.join(OUT, "ch4_eis_timescale.csv"), "w", newline="") as fh:
 hg = {}
 for r in load("DEVICES_HYST_CURVE_INFO.csv"):
     dn = r.get("device_name")
-    if not is_spine(dn):
+    if not is_replicated_grid(dn):
+        continue
+    if row_is_excluded(
+        r, "HYST", flags, curation, broken_fields=("is broken",)
+    ):
         continue
     v = fnum(r.get("on-off ratio"))
     if v and v > 0:
@@ -397,7 +473,9 @@ across_onoff = med([np.std(np.log(v), ddof=1) for v in cell_onoff.values() if le
 dl = {}
 for r in load("DEVICES_DELAYTIME_CURVE_INFO.csv"):
     dn = r.get("device_name")
-    if not is_spine(dn):
+    if not is_replicated_grid(dn):
+        continue
+    if row_is_excluded(r, "DELAYTIME", flags, curation):
         continue
     t = fnum(r.get("delay time (s)")); y = fnum(r.get("ratio"))
     if t is not None and y is not None:
@@ -477,8 +555,9 @@ with open(os.path.join(OUT, "ch4_heterogeneity_resource.csv"), "w", newline="") 
 print("=== [1] PEO-gradient significance (Ag/Li spine) ===")
 for r in grad_rows:
     print(f"  {r['metric']:12s} Spearman rho={r['spearman_rho']:+.2f}  "
-          f"perm p={r['perm_p']:.4f}  (n={r['n']})")
-print("\n=== [2] PEO x salt factorial (log-metric OLS, centred) ===")
+          f"perm p={r['perm_p']:.4f}, Holm={r['holm_p']:.4f}, "
+          f"batch={r['batch_perm_p']:.4f}  (n={r['n']})")
+print("\n=== [2] PEO x salt factorial (batch-adjusted Freedman--Lane tests) ===")
 for r in fact_rows:
     print(f"  {r['metric']:12s} bPEO={r['b_peo']:+.2f}(p={r['p_peo']:.3f})  "
           f"bSALT={r['b_salt']:+.2f}(p={r['p_salt']:.3f})  "

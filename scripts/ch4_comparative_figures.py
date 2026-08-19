@@ -19,7 +19,9 @@ Honesty notes:
   and the curation registry; every bar is labelled with its n.
 - The protocol panel fits v114 pixel R4 at its two protocols directly from the DATABASE.
 """
+import argparse
 import csv, os, collections
+from functools import lru_cache
 import numpy as np
 from scipy.optimize import curve_fit
 
@@ -31,6 +33,12 @@ from matplotlib import cm
 from matplotlib.colors import LogNorm
 
 import figstyle
+from ch4_common import (
+    curation_for,
+    load_curation_registry,
+    load_filter_flags,
+    row_is_excluded,
+)
 
 DB = "../Nanomem_Devices_Library/DATABASE"
 OUT = "handouts"
@@ -44,6 +52,7 @@ PEO_LEVELS = ["0.3", "0.6", "1.2"]      # replicated composition grid (chapter c
 SALT_LEVELS = ["0.045", "0.09", "0.18"]
 
 
+@lru_cache(maxsize=None)
 def load(f):
     with open(os.path.join(DB, f), newline="") as fh:
         return list(csv.DictReader(fh))
@@ -77,14 +86,16 @@ def composition_cells():
 
 
 def filtered_flags():
-    flags = set()
-    for r in load("FILTERED_DEVICES.csv"):
-        flags.add((g(r, "device_name"), g(r, "day"), g(r, "pixel"), g(r, "measurement_type")))
-    return flags
+    return load_filter_flags(os.path.join(DB, "FILTERED_DEVICES.csv"))
+
+
+def curation_registry():
+    return load_curation_registry(os.path.join(OUT, "ch4_png_qa_curation.csv"))
 
 
 def hyst_grid(cell, flags):
     """Per-cell median on-off ratio and |normalized area| from clean HYST curves."""
+    curation = curation_registry()
     ratio = collections.defaultdict(list)   # (peo,salt) -> [device medians]
     area = collections.defaultdict(list)
     dev_ratio = collections.defaultdict(list)   # device -> values
@@ -94,9 +105,9 @@ def hyst_grid(cell, flags):
         dn = g(r, "device_name")
         if dn not in cell:
             continue
-        if (dn, g(r, "day"), g(r, "pixel"), "HYST") in flags:
-            continue
-        if g(r, "is broken").lower() in ("true", "1"):
+        if row_is_excluded(
+            r, "HYST", flags, curation, broken_fields=("is broken",)
+        ):
             continue
         rr = fnum(g(r, "on-off ratio")); ar = fnum(g(r, "normalized area"))
         if rr is not None and np.isfinite(rr):
@@ -437,34 +448,63 @@ def _stretched(t, A, tau, beta, C):
 
 def fig_representative():
     flags = filtered_flags()
+    curation = curation_registry()
 
     # ---- panel (a): HYST I-V loops, wide (low-PEO) vs narrow (high-PEO) ----
+    hyst_devices = ("NM_v146", "NM_v144")
+    ratios_by_device = {device: {} for device in hyst_devices}
+    for r in load("DEVICES_HYST_CURVE_INFO.csv"):
+        device = g(r, "device_name")
+        if device not in ratios_by_device:
+            continue
+        if row_is_excluded(
+            r, "HYST", flags, curation, broken_fields=("is broken",)
+        ):
+            continue
+        ratio = fnum(g(r, "on-off ratio"))
+        if ratio is not None and np.isfinite(ratio):
+            ratios_by_device[device][
+                (g(r, "day"), g(r, "pixel"), g(r, "curve"))
+            ] = ratio
+
+    selected_hyst = {}
+    for device, ratios in ratios_by_device.items():
+        if ratios:
+            target = np.median(list(ratios.values()))
+            selected_hyst[device] = min(
+                ratios, key=lambda key: abs(ratios[key] - target)
+            )
+
+    # The all-datapoints file is 157 MB. Stream it once for both selected curves
+    # instead of materialising it twice.
+    hyst_points = collections.defaultdict(list)
+    with open(os.path.join(DB, "DEVICES_HYST_ALL_DATAPOINTS.csv"), newline="") as fh:
+        for r in csv.DictReader(fh):
+            device = g(r, "device_name")
+            key = selected_hyst.get(device)
+            if key is None:
+                continue
+            if (g(r, "day"), g(r, "pixel"), g(r, "curve")) != key:
+                continue
+            voltage = fnum(g(r, "voltage (V)"))
+            current = fnum(g(r, "current (uA)"))
+            point = fnum(g(r, "curve data point"))
+            if voltage is not None and current is not None and point is not None:
+                hyst_points[device].append((point, voltage, current))
+
     def hyst_curve(dev):
         """Return (V, I) of the curve whose on-off ratio is nearest this device's
         median, excluding FILTERED/broken curves."""
-        ratios = {}
-        for r in load("DEVICES_HYST_CURVE_INFO.csv"):
-            if g(r, "device_name") != dev:
-                continue
-            if (dev, g(r, "day"), g(r, "pixel"), "HYST") in flags:
-                continue
-            if g(r, "is broken").lower() in ("true", "1"):
-                continue
-            rr = fnum(g(r, "on-off ratio"))
-            if rr is not None and np.isfinite(rr):
-                ratios[(g(r, "day"), g(r, "pixel"), g(r, "curve"))] = rr
-        if not ratios:
+        key = selected_hyst.get(dev)
+        if key is None:
             return None, None, None
-        target = np.median(list(ratios.values()))
-        key = min(ratios, key=lambda k: abs(ratios[k] - target))
-        pts = []
-        for r in load("DEVICES_HYST_ALL_DATAPOINTS.csv"):
-            if (g(r, "device_name"), g(r, "day"), g(r, "pixel"), g(r, "curve")) == (dev,) + key:
-                v, i, n = fnum(g(r, "voltage (V)")), fnum(g(r, "current (uA)")), fnum(g(r, "curve data point"))
-                if v is not None and i is not None and n is not None:
-                    pts.append((n, v, i))
+        pts = hyst_points[dev]
         pts.sort()
-        return (np.array([p[1] for p in pts]), np.array([p[2] for p in pts]), ratios[key])
+        return (
+            np.array([p[1] for p in pts]),
+            np.array([p[2] for p in pts]),
+            ratios_by_device[dev][key],
+        )
 
     # ---- panel (b): PULSES potentiation, three qualitative shapes ----
     def pulse_curve(dev):
@@ -472,10 +512,15 @@ def fig_representative():
         for r in load("DEVICES_PULSES_CURVE_INFO.csv"):
             if g(r, "device_name") != dev:
                 continue
-            if (dev, g(r, "day"), g(r, "pixel"), "PULSES") in flags:
+            if row_is_excluded(r, "PULSES", flags, curation):
                 continue
+            cur = curation_for(
+                curation, dev, "PULSES", g(r, "day"), g(r, "pixel")
+            )
             N, y = fnum(g(r, "number of pulses")), fnum(g(r, "ratio"))
             if N and N > 0 and y is not None:
+                if cur and cur[0] == "clean" and cur[1] is not None and N not in cur[1]:
+                    continue
                 pts.append((N, y))
         pts = sorted(set(pts))
         return np.array([p[0] for p in pts]), np.array([p[1] for p in pts])
@@ -486,10 +531,15 @@ def fig_representative():
         for r in load("DEVICES_DELAYTIME_CURVE_INFO.csv"):
             if g(r, "device_name") != dev:
                 continue
-            if (dev, g(r, "day"), g(r, "pixel"), "DELAYTIME") in flags:
+            if row_is_excluded(r, "DELAYTIME", flags, curation):
                 continue
+            cur = curation_for(
+                curation, dev, "DELAYTIME", g(r, "day"), g(r, "pixel")
+            )
             t, y = fnum(g(r, "delay time (s)")), fnum(g(r, "ratio"))
             if t and t > 0 and y is not None:
+                if cur and cur[0] == "clean" and cur[1] is not None and t not in cur[1]:
+                    continue
                 pts.append((t, y))
         pts = sorted(set(pts))
         return np.array([p[0] for p in pts]), np.array([p[1] for p in pts])
@@ -650,15 +700,16 @@ def _host_salt(components):
 def fig_palette():
     lib = {r["device_name"]: r for r in load("UPDATED_DEVICES_LIBRARY.csv")}
     flags = filtered_flags()
+    curation = curation_registry()
 
     def dev_median(fname, col, mtype, broken_col):
         """Device-median of `col`, dropping FILTERED and broken pixels."""
         acc = collections.defaultdict(list)
         for r in load(fname):
             dev = g(r, "device_name")
-            if (dev, g(r, "day"), g(r, "pixel"), mtype) in flags:
-                continue
-            if g(r, broken_col) == "True":
+            if row_is_excluded(
+                r, mtype, flags, curation, broken_fields=(broken_col,)
+            ):
                 continue
             v = fnum(g(r, col))
             if v is not None and np.isfinite(v) and v > 0:
@@ -727,8 +778,19 @@ def fig_palette():
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--skip-representative",
+        action="store_true",
+        help=(
+            "retain the existing representative-curves figure instead of "
+            "hydrating and streaming the 157 MB raw HYST datapoint table"
+        ),
+    )
+    args = parser.parse_args()
     os.makedirs(FIGDIR, exist_ok=True)
-    fig_representative()
+    if not args.skip_representative:
+        fig_representative()
     fig_heterogeneity()
     fig_composition()
     fig_potentiation()

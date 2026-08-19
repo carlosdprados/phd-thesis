@@ -41,6 +41,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 import figstyle
+from ch4_common import pearson, spearman
 
 DB = "../Nanomem_Devices_Library/DATABASE"
 OUT = "handouts"
@@ -65,16 +66,6 @@ def fnum(x):
 def med(v):
     v = [x for x in v if x is not None and np.isfinite(x)]
     return float(np.median(v)) if v else float("nan")
-
-
-def pearson(x, y):
-    x, y = np.asarray(x, float), np.asarray(y, float)
-    return float(np.corrcoef(x, y)[0, 1])
-
-
-def spearman(x, y):
-    rx = np.argsort(np.argsort(x)); ry = np.argsort(np.argsort(y))
-    return pearson(rx, ry)
 
 
 def partial(x, y, z):

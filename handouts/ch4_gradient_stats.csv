@@ -1,5 +1,5 @@
-metric,n,spearman_rho,perm_p
-t_half_s,25,-0.515,0.0093
-growth_exp,28,-0.355,0.06535
-peak_ratio,28,-0.344,0.0728
-onoff,47,-0.277,0.06005
+metric,n,spearman_rho,perm_p,holm_p,batch_perm_p
+t_half_s,23,-0.481,0.0224,0.0224,0.01565
+growth_exp,27,-0.546,0.00375,0.01125,0.0047
+peak_ratio,27,-0.542,0.00425,0.01125,0.00205
+onoff,43,-0.529,0.00065,0.0026,0.002

@@ -110,14 +110,27 @@ with open(os.path.join(DB, "DEVICES_LIBRARY.csv"), newline="") as f:
     for r in csv.DictReader(f):
         lib[r["device_name"]] = r
 
-decay = {}
-with open(os.path.join(HO, "ch4_decay_fits.csv"), newline="") as f:
-    for r in csv.DictReader(f):
-        decay[r["device_id"]] = r
-pulse = {}
-with open(os.path.join(HO, "ch4_pulse_descriptors.csv"), newline="") as f:
-    for r in csv.DictReader(f):
-        pulse[r["device_id"]] = r
+def substrate_rows(filename, metric_fields):
+    """Collapse junction-level handout rows to one median row per substrate."""
+    grouped = defaultdict(list)
+    with open(os.path.join(HO, filename), newline="") as f:
+        for r in csv.DictReader(f):
+            grouped[r["device_id"]].append(r)
+    out = {}
+    for device, records in grouped.items():
+        row = dict(records[0])
+        for field in metric_fields:
+            values = [fnum(r.get(field)) for r in records]
+            values = [value for value in values if value is not None]
+            row[field] = statistics.median(values) if values else ""
+        out[device] = row
+    return out
+
+
+decay = substrate_rows("ch4_decay_fits.csv", ("t_half_s", "tau_s"))
+pulse = substrate_rows(
+    "ch4_pulse_descriptors.csv", ("growth_exp", "peak_ratio")
+)
 
 devs = sorted(set(decay) | set(pulse), key=lambda x: int(x.split("v")[1]))
 
@@ -143,7 +156,15 @@ for d in devs:
         lp=(math.log10(fnum(pp.get("peak_ratio"))) if fnum(pp.get("peak_ratio")) else None),
     ))
 
-li_ag = [r for r in rows if r["cat"] == "Li" and r["elec"] == "Ag" and r["peo"] is not None and r["th"] is not None]
+li_ag = [
+    r
+    for r in rows
+    if r["cat"] == "Li"
+    and r["elec"] == "Ag"
+    and r["peo"] in {0.3, 0.6, 1.2}
+    and r["salt"] in {0.045, 0.09, 0.18}
+    and r["th"] is not None
+]
 
 # --------------------------------------------------------------------------
 # report
