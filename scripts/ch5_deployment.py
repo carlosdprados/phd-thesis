@@ -21,7 +21,7 @@ Two questions a jury asks of an "affective-computing application":
       These are unoptimised, large-area proof-of-concept figures; the point is the
       order of magnitude and the qualitative contrast with a gradient-trained model.
 
-Run from the repo root:  python3 scripts/ch5_deployment.py
+Run from the repo root:  python scripts/ch5_deployment.py
 """
 import os, sys
 import numpy as np

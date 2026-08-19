@@ -427,9 +427,9 @@ def make_figure(rows, path=FIG_PATH):
                        rotation=22, ha="right", rotation_mode="anchor")
     a1.set_ylabel("held-out $R^2$")
     figstyle.panel(a1, "a", "real physiological context")
-    a1.set_ylim(0.62, 0.78)
+    a1.set_ylim(0, 0.8)
     for xi, val in zip(x, means):
-        a1.text(xi, val + 0.006, f"{val:.3f}", ha="center", fontsize=7)
+        a1.text(xi, val + 0.018, f"{val:.3f}", ha="center", fontsize=7)
 
     width = 0.25
     gx = np.arange(len(groups))
@@ -442,16 +442,16 @@ def make_figure(rows, path=FIG_PATH):
         style_bars(gb, group_colors[j])
     a2.set_xticks(gx)
     a2.set_xticklabels(group_labels)
-    a2.set_ylim(0.62, 0.83)
+    a2.set_ylim(0, 0.85)
     a2.set_ylabel("held-out $R^2$")
     figstyle.panel(a2, "b", "timescale groups")
     a2.legend(frameon=False, fontsize=7.2, loc="upper right")
 
-    fig.text(0.5, -0.04,
+    fig.text(0.5, 0.015,
              "Target: EDA/Resp/Temp/HR reconstructed at 1, 3, 8, 20 and 45 s delays "
              f"(LOSO, linear readout, N={N_NODES}).",
              ha="center", fontsize=7.4)
-    fig.tight_layout()
+    fig.tight_layout(rect=[0, 0.07, 1, 1])
     fig.savefig(path)
     plt.close(fig)
     print(f"wrote {path}")

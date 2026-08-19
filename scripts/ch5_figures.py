@@ -272,7 +272,7 @@ def fig_tau_coverage(cards):
           f"lead {lead.tau:.1f}s)")
 
 
-def fig_wesad(cards, seeds=range(5)):
+def fig_wesad(cards, seeds=range(10)):
     """WESAD affective computing (needs the dataset). Two honest panels:
     (a) Demo A window-level binary stress/baseline: reservoir vs static baseline
         -> the single-timescale window task is quasi-static (RC ~= static).
@@ -341,18 +341,18 @@ def fig_wesad(cards, seeds=range(5)):
     bb = a2.bar(x, vals, yerr=errs, width=0.62, capsize=3, error_kw={"lw": 0.8})
     style_bars(bb, cols)
     a2.set_xticks(x); a2.set_xticklabels(labels, fontsize=7.2)
-    a2.set_ylim(0.6, 0.81); a2.set_ylabel("LOSO macro-F1")
+    a2.set_ylim(0, 1); a2.set_ylabel("LOSO macro-F1")
     figstyle.panel(a2, "b", "Demo B: streaming 3-class affect tracking")
     # cumulative decomposition: inst -> +dim -> +memory -> +heterogeneity
     def _step(x0, x1, y, txt):
         a2.annotate("", xy=(x1, y), xytext=(x0, y),
                     arrowprops=dict(arrowstyle="->", lw=0.8, color="0.25"))
         a2.text((x0 + x1) / 2, y + 0.005, txt, ha="center", fontsize=6.6, color="0.25")
-    _step(0, 1, 0.752, f"+dim {mem0.mean()-f1_inst:+.3f}")
-    _step(1, 2, 0.770, f"+memory {hom.mean()-mem0.mean():+.3f}")
-    _step(2, 3, 0.788, f"+heterog {het.mean()-hom.mean():+.3f} (ns)")
+    _step(0, 1, 0.76, f"+dim {mem0.mean()-f1_inst:+.3f}")
+    _step(1, 2, 0.83, f"+memory {hom.mean()-mem0.mean():+.3f}")
+    _step(2, 3, 0.90, f"+heterog {het.mean()-hom.mean():+.3f}")
     for xi, v, c in zip(x, vals, cols):
-        a2.text(xi, 0.607, f"{v:.3f}", ha="center", va="bottom", fontsize=7,
+        a2.text(xi, v + 0.025, f"{v:.3f}", ha="center", va="bottom", fontsize=7,
                 color=c, fontweight="bold")
     fig.tight_layout()
     p = os.path.join(FIGDIR, "wesad_affect.pdf"); fig.savefig(p); plt.close(fig)
