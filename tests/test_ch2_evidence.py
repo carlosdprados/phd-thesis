@@ -7,7 +7,7 @@ import numpy as np
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
-from ch2_figures import fit_stdp_branch  # noqa: E402
+from ch2_figures import event_energies, fit_stdp_branch  # noqa: E402
 
 
 def test_stdp_branches_are_fitted_independently_from_the_measured_mean():
@@ -38,3 +38,13 @@ def test_stdp_fit_excludes_the_zero_delay_point():
 
     assert np.isclose(potentiation[1], 0.11, atol=1e-6)
     assert np.isclose(depression[1], 0.11, atol=1e-6)
+
+
+def test_event_energy_uses_the_measured_active_dwell():
+    time = np.array([0.0, 0.05, 0.10, 0.15, 0.20])
+    voltage = np.array([1.0, 0.0, 1.0, 0.0, 0.0])
+    current = np.array([2e-6, 0.0, 4e-6, 0.0, 0.0])
+
+    energy = event_energies(time, voltage, current, "positive", n_events=2)
+
+    assert np.allclose(energy, [100e-9, 200e-9])

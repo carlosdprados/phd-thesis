@@ -8,6 +8,7 @@ SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 from ch5_model import lead_card, load_cards  # noqa: E402
+from ch5_deployment import E_EVENT_MEDIAN_J, envelope  # noqa: E402
 from ch5_reservoir import (  # noqa: E402
     DEFAULT_JITTER,
     ReservoirNode,
@@ -69,3 +70,13 @@ def test_memoryless_control_preserves_write_parameters():
     assert control.w == node.w
     assert control.peak_ratio == node.peak_ratio
     assert control.n_peak == node.n_peak
+
+
+def test_deployment_counts_and_reference_energy_are_exact():
+    result = envelope(N=24, n_classes=3)
+
+    assert result["train_params"] == 75
+    assert result["readout_macs"] == 72
+    assert np.isclose(result["e_step_J"], 24 * E_EVENT_MEDIAN_J)
+    assert result["e_step_range_J"][0] < result["e_step_J"]
+    assert result["e_step_J"] < result["e_step_range_J"][1]

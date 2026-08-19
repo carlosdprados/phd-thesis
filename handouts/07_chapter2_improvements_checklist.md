@@ -73,7 +73,7 @@ A separate read flagged five claims that lacked a citation. Closing them surface
 | CMOS synaptic energy ">1 µJ/event" | `sec:comparison` | ⚠ **Number was wrong** — optimised CMOS neuromorphic is ~tens of pJ/event (TrueNorth ~26, Loihi ~24, ODIN ~12.7), which *inverts* the comparison. Reframed honestly (50 nJ sits above optimised CMOS/inorganic, a PoC value improvable by area scaling); cited `IndiveriLiu2015` + `Horowitz2014`. |
 | "µJ–mJ early inorganic devices" | `subsec:pulse_potentiation` | ⚠ **Overstated** — even early PCM/RRAM are pJ–nJ. Restated as comparable to the pJ–nJ switching energy of inorganic memristive devices; cited `YangStrukovStewart2013`. |
 
-**Note for the committee-facing draft:** the energy section previously read as systematically favourable to the organic device (competitors quoted at µJ–mJ when they are pJ–nJ). The corrected text no longer claims a per-event energy advantage; the honest position is that 50 nJ is a proof-of-concept figure, above optimised CMOS and inorganic platforms, with area scaling as the route to close the gap.
+**Updated resolution (2026-08-20):** direct re-analysis of the archived time, voltage, and current arrays supersedes the earlier 50 nJ estimate. The positive train spans 0.084–1.55 µJ/event (median 1.08 µJ) because the active dwell is about 51 ms and current increases with state. The thesis now reports the event distribution, withdraws proportional area-scaling and upper-bound claims, and treats the Chapter 5 N-fold calculation only as a Hybrane reference—not a PEO-bank or full-system prediction.
 
 **Item 2.2 — full CrossRef audit COMPLETE (2026-06-03).** All **59** Chapter 2 citation keys checked: the 6 above plus the remaining 53, audited automatically (parse each bib DOI → query CrossRef → diff title/first-author/year; script at `/tmp/crossref_audit.py`). **Every key resolves to a real, correctly attributed work — no hallucinations.** 46/53 matched cleanly; the 7 flags were all benign and confirmed by hand:
 
@@ -121,7 +121,7 @@ A separate read flagged five claims that lacked a citation. Closing them surface
 - **Problem:** "≈50 nJ, or approximately 6 fJ per 100 nm² of device area." With the stated area (0.0825 cm²), 50 nJ = **6.06 fJ per µm²**, i.e. ~6×10⁻⁴ fJ per 100 nm². The figure "6" is right; the area unit is wrong by 10⁴.
 - **Location:** `\label{subsec:pulse_potentiation}`, line 210.
 - **Fix:** Change "per 100 nm²" → "per µm²" (or recompute and restate consistently). Verify the 50 nJ figure itself against the raw current trace while here.
-- **Done when:** The normalised energy is dimensionally correct and matches the area used.
+- **Done when:** The normalised energy is dimensionally correct and matches the area used. **Superseded by the 2026-08-20 raw-waveform recalculation above; current median is ≈131 fJ/µm².**
 
 ### ☑ 1.4 — Reconcile EPSC read voltage with the non-perturbing-read threshold — DONE
 

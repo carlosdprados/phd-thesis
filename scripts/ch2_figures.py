@@ -625,8 +625,62 @@ def pulse_trace_from_raw(pixel: str = "L5") -> tuple[np.ndarray, np.ndarray, np.
     return pulse_no, seq_v, conductance_us
 
 
+def event_energies(
+    time: np.ndarray,
+    voltage: np.ndarray,
+    current: np.ndarray,
+    polarity: str,
+    n_events: int = 50,
+) -> np.ndarray:
+    """Estimate active-pulse energy from the sampled waveform using zero-order hold."""
+    if not (len(time) == len(voltage) == len(current)):
+        raise ValueError("Time, voltage, and current arrays must have equal length")
+    if polarity == "positive":
+        indices = np.flatnonzero(voltage > 0)[:n_events]
+    elif polarity == "negative":
+        indices = np.flatnonzero(voltage < 0)[:n_events]
+    else:
+        raise ValueError(f"Unknown pulse polarity: {polarity}")
+    if len(indices) != n_events or np.any(indices >= len(time) - 1):
+        raise ValueError(f"Expected {n_events} complete {polarity} pulses")
+    dwell = time[indices + 1] - time[indices]
+    return np.abs(voltage[indices] * current[indices]) * dwell
+
+
+def write_pulse_energy_summary(pixel: str = "L5") -> dict[str, dict[str, float]]:
+    folder = DEVICE_055 / "Day1_PotDepot" / pixel / "Test_1_50pot50depot"
+    time = read_series(folder / "D1_T.txt")
+    voltage = read_series(folder / "D1_V.txt")
+    current = read_series(folder / "D1_I.txt")
+    summary: dict[str, dict[str, float]] = {}
+    for polarity in ("positive", "negative"):
+        energy = event_energies(time, voltage, current, polarity)
+        summary[polarity] = {
+            "n_events": len(energy),
+            "minimum_nJ": float(np.min(energy) * 1e9),
+            "median_nJ": float(np.median(energy) * 1e9),
+            "mean_nJ": float(np.mean(energy) * 1e9),
+            "maximum_nJ": float(np.max(energy) * 1e9),
+            "total_uJ": float(np.sum(energy) * 1e6),
+        }
+    return summary
+
+
+def write_pulse_energy_audit(summary: dict[str, dict[str, float]]) -> None:
+    HANDOUT_DIR.mkdir(parents=True, exist_ok=True)
+    path = HANDOUT_DIR / "ch2_write_energy.csv"
+    fields = ["polarity", *next(iter(summary.values())).keys()]
+    with path.open("w", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fields)
+        writer.writeheader()
+        for polarity, values in summary.items():
+            writer.writerow({"polarity": polarity, **values})
+    print(f"wrote {path.relative_to(ROOT)}")
+
+
 def fig_potentiation_depression() -> None:
     pulse_no, voltage, conductance_us = pulse_trace_from_raw("L5")
+    write_pulse_energy_audit(write_pulse_energy_summary("L5"))
     ratio = conductance_us / conductance_us[0]
 
     fig, ax = plt.subplots(figsize=(4.9, 3.15))

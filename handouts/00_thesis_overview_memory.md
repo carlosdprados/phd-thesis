@@ -124,12 +124,12 @@ Vertical 2-T sandwich structure:
 | Conductance potentiation | ≥200% (50 pulses, 1 V) |
 | EPSC ratio S₁/S₀ | 7.333 |
 | EPSC ratio S₂/S₀ | 15.553 |
-| Energy per synaptic event | ≈50 nJ (≈6 fJ/100 nm²) |
+| Positive write-event energy | 0.084–1.55 µJ as state changes; median 1.08 µJ (≈131 fJ/µm² over 0.0825 cm²) |
 | STM characteristic time τ_S | 2.5–3 s |
 | LTM characteristic time τ_L | 4.7 s |
 | STM retention | 10–15 s |
 | LTM retention | >45 s |
-| STDP time constant τ | 85–90 ms |
+| STDP branch time constants τ | 89 ms (potentiation), 150 ms (depression); five-junction mean |
 | Biological synapse τ | ≈100 ms |
 | Device stability (non-encapsulated) | ~2 weeks (≈300 h) |
 

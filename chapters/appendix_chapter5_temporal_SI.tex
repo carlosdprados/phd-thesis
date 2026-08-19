@@ -276,38 +276,41 @@ extension is not part of the measured composition banks anywhere else in the cha
 
 \section{Deployment Envelope}\label{app:ch5_deploy}
 
-\Cref{tab:ch5_deployment} collects the operating budget quoted in
+\Cref{tab:ch5_deployment} collects the operating reference quoted in
 \cref{sec:ch5_deploy} (\path{scripts/ch5_deployment.py}). The trainable-parameter
 count is exact: the reservoir dynamics are fixed physical devices, and the read-out
-is a single $(N{+}1)\times K$ ridge-regression weight matrix. The energy figures are
-order-of-magnitude estimates built from the \emph{measured} proof-of-concept device of
-\cref{ch:poc} (\cref{app:ch2_si}): an energy per write event of $\approx\SI{50}{\nano\joule}$
-(a \SI{1}{\volt}, \SI{0.1}{\second} pulse), equivalently $\approx\SI{6}{\femto\joule\per\micro\metre\squared}$
-over the \SI{0.0825}{\square\centi\metre} junction (the two agree to within $1\%$,
-$\SI{6}{\femto\joule\per\micro\metre\squared}\times\SI{0.0825}{\square\centi\metre}\approx\SI{49.5}{\nano\joule}$).
-The estimate conservatively charges each node one full write event per
-one-second update; the sub-threshold, state-preserving read at \SI{0.5}{\volt} is
-cheaper, and these are unoptimised large-area figures, so the absolute energy should
-be read as an upper bound that integration would lower. The read-out compute is
-$N\,K$ multiply--accumulates per step at an assumed \SI{1}{\pico\joule} per operation.
+is a single $(N{+}1)\times K$ ridge-regression weight matrix. The number of read-out
+operations, $NK$ multiply--accumulates per step, is also exact for that abstraction;
+their energy depends on an unselected implementation and is not estimated.
+
+The only available write-energy reference is the proof-of-concept
+\SY{}/\Hybrane{}/\LiTf{} junction of \cref{ch:poc}. For each of its first 50 positive
+events, the archived voltage and current sample are multiplied by the measured
+energised dwell, $E_k\simeq|V_k I_k|\Delta t_k$. The energy rises with state from
+\SI{0.084}{\micro\joule} to \SI{1.55}{\micro\joule}; its median is
+\SI{1.08}{\micro\joule}. The N-fold products in \cref{tab:ch5_deployment} simply show
+the consequence of charging every node once per update at that reference value.
+They are not bounds: the simulated \PEO{} cards come from \SIrange{3}{4}{\volt}
+protocols on another host, their write current has not been measured in the proposed
+bank, and read, addressing, sensor, conversion, and control energy are absent.
 
 \begin{table}[t]
   \centering
-  \caption[Reservoir deployment envelope versus a deep model]{Deployment envelope for an $N$-node device reservoir read out by a linear classifier of $K$ classes, from the measured device constants of \cref{ch:poc}, contrasted with a typical gradient-trained deep model. Parameter counts are exact; energy figures are order-of-magnitude estimates (see text).}
+  \caption[Reservoir operating-budget reference]{Operating-budget reference for an $N$-node device reservoir read out by a linear classifier of $K=3$ classes. Parameter and operation counts are exact for the simulated architecture. Energy rows are N-fold transfers of one measured \Hybrane{} junction's positive-write sequence and are not predictions for a \PEO{} bank.}
   \label{tab:ch5_deployment}
-  \footnotesize
-  \setlength{\tabcolsep}{5pt}
-  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{4.3cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+  \scriptsize
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{4.0cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
     \toprule
-    Quantity & Device reservoir (this work) & Deep model (typical) \\
+    Quantity & $N=24$ & $N=48$ \\
     \midrule
-    Trainable parameters & $(N{+}1)K$: 75 ($N{=}24$) / 147 ($N{=}48$), $K{=}3$ & $10^{4}$--$10^{6}$ \\
-    Reservoir dynamics & physical, untrained (0 parameters) & --- \\
-    Training method & one closed-form ridge solve & gradient descent / backpropagation \\
-    Energy per update & $\approx N\times\SI{50}{\nano\joule}$ ($\approx\SI{1.2}{\micro\joule}$ at $N{=}24$) & --- \\
-    Average power (1\,Hz, always-on) & $\approx\SIrange{1.2}{2.4}{\micro\watt}$ ($N{=}24$--48) & --- \\
-    Read-out compute & $NK$ MACs/step ($<\SI{1}{\nano\joule}$) & --- \\
-    Operating regime & sub-kHz (affect is sub-Hz) & --- \\
+    Trainable read-out weights & 75 & 147 \\
+    Training method & \multicolumn{2}{l}{one closed-form ridge solve; physical dynamics untrained} \\
+    Read-out operations per step & 72 MACs & 144 MACs \\
+    Reference core energy/update, median & \SI{25.9}{\micro\joule} & \SI{51.8}{\micro\joule} \\
+    Reference range across source train & \SIrange{2.0}{37.2}{\micro\joule} & \SIrange{4.0}{74.4}{\micro\joule} \\
+    Reference core power at 1\,Hz & \SI{25.9}{\micro\watt} & \SI{51.8}{\micro\watt} \\
+    Full-system power & \multicolumn{2}{l}{not measured} \\
     \bottomrule
   \end{tabularx}
 \end{table}

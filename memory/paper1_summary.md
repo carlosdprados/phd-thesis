@@ -23,7 +23,7 @@ type: project
 ### Multi-State Conductance (Potentiation/Depression)
 - Pulse protocol: 50 pulses at +1 V then 50 pulses at −2 V
 - Conductance tunable by ≥200% (potentiation and depression)
-- Energy per event: ≈50 nJ (≈6 fJ/100 nm²)
+- Positive write-event energy: 0.084–1.55 µJ as the junction potentiates (median 1.08 µJ; ≈131 fJ/µm² over 0.0825 cm²), recalculated from the 51 ms active dwells in the archived pulse train
 
 ### EPSC (Excitatory Post-Synaptic Current)
 - Ground state S₀ at V₀ = 1 V for 1 s

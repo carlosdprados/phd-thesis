@@ -11,15 +11,12 @@ Two questions a jury asks of an "affective-computing application":
       stress detector of ch5_onset.py on the wrist signals and compare to the chest.
 
   (2) What would it cost to run? The reservoir's dynamics are physical and untrained;
-      only the linear read-out is fitted, by one closed-form ridge solve. We size the
-      trainable-parameter count and an order-of-magnitude energy/latency budget from
-      the MEASURED proof-of-concept device (Chapter 2):
-        - energy per synaptic (write) event ~ 50 nJ  (1 V, 0.1 s pulse)
-        - areal energy density ~ 6 fJ/um^2 over the 0.0825 cm^2 junction
-        - sub-threshold, state-preserving read at 0.5 V
-        - sub-kHz operating regime (affective signals are sub-Hz -> natively in band)
-      These are unoptimised, large-area proof-of-concept figures; the point is the
-      order of magnitude and the qualitative contrast with a gradient-trained model.
+      only the linear read-out is fitted, by one closed-form ridge solve. We report
+      the exact trainable-parameter and MAC counts. A deliberately labelled reference
+      calculation then charges each simulated node one measured Chapter 2 Hybrane
+      write event per update. This is neither a PEO-device prediction nor a complete
+      system-power estimate; it only makes the scale implied by that source train
+      auditable.
 
 Run from the repo root:  python scripts/ch5_deployment.py
 """
@@ -31,11 +28,13 @@ from ch5_model import load_cards                                  # noqa: E402
 import ch5_onset as O                                             # noqa: E402
 from ch5_wesad import load_raw, load_raw_wrist, CHANNELS, WRIST_CHANNELS  # noqa: E402
 
-# ---- measured device constants (Chapter 2 / appendix A; source of truth) ----
-E_EVENT_J = 50e-9          # energy per synaptic event (1 V, 0.1 s write pulse) [J]
-E_AREAL_J_UM2 = 6e-15      # areal switching-energy density [J/um^2]
-AREA_UM2 = 0.0825 * 1e8    # 0.0825 cm^2 junction in um^2  (1 cm^2 = 1e8 um^2)
-V_READ = 0.5               # sub-threshold read bias [V]
+# ---- measured Hybrane source-train constants (Chapter 2; source of truth) ----
+# Recomputed from the 50 positive active dwells in D1_T/D1_V/D1_I.  The values
+# are intentionally explicit here so that the deployment table can be checked
+# without rerunning the Chapter 2 raw-data extractor.
+E_EVENT_MIN_J = 84.26355719446866e-9
+E_EVENT_MEDIAN_J = 1079.6075481059008e-9
+E_EVENT_MAX_J = 1550.7477745649264e-9
 
 
 # ----------------------------------------------------------------------------
@@ -66,31 +65,29 @@ def site_comparison(cards):
 # ----------------------------------------------------------------------------
 # (2) Energy / latency / training-cost envelope
 # ----------------------------------------------------------------------------
-def envelope(N=48, n_classes=3, dt=1.0, mac_energy_J=1e-12, deep_params=(1e4, 1e6)):
-    """Order-of-magnitude deployment budget for an N-node reservoir read out by a
-    linear classifier, from the measured device constants.
+def envelope(N=48, n_classes=3, dt=1.0):
+    """Exact read-out size plus a labelled Hybrane write-energy reference.
 
     - Trainable parameters: reservoir dynamics are fixed physical devices (0 trained);
       the read-out is a single (N+1)x n_classes weight matrix, fitted by one ridge
       solve (closed form -- no backpropagation, no GPU).
-    - Energy: conservatively charge each node one measured write event per update;
-      reads are sub-threshold and cheaper. Average power = N * E_event / dt.
-    - Read-out compute: N*n_classes multiply-accumulates per step -> negligible.
-    - Latency: the device responds in the sub-kHz regime; affect is sub-Hz, so the
-      substrate is not the bottleneck, and the read-out is one matrix-vector product.
+    - Energy: charge each node one median positive event from the measured Chapter 2
+      Hybrane source train. The min--max interval propagates the event-level range.
+      This reference is not a prediction for a fabricated PEO reservoir and excludes
+      reads, conversion, sensing, communication, control, and leakage.
+    - Read-out compute: N*n_classes multiply-accumulates per step. No energy per MAC
+      is assumed because implementation technology is unspecified.
     """
     train_params = (N + 1) * n_classes
-    e_step = N * E_EVENT_J                       # J per reservoir update (write proxy)
-    p_avg = e_step / dt                          # average power [W]
-    e_readout_step = N * n_classes * mac_energy_J
+    e_step = N * E_EVENT_MEDIAN_J
+    e_step_range = (N * E_EVENT_MIN_J, N * E_EVENT_MAX_J)
+    p_avg = e_step / dt
     return dict(
         N=N, n_classes=n_classes, dt=dt,
         train_params=train_params,
-        deep_params=deep_params,
-        param_ratio=(deep_params[0] / train_params, deep_params[1] / train_params),
         e_step_J=e_step, p_avg_W=p_avg,
-        e_readout_step_J=e_readout_step,
-        areal_check_J=E_AREAL_J_UM2 * AREA_UM2,  # should ~ E_EVENT_J (consistency)
+        e_step_range_J=e_step_range,
+        readout_macs=N * n_classes,
     )
 
 
@@ -120,20 +117,19 @@ def main():
             print(f"      paired het-inst F1@sig0.4: {p['mean']:+.3f}, "
                   f"{int(p['frac_pos']*p['n'])}/{p['n']}, p={p['p']:.1e}\n")
 
-    print("(2) DEPLOYMENT ENVELOPE (from measured Chapter 2 device constants)\n")
+    print("(2) DEPLOYMENT COUNTS AND HYBRANE WRITE-ENERGY REFERENCE\n")
     for N in (24, 48):
         e = envelope(N=N)
         print(f"  N={N} nodes, {e['n_classes']} classes, dt={e['dt']:g}s:")
         print(f"    trainable params: reservoir 0 + read-out {e['train_params']} "
               f"(one ridge solve, no backprop)")
-        print(f"    vs deep model {e['deep_params'][0]:.0e}-{e['deep_params'][1]:.0e} "
-              f"params -> {e['param_ratio'][0]:.0f}x-{e['param_ratio'][1]:.0f}x fewer trained")
-        print(f"    energy/update {_fmt_si(e['e_step_J'],'J')}  ->  avg power "
+        print(f"    read-out operations: {e['readout_macs']} MACs per step")
+        print(f"    reference energy/update {_fmt_si(e['e_step_J'],'J')} "
+              f"({_fmt_si(e['e_step_range_J'][0],'J')}--"
+              f"{_fmt_si(e['e_step_range_J'][1],'J')}) -> reference power "
               f"{_fmt_si(e['p_avg_W'],'W')} (always-on, 1 update/s)")
-        print(f"    read-out compute {_fmt_si(e['e_readout_step_J'],'J')}/step (negligible)\n")
-    e = envelope()
-    print(f"  consistency: areal density x area = {_fmt_si(e['areal_check_J'],'J')} "
-          f"~ measured {_fmt_si(E_EVENT_J,'J')}/event")
+    print("\n  Reference only: one Chapter 2 Hybrane write per node per update; "
+          "not a PEO-device prediction or full-system budget.")
 
 
 if __name__ == "__main__":
