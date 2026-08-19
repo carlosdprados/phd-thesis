@@ -132,6 +132,46 @@
 \RequirePackage[hidelinks, colorlinks=false]{hyperref}
 \RequirePackage{cleveref}
 
+%% Standalone chapter PDFs still cite material in the other chapters and
+%% appendices. Import the labels written by a bound-thesis build so those
+%% public PDFs contain resolved chapter, section, figure, and table numbers.
+%% The Makefile builds the thesis first and keeps standalone auxiliary files
+%% in a separate directory, preventing either build from overwriting the
+%% other's label database.
+\ifdefined\thesismode\else
+  \RequirePackage{xr-hyper}
+  \providecommand{\standaloneauxname}{}
+  \newcommand{\importthesislabels}[1]{%
+    \def\thesislabelsource{#1}%
+    \ifx\standaloneauxname\thesislabelsource\else
+      %% Keep the embedded target relative to the peer PDF, so links remain
+      %% valid after the chapter snapshots are copied into exports/.
+      \externaldocument{../build/chapters/#1}[#1.pdf]%
+    \fi
+  }
+  \importthesislabels{frontmatter_motivation}
+  \importthesislabels{chapter1_introduction}
+  \importthesislabels{chapter2_proof_of_concept}
+  \importthesislabels{chapter3_bridge}
+  \importthesislabels{chapter4_comparative}
+  \importthesislabels{chapter5_temporal}
+  \importthesislabels{chapter6_conclusions}
+  %% Appendices are distributed within the bound thesis rather than as
+  %% separate snapshots, so their links target the exported thesis PDF.
+  \externaldocument{../build/chapters/appendix_chapter2_supporting_information}[thesis.pdf]
+  \externaldocument{../build/chapters/appendix_chapter3_bridge_SI}[thesis.pdf]
+  \externaldocument{../build/chapters/appendix_chapter4_comparative_SI}[thesis.pdf]
+  \externaldocument{../build/chapters/appendix_chapter5_temporal_SI}[thesis.pdf]
+  %% rotating creates private RF<n> labels whose names restart in each
+  %% standalone document. They are never cited, so discard imported copies
+  %% before the current document reads or creates its own rotation labels.
+  \makeatletter
+  \@for\thesis@rotlabel:=RF1,RF2,RF3,RF4,RF5,RF6,RF7,RF8,RF9,RF10,RF11,RF12\do{%
+    \global\expandafter\let\csname r@\thesis@rotlabel\endcsname\@undefined
+  }
+  \makeatother
+\fi
+
 %% --- Headers and footers ---
 \RequirePackage{fancyhdr}
 \pagestyle{fancy}

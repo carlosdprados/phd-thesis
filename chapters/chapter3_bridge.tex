@@ -15,6 +15,7 @@
 %% ---- Standalone preamble (skipped when \include'd from thesis.tex) ----
 \ifdefined\thesismode\else
   \documentclass[12pt, twoside]{report}
+  \def\standaloneauxname{chapter3_bridge}
   \usepackage{thesis-format}
   \addbibresource{../bibliography/references.bib}
   \begin{document}
@@ -41,7 +42,7 @@
 \section{The Reproducibility Problem}\label{sec:bridge_problem}
 %% ------------------------------------------------------------
 
-\Cref{ch:poc} established the memristive response of the \SY{}/\Hybrane{}/\LiTf{} formulation across assay-specific junctions and reported two-week ambient shelf stability. In the subsequent fabrication campaign, memristive hysteresis became progressively harder to obtain. Successive batches of nominally identical devices shifted from the low-current, high-area, multi-level response of the proof-of-concept platform toward high conductivity, a narrow switching window, and no usable potentiation. This chapter analyses that loss of reproducibility and the subsequent change of host before \cref{ch:comparative} examines a replicated composition grid.
+\Cref{ch:poc} established the memristive response of the formulation comprising \SY{}, \Hybrane{}, and \LiTf{} across assay-specific junctions and reported two-week ambient shelf stability. In the subsequent fabrication campaign, memristive hysteresis became progressively harder to obtain. Successive batches of nominally identical devices shifted from the low-current, high-area, multi-level response of the proof-of-concept platform toward high conductivity, a narrow switching window, and no usable potentiation. This chapter analyses that loss of reproducibility and the subsequent change of host before \cref{ch:comparative} examines a replicated composition grid.
 
 Individual-device shelf stability and campaign-scale reproducibility measure different processes. The proof-of-concept shelf record retained its characteristics over days to weeks, as did other finished \Hybrane{} devices. The fabrication line nevertheless changed between batches over the following year. This places the degradation in the supply or fabrication process over calendar time, while the finished devices remained stable over the measured shelf interval; \cref{sec:bridge_degradation} quantifies the distinction.
 
