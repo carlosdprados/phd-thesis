@@ -9,14 +9,11 @@ heterogeneity adds little (Demo B, +0.005 ns). That is because those scores are
 dominated by long stretches of steady state, where the instantaneous signal level
 already says everything.
 
-A deployed wearable is judged on the parts those averages hide: it must (i) flag a
-stressor EARLY, as the signal rises, and (ii) keep working under sensor noise and
-motion artefact. Both are temporal problems on which an instantaneous classifier is
-structurally handicapped and a fading-memory reservoir is not:
+A deployed wearable is also judged near state transitions and under sensor noise
+and motion artefact. This script tests those cases without assuming in advance that
+the reservoir will outperform a classical or instantaneous control:
 
-  * EARLY DETECTION needs the recent trajectory (is arousal rising?), which a bank
-    of different time constants encodes as the spread between fast- and slow-tau
-    states -- the instantaneous level alone cannot.
+  * ONSET DETECTION tests whether recent trajectory information changes latency.
   * NOISE ROBUSTNESS is the defining property of a leaky integrator: fading memory
     is a temporal low-pass that averages transient artefact away, whereas an
     instantaneous (or memoryless) read reacts to every spike -> false alarms.
@@ -36,7 +33,7 @@ Metrics:
     STABLE stress call (>=H s sustained); censored at the episode end
   - noise robustness: binary-F1 and false-alarm rate vs injected sensor-noise sigma
 
-Run from the repo root:  python3 scripts/ch5_onset.py
+Run from the repo root:  python scripts/ch5_onset.py
 In-silico devices (Chapter 4 parameter cards); linear read-out only.
 """
 import os, sys
@@ -98,17 +95,15 @@ def add_motion_noise(U, motion, scale, rng, floor=0.05, burst_thr=0.6, burst_gai
 # ----------------------------------------------------------------------------
 # Feature builders (per subject, temporal order preserved)
 # ----------------------------------------------------------------------------
-def _kept(ls):
+def _kept(ls, dt=DT_WES):
     """Boolean mask of steps with a defined affect label, after the washout."""
     keep = np.isin(ls, list(LABELS))
-    keep[:int(WASHOUT_S / DT_WES)] = False
+    keep[:int(WASHOUT_S / dt)] = False
     return keep
 
 
 def bank_features(nodes, raw, dt, sigma=0.0, seed=0, with_input=False):
-    """{sid: (X_kept (S,F), ybin_kept (S,))} driving the bank over the full
-    (optionally noised) session and keeping defined-label steps in order.
-    ybin = 1 for stress, 0 for not-stress."""
+    """Full-timeline bank features, original labels, and scoring mask."""
     rng = np.random.default_rng(900 + seed)
     feats = {}
     for sid, (U, lab) in raw.items():
@@ -117,8 +112,8 @@ def bank_features(nodes, raw, dt, sigma=0.0, seed=0, with_input=False):
         X = run_states(nodes, Us)
         if with_input:
             X = np.hstack([X, Us])
-        keep = _kept(ls)
-        feats[sid] = (X[keep], (ls[keep] == STRESS).astype(int))
+        keep = _kept(ls, dt)
+        feats[sid] = (X, ls, keep)
     return feats
 
 
@@ -129,8 +124,8 @@ def instant_features(raw, dt, sigma=0.0, seed=0):
     for sid, (U, lab) in raw.items():
         Us, ls = stream_subject(U, lab, dt)
         Us = add_noise(Us, sigma, rng)
-        keep = _kept(ls)
-        feats[sid] = (Us[keep], (ls[keep] == STRESS).astype(int))
+        keep = _kept(ls, dt)
+        feats[sid] = (Us, ls, keep)
     return feats
 
 
@@ -168,8 +163,8 @@ def ema_features(raw, dt, taus, sigma=0.0, seed=0):
     for sid, (U, lab) in raw.items():
         Us, ls = stream_subject(U, lab, dt)
         Us = add_noise(Us, sigma, rng)
-        keep = _kept(ls)
-        feats[sid] = (ema(Us, taus, dt)[keep], (ls[keep] == STRESS).astype(int))
+        keep = _kept(ls, dt)
+        feats[sid] = (ema(Us, taus, dt), ls, keep)
     return feats
 
 
@@ -177,44 +172,61 @@ def ema_features(raw, dt, taus, sigma=0.0, seed=0):
 # LOSO binary read-out, returning per-subject ordered prediction sequences
 # ----------------------------------------------------------------------------
 def loso_binary(feats, smooth=0):
-    """Leave-one-subject-out 2-class ridge. Returns (macro_F1, {sid:(y_true,y_pred)})
-    with each held-out subject's sequences in temporal order (for latency/transition
-    scoring)."""
+    """LOSO binary ridge with prediction and smoothing on the full timeline.
+
+    Returns ``{sid: (labels_full, prediction_full, score_mask)}``, retaining
+    undefined intervals so temporal metrics never concatenate separated blocks.
+    """
     sids = list(feats)
     classes = [0, 1]
     f1s, per = [], {}
     for s in sids:
-        Ftr = np.vstack([feats[k][0] for k in sids if k != s])
-        ytr = np.concatenate([feats[k][1] for k in sids if k != s])
-        Fte, yte = feats[s]
-        if len(np.unique(ytr)) < 2 or len(yte) == 0:
+        Ftr = np.vstack([feats[k][0][feats[k][2]] for k in sids if k != s])
+        ltr = np.concatenate([feats[k][1][feats[k][2]] for k in sids if k != s])
+        ytr = (ltr == STRESS).astype(int)
+        Fte, labels, score = feats[s]
+        yte = (labels[score] == STRESS).astype(int)
+        if len(np.unique(ytr)) < 2 or not score.any():
             continue
         mu, sd = Ftr.mean(0), Ftr.std(0) + 1e-9
         W = _ridge_onehot_fit((Ftr - mu) / sd, ytr, classes)
         pred = _predict((Fte - mu) / sd, W, classes)
         if smooth > 1:
             pred = _roll_mode(pred, smooth)
-        f1s.append(macro_f1(yte, pred, classes))
-        per[s] = (yte, pred)
+        f1s.append(macro_f1(yte, pred[score], classes))
+        per[s] = (labels, pred, score)
     return (float(np.mean(f1s)) if f1s else float("nan")), per
 
 
 # ----------------------------------------------------------------------------
 # Temporal metrics from the per-subject ordered sequences
 # ----------------------------------------------------------------------------
-def transition_f1(per, dt, w_s=TRANS_W_S):
-    """Macro-F1 restricted to steps within +/- w_s of any label change -- the hard
-    region where the instantaneous level is ambiguous and memory should pay."""
+def _transition_score_mask(labels, score, dt, w_s=TRANS_W_S):
+    """Scored samples near genuine segment boundaries on the full timeline."""
+    labels = np.asarray(labels)
+    score = np.asarray(score, bool)
+    valid = np.isin(labels, list(LABELS))
+    y = labels == STRESS
+    boundary = np.zeros(len(labels), bool)
+    if len(labels) > 1:
+        changed = (valid[1:] != valid[:-1]) | (valid[1:] & valid[:-1] & (y[1:] != y[:-1]))
+        idx = np.where(changed)[0]
+        boundary[idx] = True
+        boundary[idx + 1] = True
     w = max(int(w_s / dt), 1)
+    near = np.zeros(len(labels), bool)
+    for c in np.where(boundary)[0]:
+        near[max(0, c - w):min(len(labels), c + w + 1)] = True
+    return near & score
+
+
+def transition_f1(per, dt, w_s=TRANS_W_S):
+    """Macro-F1 within +/-w_s of full-timeline valid-segment boundaries."""
     yt, yp = [], []
-    for yte, pred in per.values():
-        ch = np.where(np.diff(yte) != 0)[0]            # change points (index i -> i+1)
-        if len(ch) == 0:
-            continue
-        mask = np.zeros(len(yte), bool)
-        for c in ch:
-            mask[max(0, c - w):min(len(yte), c + w + 1)] = True
-        yt.append(yte[mask]); yp.append(pred[mask])
+    for labels, pred, score in per.values():
+        mask = _transition_score_mask(labels, score, dt, w_s)
+        if mask.any():
+            yt.append((labels[mask] == STRESS).astype(int)); yp.append(pred[mask])
     if not yt:
         return float("nan")
     return macro_f1(np.concatenate(yt), np.concatenate(yp), [0, 1])
@@ -227,11 +239,14 @@ def onset_latency(per, dt, stable_s=STABLE_S):
     episode length, so a model that simply never fires is penalised, not rewarded."""
     h = max(int(stable_s / dt), 1)
     lats = []
-    for yte, pred in per.values():
-        onsets = np.where((yte[1:] == 1) & (yte[:-1] == 0))[0] + 1
+    for labels, pred, score in per.values():
+        stress = labels == STRESS
+        onsets = np.where(stress & ~np.r_[False, stress[:-1]])[0]
         for o in onsets:
+            if not score[o]:
+                continue
             end = o
-            while end < len(yte) and yte[end] == 1:    # extent of this stress episode
+            while end < len(labels) and stress[end]:
                 end += 1
             lat = (end - o) * dt                        # censored = full episode
             for t in range(o, end):
@@ -246,29 +261,25 @@ def false_alarm_rate(per):
     """Fraction of not-stress steps predicted stress (pooled) -- spurious alarms,
     the cost a noisy instantaneous detector pays and a fading-memory one suppresses."""
     fp = tot = 0
-    for yte, pred in per.values():
-        ns = yte == 0
+    for labels, pred, score in per.values():
+        ns = score & (labels != STRESS)
         fp += int(np.sum(pred[ns] == 1)); tot += int(np.sum(ns))
     return fp / tot if tot else float("nan")
 
 
 def subj_f1(per):
     """Per-subject binary macro-F1 (for paired tests across the held-out subjects)."""
-    return {s: macro_f1(yt, yp, [0, 1]) for s, (yt, yp) in per.items()}
+    return {s: macro_f1((labels[score] == STRESS).astype(int), pred[score], [0, 1])
+            for s, (labels, pred, score) in per.items()}
 
 
 def subj_transition_f1(per, dt, w_s=TRANS_W_S):
     """Per-subject transition-window macro-F1 (subjects with a label change)."""
-    w = max(int(w_s / dt), 1)
     out = {}
-    for s, (yt, yp) in per.items():
-        ch = np.where(np.diff(yt) != 0)[0]
-        if len(ch) == 0:
-            continue
-        m = np.zeros(len(yt), bool)
-        for c in ch:
-            m[max(0, c - w):min(len(yt), c + w + 1)] = True
-        out[s] = macro_f1(yt[m], yp[m], [0, 1])
+    for s, (labels, pred, score) in per.items():
+        m = _transition_score_mask(labels, score, dt, w_s)
+        if m.any():
+            out[s] = macro_f1((labels[m] == STRESS).astype(int), pred[m], [0, 1])
     return out
 
 
@@ -424,8 +435,8 @@ def motion_control(raw, motions, cards, scales=(0.0, 0.2, 0.4, 0.6, 0.8),
                 F = ema(Us, [tau_lead], dt)
             else:
                 F = run_states(het, Us)
-            keep = _kept(ls)
-            out[sid] = (F[keep], (ls[keep] == STRESS).astype(int))
+            keep = _kept(ls, dt)
+            out[sid] = (F, ls, keep)
         return out
 
     acc = {b: [] for b in banks}

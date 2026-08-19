@@ -15,8 +15,8 @@ continuous stress detector that an instantaneous classifier cannot match.
 Labels are mapped to the WESAD binary convention so the ch5_onset harness runs
 unchanged: relaxation -> 1 (not-stress), any stress phase -> 2 (stress).
 
-Get the data (~25 MB, open access):  python3 -c "import wfdb; wfdb.dl_database('noneeg','data/noneeg')"
-Run from the repo root:              python3 scripts/ch5_noneeg.py
+Get the data (~25 MB, open access):  python -c "import wfdb; wfdb.dl_database('noneeg','data/noneeg')"
+Run from the repo root:              python scripts/ch5_noneeg.py
 """
 import os, sys, glob
 import numpy as np
@@ -24,7 +24,8 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ch5_model import load_cards                                  # noqa: E402
 import ch5_onset as O                                             # noqa: E402
-from ch5_wesad import SLOW_FS, _scale_subject                     # noqa: E402
+from ch5_wesad import (CALIBRATION_S, SLOW_FS, _load_stream_cache,  # noqa: E402
+                       _save_stream_cache, _scale_subject, _source_signature)
 
 NONEEG_DIR = "data/noneeg"
 RELAX, STRESS, DROP = 1, 2, 0       # WESAD-compatible label codes (0 = excluded)
@@ -37,12 +38,14 @@ PSYCH_ONLY = True
 
 
 def _interp_to(x, n_out):
-    """Linear-resample a 1-D signal to n_out samples, filling any NaNs first."""
+    """Past-hold resampling to n_out samples, with causal forward NaN filling."""
     x = np.asarray(x, float).ravel()
-    if np.isnan(x).any():                      # forward/linear fill gaps
-        idx = np.arange(len(x)); good = ~np.isnan(x)
-        x = np.interp(idx, idx[good], x[good]) if good.any() else np.zeros_like(x)
-    return np.interp(np.linspace(0, len(x) - 1, n_out), np.arange(len(x)), x)
+    if np.isnan(x).any():
+        idx = np.where(~np.isnan(x), np.arange(len(x)), -1)
+        idx = np.maximum.accumulate(idx)
+        x = np.where(idx >= 0, x[np.maximum(idx, 0)], 0.0)
+    pos = np.minimum(np.floor(np.arange(n_out) * len(x) / n_out).astype(int), len(x) - 1)
+    return x[pos]
 
 
 def _load_subject(base):
@@ -74,20 +77,22 @@ def _load_subject(base):
             lab8[a:b] = STRESS
         else:                                          # relaxation
             lab8[a:b] = RELAX
-    li = np.clip(np.round(np.linspace(0, len(lab8) - 1, n)).astype(int), 0, len(lab8) - 1)
-    return _scale_subject(U), lab8[li]
+    li = np.minimum(np.floor(np.arange(n) * len(lab8) / n).astype(int), len(lab8) - 1)
+    return _scale_subject(U, fs=SLOW_FS), lab8[li]
 
 
 def load_raw_noneeg(cache=True):
     """{sid: (U (T,3) scaled @ SLOW_FS, lab in {1,2})} for the Non-EEG corpus."""
     tag = "psych" if PSYCH_ONLY else "allstress"
-    cache_path = os.path.join(os.path.dirname(NONEEG_DIR), f"_cache_noneeg_{tag}_EDA-Temp-HR_4hz.npz")
+    paths = sorted(glob.glob(os.path.join(NONEEG_DIR, "Subject*")))
+    signature = _source_signature([p for p in paths if os.path.isfile(p)])
+    cache_path = os.path.join(os.path.dirname(NONEEG_DIR),
+                              f"_cache_v3_causalcal{CALIBRATION_S:g}_noneeg_"
+                              f"{tag}_EDA-Temp-HR_4hz.npz")
     raw = {}
-    if cache and os.path.exists(cache_path):
-        z = np.load(cache_path, allow_pickle=True)
-        for k in z.files:
-            if k.endswith("_U"):
-                sid = k[:-2]; raw[sid] = (z[f"{sid}_U"], z[f"{sid}_lab"])
+    cached = _load_stream_cache(cache_path, signature) if cache else None
+    if cached is not None:
+        raw = cached
         print(f"  (loaded {len(raw)} subjects from cache {cache_path})")
         return raw
     for hea in sorted(glob.glob(os.path.join(NONEEG_DIR, "Subject*_AccTempEDA.hea"))):
@@ -98,10 +103,7 @@ def load_raw_noneeg(cache=True):
         except Exception as e:
             print(f"  ! skip {sid}: {e}")
     if cache and raw:
-        flat = {}
-        for sid, (U, lab) in raw.items():
-            flat[f"{sid}_U"] = U; flat[f"{sid}_lab"] = lab
-        np.savez_compressed(cache_path, **flat)
+        _save_stream_cache(cache_path, signature, raw)
         print(f"  (cached {len(raw)} subjects -> {cache_path})")
     return raw
 
@@ -110,7 +112,7 @@ def main():
     cards = load_cards(li_only=True)
     if not glob.glob(os.path.join(NONEEG_DIR, "Subject*_AccTempEDA.hea")):
         print(f"Non-EEG dataset not found at {NONEEG_DIR}. Fetch it with:\n"
-              f"  python3 -c \"import wfdb; wfdb.dl_database('noneeg','{NONEEG_DIR}')\"")
+              f"  python -c \"import wfdb; wfdb.dl_database('noneeg','{NONEEG_DIR}')\"")
         return
     raw = load_raw_noneeg()
     secs = {"relax": 0, "stress": 0}

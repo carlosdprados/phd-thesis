@@ -2,7 +2,7 @@
 """Chapter 5 physiology temporal-context reconstruction benchmark.
 
 Run from the repo root:
-  python3 scripts/ch5_physio_context.py
+  python scripts/ch5_physio_context.py
 
 Purpose
 -------
@@ -67,7 +67,7 @@ def lag_group(lag):
         return "fast 1-3 s"
     if lag <= 10:
         return "mid 8 s"
-    return "slow 20-45 s"
+    return "slow >=20 s"
 
 
 def lagged_targets(Us, lags=LAGS_S):
@@ -232,7 +232,7 @@ def print_summary(rows):
         vals = _condition_seed_means([r for r in rows if r["condition"] == cond])
         arr = np.array(list(vals.values()))
         group_vals = []
-        for group in ["fast 1-3 s", "mid 8 s", "slow 20-45 s"]:
+        for group in ["fast 1-3 s", "mid 8 s", "slow >=20 s"]:
             gv = _condition_seed_means([r for r in rows if r["condition"] == cond], group)
             group_vals.append(float(np.mean(list(gv.values()))))
         sd = 0.0 if len(arr) <= 1 else float(arr.std(ddof=1))
@@ -250,12 +250,12 @@ def print_summary(rows):
 
 
 def paired_significance(raw, cards, n_nodes=N_NODES, seeds=SEEDS):
-    """Paired het-vs-best-homogeneous test across subjects on overall R2.
+    """Pre-specified subject-level tests versus both homogeneous controls.
 
-    For each subject, average its held-out R2 over seeds (so the comparison is not
-    a single lucky bank draw), then a Wilcoxon signed-rank over the 15 subjects of
-    (heterogeneous - homogeneous_slow). This stress-tests the POSITIVE heterogeneity
-    result exactly as the WESAD-label null is stress-tested."""
+    Node-draw seeds are averaged within each subject. Two Wilcoxon tests then use
+    subjects as the experimental units; Holm adjustment controls the two-comparison
+    family without selecting a comparator from held-out test performance.
+    """
     def persubject_over_seeds(condition):
         acc = {}
         for seed in seeds:
@@ -264,23 +264,40 @@ def paired_significance(raw, cards, n_nodes=N_NODES, seeds=SEEDS):
                 acc.setdefault(sid, []).append(v)
         return {sid: float(np.mean(v)) for sid, v in acc.items()}
 
+    banks = {
+        "homogeneous_fast": persubject_over_seeds("homogeneous_fast"),
+        "homogeneous_slow": persubject_over_seeds("homogeneous_slow"),
+    }
     het = persubject_over_seeds("heterogeneous")
-    hom = persubject_over_seeds("homogeneous_slow")
-    sids = sorted(het)
-    a = np.array([het[s] for s in sids])
-    b = np.array([hom[s] for s in sids])
-    d = a - b
-    try:
-        from scipy.stats import wilcoxon
-        p = float(wilcoxon(a, b).pvalue) if np.ptp(d) > 0 else 1.0
-    except Exception:
-        p = float("nan")
-    print("\nPaired het - homogeneous(slow) over subjects (mean R2 per subject, "
-          f"averaged over {len(list(seeds))} seeds):")
-    print(f"  n={len(sids)} subjects | mean diff = {d.mean():+.4f} | "
-          f"{int((d>0).sum())}/{len(d)} subjects positive | Wilcoxon p={p:.2e}")
-    return dict(mean=float(d.mean()), n=len(sids),
-                n_pos=int((d > 0).sum()), p=p)
+    tests = {}
+    for name, hom in banks.items():
+        sids = sorted(set(het) & set(hom))
+        a = np.array([het[s] for s in sids])
+        b = np.array([hom[s] for s in sids])
+        d = a - b
+        try:
+            from scipy.stats import wilcoxon
+            p = float(wilcoxon(a, b).pvalue) if np.ptp(d) > 0 else 1.0
+        except Exception:
+            p = float("nan")
+        tests[name] = dict(mean=float(d.mean()), n=len(sids),
+                           n_pos=int((d > 0).sum()), p=p)
+
+    ordered = sorted(tests, key=lambda key: tests[key]["p"])
+    running = 0.0
+    for rank, name in enumerate(ordered):
+        adjusted = min(1.0, tests[name]["p"] * (len(ordered) - rank))
+        running = max(running, adjusted)
+        tests[name]["p_holm"] = running
+
+    print("\nPaired heterogeneous-bank comparisons over subjects "
+          f"(subject scores averaged over {len(list(seeds))} node draws):")
+    for name in ("homogeneous_fast", "homogeneous_slow"):
+        st = tests[name]
+        print(f"  het - {name.removeprefix('homogeneous_'):4s}: "
+              f"mean diff={st['mean']:+.4f} | {st['n_pos']}/{st['n']} subjects positive | "
+              f"Wilcoxon p={st['p']:.2e}, Holm p={st['p_holm']:.2e}")
+    return tests
 
 
 def _evaluate_persubject(raw, cards, condition, seed, n_nodes):
@@ -312,14 +329,14 @@ def tonic_extension(raw, cards, seeds=SEEDS, n_nodes=N_NODES,
     minutes-scale nodes to the heterogeneous composition bank and asks whether
     closing the tonic gap raises the SLOW-band reconstruction. Targets are extended
     to 90 and 120 s delays so the genuinely tonic context is in the vector; the
-    comparison is heterogeneous (measured) vs heterogeneous + tonic, LOSO,
-    seed-averaged, with a paired slow-band test across seeds."""
+    comparison is heterogeneous (measured) vs heterogeneous + tonic, LOSO and
+    summarized across matched node-draw seeds. Seeds quantify algorithmic
+    sensitivity; they are not treated as independent experimental units."""
     from ch5_model import tonic_cards
-    from ch5_reservoir import paired_stats
     full = _full(cards)
     ext = full + tonic_cards(cards)
     C = len(W.CHANNELS)
-    SLOW = "slow 20-45 s"
+    SLOW = "slow >=20 s"
 
     def run(base):
         ov, slow = [], []
@@ -335,17 +352,21 @@ def tonic_extension(raw, cards, seeds=SEEDS, n_nodes=N_NODES,
 
     het_ov, het_slow = run(full)
     ext_ov, ext_slow = run(ext)
-    st = paired_stats(ext_slow, het_slow)
+    gain = ext_slow - het_slow
+    gain_sd = float(gain.std(ddof=1)) if len(gain) > 1 else 0.0
     print(f"\nTonic-node extension (slow targets now include 90, 120 s):")
     print(f"  {'bank':24s} {'overall R2':>11} {'slow-band R2':>13}")
     print(f"  {'heterogeneous':24s} {het_ov.mean():11.3f} {het_slow.mean():13.3f}")
     print(f"  {'+ drive-boosted tonic':24s} {ext_ov.mean():11.3f} {ext_slow.mean():13.3f}")
-    print(f"  slow-band gain = {st['mean']:+.3f} (p={st['p']:.1e}, r_rb={st['r_rb']:+.2f}); "
+    print(f"  slow-band gain across node draws = {gain.mean():+.3f} +/- {gain_sd:.3f}; "
+          f"{int((gain > 0).sum())}/{len(gain)} draws positive; "
           f"overall {ext_ov.mean()-het_ov.mean():+.3f}")
     print("  (closing the minutes-scale tonic gap helps the slowest context the "
           "composition grid cannot reach.)")
     return dict(het_overall=float(het_ov.mean()), ext_overall=float(ext_ov.mean()),
-                het_slow=float(het_slow.mean()), ext_slow=float(ext_slow.mean()), stat=st)
+                het_slow=float(het_slow.mean()), ext_slow=float(ext_slow.mean()),
+                stat=dict(mean=float(gain.mean()), sd=gain_sd,
+                          n_pos=int((gain > 0).sum()), n=len(gain)))
 
 
 def make_figure(rows, path=FIG_PATH):
@@ -381,7 +402,7 @@ def make_figure(rows, path=FIG_PATH):
         means.append(float(vals.mean()))
         errs.append(0.0 if len(vals) <= 1 else float(vals.std(ddof=1)))
 
-    groups = ["fast 1-3 s", "mid 8 s", "slow 20-45 s"]
+    groups = ["fast 1-3 s", "mid 8 s", "slow >=20 s"]
     group_labels = ["fast\n1-3 s", "mid\n8 s", "slow\n20-45 s"]
     group_conditions = ["homogeneous_fast", "homogeneous_slow", "heterogeneous"]
     group_colors = [COLORS["green"], COLORS["blue"], COLORS["red"]]

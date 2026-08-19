@@ -2,7 +2,7 @@
 """Chapter 5 -- continuous valence/arousal tracking on the CASE corpus.
 
 Run from the repo root:
-  python3 scripts/ch5_case.py
+  python scripts/ch5_case.py
 
 Purpose
 -------
@@ -23,7 +23,8 @@ CASE (Continuously Annotated Signals of Emotion), Sharma et al., Sci. Data 2019
 in [0.5, 9.5] at 20 Hz; physiology at 1000 Hz (ecg, bvp, gsr, rsp, skt, 3x emg).
 We use the WESAD-analogue slow channel set EDA(gsr)/Resp(rsp)/Temp(skt)/HR(ecg),
 the eight emotional videos (IDs 1-8; the blue baseline IDs 10/11/12 are dropped),
-resampled to a 1 s reservoir cadence, per-subject robustly scaled (LOSO-safe).
+resampled to a 1 s reservoir cadence and scaled from a fixed initial 60 s
+calibration interval.
 
 Method (same RC discipline as the rest of the chapter)
 ------
@@ -42,6 +43,7 @@ Outputs
   figures/chapter5/case_valence_arousal.pdf
 """
 import csv
+from dataclasses import replace
 import glob
 import os
 import sys
@@ -65,7 +67,6 @@ ANNO_FS = 20.0                 # CASE annotation rate [Hz]
 CHANNELS = ["EDA", "Resp", "Temp", "HR"]
 TARGETS = ["valence", "arousal"]
 EMO_VIDEOS = set(range(1, 9))  # emotional stimuli; 10/11/12 are blue baseline
-EMA_TAUS = (3.0, 7.0, 12.0, 19.0, 26.0)   # device-range tau spread for the EMA bank
 
 # CASE interpolated CSVs: env override, else repo data/case, else /tmp extraction.
 def _find_case_dir():
@@ -78,7 +79,7 @@ def _find_case_dir():
 
 
 CASE_DIR = _find_case_dir()
-CACHE = "data/case/_cache_case_1hz.npz"
+CACHE = f"data/case/_cache_v3_causalcal{W.CALIBRATION_S:g}_case_1hz.npz"
 OUT_CSV = "handouts/ch5_case_results.csv"
 FIG_PATH = "figures/chapter5/case_valence_arousal.pdf"
 
@@ -122,13 +123,15 @@ def load_raw(cache=True):
     """Return {sid: (U scaled (T,4), Y (T,2) [valence,arousal], video (T,))}.
 
     Caches the compact 1 Hz streams so the 4.5 GB of 1000 Hz CSVs are parsed once."""
-    if cache and os.path.exists(CACHE):
-        z = np.load(CACHE, allow_pickle=True)
-        raw = {k: (z[f"{k}_U"], z[f"{k}_Y"], z[f"{k}_v"]) for k in z["sids"]}
-        print(f"  (loaded {len(raw)} CASE subjects from cache {CACHE})")
-        return raw
     paths = sorted(glob.glob(os.path.join(CASE_DIR, "physiological", "sub_*.csv")),
                    key=lambda p: int(os.path.basename(p).split("_")[1].split(".")[0]))
+    anno_paths = sorted(glob.glob(os.path.join(CASE_DIR, "annotations", "sub_*.csv")))
+    signature = W._source_signature(paths + anno_paths)
+    cached = W._load_stream_cache(CACHE, signature, fields=("U", "Y", "v")) if cache else None
+    if cached is not None:
+        raw = cached
+        print(f"  (loaded {len(raw)} CASE subjects from cache {CACHE})")
+        return raw
     if not paths:
         print(f"CASE not found under {CASE_DIR}. Fetch CASE_full.zip from figshare\n"
               f"  (10.6084/m9.figshare.8869157) and extract data/interpolated, or set CASE_DIR.")
@@ -137,14 +140,15 @@ def load_raw(cache=True):
     for p in paths:
         sid = os.path.basename(p).split("_")[1].split(".")[0]
         U, val, aro, vid = _parse_subject(sid)
-        Us = W._scale_subject(U)                            # per-subject robust scaling
+        Us = W._scale_subject(U, fs=1.0)
         Y = np.column_stack([val, aro])
         raw[sid] = (Us, Y, vid)
         store[f"{sid}_U"], store[f"{sid}_Y"], store[f"{sid}_v"] = Us, Y, vid
         print(f"  sub_{sid}: T={len(Us)}s  emotional={int(np.isin(vid, list(EMO_VIDEOS)).sum())}s")
     if cache:
-        os.makedirs(os.path.dirname(CACHE), exist_ok=True)
-        np.savez_compressed(CACHE, sids=np.array(list(raw)), **store)
+        packed = {sid: (store[f"{sid}_U"], store[f"{sid}_Y"], store[f"{sid}_v"])
+                  for sid in raw}
+        W._save_stream_cache(CACHE, signature, packed, fields=("U", "Y", "v"))
         print(f"  (cached {len(raw)} subjects -> {CACHE})")
     return raw
 
@@ -183,14 +187,14 @@ def _ema_features(U, taus, dt=DT):
     return np.hstack(cols)
 
 
-def _states(condition, U, nodes):
+def _states(condition, U, nodes, cards):
     """Feature matrix for one video segment under the given condition."""
     if condition == "instantaneous":
         return U
     if condition == "ema_single":
-        return _ema_features(U, (EMA_TAUS[3],))          # lead-cell tau ~19 s
+        return _ema_features(U, (float(lead_card(cards).tau),))
     if condition == "ema_bank":
-        return _ema_features(U, EMA_TAUS)
+        return _ema_features(U, sorted(float(card.tau) for card in _full(cards)))
     return run_states(nodes, U)                          # reservoir banks + memoryless
 
 
@@ -214,10 +218,10 @@ def _build_nodes(condition, cards, seed):
         # the device-vs-EMA gap isolates the compressive nonlinearity, not the mask.
         base = nodes_from(full, N_NODES, rng, dt=DT, n_in=C, sparsity=0.0)
         out = []
-        for i, (d, a, w) in enumerate(base):
+        for i, node in enumerate(base):
             oneh = np.zeros(C)
-            oneh[i % C] = float(np.linalg.norm(w)) or 1.0
-            out.append((d, a, oneh))
+            oneh[i % C] = float(np.linalg.norm(node.w)) or 1.0
+            out.append(replace(node, w=oneh))
         return out
     raise ValueError(condition)
 
@@ -231,7 +235,7 @@ def feature_dict(raw, condition, cards, seed):
         Fs, Ys = [], []
         for (i, j) in _video_segments(vid):
             seg = U[i:j]
-            F = _states(condition, seg, nodes)
+            F = _states(condition, seg, nodes, cards)
             k = min(wo, max(0, len(seg) - 5))            # keep at least a few steps
             Fs.append(F[k:]); Ys.append(Y[i:j][k:])
         if Fs:
