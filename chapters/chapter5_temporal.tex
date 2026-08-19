@@ -34,7 +34,6 @@
 \providecommand{\KTf}{KOTf}
 \providecommand{\twoterminal}{two-terminal}
 \providecommand{\WESAD}{\textsc{wesad}}
-\providecommand{\CASE}{\textsc{case}}
 \providecommand{\NARMA}{NARMA-10}
 %% Standalone-safe reference into this chapter's Supporting Information
 %% (Appendix D). Resolves with \cref in the full thesis; prints a literal
@@ -51,7 +50,7 @@
 
 \Cref{ch:poc,ch:comparative} established and quantified the slow, volatile response of these polymer-electrolyte composites. Behavioural models fitted to that response are now evaluated on temporal-computing tasks. A reservoir maps a time-varying input onto a high-dimensional dynamical state from which a linear read-out can recover temporal information.
 
-The central comparison is between a bank drawn from one composition and a bank spanning several measured timescales. The latter should help when a target depends on several lags, but need not improve a task dominated by one timescale. Wearable \emph{affective computing} (the recognition of emotional and physiological state) provides a relevant test because its signals contain both fast and slow components. The evaluation proceeds from reservoir benchmarks to physiological streams, \WESAD{} classification, continuous valence/arousal tracking, and tests with sensor noise and wrist-band data.
+The central comparison is between a bank drawn from one composition and a bank spanning several measured timescales. The latter should help when a target depends on several lags, but need not improve a task dominated by one timescale. Wearable \emph{affective computing} (the recognition of emotional and physiological state) provides a relevant test because its signals contain both fast and slow components. The evaluation proceeds from reservoir benchmarks to physiological streams, \WESAD{} classification, and tests with sensor noise, an independent corpus, and wrist-band data.
 
 All results in this chapter are \emph{in silico}; no new devices were fabricated. Each node is a compact behavioural model parameterised by the fits in \cref{ch:comparative} (\cref{sec:ch5_model}), and every read-out is a single linear ridge regression. Demonstration~A tests whether one composition suffices for a single-timescale feature. Demonstration~B tests whether a composition-diverse bank improves multi-timescale tasks.
 
@@ -105,7 +104,7 @@ Write nonlinearity and fading memory were measured at different write amplitudes
 
 Reservoir suitability is first evaluated without an application-specific task. Linear memory capacity measures fading memory, while information-processing capacity separates its linear and nonlinear components. The \NARMA{} system-identification task is used only to rank compositions, not to claim absolute performance. All three benchmarks use a random rate-coded input, $N$ device nodes, and a linear ridge read-out.
 
-\paragraph{Statistical units.} Random input and bank seeds sample the algorithm's sensitivity to stochastic initialisation; they are not independent devices, experiments, or subjects. Seed-only benchmark comparisons therefore report means, standard deviations, and sign consistency without inferential $p$-values. Inferential paired tests are reserved for independent held-out subjects in the \WESAD{} and \CASE{} analyses, or for independently fabricated devices in the experimental chapters. The complete distinction is recorded in \siTempRef{tab:ch5_settings}.
+\paragraph{Statistical units.} Random input and bank seeds sample the algorithm's sensitivity to stochastic initialisation; they are not independent devices, experiments, or subjects. Seed-only benchmark comparisons therefore report means, standard deviations, and sign consistency without inferential $p$-values. Inferential paired tests are reserved for independent held-out subjects in the physiological-corpus analyses, or for independently fabricated devices in the experimental chapters. The complete distinction is recorded in \siTempRef{tab:ch5_settings}.
 
 \paragraph{Memory capacity.} The linear memory capacity of Jaeger measures how much of the past input a reservoir can reconstruct: $\mathrm{MC}_k$ is the squared correlation between a ridge reconstruction of the input $k$ steps ago and its true value, and the total is the sum over all lags, bounded above by the number of nodes $N$ \cite{Jaeger2002STM}. \Cref{fig:ch5_mc_curve} compares two banks of equal size ($N=24$): a \emph{homogeneous} bank of jittered copies of the lead cell (\PEO{}~0.3/0.09) and a \emph{heterogeneous} bank spanning the replicated composition grid ($\tau\approx 4$--$30$\,s). Under the bounded, peak-calibrated update, total capacity changes from $4.19\pm0.42$ to $4.52\pm0.67$ (means $\pm$ SD over ten random input/bank seeds), a ratio of $1.08\pm0.15$ and a paired gain of $0.33\pm0.60$. The heterogeneous value is higher in seven of ten seed pairs, so the linear-memory benchmark does \emph{not} establish a robust heterogeneity advantage. It does show a different lag profile: single-step recall rises from $\mathrm{MC}_1=0.52$ to $0.99$, whereas recall at lag~15 falls from $0.11$ to $0.05$. The composition spread therefore redistributes recoverable information toward short lags in this architecture rather than increasing total linear capacity decisively.
 
@@ -180,23 +179,25 @@ The benchmarks of \cref{sec:ch5_benchmarks} show that a spread of device timesca
 
 The reservoir is run continuously over each \WESAD{} session at $\Delta t = \SI{1}{\second}$ on four chest channels (electrodermal activity, respiration, temperature, and an electrocardiogram-derived heart rate), and a linear read-out reconstructs each channel at delays of $1$, $3$, $8$, $20$ and \SI{45}{\second}. These delays span fast phasic and beat-to-beat context, respiration- and HF-HRV-scale context, and tonic, LF-HRV-scale context~\cite{Boucsein2012EDA,TaskForce1996HRV}. Evaluation is leave-one-subject-out over all fifteen subjects, with $N=48$ nodes per bank.
 
-\Cref{tab:ch5_physio} reports the held-out reconstruction quality. A memoryless bank gives $R^2 = 0.674$, compared with $0.673$ for instantaneous input. A single-timescale memory raises $R^2$ to about $0.74$, and the heterogeneous composition bank reaches $0.756$: $+0.084$ over instantaneous input and $+0.012$ over the best same-size homogeneous control. This difference is positive for all fifteen subjects (paired Wilcoxon signed-rank $p<10^{-4}$). In the band-resolved results, the fast homogeneous bank performs best at the shortest delays and the slow homogeneous bank at the longest. The heterogeneous bank gives the highest single-bank score across the full delay range (\cref{fig:ch5_physio}).
+Preprocessing is causal. ECG filtering and RR-interval assignment use only completed beats; resampling uses the nearest past label. Each channel is mapped to $(0,1)$ by a monotone transform fitted to the first \SI{60}{\second} only: the calibration-prefix 5th and 95th percentiles map to 0.25 and 0.75, without hard clipping later values. Thus neither later held-out values nor affect labels set the scale. The reported out-of-sample $R^2$ uses the training-subject mean as its deployable null predictor, clips reconstructed normalised physiology to $[0,1]$, and weights each held-out subject equally.
+
+\Cref{tab:ch5_physio} reports the held-out reconstruction quality. A memoryless bank gives $R^2 = 0.636$, compared with $0.646$ for instantaneous input. A single-timescale memory raises $R^2$ to $0.679$--$0.692$, and the heterogeneous composition bank reaches $0.701$: $+0.055$ over instantaneous input and $+0.010$ over the stronger same-size homogeneous control. The heterogeneous-minus-fast difference is positive in $14/15$ subjects (Holm-adjusted $p=2.4\times10^{-4}$); heterogeneous-minus-slow is positive in $11/15$ ($p_{\mathrm{Holm}}=0.030$). The fast homogeneous bank is strongest at the shortest delays and the slow homogeneous bank at the longest; heterogeneity gives the highest overall score, but the margin is modest (\cref{fig:ch5_physio}).
 
 \begin{table}[t]
   \centering
   \small
   \setlength{\tabcolsep}{5pt}
-  \caption[Physiological temporal-context reconstruction on WESAD]{Leave-one-subject-out held-out $R^2$ for multi-lag physiological context reconstruction on \WESAD{} ($N=48$ nodes; means over ten bank seeds where applicable). Bands are reconstruction delays: fast $=1$--$3$\,s, mid $=8$\,s, slow $=20$--$45$\,s. Fast and slow homogeneous banks give their highest scores in their corresponding bands. Across the full context vector, the heterogeneous bank exceeds the best homogeneous bank by $+0.012$ $R^2$, with a positive difference in all fifteen subjects (paired Wilcoxon $p<10^{-4}$).}
+  \caption[Physiological temporal-context reconstruction on WESAD]{Subject-mean leave-one-subject-out $R^2$ for multi-lag physiological context reconstruction on \WESAD{} ($N=48$ nodes; means over ten bank seeds where applicable). The null prediction is the training-subject mean. Bands are reconstruction delays: fast $=1$--$3$\,s, mid $=8$\,s, slow $=20$--$45$\,s. Across the full context vector, the heterogeneous bank exceeds the stronger homogeneous control by $+0.010$ $R^2$ ($11/15$ subjects; Holm-adjusted $p=0.030$).}
   \label{tab:ch5_physio}
   \begin{tabular}{lcccc}
     \toprule
     Bank & overall $R^2$ & fast & mid & slow \\
     \midrule
-    Instantaneous     & 0.673 & 0.715 & 0.670 & 0.632 \\
-    Memoryless        & 0.674 & 0.721 & 0.667 & 0.630 \\
-    Homogeneous, fast & 0.741 & \textbf{0.815} & 0.735 & 0.669 \\
-    Homogeneous, slow & 0.744 & 0.787 & 0.724 & \textbf{0.711} \\
-    Heterogeneous     & \textbf{0.756} & \textbf{0.815} & \textbf{0.737} & 0.708 \\
+    Instantaneous     & 0.646 & 0.699 & 0.647 & 0.592 \\
+    Memoryless        & 0.636 & 0.691 & 0.637 & 0.580 \\
+    Homogeneous, fast & 0.679 & \textbf{0.777} & 0.655 & 0.594 \\
+    Homogeneous, slow & 0.692 & 0.714 & \textbf{0.702} & \textbf{0.664} \\
+    Heterogeneous     & \textbf{0.701} & 0.767 & 0.696 & 0.638 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -204,7 +205,7 @@ The reservoir is run continuously over each \WESAD{} session at $\Delta t = \SI{
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.82\linewidth]{../figures/chapter5/physio_context_reconstruction.pdf}
-  \caption[Physiological temporal-context reconstruction on WESAD]{Multi-lag physiological context reconstruction on real \WESAD{} streams (chest EDA, respiration, temperature, and ECG-derived heart rate). A linear read-out reconstructs each channel at delays of $1$, $3$, $8$, $20$ and $45$\,s from the reservoir state (leave-one-subject-out, $N=48$). The heterogeneous composition bank gives the best single-bank held-out $R^2$ ($0.756$) across the full fast-to-slow context vector, ahead of the best same-size homogeneous control ($0.744$) and well ahead of instantaneous input ($0.673$). Fast and slow homogeneous banks each win only their own band.}
+  \caption[Physiological temporal-context reconstruction on WESAD]{Multi-lag physiological context reconstruction on real \WESAD{} streams (chest EDA, respiration, temperature, and causally derived heart rate). A linear read-out reconstructs each channel at delays of $1$, $3$, $8$, $20$ and $45$\,s (leave-one-subject-out, $N=48$). The heterogeneous bank gives the highest overall subject-mean $R^2$ ($0.701$), ahead of the slow homogeneous control ($0.692$) and instantaneous input ($0.646$). The zero-based axes avoid magnifying these modest differences.}
   \label{fig:ch5_physio}
 \end{figure}
 
@@ -212,7 +213,7 @@ The reservoir is run continuously over each \WESAD{} session at $\Delta t = \SI{
 \section{WESAD Affective Classification}\label{sec:ch5_wesad}
 %% ------------------------------------------------------------
 
-The downstream task is affective-state classification from the \WESAD{} physiological streams with a leave-one-subject-out linear read-out. The analysis reports the contribution of timescale heterogeneity with uncertainty, including when the increment does not differ from zero. The study that introduced \WESAD{} reports three-class chest macro-F1 $\approx0.72$ with engineered window features and conventional classifiers under the same leave-one-subject-out protocol~\cite{Schmidt2018WESAD}; the present streaming model reaches $0.758$ under that matched metric and subject split (\cref{tab:ch5_sota}). Accuracy-only results or studies using different validation splits are excluded from this numerical comparison because they estimate a different quantity.
+The downstream task is affective-state classification from the \WESAD{} physiological streams with a leave-one-subject-out linear read-out. The reservoir and the \SI{15}{\second} causal prediction smoother run on the complete physical timeline; samples with undefined affect labels are excluded only from fitting and scoring. This prevents the smoother from joining labelled blocks separated by long protocol gaps. The study that introduced \WESAD{} reports three-class chest macro-F1 $\approx0.72$ with engineered window features and conventional classifiers under leave-one-subject-out validation~\cite{Schmidt2018WESAD}; the present streaming linear read-out reaches $0.524$ averaged over bank draws (\cref{tab:ch5_sota}). The formulations differ, so this is a scale reference and not a like-for-like ranking.
 
 \begin{table}[t]
   \centering
@@ -225,28 +226,28 @@ The downstream task is affective-state classification from the \WESAD{} physiolo
     Study & Features and read-out & Validation & macro-F1 \\
     \midrule
     Schmidt et al.\ (2018)~\cite{Schmidt2018WESAD} & engineered window features, AdaBoost/RF & 15-subject LOSO & $\approx0.72$ \\
-    This work & streaming device-model states, linear ridge read-out & 15-subject LOSO & $0.758$ \\
+    This work & streaming device-model states, linear ridge read-out & 15-subject LOSO & $0.524$ \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
-\paragraph{Demonstration~A: window-level electrodermal classification.} Binary stress-versus-baseline classification from electrodermal activity, read out at the window level from the lead composition alone, reaches a leave-one-subject-out macro-F1 of $0.894$ (\cref{fig:ch5_wesad}a). A static baseline using the mean, standard deviation, last value, and slope of the same signal reaches $0.899$. The 60-second-window task therefore does not demonstrate a contribution from temporal memory or timescale heterogeneity. The streaming formulation below tests the same distinction without compressing each window into one prediction.
+\paragraph{Demonstration~A: window-level electrodermal classification.} Binary stress-versus-baseline classification from electrodermal activity, read out at the window level from the lead composition alone, reaches leave-one-subject-out macro-F1 $0.669$ (\cref{fig:ch5_wesad}a). A static baseline using the mean, standard deviation, last value, and slope of the same signal reaches $0.714$. The reservoir does not improve this \SI{60}{\second}-window task.
 
-\paragraph{Demonstration~B: streaming three-class tracking.} The reservoir runs continuously over each session, and the affective class (baseline, stress, or amusement) is read out at every step. This formulation uses the evolving reservoir state without a static window summary. \Cref{tab:ch5_wesad} decomposes the result into four matched-size banks. Under the same leave-one-subject-out protocol, a majority-class predictor reaches macro-F1 $0.23$ and a stratified-random predictor $0.33$, compared with $0.758$ for the heterogeneous reservoir. Bank comparisons are assessed across the fifteen independent held-out subjects, preventing within-subject temporal autocorrelation from inflating the test. Relative to instantaneous input, a same-size memoryless bank contributes $+0.028$, a homogeneous fading-memory bank adds $+0.016$, and timescale heterogeneity adds $+0.005$. The fading-memory gain over a same-size memoryless bank is $+0.014$ to $+0.020$. The heterogeneity increment is $+0.005 \pm 0.011$, within seed variation; it is positive in seven of ten seeds, and remains in $[+0.002,+0.007]$ across sampling intervals from $0.5$ to \SI{4}{\second} without separating from zero. Per-class F1 is $0.90$ for baseline, $0.92$ for stress, and $0.55$ for amusement. Amusement has the least labelled data (roughly $5.6$\,ks, compared with $17.6$\,ks for baseline and $10.0$\,ks for stress) and the lowest autonomic arousal. Its score remains low across all banks, so this class does not distinguish memory configurations.
+\paragraph{Demonstration~B: streaming three-class tracking.} The reservoir runs continuously over each session, and baseline, stress, or amusement is read out at every labelled step. \Cref{tab:ch5_wesad} decomposes the result into four matched-size banks. A majority-class predictor reaches macro-F1 $0.231$ and a stratified-random predictor $0.333$. Instantaneous input reaches $0.482$; the memoryless bank reaches $0.513\pm0.040$; and the homogeneous fading-memory bank reaches $0.545\pm0.037$. The heterogeneous bank reaches $0.524\pm0.032$, a $+0.042$ gain over instantaneous input but $-0.021\pm0.024$ relative to homogeneous, with heterogeneity higher in only one of ten matched seed pairs. At the representative seed, amusement remains the weakest class (F1 $0.35$, versus $0.82$ for baseline and $0.74$ for stress). The corrected experiment therefore supports a memory benefit relative to an instantaneous read, but not a timescale-diversity benefit for these sustained labels.
 
 \begin{table}[t]
   \centering
   \small
-  \caption[Streaming three-class affect tracking on WESAD]{Leave-one-subject-out macro-F1 for streaming three-class \WESAD{} tracking (means $\pm$ SD over ten bank seeds; matched input masks). Each increment is the gain over the row above: fading memory contributes a small, consistent gain, while the timescale-heterogeneity increment is within noise (\textit{ns}).}
+  \caption[Streaming three-class affect tracking on WESAD]{Leave-one-subject-out macro-F1 for streaming three-class \WESAD{} tracking (means $\pm$ SD over ten matched bank seeds). The homogeneous fading-memory bank is strongest; adding the measured timescale spread does not improve the sustained-label task.}
   \label{tab:ch5_wesad}
   \begin{tabular}{lcc}
     \toprule
     Bank & macro-F1 & increment \\
     \midrule
-    Instantaneous (no memory)             & 0.709             & --- \\
-    Memoryless (dimensionality only)      & 0.737             & $+0.028$ \\
-    Homogeneous (memory, single $\tau$)   & $0.753 \pm 0.009$ & $+0.016$ \\
-    Heterogeneous (memory, $\tau$ spread) & $0.758 \pm 0.006$ & $+0.005$ (\textit{ns}) \\
+    Instantaneous (no memory)             & 0.482             & --- \\
+    Memoryless (dimensionality only)      & $0.513 \pm 0.040$ & $+0.031$ \\
+    Homogeneous (memory, single $\tau$)   & $\mathbf{0.545 \pm 0.037}$ & $+0.032$ \\
+    Heterogeneous (memory, $\tau$ spread) & $0.524 \pm 0.032$ & $-0.021$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -254,30 +255,11 @@ The downstream task is affective-state classification from the \WESAD{} physiolo
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{../figures/chapter5/wesad_affect.pdf}
-  \caption[WESAD affective classification with device reservoirs]{Affective classification with in-silico device reservoirs (leave-one-subject-out, linear read-out). (a)~Demonstration A, window-level binary stress-versus-baseline from EDA: the single lead composition matches a static feature baseline, i.e.\ the $60$\,s-window task is quasi-static and requires no fading memory. (b)~Demonstration B, streaming three-class affect tracking (baseline/stress/amusement) decomposed as instantaneous $\rightarrow$ $+$dimensionality $\rightarrow$ $+$fading memory $\rightarrow$ $+$timescale heterogeneity. Fading memory contributes a small but consistent gain; the timescale-heterogeneity increment ($+0.005\pm0.011$) is within seed noise. Error bars are $\pm 1$\,SD over $10$ bank seeds.}
+  \caption[WESAD affective classification with device reservoirs]{Affective classification with in-silico device reservoirs (leave-one-subject-out, linear read-out). (a)~Window-level binary stress-versus-baseline from EDA: the device model scores $0.669$, below the static-feature control ($0.714$). (b)~Streaming three-class tracking. Fading memory improves on instantaneous input, but the homogeneous bank ($0.545\pm0.037$) exceeds the heterogeneous bank ($0.524\pm0.032$). Error bars are $\pm 1$\,SD over ten bank seeds; both bar-chart axes begin at zero.}
   \label{fig:ch5_wesad}
 \end{figure}
 
-\paragraph{Why heterogeneity does not improve the label scores.} The affect labels are slowly varying sustained states, and their discriminative memory is dominated by the slow tonic band already covered by the lead composition ($\tau\approx19$--$26$\,s). A wider timescale distribution improves performance when a target requires several lags simultaneously, as in the memory-capacity and physiological-context tasks (\cref{fig:ch5_mc_curve,tab:ch5_physio}). The sustained label task does not show that requirement. Under this protocol, fading memory helps classification, but the additional heterogeneity increment is not resolved.
-
-%% ------------------------------------------------------------
-\section{Continuous Valence and Arousal}\label{sec:ch5_case}
-%% ------------------------------------------------------------
-
-The \WESAD{} tasks of \cref{sec:ch5_wesad} use categorical labels dominated by sustained states. Continuous valence (pleasantness) and arousal (activation) provide a dimensional target with fast phasic components and slow tonic drift~\cite{Picard1997}. The third corpus tests whether a spread of timescales improves prediction of this continuous target.
-
-The Continuously Annotated Signals of Emotion corpus (\CASE{}) of Sharma et al.~\cite{Sharma2019CASE} records thirty subjects who rated valence and arousal continuously on a joystick (range $[0.5,9.5]$, \SI{20}{\hertz}) while watching emotional videos, with synchronised physiology at \SI{1}{\kilo\hertz}. The reservoir is run over the eight emotional videos at $\Delta t=\SI{1}{\second}$ on the same slow channel set as \WESAD{} (electrodermal activity, respiration, skin temperature, and an electrocardiogram-derived heart rate), with robust scaling per subject. The state is reset and a short washout is removed at each video boundary to prevent persistence across stimuli. A linear ridge read-out predicts valence and arousal under leave-one-subject-out evaluation, scored by the concordance correlation coefficient (CCC)~\cite{Lin1989CCC}.
-
-Every fading-memory bank outperforms the instantaneous read on the \CASE{} task (the heterogeneous bank by $+0.079$ mean CCC, positive in $24$ of $30$ subjects, paired Wilcoxon $p<10^{-4}$). A multi-$\tau$ filter bank raises CCC from $0.23$ for a single timescale to $0.41$ ($+0.176$, $27/30$ subjects, $p<10^{-6}$). Timescale spread therefore improves this continuously annotated target, consistent with the memory-capacity and physiological-context results of \cref{sec:ch5_benchmarks,sec:ch5_physio} and unlike the sustained \WESAD{} labels.
-
-On this smooth regression, a linear multi-$\tau$ filter uses the timescale spread more effectively than the device model. A per-channel device bank reaches CCC $0.358$, compared with $0.413$ for the linear bank ($-0.047$, $p<10^{-2}$ across the thirty held-out subjects); random cross-channel mixing in the standard bank reduces the score by a further $\approx0.014$. The device models therefore do not outperform an equivalent digital filter on this task. Their proposed advantage is passive material-level filtering at the core-power estimate of \cref{sec:ch5_deploy}. The increment from device-internal heterogeneity is not resolved across held-out subjects ($+0.005$, $p=0.18$; subject values are seed-averaged), because the jittered homogeneous bank already contains a timescale spread (\siTempRef{app:ch5_case}).
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\linewidth]{../figures/chapter5/case_valence_arousal.pdf}
-  \caption[Continuous valence/arousal tracking on CASE]{Continuous affect tracking on the \CASE{} corpus~\cite{Sharma2019CASE} (thirty subjects; held-out concordance correlation coefficient, leave-one-subject-out, linear read-out; mean $\pm$ SD over ten bank seeds). (a)~Valence and (b)~arousal. A linear multi-$\tau$ filter bank increases CCC by $+0.176$ over a single-$\tau$ filter, with a positive difference in $27/30$ subjects ($p<10^{-6}$). Device banks with mixed and per-channel input masks also use a spread of timescales but score below the linear filter on this regression task.}
-  \label{fig:ch5_case}
-\end{figure}
+\paragraph{Why heterogeneity does not improve the label scores.} The affect labels are slowly varying sustained states, and their discriminative memory is dominated by the slow tonic band already covered by the lead composition. A wider timescale distribution is modestly useful when the target explicitly requires several lags (\cref{tab:ch5_physio}), but not here. Under this protocol, fading memory helps classification; replacing the homogeneous bank with the measured heterogeneous distribution slightly lowers the seed-mean score.
 
 %% ------------------------------------------------------------
 \section{Continuous Monitoring Under Deployment Conditions}\label{sec:ch5_robust}
@@ -285,34 +267,34 @@ On this smooth regression, a linear multi-$\tau$ filter uses the timescale sprea
 
 The sustained \WESAD{} states can often be classified from the instantaneous signal level, as shown by the static-feature baseline. Wearable measurements also contain sensor noise and motion artefacts, particularly in wrist-worn electrodermal and photoplethysmographic signals. Fading memory implements temporal low-pass filtering and may therefore reduce sensitivity to transient artefacts. The tests below add synthetic noise, measured-motion gating, and an independent sensor corpus.
 
-\Cref{fig:ch5_robust_monitoring} tests a continuous binary stress detector (stress versus baseline plus amusement, read out at every step, leave-one-subject-out, with the same linear read-out used throughout). On clean streams, all banks reach macro-F1 $\approx0.91$--$0.92$, comparable to the $\approx93\%$ binary benchmark for the corpus~\cite{Schmidt2018WESAD}. With increasing sensor noise and motion-artefact bursts, the instantaneous and memoryless controls fall from $0.914$ to $0.840$ at $\sigma=0.4$ of the signal range, while the fading-memory banks remain near $0.92$. At $\sigma=0.4$, the heterogeneous bank exceeds the instantaneous read by $+0.088$ for all fifteen subjects (paired Wilcoxon $p<10^{-4}$). On clean streams, fading memory reduces the false-alarm rate from $0.046$ to $0.026$. Homogeneous and heterogeneous banks have similar robustness, associating the result with their shared fading memory. Near label transitions, the increase from $0.747$ to $0.775$ is not resolved across subjects, and detection latency is similar across banks because it is set by the prediction-smoothing horizon.
+\Cref{fig:ch5_robust_monitoring} tests a continuous binary stress detector (stress versus baseline plus amusement, read out at every step, leave-one-subject-out, with the same linear read-out used throughout). On clean streams, macro-F1 ranges from $0.781$ to $0.800$. At $\sigma=0.4$, instantaneous and memoryless reads fall to $0.641$ and $0.649$, while the homogeneous and heterogeneous memory banks retain $0.807$ and $0.775$. The heterogeneous-minus-instantaneous subject difference is $+0.125$ ($12/15$ positive, paired Wilcoxon $p=0.030$). Clean false-alarm rates are similar (instantaneous $0.094$, heterogeneous $0.090$ seed-mean). Transition-window F1 changes from $0.832$ to $0.848$, but the subject difference is not resolved ($6/15$ positive, $p=0.33$); all banks have zero median onset latency under the five-second stable-call definition. Temporal smoothing is useful under corruption, not for earlier detection in this protocol.
 
-\paragraph{Accelerometer-gated motion artefact.} Because the preceding corruption is synthetic, a second test gates its amplitude with the measured chest accelerometer. At each step, injected amplitude follows measured movement rather than being distributed uniformly. At the strongest gating, the instantaneous read falls from macro-F1 $0.914$ to $0.898$, while the memory bank remains near $0.92$. The $+0.032$ difference is positive across subjects (paired $p=0.04$), and a classical moving average gives a similar $+0.036$ difference (\siTempRef{app:ch5_robust}). The effect is smaller than under the synthetic injection, consistent with a mechanically stable chest strap and a largely seated protocol. Wrist measurements are examined in \cref{sec:ch5_deploy}.
+\paragraph{Accelerometer-gated motion artefact.} Because the preceding corruption is synthetic, a second test gates its amplitude with the measured chest accelerometer. At the strongest gating, the instantaneous read falls to $0.702$, the heterogeneous bank retains $0.791$, and the EMA reaches $0.810$. The heterogeneous-minus-instantaneous subject difference ($+0.087$) is not resolved ($p=0.084$), whereas EMA-minus-instantaneous is ($+0.112$, $p=0.035$; \siTempRef{app:ch5_robust}). The data-driven control therefore supports conventional temporal filtering under measured-motion corruption, but not a separate device-model advantage.
 
-\paragraph{Classical-filter control.} An exponential moving average applied to the same raw channels tests whether the noise robustness requires the device model. A single time constant matched to the lead cell reaches macro-F1 $0.927$ at $\sigma=0.4$, compared with $0.840$ for the instantaneous read and $0.916$ for the device bank ($+0.091$ over instantaneous, all fifteen subjects, $p<10^{-4}$). Spreading the moving-average timescales adds $+0.005$ (\textit{ns}), and the device's compressive nonlinearity adds $-0.008$ relative to that linear filter bank (\textit{ns}; \siTempRef{tab:ch5_filter}). These controls attribute the robustness to fading-memory filtering; the device-specific nonlinearity provides no resolved increment. The proposed device contribution is to perform this filtering through material relaxation, with no trained dynamics and at the core-power estimate of \cref{sec:ch5_deploy}. The multi-timescale benchmarks of \cref{sec:ch5_benchmarks,sec:ch5_physio} distinguish the heterogeneous bank; this single-timescale stress detector does not.
+\paragraph{Classical-filter control.} A single exponential moving average reaches macro-F1 $0.804$ at $\sigma=0.4$, compared with $0.641$ for instantaneous input; its paired subject gain is $+0.171$ ($p=0.022$). A linear multi-$\tau$ EMA bank reaches $0.811$, with no resolved gain over the single EMA ($+0.006$, $p=0.20$). The heterogeneous device model reaches $0.775$ and is lower than the EMA bank by $-0.052$ ($p=0.030$; \siTempRef{tab:ch5_filter}). Robustness is therefore attributable to temporal low-pass filtering, and the linear digital control is superior on this test. The proposed material role is passive filtering, not an accuracy advantage over that control.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{../figures/chapter5/robust_monitoring.pdf}
-  \caption[Continuous stress monitoring under sensor noise]{Continuous stress monitoring with device reservoirs (binary stress vs.\ baseline-plus-amusement, per-step, leave-one-subject-out, linear read-out). (a)~Detection macro-F1 against the magnitude $\sigma$ of injected sensor noise and motion-artefact bursts. Fading-memory banks remain near $0.92$, while instantaneous and memoryless controls decrease with noise; bands are $\pm 1$\,SD over seeds. (b)~At $\sigma=0.4$, the heterogeneous memory bank exceeds the instantaneous read for all fifteen subjects (paired Wilcoxon $p<10^{-4}$). Homogeneous and heterogeneous banks have similar scores, associating this result with fading memory rather than timescale spread.}
+  \caption[Continuous stress monitoring under sensor noise]{Continuous stress monitoring (binary stress vs.\ baseline-plus-amusement, per-step, leave-one-subject-out, linear read-out). (a)~Detection macro-F1 against injected corruption. At $\sigma=0.4$, instantaneous input falls to $0.641$, while homogeneous and heterogeneous memory banks retain $0.807$ and $0.775$; bands are $\pm 1$\,SD over seeds. (b)~The heterogeneous bank exceeds instantaneous input in $12/15$ subjects ($p=0.030$). The homogeneous bank's higher score shows that timescale spread is not required.}
   \label{fig:ch5_robust_monitoring}
 \end{figure}
 
-\paragraph{Cross-corpus replication.} The robustness test was repeated on the PhysioNet Non-EEG corpus of Birjandtalab et al.~\cite{Birjandtalab2016}: twenty subjects wearing an Affectiva Q wrist sensor for electrodermal activity and skin temperature, with pulse-oximeter heart rate, during relaxation and cognitive, emotional, and physical stress phases. Cognitive and emotional stress are compared with relaxation; the physical-exertion phase is held out because its elevated heart rate represents a different mechanism. With the same detector, clean macro-F1 is $\approx 0.65$--$0.68$, compared with $\approx 0.91$ on \WESAD{}, and the clean-stream memory difference is not resolved. Under injected noise, the instantaneous detector decreases from $0.651$ to $0.516$, while the fading-memory bank remains near $0.66$. At $\sigma=0.4$, the difference is $+0.130$, positive in nineteen of twenty subjects (paired Wilcoxon $p<10^{-5}$; \cref{tab:ch5_crosscorpus}). This independent corpus reproduces the noise-response ordering with a different sensor and population.
+\paragraph{Cross-corpus replication.} The robustness test was repeated on the PhysioNet Non-EEG corpus of Birjandtalab et al.~\cite{Birjandtalab2016}: twenty subjects wearing an Affectiva Q wrist sensor for electrodermal activity and skin temperature, with pulse-oximeter heart rate. Cognitive and emotional stress are compared with relaxation; physical exertion is excluded. On clean streams, seed-mean heterogeneous and instantaneous scores are $0.644$ and $0.639$; the representative-seed subject difference is not resolved ($p=0.39$). At $\sigma=0.4$, they are $0.629$ and $0.451$: a $+0.177$ gain, positive in all twenty subjects ($p=1.9\times10^{-6}$; \cref{tab:ch5_crosscorpus}). This independent corpus reproduces the noise-response ordering, while confirming that the clean-stream advantage is absent.
 
 \begin{table}[t]
   \centering
   \small
-  \caption[Cross-corpus replication on the PhysioNet Non-EEG dataset]{Noise-response comparison on the independent PhysioNet Non-EEG stress corpus~\cite{Birjandtalab2016} (twenty subjects; Affectiva Q wrist electrodermal activity and temperature plus pulse-oximeter heart rate; cognitive and emotional stress versus relaxation; leave-one-subject-out, linear read-out). At $\sigma=0.4$, the heterogeneous-minus-instantaneous difference is $+0.130$, positive in $19/20$ subjects ($p<10^{-5}$). Homogeneous and heterogeneous banks again have similar scores.}
+  \caption[Cross-corpus replication on the PhysioNet Non-EEG dataset]{Noise-response comparison on the independent PhysioNet Non-EEG stress corpus~\cite{Birjandtalab2016} (twenty subjects; leave-one-subject-out, linear read-out). At $\sigma=0.4$, the heterogeneous-minus-instantaneous difference is $+0.177$, positive in $20/20$ subjects ($p=1.9\times10^{-6}$). Clean-stream scores are comparable.}
   \label{tab:ch5_crosscorpus}
   \setlength{\tabcolsep}{8pt}
   \begin{tabular}{lcc}
     \toprule
     Detector & macro-F1 (clean) & macro-F1 ($\sigma=0.4$) \\
     \midrule
-    Instantaneous (no memory) & 0.651 & 0.516 \\
-    Homogeneous (memory)      & \textbf{0.682} & \textbf{0.657} \\
-    Heterogeneous (memory)    & 0.667 & 0.646 \\
+    Instantaneous (no memory) & 0.639 & 0.451 \\
+    Homogeneous (memory)      & \textbf{0.652} & \textbf{0.630} \\
+    Heterogeneous (memory)    & 0.644 & 0.629 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -323,12 +305,12 @@ The sustained \WESAD{} states can often be classified from the instantaneous sig
 
 The robustness of the previous section is a laboratory statement until two further questions are answered: whether the advantage survives a consumer-grade sensor, and what the device would cost to run. Both are answered from the same measured ingredients (the \WESAD{} wrist recordings and the device constants of \cref{ch:poc}) without any new assumption.
 
-\paragraph{Sensor site.} \WESAD{} records each session with both a chest strap and an Empatica E4 wrist band. The wrist band has fewer and noisier channels: skin conductance, skin temperature, and photoplethysmography-derived heart rate, without respiration. On the wrist data (\cref{tab:ch5_wrist}), the clean macro-F1 of the instantaneous detector falls from $0.914$ to $0.881$, whereas the fading-memory reservoir changes from $0.920$ to $0.922$. The memory advantage is consequently larger on the wrist than on the chest ($+0.041$ versus $+0.006$ on clean streams and $+0.069$ under injected noise). Fading memory also reduces the wrist false-alarm rate from $0.062$ to $0.040$.
+\paragraph{Sensor site.} \WESAD{} records each session with both a chest strap and an Empatica E4 wrist band. The wrist band has fewer and noisier channels: skin conductance, skin temperature, and photoplethysmography-derived heart rate, without respiration. On clean wrist data (\cref{tab:ch5_wrist}), instantaneous and heterogeneous scores are $0.724$ and $0.736$. At $\sigma=0.4$ they are $0.615$ and $0.732$; the paired subject gain is $+0.106$ ($11/15$ positive, $p=0.035$). The corresponding chest scores are $0.641$ and $0.775$. Clean wrist false-alarm rates are not improved (instantaneous $0.112$, heterogeneous $0.115$), so the supported benefit is robustness under injected corruption rather than fewer clean-stream alarms.
 
 \begin{table}[t]
   \centering
   \small
-  \caption[Stress detection: chest versus consumer wrist sensor]{Continuous binary stress-detection macro-F1 on the \WESAD{} chest strap versus the Empatica E4 wrist band (leave-one-subject-out, linear read-out). Moving to the noisier consumer sensor degrades the instantaneous (static) detector but not the fading-memory reservoir, so the memory advantage is larger on the wrist; $\sigma$ is the injected sensor-noise level of \cref{fig:ch5_robust_monitoring}.}
+  \caption[Stress detection: chest versus consumer wrist sensor]{Continuous binary stress-detection macro-F1 on the \WESAD{} chest strap versus the Empatica E4 wrist band (leave-one-subject-out, linear read-out; seed means). Under injected corruption, the temporal bank exceeds instantaneous input at both sites; $\sigma$ follows \cref{fig:ch5_robust_monitoring}.}
   \label{tab:ch5_wrist}
   \setlength{\tabcolsep}{5pt}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xcccc@{}}
@@ -337,8 +319,8 @@ The robustness of the previous section is a laboratory statement until two furth
     \cmidrule(lr){2-3}\cmidrule(lr){4-5}
     Detector & clean & $\sigma=0.4$ & clean & $\sigma=0.4$ \\
     \midrule
-    Instantaneous (no memory)   & 0.914 & 0.840 & 0.881 & 0.847 \\
-    Memory reservoir (het)      & \textbf{0.920} & \textbf{0.916} & \textbf{0.922} & \textbf{0.916} \\
+    Instantaneous (no memory)   & 0.781 & 0.641 & 0.724 & 0.615 \\
+    Memory reservoir (het)      & \textbf{0.791} & \textbf{0.775} & \textbf{0.736} & \textbf{0.732} \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -353,26 +335,26 @@ The estimate covers only the reservoir core: device charging and read-out operat
 
 Performance depends on the overlap between device and task timescales (\cref{fig:ch5_tau_coverage}). In the single-composition sweep, the lead cell gives the highest memory capacity for the seconds-scale benchmark (\cref{fig:ch5_composition_sweep}). For the multi-lag physiological task, no single cell covers the full delay range, and the heterogeneous bank gives the highest single-bank score (\cref{tab:ch5_physio}).
 
-\paragraph{Effect of timescale breadth.} \Cref{tab:ch5_summary} separates the effect of fading memory from that of timescale breadth. Both homogeneous and heterogeneous memory banks outperform memoryless and instantaneous baselines, with gains of up to $+0.08$ macro-F1 under sensor noise (\cref{sec:ch5_robust,sec:ch5_deploy}). The bounded benchmark does not resolve a total linear-memory advantage: the heterogeneous-minus-homogeneous difference is $+0.33\pm0.60$, positive in $7/10$ seeds. It does, however, raise nonlinear information-processing capacity and change the lag profile. The subject-level physiological and continuous-affect comparisons provide independent tests of whether a multi-timescale bank helps real streams; their inferential unit is the held-out subject rather than the random seed.
+\paragraph{Effect of timescale breadth.} \Cref{tab:ch5_summary} separates fading memory from timescale breadth. The bounded benchmark does not resolve a total linear-memory advantage: the heterogeneous-minus-homogeneous difference is $+0.33\pm0.60$, positive in $7/10$ seeds. It does raise nonlinear information-processing capacity and change the lag profile. On real physiology, heterogeneity gives a modest $+0.010$ context-reconstruction gain over the stronger homogeneous control, but loses $0.021$ macro-F1 on sustained three-class labels. Under corruption, the homogeneous bank is also stronger. The task, not diversity alone, determines the useful distribution.
 
-When one slow timescale dominates, as in the sustained stress labels and single-channel monitoring task, the best-matched homogeneous bank is as good as or marginally better than the heterogeneous bank. Across an unknown mixture of tasks, a composition-diverse bank trades at most about $0.01$ macro-F1 on the single-timescale tasks considered here for larger gains on the multi-timescale tasks. The available variation comes from composition and device-to-device scatter; chemistry and drive amplitude provide additional, sample-limited axes in \cref{ch:comparative}.
+When one slow timescale dominates, as in the sustained stress labels and stress-monitoring task, the best-matched homogeneous bank is better by about $0.01$--$0.03$ macro-F1. The available variation comes from composition and device-to-device scatter; chemistry and drive amplitude provide additional, sample-limited axes in \cref{ch:comparative}.
 
 \begin{table}[t]
   \centering
   \small
-  \caption[Fading memory and timescale spread across the affective workload]{Comparison of instantaneous, homogeneous, and heterogeneous banks across the affective tasks in this chapter. Both memory banks exceed the instantaneous baseline, with the largest differences under sensor noise. The heterogeneous bank gives the highest physiological-context score, while the best-matched homogeneous bank gives the highest score for sustained labels and single-channel monitoring; homogeneous--heterogeneous differences on the classification tasks remain below about $0.01$ macro-F1. Bold marks the highest score per row. Scores from \cref{tab:ch5_physio,tab:ch5_wesad} and \cref{sec:ch5_robust,sec:ch5_deploy}.}
+  \caption[Fading memory and timescale spread across the affective workload]{Comparison of instantaneous, homogeneous, and heterogeneous banks across the affective tasks in this chapter. Temporal banks show their largest gains under corruption. Heterogeneity gives the highest physiological-context score, whereas the homogeneous bank is strongest on most classification rows. Bold marks the highest score per row.}
   \label{tab:ch5_summary}
   \setlength{\tabcolsep}{4pt}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xlccc@{}}
     \toprule
     Affective task & Metric & Instantaneous & Homogeneous & Heterogeneous \\
     \midrule
-    Physiological context (multi-$\tau$) & $R^2$       & 0.673 & 0.744 & \textbf{0.756} \\
-    Three-class affect tracking          & macro-F1    & 0.709 & 0.753 & \textbf{0.758} \\
-    Stress monitoring, clean             & macro-F1    & 0.914 & \textbf{0.922} & 0.920 \\
-    Stress monitoring, $\sigma{=}0.4$    & macro-F1    & 0.840 & \textbf{0.917} & 0.916 \\
-    Wrist stress, clean                  & macro-F1    & 0.881 & \textbf{0.930} & 0.922 \\
-    Wrist stress, $\sigma{=}0.4$         & macro-F1    & 0.847 & \textbf{0.918} & 0.916 \\
+    Physiological context (multi-$\tau$) & $R^2$       & 0.646 & 0.692 & \textbf{0.701} \\
+    Three-class affect tracking          & macro-F1    & 0.482 & \textbf{0.545} & 0.524 \\
+    Stress monitoring, clean             & macro-F1    & 0.781 & \textbf{0.800} & 0.791 \\
+    Stress monitoring, $\sigma{=}0.4$    & macro-F1    & 0.641 & \textbf{0.807} & 0.775 \\
+    Wrist stress, clean                  & macro-F1    & 0.724 & 0.730 & \textbf{0.736} \\
+    Wrist stress, $\sigma{=}0.4$         & macro-F1    & 0.615 & \textbf{0.738} & 0.732 \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -398,15 +380,17 @@ When one slow timescale dominates, as in the sustained stress labels and single-
 
 \paragraph{Heterogeneity axes.} The quantitative comparisons span the replicated \PEO{}/\LiTf{} composition grid; the single recovered \PEO{}~0.15 substrate is excluded. Chemistry and drive amplitude enter only as secondary controls because their matched cells contain at most two substrates (\cref{ch:comparative}); Demonstration~B is a proof of principle for composition heterogeneity, not a powered comparison across chemistries. The cards index composition, but thickness and other fabrication variables are not fully separable from that design. The available covariate checks do not explain the composition association, yet they cannot prove composition is the sole cause (\cref{fig:ch4_thickness_control}, \cref{sec:ch4_materials}).
 
-\paragraph{Corpora and negative controls.} The affective results use \WESAD{} as the main corpus. Noise robustness is replicated on the PhysioNet Non-EEG dataset (\cref{sec:ch5_robust}), and continuous valence and arousal are tested on \CASE{} (\cref{sec:ch5_case}). A broader multi-corpus study remains future work. Two comparisons do not show a device-specific improvement: timescale heterogeneity does not separately improve final-label classification when one slow timescale dominates (\cref{sec:ch5_wesad}), and the nonlinear device encoding does not exceed a linear multi-$\tau$ filter on smooth continuous-affect regression (\cref{sec:ch5_case}). The corrected random-input benchmark likewise does not resolve a total linear-memory advantage, although it does show higher nonlinear capacity and a shifted lag profile.
+\paragraph{Corpora, protocol, and negative controls.} The affective results use \WESAD{} as the main corpus, and noise robustness is replicated on the PhysioNet Non-EEG dataset (\cref{sec:ch5_robust}). A broader multi-corpus study remains future work. In \WESAD{}, the experimental blocks follow a fixed protocol rather than a counterbalanced order. Affect label, elapsed time, and slow session drift are therefore partly entangled: causal prefix calibration prevents future-sample leakage, but it cannot establish that a classifier is specific to affect rather than protocol position. The sustained block labels also do not provide independent ground truth for physiological onset, so the transition and latency analyses quantify agreement with protocol boundaries, not the onset of an internal state.
+
+The strongest robustness results use synthetic, channel-wise corruption and should be read as controlled stress tests. The measured-motion gate is a more realistic but weaker control and does not resolve a heterogeneous-over-instantaneous advantage. Two further comparisons do not show a device-specific improvement: timescale heterogeneity lowers the seed-mean final-label score relative to the slow homogeneous control (\cref{sec:ch5_wesad}), and the nonlinear device encoding is inferior to a linear multi-$\tau$ EMA under strong synthetic corruption (\siTempRef{tab:ch5_filter}). The corrected random-input benchmark likewise does not resolve a total linear-memory advantage, although it does show higher nonlinear capacity and a shifted lag profile.
 
 %% ------------------------------------------------------------
 \section{Summary}\label{sec:ch5_conclusions}
 %% ------------------------------------------------------------
 
-Behavioural models fitted to the measurements of \cref{ch:comparative} support temporal-computing simulations with a linear read-out. Once the node update is bounded by the measured potentiation peak and pulse count, the heterogeneous bank changes total linear memory only from $4.19$ to $4.52$ ($7/10$ seeds), but increases mean information-processing capacity from $6.31$ to $10.33$, chiefly through nonlinear degree-two terms. The application results are evaluated separately on held-out subjects. On \WESAD{}, the models reach leave-one-subject-out macro-F1 scores of $0.894$ for binary stress and $0.758$ for three-class streaming classification. Under injected sensor noise, fading-memory banks remain near $0.92$ macro-F1 while the instantaneous baseline falls to $0.84$. A classical moving average matches this robustness, attributing it to fading-memory filtering rather than to device-specific nonlinearity.
+Behavioural models fitted to the measurements of \cref{ch:comparative} support temporal-computing simulations with a linear read-out. Once the node update is bounded by the measured potentiation peak and pulse count, the heterogeneous bank changes total linear memory only from $4.19$ to $4.52$ ($7/10$ seeds), but increases mean information-processing capacity from $6.31$ to $10.33$, chiefly through nonlinear degree-two terms. On \WESAD{}, a lead-cell reservoir scores $0.669$ on windowed binary EDA, below a static control ($0.714$). Streaming three-class macro-F1 is $0.524\pm0.032$ for the heterogeneous bank and $0.545\pm0.037$ for homogeneous memory. Under synthetic corruption, the heterogeneous bank retains $0.775$ while instantaneous input falls to $0.641$, but a linear EMA bank reaches $0.811$ and significantly exceeds the device model.
 
-The additional value of a timescale distribution depends on the task and metric. It is not resolved for total random-input linear memory, sustained \WESAD{} labels, or single-timescale stress monitoring. It is larger for nonlinear capacity, and the real-stream comparisons test it at the independent-subject level. Composition-dependent relaxation and the screened within-composition $t_{1/2}$ spread provide the distributions used in these simulations.
+The additional value of a timescale distribution depends on the task and metric. It is not resolved for total random-input linear memory or sustained \WESAD{} labels. It is large for nonlinear capacity and modest but subject-resolved for multi-lag physiological reconstruction ($+0.010$ $R^2$ over the slow homogeneous control). Noise robustness replicates on the independent Non-EEG corpus, but represents generic temporal filtering rather than a device-specific accuracy advantage.
 
 The next experimental steps are a matched-amplitude pulse protocol that varies pulse count and cadence, a replicated study of chemistry and drive-amplitude heterogeneity, and a wired device bank that tests the behavioural-model predictions in hardware.
 

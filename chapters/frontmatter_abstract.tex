@@ -49,12 +49,13 @@ survey, and the data do not support the hypothesised \ce{Li+} > \ce{Na+} >
 dynamics drive bounded reservoir-computing simulations. A heterogeneous composition
 bank does not resolve a total linear-memory advantage across random seeds, but raises
 mean information-processing capacity from $6.31$ to $10.33$, chiefly through nonlinear terms. Device-model banks
-classify stress on the WESAD corpus (leave-one-subject-out macro-F1 of $0.894$
-binary and $0.758$ three-class), although the heterogeneity increment is not
-resolved for the sustained labels. On the CASE corpus, an equivalent linear
-multi-timescale filter, not the device bank, gains $+0.176$ in concordance
-correlation over a single-timescale filter; device-internal heterogeneity
-contributes only $+0.005$, within random-seed variation.
+encode multi-lag WESAD physiology with a modest heterogeneous-bank advantage
+($R^2=0.701$ versus $0.692$ for the stronger homogeneous control), but the
+heterogeneous increment is absent for sustained affect labels: three-class
+macro-F1 is $0.524$ versus $0.545$ for homogeneous memory. Under strong injected
+noise the temporal bank exceeds instantaneous input on WESAD and an independent
+PhysioNet corpus, while a linear exponential-moving-average control matches or
+exceeds the device model.
 
 The replicated PEO/lithium-triflate series identifies composition as a control
 of fading memory, while the sample-limited chemistry survey does not support the
@@ -95,17 +96,16 @@ evanescente entre aproximadamente 2 y 20\,s. Las sustituciones de matriz, anión
 catión siguen siendo un estudio limitado por el tamaño muestral, y los datos no
 respaldan el orden catiónico hipotético \ce{Li+} > \ce{Na+} > \ce{K+}. Los
 modelos de comportamiento compactos ajustados a la dinámica medida
-alimentan simulaciones de computación de reservorio. Un banco heterogéneo de
-composiciones aumenta la capacidad de memoria lineal en un factor de $1{,}54$ y
-la capacidad de procesamiento de información de $7{,}1$ a $11{,}6$. Los bancos
-de modelos de dispositivo clasifican el estrés en el corpus WESAD (macro-F1 de
-$0{,}894$ binario y $0{,}758$ de tres clases con validación
-dejando-un-sujeto-fuera), aunque no se resuelve el incremento atribuible a la
-heterogeneidad para las etiquetas sostenidas. En el corpus CASE, un filtro
-lineal multiescala, no el banco de dispositivos, obtiene una ganancia de
-$+0{,}176$ en correlación de concordancia frente a un filtro de una sola escala;
-la heterogeneidad interna del dispositivo aporta solo $+0{,}005$, dentro de la
-variación entre inicializaciones aleatorias.
+alimentan simulaciones de computación de reservorio. Un banco heterogéneo no
+resuelve una ventaja en memoria lineal total entre semillas, pero eleva la
+capacidad media de procesamiento de información de $6{,}31$ a $10{,}33$,
+principalmente mediante términos no lineales. En la fisiología multirretardo de
+WESAD aporta una ventaja modesta ($R^2=0{,}701$ frente a $0{,}692$), pero no en
+las etiquetas sostenidas: el macro-F1 de tres clases es $0{,}524$ frente a
+$0{,}545$ con memoria homogénea. Bajo ruido inyectado intenso, el banco temporal
+supera a la entrada instantánea en WESAD y en un corpus PhysioNet independiente,
+aunque un filtro lineal de media móvil exponencial iguala o supera al modelo de
+dispositivo.
 
 La serie replicada PEO/triflato de litio identifica la composición como variable
 de control de la memoria evanescente, mientras que el estudio químico limitado
@@ -149,16 +149,15 @@ composicions replicada ajusta el temps de memòria evanescent entre aproximadame
 limitat per la grandària mostral, i les dades no confirmen l'ordre catiònic
 hipotètic \ce{Li+} > \ce{Na+} > \ce{K+}. Els models de comportament
 compactes ajustats a la dinàmica mesurada alimenten simulacions de computació de
-reservori. Un banc heterogeni de composicions augmenta la capacitat de memòria
-lineal en un factor de $1{,}54$ i la capacitat de processament d'informació de
-$7{,}1$ a $11{,}6$. Els bancs de models de dispositiu classifiquen l'estrès en el
-corpus WESAD (macro-F1 de $0{,}894$ binari i $0{,}758$ de tres classes amb
-validació deixant-un-subjecte-fora), encara que l'increment atribuïble a
-l'heterogeneïtat no queda resolt per a les etiquetes sostingudes. En el corpus
-CASE, un filtre lineal multiescala, no el banc de dispositius, obté un guany de
-$+0{,}176$ en correlació de concordança respecte d'un filtre d'una sola escala;
-l'heterogeneïtat interna del dispositiu aporta només $+0{,}005$, dins de la
-variació entre inicialitzacions aleatòries.
+reservori. Un banc heterogeni no resol un avantatge en memòria lineal total entre
+llavors, però eleva la capacitat mitjana de processament d'informació de $6{,}31$
+a $10{,}33$, principalment mitjançant termes no lineals. En la fisiologia
+multiretard de WESAD aporta un avantatge modest ($R^2=0{,}701$ enfront de
+$0{,}692$), però no en les etiquetes sostingudes: el macro-F1 de tres classes és
+$0{,}524$ enfront de $0{,}545$ amb memòria homogènia. Sota soroll injectat intens,
+el banc temporal supera l'entrada instantània en WESAD i en un corpus PhysioNet
+independent, encara que un filtre lineal de mitjana mòbil exponencial iguala o
+supera el model de dispositiu.
 
 La sèrie replicada PEO/triflat de liti identifica la composició com a variable
 de control de la memòria evanescent, mentre que l'estudi químic limitat per la

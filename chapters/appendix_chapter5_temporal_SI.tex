@@ -16,7 +16,7 @@ with the per-cell tables of \cref{app:ch4_celltables}, it makes the in-silico
 results reproducible without consulting the analysis scripts
 (\path{scripts/ch5_figures.py}, \path{scripts/ch5_physio_context.py},
 \path{scripts/ch5_onset.py}, \path{scripts/ch5_deployment.py},
-\path{scripts/ch5_noneeg.py}, \path{scripts/ch5_case.py}).
+\path{scripts/ch5_noneeg.py}).
 
 \section{Parameter-Card Sourcing}\label{app:ch5_cards}
 
@@ -57,16 +57,28 @@ leakage.
     Read-out & single linear ridge regression \\
     Bank size $N$ & 24 (benchmarks); 48 (physiology/affect) \\
     Algorithmic variability & 10 random input/bank seeds; means $\pm$ SD and sign consistency reported; seeds are not inferential replicates \\
-    Inferential unit & independent held-out subject for \WESAD{}/\CASE{}; independently fabricated device for experimental comparisons \\
+    Inferential unit & independent held-out subject for physiological corpora; independently fabricated device for experimental comparisons \\
     Memory capacity & $\mathrm{MC}_k$ summed over lags, random uniform input \cite{Jaeger2002STM} \\
     NARMA & NARMA-10 system identification, NRMSE \cite{AtiyaParlos2000} \\
     Information-processing capacity & degree-1 (linear) + degree-2 (nonlinear), bounded by $N$ \cite{Dambre2012} \\
     Affective corpus & \WESAD{} chest signals, leave-one-subject-out over 15 subjects \cite{Schmidt2018WESAD} \\
     Streaming cadence & $\Delta t=\SI{1}{\second}$; reconstruction delays $1,3,8,20,45$\,s \\
+    Subject calibration & first \SI{60}{\second} only; 5th/95th percentiles mapped monotonically to 0.25/0.75; no later-sample or label information \\
+    Heart rate & causal band-pass/integration; completed RR intervals assigned by past-value hold \\
+    Timeline handling & reservoir and causal smoother run over the full session; undefined-label samples masked only for fit/score \\
+    Ridge convention & mean-squared-error objective plus $\lambda=10^{-3}$ (Gram matrix divided by sample count) \\
     Affect scoring & class-balanced macro-F1 \\
     \bottomrule
   \end{tabularx}
 \end{table}
+
+For all physiological corpora, the raw-stream caches store a schema identifier and
+a signature of the source files; a preprocessing or source mismatch forces
+regeneration. ECG and wrist-BVP filters are causal, and heart rate at time $t$ is
+the most recent completed RR interval rather than a linear interpolation involving
+the next beat. The calibration transform is a Cauchy cumulative map centred on the
+initial-prefix robust range, so later out-of-range values retain ordering rather
+than collapsing at a hard clipping boundary.
 
 \section{Measured Device-to-Device Scatter}\label{app:ch5_scatter}
 
@@ -112,11 +124,12 @@ the training and held-out streams so the comparison isolates each architecture's
 intrinsic noise tolerance. Robustness curves are seed-averaged over three bank/noise
 seeds; the per-subject significance test at $\sigma=0.4$ is a paired Wilcoxon
 signed-rank over the fifteen subjects. Reported metrics are the binary macro-F1, the
-pooled false-alarm rate (fraction of not-stress steps called stress), and, for
-completeness (though they do not separate the banks), the transition-window
-macro-F1 (steps within $\pm\SI{20}{\second}$ of a label change) and the onset
-detection latency (time to the first $\geq\SI{5}{\second}$ sustained stress call after
-each onset).
+pooled false-alarm rate (fraction of scored not-stress steps called stress), and,
+for completeness, the transition-window macro-F1 and onset latency. Both are
+computed on the full physical timeline: transition windows lie within
+$\pm\SI{20}{\second}$ of entry to or exit from a contiguous valid-label segment,
+and each stress onset is the start of a contiguous label-2 segment. Undefined
+intervals are never concatenated before smoothing or event detection.
 
 The cross-corpus replication (\cref{tab:ch5_crosscorpus}, \path{scripts/ch5_noneeg.py})
 applies the \emph{same} detector and noise model to the PhysioNet Non-EEG corpus
@@ -130,17 +143,15 @@ not-stress, with the physical-stress (exercise) phase excluded.
 \paragraph{Real-motion corruption.} To confirm the robustness is not an artefact of the
 Gaussian noise model, the corruption is also driven by the \emph{measured} chest
 accelerometer (\path{add_motion_noise}, \path{load_motion} in the scripts). A per-step
-motion index is the magnitude of the gravity-removed acceleration, RMS-smoothed over
-\SI{1}{\second} and robustly scaled to $[0,1]$ per subject; the injected noise standard
+motion index is the magnitude of the gravity-removed acceleration, causally
+RMS-smoothed over \SI{1}{\second} and scaled from the initial calibration prefix; the injected noise standard
 deviation at each step is $\text{scale}\times(0.05 + \text{motion})$, with an amplified
 artefact burst where the index exceeds $0.6$, so corruption lands where the wearer
-actually moves. Across a corruption scale of $0$ to $0.8$ the instantaneous detector
-falls from macro-F1 $0.914$ to $0.898$ while the memory bank holds near $0.92$; at the
-strongest gating the memory-minus-instantaneous advantage is $+0.032$ (paired Wilcoxon
-$p=0.04$, $r_{\mathrm{rb}}=+0.6$) and the single-$\tau$ moving average matches it
-($+0.036$). The advantage is smaller than under the synthetic injection because the
-chest strap is mechanically stable and the protocol largely seated; the wrist site
-(\cref{tab:ch5_wrist}) is where motion artefact dominates.
+actually moves. At corruption scale $0.8$, instantaneous, heterogeneous, and EMA
+scores are $0.702$, $0.791$, and $0.810$. The heterogeneous-minus-instantaneous
+subject difference is $+0.087$ ($p=0.084$, not resolved); EMA-minus-instantaneous is
+$+0.112$ ($p=0.035$). Thus the measured-motion control supports conventional
+temporal filtering, not a device-specific effect.
 
 \section{Control Experiments}\label{app:ch5_controls}
 
@@ -164,7 +175,7 @@ is the low-pass advantage of temporal memory over an instantaneous read.
 
 \begin{table}[t]
   \centering
-  \caption[Classical exponential-moving-average control]{Classical-filter control for the continuous stress monitor (binary macro-F1, leave-one-subject-out, $\sigma$ the injected sensor noise of \cref{fig:ch5_robust_monitoring}). A single-time-constant moving average of the raw channels recovers the robustness an instantaneous read loses, and a linear moving-average bank spread over the device timescale range adds little; the device reservoir's compressive nonlinearity adds nothing further on this single-timescale task. Paired at $\sigma=0.4$ over the fifteen subjects: EMA(single)$-$instantaneous $=+0.091$ ($p<10^{-4}$, $r_{\mathrm{rb}}=+1.0$); EMA(bank)$-$EMA(single) $=+0.005$ (\textit{ns}); reservoir$-$EMA(bank) $=-0.008$ (\textit{ns}).}
+  \caption[Classical exponential-moving-average control]{Classical-filter control for the continuous stress monitor (binary macro-F1, leave-one-subject-out). Paired at $\sigma=0.4$ over fifteen subjects: EMA(single)$-$instantaneous $=+0.171$ ($p=0.022$, $r_{\mathrm{rb}}=+0.67$); EMA(bank)$-$EMA(single) $=+0.006$ ($p=0.20$); device reservoir$-$EMA(bank) $=-0.052$ ($p=0.030$, $r_{\mathrm{rb}}=-0.63$). The digital linear filter is the stronger control.}
   \label{tab:ch5_filter}
   \footnotesize
   \setlength{\tabcolsep}{6pt}
@@ -172,10 +183,10 @@ is the low-pass advantage of temporal memory over an instantaneous read.
     \toprule
     Detector (linear read-out on \dots) & clean & $\sigma=0.4$ \\
     \midrule
-    Instantaneous channels (no memory)            & 0.914 & 0.840 \\
-    EMA, single $\tau$ (lead cell)                 & \textbf{0.937} & 0.927 \\
-    EMA bank, $\tau$ spread (linear reservoir)     & 0.926 & \textbf{0.930} \\
-    Device reservoir (nonlinear, heterogeneous)    & 0.920 & 0.916 \\
+    Instantaneous channels (no memory)            & 0.781 & 0.641 \\
+    EMA, single $\tau$ (lead cell)                 & 0.803 & 0.804 \\
+    EMA bank, $\tau$ spread (linear reservoir)     & \textbf{0.807} & \textbf{0.811} \\
+    Device reservoir (nonlinear, heterogeneous)    & 0.791 & 0.775 \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -245,9 +256,8 @@ is reproduced by \path{scripts/ch5_reservoir.py}.
 \paragraph{Chance baselines.} Under the streaming three-class protocol of
 \cref{sec:ch5_wesad}, a majority-class predictor scores macro-F1 $0.23$ and a
 stratified-random predictor $0.33$ (leave-one-subject-out, per step), so the
-reservoir's $0.758$ is well above chance. Significance of the bank comparisons is
-assessed across the fifteen independent held-out subjects, so within-subject temporal
-autocorrelation does not inflate it.
+reservoir's $0.524$ seed-mean score is above both floors. The ten node-mask seeds
+quantify algorithmic sensitivity and are not treated as inferential replicates.
 
 \paragraph{Drive-boosted tonic-node extension.} The minutes-scale tonic gap of
 \cref{fig:ch5_tau_coverage} is probed by extending the heterogeneous bank with
@@ -259,9 +269,9 @@ the extension raises the long-lag tail beyond \SI{75}{\second}
 ($\mathrm{MC}_{k>15}$ from $0.20$ to $0.91$, positive in all ten seed pairs) and raises total
 capacity from $4.52$ to $5.03$. On the physiological-context reconstruction, with the
 target delays extended to $90$ and \SI{120}{\second} so the genuinely tonic context is
-present, the slow-band held-out $R^2$ rises from $0.672$ to $0.690$
-($+0.019$, positive in all ten seed pairs) and the overall
-$R^2$ by $+0.009$ (\path{tonic_extension} in \path{scripts/ch5_physio_context.py}). The
+present, the slow-band held-out $R^2$ rises from $0.587$ to $0.610$.
+The matched-seed gain is $+0.023\pm0.028$ and positive in $8/10$ draws; the overall
+$R^2$ rises by $+0.008$ (\path{tonic_extension} in \path{scripts/ch5_physio_context.py}). Seeds quantify algorithmic sensitivity and are not used for a population-level test. The
 extension is not part of the measured composition banks anywhere else in the chapter.
 
 \section{Deployment Envelope}\label{app:ch5_deploy}
@@ -298,58 +308,6 @@ $N\,K$ multiply--accumulates per step at an assumed \SI{1}{\pico\joule} per oper
     Average power (1\,Hz, always-on) & $\approx\SIrange{1.2}{2.4}{\micro\watt}$ ($N{=}24$--48) & --- \\
     Read-out compute & $NK$ MACs/step ($<\SI{1}{\nano\joule}$) & --- \\
     Operating regime & sub-kHz (affect is sub-Hz) & --- \\
-    \bottomrule
-  \end{tabularx}
-\end{table}
-
-\section{Continuous Affect: CASE Protocol and Results}\label{app:ch5_case}
-
-\Cref{tab:ch5_case} gives the full continuous valence/arousal result behind
-\cref{sec:ch5_case} (\path{scripts/ch5_case.py}). The \CASE{} corpus
-\cite{Sharma2019CASE} (open access; figshare \texttt{10.6084/m9.figshare.8869157})
-provides, for thirty subjects, a continuous joystick annotation of valence and
-arousal (range $[0.5,9.5]$, \SI{20}{\hertz}) synchronised with eight physiological
-channels at \SI{1}{\kilo\hertz}. We use the four slow channels that match the device
-band and the \WESAD{} set -- electrodermal activity, respiration, skin temperature,
-and a heart rate recovered from the electrocardiogram by the same robust R-peak
-detector used for \WESAD{} -- resampled to the $\Delta t=\SI{1}{\second}$ reservoir
-cadence over the eight emotional videos (the blue baseline clips are excluded),
-per-subject robustly scaled exactly as the \WESAD{} streams. The reservoir state is
-reset and a \SI{10}{\second} washout dropped at each video boundary. The read-out is a
-single linear ridge regression predicting valence and arousal jointly,
-leave-one-subject-out, scored by Lin's concordance correlation coefficient (CCC)
-\cite{Lin1989CCC}, $\mathrm{CCC}=2\,\mathrm{cov}(y,\hat y)/[\sigma_y^2+\sigma_{\hat y}^2+(\mu_y-\mu_{\hat y})^2]$.
-
-Two classical controls bound the device. The \emph{EMA} rows replace the reservoir
-with an exponential moving average of the raw channels fed to the same read-out: a
-single time constant (lead cell), and a bank spread over the device timescale range
-(\SIrange{3}{26}{\second}). The \emph{per-channel} device bank gives each node a
-single-channel input mask instead of the random multi-channel mask -- the
-apples-to-apples device analogue of the linear EMA bank -- so the device-minus-EMA
-gap isolates the compressive nonlinearity rather than the mask. Paired Wilcoxon tests
-over the thirty held-out subjects (mean CCC per subject, seed-averaged):
-$\tau$-spread $-$ single-$\tau$ (EMA) $=+0.176$ ($27/30$, $p=1.6\times10^{-7}$,
-$r_{\mathrm{rb}}=+0.94$); memory $-$ instantaneous $=+0.079$ ($24/30$,
-$p=1.2\times10^{-4}$); per-channel device $-$ EMA bank $=-0.047$ ($p=6.6\times10^{-3}$);
-heterogeneous $-$ homogeneous device $=+0.005$ ($p=0.18$, \textit{ns}).
-
-\begin{table}[t]
-  \centering
-  \caption[Continuous valence/arousal on CASE]{Held-out concordance correlation coefficient (CCC) for continuous valence and arousal on \CASE{}~\cite{Sharma2019CASE} ($N=48$ nodes, leave-one-subject-out, linear ridge read-out; reservoir/memoryless rows are means over ten bank seeds). A single timescale barely beats the instantaneous read; a \emph{spread} of timescales (the linear $\tau$-spread EMA bank, bold) nearly doubles it. The device banks capture much of that spread but, on this smooth regression, trail the clean linear filter; the per-channel device recovers part of the gap that the random cross-channel mask costs.}
-  \label{tab:ch5_case}
-  \footnotesize
-  \setlength{\tabcolsep}{7pt}
-  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xccc@{}}
-    \toprule
-    Read-out features & CCC valence & CCC arousal & CCC mean \\
-    \midrule
-    Instantaneous (no memory)            & 0.178 & 0.320 & 0.249 \\
-    Memoryless bank                      & 0.232 & 0.375 & 0.304 \\
-    EMA, single $\tau$ (classical)       & 0.170 & 0.290 & 0.230 \\
-    \textbf{EMA bank, $\tau$ spread (classical)} & \textbf{0.311} & \textbf{0.516} & \textbf{0.413} \\
-    Device, homogeneous (lead $\tau$)    & 0.240 & 0.433 & 0.337 \\
-    Device, heterogeneous (mixed mask)   & 0.247 & 0.440 & 0.344 \\
-    Device, heterogeneous (per-channel)  & 0.258 & 0.458 & 0.358 \\
     \bottomrule
   \end{tabularx}
 \end{table}
