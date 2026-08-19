@@ -462,8 +462,9 @@ def stream_subject(U, lab, dt):
     """Resample a subject's full (T,C) scaled stream + labels to the reservoir step
     dt (i.e. 1/dt Hz). Returns (Us (S,C), labs (S,))."""
     fs_out = 1.0 / dt
-    S = max(int(len(U) / SLOW_FS * fs_out), 1)
-    Us = np.column_stack([_resample(U[:, c], SLOW_FS, fs_out) for c in range(U.shape[1])])
+    cols = [_resample(U[:, c], SLOW_FS, fs_out) for c in range(U.shape[1])]
+    S = min(len(col) for col in cols)
+    Us = np.column_stack([col[:S] for col in cols])
     return Us, _resample_labels(lab, S)
 
 

@@ -37,6 +37,14 @@ def test_causal_hold_does_not_use_the_next_rr_interval():
     assert np.array_equal(held, [70.0, 70.0, 80.0, 120.0])
 
 
+def test_stream_resampling_keeps_feature_and_label_lengths_equal():
+    U = np.arange(31 * 2, dtype=float).reshape(31, 2)
+    labels = np.ones(31, dtype=int)
+    for dt in (0.5, 1.0, 2.0, 4.0):
+        Us, ls = wesad.stream_subject(U, labels, dt)
+        assert len(Us) == len(ls)
+
+
 def test_binary_loso_retains_unlabelled_timeline_gaps():
     labels = np.array([1, 1, 0, 0, 2, 2, 1, 1])
     score = labels != 0
@@ -64,4 +72,3 @@ def test_case_per_channel_bank_uses_bounded_nodes_and_one_hot_masks():
     nodes = case._build_nodes("heterogeneous_perchan", load_cards(li_only=True), seed=3)
     assert all(isinstance(node, ReservoirNode) for node in nodes)
     assert all(np.count_nonzero(node.w) == 1 for node in nodes)
-
