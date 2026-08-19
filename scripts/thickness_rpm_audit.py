@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
-"""Thickness / spin-coat-RPM confound audit for the Chapter 3-4 composition spine.
+"""Thickness / spin-coat-RPM covariate audit for the Chapter 3-4 composition spine.
 
 Run from the repo root:  python3 scripts/thickness_rpm_audit.py
 
 Question (raised 2026-06-04): devices were spin-coated at different RPM, and RPM
 was sometimes (but not always) raised for higher PEO/LiTr concentrations to thin
 the otherwise-thicker film. Does this deliberate thickness tuning contaminate the
-composition claims of Chapter 3 (and therefore the Chapter-4 parameter cards)?
+composition associations of Chapter 4 (and therefore the Chapter-5 model inputs)?
 
 Source of truth for thickness = DATABASE/DEVICES_PROFILOMETRY_STATS.csv (nm).
 RPM + composition = DATABASE/DEVICES_LIBRARY.csv.
-Dynamics metrics (t_half, tau, growth exponent, peak ratio) = the per-device fit
+Dynamics metrics (t_half, tau, growth exponent, peak ratio) = substrate-level
 artifacts handouts/ch4_decay_fits.csv and handouts/ch4_pulse_descriptors.csv
 (produced by scripts/ch4_dynamics_fits.py).
 
-Verdict (see handouts/14_thickness_rpm_confound_audit.md): PEO and thickness covary
-(RPM compensation was incomplete), but thickness has *no* effect on the dynamics once
-composition is held fixed -> thickness is a controlled covariate, not a confound, and
-no reported value, parameter card, or simulation changes.
+Interpretation (see handouts/14_thickness_rpm_confound_audit.md): PEO and thickness
+covary because RPM compensation was incomplete. The PEO--timescale association
+persists after adjustment for measured thickness, but the finite sample does not
+exclude a secondary thickness contribution.
 
 Outputs:
   - prints the joined table, correlations, partial correlations, and the verdict
@@ -204,14 +204,14 @@ rep("thickness -> growth exponent", "th", "alpha", [r for r in li_ag if r["alpha
 rep("PEO       -> log10(peak ratio)", "peo", "lp", [r for r in li_ag if r["lp"] is not None])
 rep("thickness -> log10(peak ratio)", "th", "lp", [r for r in li_ag if r["lp"] is not None])
 
-print("\nPartial correlations (the decisive test):")
+print("\nPartial correlations (measured-covariate sensitivity):")
 pr, n = partial([r for r in li_ag if r["lt"] is not None], "th", "lt", "peo")
-print(f"   r(thickness, log t_half | PEO) = {pr:+.2f}  (n={n})  -> ~0: thickness adds nothing beyond PEO")
+print(f"   r(thickness, log t_half | PEO) = {pr:+.2f}  (n={n})")
 pr2, n2 = partial([r for r in li_ag if r["lt"] is not None], "peo", "lt", "th")
-print(f"   r(PEO, log t_half | thickness) = {pr2:+.2f}  (n={n2})  -> strong: composition effect survives")
+print(f"   r(PEO, log t_half | thickness) = {pr2:+.2f}  (n={n2})")
 
-print("\nVERDICT: thickness is a controlled covariate, not a confound. Composition claims,")
-print("parameter cards, and simulations are unaffected. See handouts/14_*.md.\n")
+print("\nINTERPRETATION: the composition association persists after thickness adjustment;")
+print("a secondary thickness contribution is not excluded. See handouts/14_*.md.\n")
 
 # --------------------------------------------------------------------------
 # figure

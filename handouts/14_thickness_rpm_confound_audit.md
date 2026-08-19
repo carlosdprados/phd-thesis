@@ -1,10 +1,10 @@
 <!-- markdownlint-disable-file MD013 -->
 
-# Thickness / Spin-Coat-RPM Confound Audit — Chapters 3 & 4
+# Thickness / Spin-Coat-RPM Covariate Audit — Chapters 4 & 5
 
-**Author:** Carlos David Prado-Socorro · **Date:** 2026-06-04 · **Status:** resolved — claims stand.
-**Reproduce:** `python3 scripts/thickness_rpm_audit.py` (prints the table below + regenerates `figures/chapter4/thickness_control.pdf`).
-**Companion:** the broader claims ledger [`08_chapter3_4_claims_audit.md`](08_chapter3_4_claims_audit.md), which controlled protocol amplitude (§13), electrode Ag/Au (§16), and aging — but **not** film thickness. This handout closes that gap.
+**Author:** Carlos David Prado-Socorro · **Updated:** 2026-08-19 · **Status:** composition association persists; secondary thickness contribution not excluded.
+**Reproduce:** `MPLCONFIGDIR=tmp/matplotlib python scripts/thickness_rpm_audit.py` (prints the statistics below and regenerates `figures/chapter4/thickness_control.pdf`).
+**Companion:** the broader claims ledger [`08_chapter3_4_claims_audit.md`](08_chapter3_4_claims_audit.md).
 
 ---
 
@@ -12,19 +12,19 @@
 
 Devices were spin-coated at different RPM. Crucially, RPM was sometimes — **but not for every comparison batch** — raised for higher PEO/LiTr concentrations, deliberately, to thin the otherwise-thicker film and partially equalise thickness across the composition grid. **Source of truth for thickness = `DATABASE/DEVICES_PROFILOMETRY_STATS.csv` (nm).**
 
-So: are the Chapter-4 composition claims (higher PEO → smaller switching window, lower potentiation exponent α, shorter fading-memory time) and the Chapter-5 parameter cards / simulations **contaminated** by this deliberate thickness tuning, i.e. is "PEO effect" partly a "thickness effect"?
+So: could the Chapter-4 composition associations (higher PEO → smaller switching window, lower potentiation exponent α, shorter fading-memory time) instead be partly a thickness effect? This audit treats thickness as a measured covariate. It can test whether the composition association persists after statistical adjustment; it cannot prove that thickness has no secondary effect.
 
 ## 1. Method
 
-For all **32** devices in the Ch3/Ch4 quantitative spine (the ones in `ch4_decay_fits.csv` + `ch4_pulse_descriptors.csv`), joined per device:
+The script joins **33 substrates** represented in `ch4_decay_fits.csv` and `ch4_pulse_descriptors.csv` to:
 
-- **composition** (PEO, salt mass fraction) and **spin RPM** — `DATABASE/DEVICES_LIBRARY.csv` (`Spin Coating Rotational Speed [RPM]`);
-- **film thickness** — `DEVICES_PROFILOMETRY_STATS.csv` (`avg_thickness (nm)`, per-device mean over profilometry rows);
+- **composition** (PEO/SY and salt/SY mass ratios) and **spin RPM** — `DATABASE/DEVICES_LIBRARY.csv` (`Spin Coating Rotational Speed [RPM]`);
+- **film thickness** — `DEVICES_PROFILOMETRY_STATS.csv` (`avg_thickness (nm)`, per-substrate mean over profilometry rows);
 - **dynamics metrics** — `t½`, identified `τ`, `β` (decay), growth exponent `α`, peak ratio (pulses).
 
-Stats restricted to the **Li / Ag composition spine (n = 30)** — the only replicated quantitative axis (handout 08 §16). Correlations are Pearson + Spearman; the decisive test is the **partial correlation** of thickness vs dynamics controlling for PEO.
+Junction measurements are collapsed to a substrate median first. Statistics are restricted to the replicated **Li/Ag grid** (`PEO/SY = 0.3, 0.6, 1.2`; `salt/SY = 0.045, 0.09, 0.18`). Of its **28 substrates** with profilometry, 23 have `t½` and 27 have pulse descriptors. Correlations are Pearson and tie-aware Spearman; complementary partial correlations test the measured-covariate sensitivity.
 
-## 2. The confound is real at the fabrication level (as suspected)
+## 2. Composition and thickness covary
 
 **RPM was escalated with PEO, but not uniformly** — confirming "adjusted, but not for every batch":
 
@@ -45,44 +45,42 @@ Stats restricted to the **Li / Ag composition spine (n = 30)** — the only repl
 | 0.6 | 248 | 151–325 | 9 |
 | 1.2 | 298 | 272–392 | 9 |
 
-`PEO → thickness`: **Pearson +0.68, Spearman +0.72** (n=30). PEO and thickness genuinely covary (+31% median thickness from PEO 0.3 to 1.2). So the question is legitimate.
+`PEO → thickness`: **Pearson +0.65, Spearman +0.68** (n=28). PEO and thickness genuinely covary (+31% median thickness from PEO 0.3 to 1.2), so thickness cannot be described as perfectly matched or fully controlled.
 
-## 3. But thickness is *not* the driver — five independent lines
+## 3. Measured-covariate results
 
 | Correlation (Li/Ag spine) | Pearson | n |
 |---|---|---|
-| PEO → log₁₀(t½) | **−0.51** | 25 |
-| thickness → log₁₀(t½) | −0.31 | 25 |
-| PEO → growth exponent α | **−0.44** | 28 |
-| thickness → α | −0.14 | 28 |
-| PEO → log₁₀(peak ratio) | **−0.43** | 28 |
-| thickness → peak ratio | −0.08 | 28 |
+| PEO → log₁₀(t½) | **−0.46** | 23 |
+| thickness → log₁₀(t½) | −0.14 | 23 |
+| PEO → growth exponent α | **−0.58** | 27 |
+| thickness → α | −0.24 | 27 |
+| PEO → log₁₀(peak ratio) | **−0.57** | 27 |
+| thickness → log₁₀(peak ratio) | −0.17 | 27 |
 
-**Partial correlations (decisive):**
-- `r(thickness, log t½ | PEO) = +0.05` (n=25) → **once composition is fixed, thickness explains essentially nothing.**
-- `r(PEO, log t½ | thickness) = −0.42` (n=25) → **the composition effect survives controlling for thickness.**
+**Partial correlations (n=23):**
+- `r(thickness, log t½ | PEO) = +0.28`.
+- `r(PEO, log t½ | thickness) = −0.51`.
 
-The raw thickness↔dynamics correlation is entirely *mediated* by PEO; thickness is a downstream consequence of how much ion-transport polymer is in the film, not an independent cause.
+The second result supports the bounded chapter statement: the negative composition–timescale association persists after adjustment for measured thickness. The first is not zero and, together with the sample size and non-random fabrication design, prevents a claim that thickness is irrelevant.
 
 Supporting evidence:
 
 1. **Lead anchor cell PEO 0.3 / 0.09** (the Ch4 lead composition): thickness **196 → 271 nm (38% spread)** yet t½ is flat at **18.5 / 22.0 / 19.2 s**. A large thickness swing inside one composition moves the memory not at all.
-2. **Within-cell pooled** (center thickness & log t½ per cell, then pool, n=24/8 cells): r = −0.25 — much weaker than the cross-PEO −0.51, and near-zero after the partial.
-3. **Metrics are dimensionless** (on–off *ratio*, log–log *slope* α, *timescale* t½/τ, β): a pure series-resistance / geometry effect of thickness cancels.
-4. **Activation voltage is flat** (2.17–2.56 V; `thickness → activation V` r = **−0.06**) across a **2.6× thickness range (151–392 nm)**. If switching were a bulk-field (V/thickness) effect, the threshold would scale with thickness. It does not → the threshold is an intrinsic ionic/electrochemical property, ruling out the main mechanism by which thickness *could* matter.
-5. **Sign is wrong for a thickness mechanism:** thicker films show *shorter* memory; a longer ionic transit path would predict *longer* retention. Only an ion-transport-fraction driver explains the observed direction.
+2. **Activation voltage has no resolved linear thickness trend** (`r ≈ −0.06`) across a 2.6× thickness range. This disfavors simple inverse-thickness threshold scaling; it does not prove an intrinsic ionic/electrochemical threshold.
+3. **Conductance ratios reduce sensitivity to absolute geometry**, but timescales and nonlinear pulse descriptors need not cancel thickness. They remain empirical observables requiring the direct audit above.
 
 ## 4. Verdict
 
-- **Composition claims (Ch3 quantitative spine): STAND.** Thickness is a **controlled covariate, not a confound.**
-- **Salt axis: STANDS.** salt → thickness weak (+0.31); the salt claim is about turnover/dynamic range, composition-intrinsic.
-- **Parameters & simulations (Ch4): UNCHANGED.** Parameter cards are per-cell composition aggregates; the composition→dynamics mapping is intact. MC 4.10→6.12 (1.49×), the WESAD numbers, and the physiological-context results are unaffected.
-- **Chemistry axis (illustrative/null): one minor note.** The K device v249 happens to be thin (164 nm); since the cation result is already an honest null, no claim rests on it.
+- **Composition association:** supported. PEO remains associated with `t½` after adjustment for measured thickness, and pulse descriptors correlate more strongly with PEO than with thickness.
+- **Thickness exclusion:** not supported. The design is observational, PEO and thickness covary, and a secondary thickness contribution remains possible.
+- **Salt interpretation:** evaluated separately through turnover and the batch-adjusted factorial model; this audit does not establish an independent salt mechanism.
+- **Chapter 5 parameters:** must use measured substrate variability and sensitivity analyses. This audit does not justify declaring all simulations unaffected.
 
 ## 5. What changed in the thesis
 
-No values, parameter cards, or simulations were re-computed (the audit shows none should). Added for **transparency** so the question is answered on the record:
+The thesis now states the bounded conclusion supported by the audit:
 
-- **Ch4** §Materials: a "thickness is controlled, not confounding" paragraph + the supplementary figure `fig:ch4_thickness_control` (`figures/chapter4/thickness_control.pdf`).
-- **Ch5** §Limitations: one sentence cross-referencing the Ch4 thickness control.
+- **Ch4** §Materials: thickness is a measured covariate; it does not account for the composition association, but a secondary contribution is not excluded.
+- **Ch5**: variability and sensitivity analyses must not assume that the composition mapping is deterministic.
 - **This handout** + the committed `scripts/thickness_rpm_audit.py` (reproducible).
