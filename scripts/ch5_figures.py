@@ -90,7 +90,7 @@ def fig_composition_sweep(cards, N=16, max_k=30):
     b2 = a2.bar(x, nrs, yerr=nrsd, **ek); style_bars(b2, cols)
     a2.set_xticks(x); a2.set_xticklabels(labels, rotation=45, ha="right", fontsize=7)
     a2.set_ylabel("NARMA-10 NRMSE (lower better)"); figstyle.panel(a2, "b", "NARMA-10 by composition")
-    fig.text(0.5, -0.04, "PEO / salt mass fraction (orange = lead cell 0.3/0.09); "
+    fig.text(0.5, -0.04, "PEO/SY and salt/SY mass ratios (orange = lead cell 0.3/0.09); "
              "error bars $\\pm 1$ SD over 10 seeds", ha="center", fontsize=8)
     fig.tight_layout()
     p = os.path.join(FIGDIR, "composition_sweep.pdf"); fig.savefig(p); plt.close(fig)

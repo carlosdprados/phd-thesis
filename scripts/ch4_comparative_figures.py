@@ -144,9 +144,9 @@ def heat_row(fig, axes, panels):
             ax.axvline(k, color="white", lw=1.4)
         ax.set_xticks(range(len(SALT_LEVELS))); ax.set_xticklabels(SALT_LEVELS)
         ax.set_yticks(range(len(PEO_LEVELS))); ax.set_yticklabels(PEO_LEVELS)
-        ax.set_xlabel("salt mass fraction")
+        ax.set_xlabel(r"salt/SY mass ratio, $r_{\mathrm{salt}}$")
         if ax is axes[0]:
-            ax.set_ylabel("PEO mass fraction")
+            ax.set_ylabel(r"PEO/SY mass ratio, $r_{\mathrm{PEO}}$")
         for i in range(len(PEO_LEVELS)):
             for j in range(len(SALT_LEVELS)):
                 if np.isfinite(M[i, j]):
@@ -407,7 +407,7 @@ def fig_design_space():
     ax.set_xlabel("potentiation dynamic range (peak ratio)")
     ax.set_ylabel("fading-memory time $t_{1/2}$ (s)")
     # Two encodings, both legends parked outside the data area (right margin):
-    # colour = PEO mass fraction, marker shape = salt mass fraction. Only the
+    # colour = PEO/SY mass ratio, marker shape = salt/SY mass ratio. Only the
     # levels actually present in the plotted device set are listed.
     from matplotlib.lines import Line2D
     ph = [Line2D([0], [0], marker="o", color="none", markerfacecolor=c, markersize=7,
@@ -417,10 +417,10 @@ def fig_design_space():
                  markeredgecolor="white", label=s)
           for s, m in salt_mk.items() if s in seen_salt]
     leg1 = ax.legend(handles=ph, fontsize=7, loc="upper left", bbox_to_anchor=(1.02, 1.0),
-                     title="PEO mass frac.", title_fontsize=7, borderaxespad=0.0)
+                     title=r"$r_{\mathrm{PEO}}$", title_fontsize=7, borderaxespad=0.0)
     ax.add_artist(leg1)
     ax.legend(handles=sh, fontsize=7, loc="lower left", bbox_to_anchor=(1.02, 0.0),
-              title="salt mass frac.", title_fontsize=7, borderaxespad=0.0)
+              title=r"$r_{\mathrm{salt}}$", title_fontsize=7, borderaxespad=0.0)
     p = os.path.join(FIGDIR, "design_space.pdf"); fig.savefig(p); plt.close(fig)
     print("wrote", p, f"| {len(both)} devices")
 
@@ -605,7 +605,7 @@ def fig_heterogeneity():
                     ha="left", va="center", fontweight="bold")
         ax.set_xticks(range(len(peo_order))); ax.set_xticklabels(peo_order)
         ax.set_xlim(-0.55, len(peo_order) - 0.3)
-        ax.set_xlabel("PEO mass fraction"); ax.set_ylabel(ylabel)
+        ax.set_xlabel(r"PEO/SY mass ratio, $r_{\mathrm{PEO}}$"); ax.set_ylabel(ylabel)
         if logy:
             ax.set_yscale("log")
 

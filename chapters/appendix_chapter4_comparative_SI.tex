@@ -117,7 +117,7 @@ thickness (spanning \SIrange{1500}{3500}{rpm}). The compensation was deliberate
 but incomplete: median film thickness still rises from
 \(\approx\SI{227}{\nano\meter}\) at \PEO{}~\num{0.3} to
 \(\approx\SI{298}{\nano\meter}\) at \PEO{}~\num{1.2}, giving a Pearson
-\(r\approx0.68\) between \PEO{} fraction and thickness
+\(r\approx0.68\) between \(r_{\PEO{}}\) and thickness
 (\cref{fig:ch4_thickness_control}).
 Four observations show that thickness is nonetheless not the operative variable:
 \begin{enumerate}
@@ -256,8 +256,8 @@ used. Second, per-spectrum circuit fits are genuinely ill-conditioned, an
 independent refit confirms that several do not converge robustly, so
 \(R_{\mathrm{ion}}\) is reported only as corroboration of the model-free quantity,
 never as a precise number. Both observables nonetheless fall steeply and
-monotonically with \PEO{} fraction (\cref{tab:ch4_eis_by_cell}): the model-free
-\(Z_{\mathrm{real}}^{\mathrm{apex}}\) at rank correlation \(-0.83\) against \PEO{}
+monotonically with \(r_{\PEO{}}\) (\cref{tab:ch4_eis_by_cell}): the model-free
+\(Z_{\mathrm{real}}^{\mathrm{apex}}\) at rank correlation \(-0.83\) against \(r_{\PEO{}}\)
 on cell medians, the fitted \(R_{\mathrm{ion}}\) at \(-0.84\).
 
 \begin{table}[t]
@@ -622,7 +622,7 @@ substrate identities are inferred, as stated under provenance.
 The composition trends of \cref{sec:ch4_composition} are reported in the main text
 as cell medians. This section attaches a significance test and a non-parametric
 uncertainty to them, on the replicated Ag/\ce{Li} \SY{}/\PEO{}/\LiTf{} series. For
-each descriptor we compute the Spearman rank correlation with the \PEO{} fraction
+each descriptor we compute the Spearman rank correlation with \(r_{\PEO{}}\)
 across individual devices, with a two-sided permutation \(p\)-value
 (\num{20000} relabellings; \cref{tab:ch4_gradient}). The fading-memory time
 \(t_{1/2}\), the descriptor that matters for \cref{ch:temporal}, carries a
@@ -636,7 +636,7 @@ potentiation trends are indicative.
 
 \begin{table}[t]
   \centering
-  \caption[Significance of the composition gradient]{Per-device Spearman rank correlation of each descriptor with the \PEO{} mass fraction (Ag/\ce{Li} composition series), with a two-sided permutation \(p\)-value. Only the fading-memory time clears \(p<0.05\).}
+  \caption[Significance of the composition gradient]{Per-substrate Spearman rank correlation of each descriptor with the \PEO{}-to-\SY{} mass ratio \(r_{\PEO{}}\) (Ag/\ce{Li} composition series), with a two-sided permutation \(p\)-value. Only the fading-memory time clears \(p<0.05\).}
   \label{tab:ch4_gradient}
   \footnotesize
   \setlength{\tabcolsep}{8pt}
@@ -720,7 +720,7 @@ relaxation, not electronic percolation.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.62\linewidth]{../figures/chapter4/percolation.pdf}
-  \caption[Absolute on-state conductance rises with \PEO{}]{Absolute on-state conductance (HYST, conductance at the sweep maximum; device medians, Ag series, \(n=47\), coloured by salt) against \PEO{} fraction, log--log. The conductance rises steeply with \PEO{} (\(\rho=+0.65\), \(p<10^{-4}\), slope \(\approx+3.6\), dashed), the opposite of the prediction of an electronic-percolation \emph{dilution}, and the basis for the rising-floor reading of the window contraction in \cref{sec:ch4_discussion}.}
+  \caption[Absolute on-state conductance rises with \PEO{}]{Absolute on-state conductance (HYST, conductance at the sweep maximum; substrate medians, Ag series, coloured by \(r_{\mathrm{salt}}\)) against \(r_{\PEO{}}\), log--log. The conductance rises steeply with \(r_{\PEO{}}\) (statistics printed in the panel), the opposite of the prediction of electronic-percolation \emph{dilution}, and the basis for the rising-floor reading of the window contraction in \cref{sec:ch4_discussion}.}
   \label{fig:ch4_percolation}
 \end{figure}
 

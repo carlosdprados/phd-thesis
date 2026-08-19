@@ -218,7 +218,7 @@ def main():
     peos = sorted({k[0] for k in cm_z})
     cmed = [med([cm_z[k] for k in cm_z if k[0] == p]) for p in peos]
     axA.plot(peos, cmed, "k-o", lw=1.4, ms=4, zorder=3, label="PEO median")
-    axA.set_yscale("log"); axA.set_xlabel("PEO mass fraction")
+    axA.set_yscale("log"); axA.set_xlabel(r"PEO/SY mass ratio, $r_{\mathrm{PEO}}$")
     axA.set_ylabel(r"$Z_{\mathrm{real}}$ at Nyquist apex ($\Omega$), 0 V DC")
     figstyle.panel(axA, "a", "ionic impedance vs composition")
     handles = [plt.Line2D([], [], marker="o", ls="", color=cmap[s], label=f"salt {s}") for s in salt_levels]
@@ -240,7 +240,7 @@ def main():
     pz = [p for p in peo_levels if np.isfinite(z_by_peo[p])]
     l1, = axB.plot(pz, [z_by_peo[p] for p in pz], "-o", color=c_eis, lw=1.6, ms=5, zorder=3)
     axB.set_yscale("log")
-    axB.set_xlabel("PEO mass fraction")
+    axB.set_xlabel(r"PEO/SY mass ratio, $r_{\mathrm{PEO}}$")
     axB.set_ylabel(r"EIS $Z_{\mathrm{real}}$ at apex ($\Omega$)", color=c_eis)
     axB.tick_params(axis="y", labelcolor=c_eis)
     figstyle.panel(axB, "b", "two measurements, one composition axis")

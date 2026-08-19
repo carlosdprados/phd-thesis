@@ -20,7 +20,7 @@ the archive:
       ->  handouts/ch4_factorial.csv
 
   [3] PERCOLATION / dilution test of the mechanism.
-      Absolute on-state conductance (HYST) vs PEO fraction: if added ion-transport
+      Absolute on-state conductance (HYST) vs PEO/SY mass ratio: if added ion-transport
       polymer dilutes the SY electronic-percolation network, the absolute
       conductance must fall with PEO -- a prediction independent of the
       peak-normalised dynamics. Power-law fit + figure.
@@ -299,7 +299,7 @@ ax.plot(xx, np.exp(np.polyval(np.polyfit(np.log(px), np.log(gy), 1), np.log(xx))
         "--", color="k", lw=1.0, zorder=2,
         label=fr"power law $\propto$PEO$^{{{slope_g:.1f}}}$")
 ax.set_xscale("log"); ax.set_yscale("log")
-ax.set_xlabel("PEO mass fraction"); ax.set_ylabel(r"on-state conductance ($\mu$S)")
+ax.set_xlabel(r"PEO/SY mass ratio, $r_{\mathrm{PEO}}$"); ax.set_ylabel(r"on-state conductance ($\mu$S)")
 handles = [plt.Line2D([], [], marker="o", ls="", color=SALTC[s], label=f"salt {s}")
            for s in sorted(SALTC)]
 handles += [plt.Line2D([], [], marker="o", color=COLORS["gray"], label="PEO median"),

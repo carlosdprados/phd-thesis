@@ -216,7 +216,7 @@ for p in peo_levels:
 axA.set_xticks(range(len(peo_levels)))
 axA.set_xticklabels([str(p) for p in peo_levels])
 axA.set_xlim(-0.85, len(peo_levels) - 0.6)
-axA.set_xlabel("PEO mass fraction")
+axA.set_xlabel(r"PEO/SY mass ratio, $r_{\mathrm{PEO}}$")
 axA.set_ylabel("film thickness (nm)")
 figstyle.panel(axA, "a", "thickness covaries with PEO")
 cb = fig.colorbar(sc, ax=axA, pad=0.02)
