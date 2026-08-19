@@ -49,8 +49,9 @@ type: project
 Two models reconciled (van Reenen et al. 2010):
 1. **Electrodynamic model** (injection-limited): ionic double layer bends valence/conduction bands, reduces Schottky barrier
 2. **Electrochemical Doping model** (ohmic injection): cation/anion displacement dopes the semiconducting polymer
-- Li⁺ (hard acid) ↔ O atoms of Hybrane (hard base) → strong Lewis interaction → high voltage threshold for migration → LTM
-- CF₃SO₃⁻ (soft base) → weak interaction → easily displaced at low voltage → STM
+- Candidate assignment: Li⁺ coordination to Hybrane oxygen contributes to the higher-drive, longer-retention response; this was not measured species-selectively.
+- Candidate assignment: charge-delocalised, weakly coordinating CF₃SO₃⁻ contributes to the lower-drive, faster response.
+- Boundary: HSAB motivates local coordination but does not determine drift mobility; the later cation survey runs opposite to the simple predicted order under triflate and changes with the anion.
 
 ## Device Stability
 - Non-encapsulated devices functional for ~2 weeks (≈300 working hours) in air at RT

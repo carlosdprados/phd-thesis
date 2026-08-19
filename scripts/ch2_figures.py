@@ -450,18 +450,18 @@ def fig_device_schematic() -> None:
     axL.text(dim_x + 0.22, (y_ag + top) / 2 + oy * 0.35, "100 nm", ha="left", va="center", fontsize=7.5, color="0.25")
 
     contact_x = x0 + w / 2 + ox * 0.55
-    axL.plot([contact_x, contact_x], [top + oy, top + oy + 0.72], color=COLORS["red"], lw=0.9)
-    axL.add_patch(Circle((contact_x, top + oy + 0.77), 0.07, facecolor=COLORS["red"], edgecolor=COLORS["red"]))
-    axL.text(contact_x + 0.32, top + oy + 0.75, r"Ag: $+V$", ha="left", va="center", fontsize=8.0, color=COLORS["red"])
+    axL.plot([contact_x, contact_x], [top + oy, top + oy + 0.25], color=COLORS["red"], lw=0.9)
+    axL.add_patch(Circle((contact_x, top + oy + 0.29), 0.07, facecolor=COLORS["red"], edgecolor=COLORS["red"]))
+    axL.text(contact_x + 0.27, top + oy + 0.27, r"Ag: $+V$", ha="left", va="center", fontsize=8.0, color=COLORS["red"])
     ground_y = y_glass - 0.34
     axL.plot([x0 + 0.55, x0 + 0.55], [y_ito, ground_y + 0.20], color="0.25", lw=0.8)
     for i, ww in enumerate([0.50, 0.34, 0.18]):
         axL.plot([x0 + 0.55 - ww / 2, x0 + 0.55 + ww / 2], [ground_y - 0.09 * i, ground_y - 0.09 * i], color="0.25", lw=0.8)
     axL.text(x0 + 1.08, ground_y - 0.02, "ITO: 0 V", ha="left", va="center", fontsize=8.0, color="0.25")
 
-    # ---- (b) two-regime ion-migration mechanism -------------------------
+    # ---- (b) candidate two-regime ion assignment -------------------------
     axR.text(0.18, 8.55, "b", fontsize=11, weight="bold")
-    axR.text(1.00, 8.57, "ion redistribution under positive Ag bias", ha="left", va="top",
+    axR.text(1.00, 8.57, "candidate ion assignment under positive Ag bias", ha="left", va="top",
              fontsize=8.8, weight="bold", color="0.12")
     axR.add_patch(FancyArrowPatch((8.45, 8.04), (1.55, 8.04), arrowstyle="-|>",
                                   mutation_scale=11, lw=1.0, color="0.38"))
@@ -518,12 +518,12 @@ def fig_device_schematic() -> None:
 
     mechanism_cell(
         axR, 4.70,
-        r"low field ($\sim$1 V): OTf$^-$ drifts to Ag $\rightarrow$ STM",
+        r"candidate at $\sim$1 V: OTf$^-$ redistribution $\rightarrow$ STM",
         COLORS["red"], moving="OTf",
     )
     mechanism_cell(
         axR, 1.00,
-        r"high field ($\sim$3 V): Li$^+$ drifts to ITO $\rightarrow$ long-lived state",
+        r"candidate at $\sim$3 V: added Li$^+$ contribution $\rightarrow$ long-lived state",
         COLORS["blue"], moving="Li",
     )
 
