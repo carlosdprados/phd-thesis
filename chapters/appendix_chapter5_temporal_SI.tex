@@ -12,8 +12,9 @@
 This appendix documents how the behavioural-model parameter cards of
 \cref{sec:ch5_model} are sourced from the measured archive, and lists the
 simulation and read-out settings used across the three evidence tiers. Together
-with the per-cell tables of \cref{app:ch4_celltables}, it makes the in-silico
-results reproducible without consulting the analysis scripts
+with the per-cell tables of \cref{app:ch4_celltables}, it defines the inputs and
+controls needed to audit the in-silico results; the executable workflow is in
+the repository
 (\path{scripts/ch5_figures.py}, \path{scripts/ch5_physio_context.py},
 \path{scripts/ch5_onset.py}, \path{scripts/ch5_deployment.py},
 \path{scripts/ch5_noneeg.py}).
@@ -71,6 +72,37 @@ leakage.
     \bottomrule
   \end{tabularx}
 \end{table}
+
+\section{Computational Reproducibility and Data Availability}\label{app:reproducibility}
+
+The thesis repository records the tested Python environment, regression tests,
+the ordered analysis scripts, a hash manifest for the principal processed
+experimental tables, and an automated audit of the complete \LaTeX{} build.
+Running \path{make verify} tests the calculations and behavioural-model
+invariants covered by the regression suite, rebuilds the complete thesis from
+the committed source and derived artifacts, and rejects LaTeX{} errors,
+undefined citations or references, and overfull boxes. This is a verification
+of the deposited snapshot; it is not, by itself, a regeneration of every figure
+from raw measurement files.
+
+Raw-to-result regeneration is split into explicit workflows. The command
+\path{make reproduce-core} requires the separately held, unversioned
+\path{Nanomem_Devices_Library} as a sibling of the thesis repository. Its
+processed database is checked against the SHA-256 manifest in
+\path{provenance/database_inputs.sha256}; that manifest binds the principal
+tables used by Chapters~3--5 but does not cover every raw Keithley,
+spectroscopy, lock-in, or Chapter~2 source file. The raw experimental archive is
+not distributed with this repository, so the deposited repository alone cannot
+independently reconstruct the experimental results from raw data.
+
+The command \path{make reproduce-physio} requires independently obtained WESAD
+and PhysioNet Non-EEG corpora under the ignored \path{data/} directory. CASE is
+not part of the reproduction graph: its raw corpus was unavailable for this
+audited snapshot, cached CASE outputs were removed, and no CASE result is
+reported. The combined \path{make reproduce-all} workflow checks the required
+inputs, executes the available analysis stages sequentially, stops at the first
+failure, and finishes with the test and thesis-build audit. Exact placement,
+scope, and limitations are documented in \path{docs/reproducibility.md}.
 
 For all physiological corpora, the raw-stream caches store a schema identifier and
 a signature of the source files; a preprocessing or source mismatch forces

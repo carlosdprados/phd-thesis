@@ -13,6 +13,9 @@ CHAPTER_DIR    := chapters
 BUILD_CHAPTERS := build/chapters
 BUILD_THESIS   := build
 EXPORTS        := exports
+PYTHON         ?= python
+MPLCONFIGDIR_LOCAL := $(CURDIR)/tmp/matplotlib
+ANALYSIS_ENV   := PYTHONHASHSEED=0 MPLBACKEND=Agg MPLCONFIGDIR="$(MPLCONFIGDIR_LOCAL)"
 
 CHAPTER1_SRC := chapter1_introduction.tex
 CHAPTER2_SRC := chapter2_proof_of_concept.tex
@@ -27,7 +30,7 @@ THESIS_TEXINPUTS := TEXINPUTS=./$(CHAPTER_DIR):
 
 .PHONY: all thesis chapter1 chapter2 chapter3 chapter4 chapter5 chapter6 \
         thesis-clean chapter1-clean chapter2-clean chapter3-clean chapter4-clean chapter5-clean chapter6-clean clean \
-        export exports
+        export exports test verify inputs-check reproduce-core reproduce-physio reproduce-all
 
 all: chapter1 chapter2 chapter3 chapter4 chapter5 chapter6 thesis
 
@@ -90,3 +93,35 @@ exports:
 	cp $(BUILD_THESIS)/thesis.pdf $(EXPORTS)/
 
 export: exports
+
+## Verify the committed analysis code and the complete thesis snapshot without
+## requiring access to the separately held raw experimental archive.
+test:
+	@mkdir -p "$(MPLCONFIGDIR_LOCAL)"
+	$(ANALYSIS_ENV) $(PYTHON) -m pytest -q
+
+verify:
+	$(MAKE) test
+	$(MAKE) thesis
+	$(PYTHON) scripts/check_thesis_build.py --log build/thesis.log --pdf build/thesis.pdf
+
+## Validate external input placement and the processed-database snapshot.
+inputs-check:
+	@mkdir -p "$(MPLCONFIGDIR_LOCAL)"
+	$(ANALYSIS_ENV) $(PYTHON) scripts/reproduce.py all --check-only
+
+## Full regeneration targets intentionally replace tracked tables and figures.
+reproduce-core:
+	@mkdir -p "$(MPLCONFIGDIR_LOCAL)"
+	$(ANALYSIS_ENV) $(PYTHON) scripts/reproduce.py core
+	$(MAKE) verify
+
+reproduce-physio:
+	@mkdir -p "$(MPLCONFIGDIR_LOCAL)"
+	$(ANALYSIS_ENV) $(PYTHON) scripts/reproduce.py physio
+	$(MAKE) verify
+
+reproduce-all:
+	@mkdir -p "$(MPLCONFIGDIR_LOCAL)"
+	$(ANALYSIS_ENV) $(PYTHON) scripts/reproduce.py all
+	$(MAKE) verify

@@ -114,6 +114,8 @@ The conclusions are limited by the evidence available for each part of the thesi
 
   \item \textbf{The application results are in silico and only partly cross-corpus.} Every temporal-computing result is a simulation of measured device models with a linear read-out; no wired reservoir was built. The physiological-context and affective-label results use \WESAD{} as the main corpus, and heterogeneity does not improve its sustained labels. Noise robustness replicates on the PhysioNet Non-EEG corpus, but a linear moving-average control matches or exceeds the device model. Broader multi-corpus validation remains future work.
 
+  \item \textbf{Raw-data availability is incomplete.} The repository verifies the committed analysis code, derived tables and figures, and complete thesis build, but the experimental archive is separately held and unversioned. A SHA-256 manifest binds the principal processed database snapshot without covering every raw measurement. WESAD and PhysioNet Non-EEG must also be obtained independently; CASE is excluded because its raw corpus was unavailable and no CASE result is reported. The exact boundary and regeneration commands are recorded in \cref{app:reproducibility}.
+
   \item \textbf{Material stability remains open.} Devices were characterised unencapsulated on a $\sim$\SI{300}{\hour} ambient shelf scale; cycling endurance, read-disturb under continuous pulsing, and long-run drift under encapsulation were not systematically studied, and device ageing was not modelled in the comparative corpus.
 \end{enumerate}
 

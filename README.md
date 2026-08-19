@@ -70,16 +70,25 @@ The proof-of-concept chapter expands the published work:
 | [`bibliography/`](bibliography) | Shared BibLaTeX database |
 | [`exports/`](exports) | Committed PDF snapshots |
 | [`handouts/`](handouts) | Planning documents, outlines, and working notes |
-| [`docs/`](docs) | Reference docs about the experimental archive and analysis pipeline (data and code live in the sibling `Nanomem_Devices_Library/`) |
+| [`scripts/`](scripts) | Analysis, figure-generation, reproduction, and build-audit code |
+| [`tests/`](tests) | Regression tests for calculations, curation, models, and reproducibility tooling |
+| [`provenance/`](provenance) | Hash manifest for the processed experimental-database snapshot |
+| [`docs/`](docs) | Reproducibility instructions and the as-built experimental-archive reference |
 
 **Naming convention.** Chapter sources, internal labels, `figures/chapterN/`,
 analysis scripts, and current per-cell CSV artifacts now follow the **bound
 chapter order**: Ch3 = bridge, Ch4 = comparative, Ch5 = temporal. The canonical
 map is recorded in [`docs/current_chapter_numbering.md`](docs/current_chapter_numbering.md).
 
-## Build The Thesis
+## Verify or Build the Thesis
 
-The chapter files compile both independently and as part of the complete thesis. A local LaTeX installation with `latexmk` and `biber` is required.
+The public repository can be tested and rebuilt without the private raw-data archive. Create the tested Python environment with `conda env create -f environment.yml`, activate it, and install a local LaTeX distribution providing `latexmk` and `biber`. Then run:
+
+```sh
+make verify         # run all tests, build the thesis, and reject serious log defects
+```
+
+The chapter files also compile independently:
 
 ```sh
 make chapter1       # build/chapters/chapter1_introduction.pdf
@@ -95,3 +104,5 @@ make clean          # remove generated LaTeX artefacts
 ```
 
 Run these commands from the repository root. Generated LaTeX files are written to `build/` and excluded from version control.
+
+Regenerating analysis tables and figures from their source measurements has additional data requirements. The experimental archive must be placed as the sibling `../Nanomem_Devices_Library/`; WESAD and PhysioNet Non-EEG must be placed under `data/`. Check all inputs with `make inputs-check`, then use `make reproduce-core`, `make reproduce-physio`, or `make reproduce-all`. These commands intentionally replace tracked derived artifacts. See [`docs/reproducibility.md`](docs/reproducibility.md) for the exact scope, input provenance, and the deliberate exclusion of CASE.

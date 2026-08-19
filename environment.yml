@@ -1,0 +1,14 @@
+name: phd-thesis
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10.13
+  - numpy=1.26.4
+  - scipy=1.14.1
+  - pandas=2.2.3
+  - matplotlib=3.9.4
+  - pillow=10.4.0
+  - scikit-learn=1.5.2
+  - wfdb=4.3.1
+  - rdkit=2022.09.5
+  - pytest=9.0.2
