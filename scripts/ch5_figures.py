@@ -5,7 +5,7 @@
   fig:ch5_wesad             -> wesad_affect.pdf       (WESAD: Demo A window task +
                                 streaming Demo B decomposition; needs the dataset)
 
-Run from the repo root:  python3 scripts/ch5_figures.py
+Run from the repo root:  python scripts/ch5_figures.py
 Depends on scripts/ch5_reservoir.py + scripts/ch5_model.py (+ ch5_wesad.py & the
 WESAD dataset for the last figure, which is skipped if the data is absent).
 """
@@ -21,7 +21,7 @@ import matplotlib.colors as mcolors
 from ch5_reservoir import (load_cards, make_nodes, run_states, memory_capacity,
                            nodes_from, _full, narma10, task_nrmse,
                            mc_curve_seeded, composition_sweep, paired_stats,
-                           ipc_seeded, DT)  # noqa: E402
+                           ipc_seeded, memoryless_nodes, DT)  # noqa: E402
 
 import figstyle
 
@@ -57,14 +57,16 @@ def fig_mc_curve(cards, N=24, max_k=30):
     ax.set_title(f"Memory capacity vs lag (N = {N} nodes)", loc="left")
     ax.set_xlim(0, max_k + 0.5)
     # Direct, colour-matched totals in the upper-right (the curves have decayed
-    # to near zero there), with the paired test underneath -- no boxed legend.
+    # to near zero there), with seed consistency underneath -- no boxed legend.
     ax.text(0.97, 0.93, f"heterogeneous   MC = {het_tot.mean():.1f} $\\pm$ {het_tot.std(ddof=1):.1f}",
             transform=ax.transAxes, ha="right", va="top", color=COLORS["red"],
             fontsize=8, fontweight="bold")
     ax.text(0.97, 0.83, f"homogeneous   MC = {hom_tot.mean():.1f} $\\pm$ {hom_tot.std(ddof=1):.1f}",
             transform=ax.transAxes, ha="right", va="top", color=COLORS["blue"],
             fontsize=8, fontweight="bold")
-    ax.text(0.97, 0.72, f"Wilcoxon $p = {st['p']:.0e}$", transform=ax.transAxes,
+    n_pos = int(st["frac_pos"] * st["n"])
+    ax.text(0.97, 0.72, f"heterogeneous higher in {n_pos}/{st['n']} seeds",
+            transform=ax.transAxes,
             ha="right", va="top", color="0.4", fontsize=7)
     fig.tight_layout()
     p = os.path.join(FIGDIR, "mc_curve.pdf"); fig.savefig(p); plt.close(fig)
@@ -97,30 +99,32 @@ def fig_composition_sweep(cards, N=16, max_k=30):
     print("wrote", p)
 
 
-def measured_scatter(default=0.85):
-    """Data-derived device-to-device scatter sigma(ln tau), written by
+def measured_scatter(default=0.264):
+    """Data-derived typical device-to-device scatter sigma(ln t_half), written by
     scripts/ch5_scatter_audit.py to handouts/ch5_scatter_audit.csv. This is the
-    measured value of the `jitter` parameter (confound-checked against composition,
-    spin RPM, anneal, film thickness, aging). Falls back to the documented default
-    if the audit has not been run."""
+    measured value of the `jitter` parameter. It is a screened, substrate-level
+    estimate within each composition cell; it does not imply that all fabrication
+    or batch contributions have been excluded. Falls back to the documented
+    default if the audit has not been run."""
     path = os.path.join("handouts", "ch5_scatter_audit.csv")
     try:
         import csv
         for row in csv.DictReader(open(path)):
-            if row["metric"] == "sigma_lnTau_within_cell":
+            if row["metric"] == "sigma_lnThalf_within_cell":
                 return float(row["value"])
     except (OSError, KeyError, ValueError):
         pass
     return default
 
 
-def fig_robustness(cards, N=24, jitters=(0.0, 0.12, 0.25, 0.40, 0.60, 0.85, 1.0)):
-    """Total memory capacity versus injected device-to-device scatter (jitter), for
-    the homogeneous and heterogeneous banks. Substantiates the claim that scatter
-    is part of the computational substrate, not a yield problem: the heterogeneous
-    bank keeps its advantage across the whole realistic spread -- including at the
-    measured scatter (sigma(ln tau) from scripts/ch5_scatter_audit.py) -- and
-    modest scatter does not degrade, and slightly aids, recoverable memory."""
+def fig_robustness(cards, N=24, jitters=(0.0, 0.10, 0.264, 0.40, 0.60, 0.85, 1.0)):
+    """Sensitivity of total memory capacity to timescale-only log-normal jitter.
+
+    The dotted line is the primary screened within-cell estimate from the robust
+    model-free half-time. Larger values include the legacy fit-based estimate as a
+    stress test; the curves are descriptive algorithmic sensitivity, not evidence
+    that material variability is beneficial.
+    """
     sigma = measured_scatter()
     jitters = tuple(sorted(set(jitters) | {round(sigma, 2)}))
     fig, ax = plt.subplots(figsize=(4.6, 3.2))
@@ -138,7 +142,7 @@ def fig_robustness(cards, N=24, jitters=(0.0, 0.12, 0.25, 0.40, 0.60, 0.85, 1.0)
     ax.text(sigma - 0.02, ax.get_ylim()[0] + 0.3,
             f"measured\nscatter\n($\\sigma\\!\\approx\\!{sigma:.2f}$)",
             fontsize=6.6, color="0.45", ha="right")
-    ax.set_xlabel(r"device-to-device scatter (jitter, $\sigma$ of $\ln\tau$)")
+    ax.set_xlabel(r"timescale jitter ($\sigma$ of $\ln t_{1/2}$)")
     ax.set_ylabel("total memory capacity")
     ax.set_title(f"Robustness to device scatter (N = {N})", loc="left")
     ax.legend(frameon=False, fontsize=8, loc="center right")
@@ -177,10 +181,13 @@ def fig_ipc(cards, N=24):
                 color=COLORS["blue"], fontsize=8, fontweight="bold")
         ax.text(xi, l + n / 2, f"{n:.1f}", ha="center", va="center",
                 color=COLORS["orange"], fontsize=8, fontweight="bold")
-    # paired significance as a bracket spanning the two totals
+    # Paired seed consistency as a bracket spanning the two totals. Random seeds
+    # probe algorithmic sensitivity; they are not independent inferential units.
     ytop = max(tot) + max(tot_sd) + 1.2
     ax.plot([0, 0, 1, 1], [ytop - 0.4, ytop, ytop, ytop - 0.4], lw=0.8, c="0.3")
-    ax.text(0.5, ytop + 0.1, f"$p = {st['p']:.0e}$", ha="center", va="bottom",
+    n_pos = int(st["frac_pos"] * st["n"])
+    ax.text(0.5, ytop + 0.1, f"heterogeneous higher in {n_pos}/{st['n']} seeds",
+            ha="center", va="bottom",
             fontsize=7.2, color="0.3")
     ax.set_xticks(x); ax.set_xticklabels(["homogeneous", "heterogeneous"])
     ax.set_xlim(-0.6, 1.6)
@@ -306,7 +313,7 @@ def fig_wesad(cards, seeds=range(5)):
                        dt=dt, n_in=C, sparsity=0.4)
         m = nodes_from([lead_card(cards)], W.N_NODES, np.random.default_rng(s),
                        dt=dt, n_in=C, sparsity=0.4)
-        z = [(0.0, a, w) for (_, a, w) in h]                       # memoryless control
+        z = memoryless_nodes(h)
         het.append(W.loso_stream(W.stream_features(h, raw, dt), [1, 2, 3], smooth=sm)[0])
         hom.append(W.loso_stream(W.stream_features(m, raw, dt), [1, 2, 3], smooth=sm)[0])
         mem0.append(W.loso_stream(W.stream_features(z, raw, dt), [1, 2, 3], smooth=sm)[0])

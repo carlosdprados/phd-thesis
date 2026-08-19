@@ -51,7 +51,8 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from ch5_model import load_cards, lead_card          # noqa: E402
-from ch5_reservoir import _full, nodes_from, run_states, paired_stats  # noqa: E402
+from ch5_reservoir import (_full, memoryless_nodes, nodes_from, run_states,
+                           paired_stats)  # noqa: E402
 import ch5_wesad as W                                # noqa: E402
 
 DT = 1.0                       # reservoir cadence [s]
@@ -202,7 +203,7 @@ def _build_nodes(condition, cards, seed):
         return None
     if condition == "memoryless":
         nodes = nodes_from(full, N_NODES, rng, dt=DT, n_in=C, sparsity=0.4)
-        return [(0.0, a, w) for _, a, w in nodes]
+        return memoryless_nodes(nodes)
     if condition == "homogeneous":
         return nodes_from([slow], N_NODES, rng, dt=DT, n_in=C, sparsity=0.4)
     if condition == "heterogeneous":

@@ -19,7 +19,17 @@ This is **not** about new experiment types; only re-mining what exists.
   (days since fabrication). The comparative chapter rests on three of these:
   `_Hyst`, `_NmbPls`, `_DlyTime`.
 
-All numbers below were computed live from the May-2025 CSVs on 2026-06-10.
+The original numbers below were computed from the May-2025 CSVs on 2026-06-10.
+
+> **Superseding correction (2026-08-20).** Chapter 4 now treats screened,
+> substrate-level, model-free `t_half` as the primary timescale. Recomputing
+> within-cell scatter on that basis gives median σ(ln t_half) = **0.2637**
+> (23 substrates, 8 replicated cells; cell-SD range 0.0894–1.0179). The earlier
+> σ(ln τ) = 0.85 value came from noisier, unscreened instrument-fit time constants
+> and is retained only as a sensitivity bound. The bounded, peak-calibrated node
+> model also removes the previously claimed large linear-memory advantage: total
+> MC is 4.19 vs 4.52, with the heterogeneous bank higher in 7/10 random seeds.
+> This correction supersedes the original Finding 1 text and recommendations.
 
 > **Confound update (2026-06-10, same day).** Every finding was re-checked against
 > fabrication/experimental covariates (composition mass ratios, RPM, anneal,
@@ -35,7 +45,7 @@ All numbers below were computed live from the May-2025 CSVs on 2026-06-10.
 
 | # | Finding | Payoff | Effort |
 |---|---------|--------|--------|
-| 1 | The "measured device-to-device scatter ≈ 0.12" that the Ch5 robustness claim cites is **never derived from data**; the confound-checked value is σ(ln τ) ≈ **0.85** (~7× larger). | **High** — fixes a viva-exposed factual gap *and* strengthens the heterogeneity-as-resource thesis | Low |
+| 1 | The undocumented 0.12 jitter is replaced by the screened substrate-level median σ(ln t_half) = **0.2637**; the fit-based 0.85 is secondary. | **High** — aligns the model with Chapter 4's primary estimator and removes a headline overclaim | Low |
 | 2 | A library-wide **dynamical property map** exists in the data but is shown only for the Li/PEO spine; extend it to the **HYST window axis** and the **full chemistry palette**. | High — visually grounds the "heterogeneous palette" for the whole library | Low–Med |
 | ~~3~~ | ~~window↔τ coupling~~ **RETRACTED** — the apparent ρ=0.23 is composition-mediated and vanishes at fixed composition (ρ=0.03, p=0.79). | Reframed as: window & τ are *independent* knobs at fixed composition (validates the reservoir model) | — |
 | 4 | **VCONST** constant-voltage relaxation is essentially **unextracted** (rich features, but only 8 devices). | Low — optional third τ probe for those 8 | Low |
@@ -45,57 +55,30 @@ sweep-rate dependence of the hysteresis loop, and yield-by-composition.
 
 ---
 
-## FINDING 1 — The heterogeneity number the central claim cites is ~15× too small (and the truth helps you)
+## FINDING 1 — Corrected variability estimate and model consequence
 
-**What the thesis currently does.** `scripts/ch5_reservoir.py` injects
-device-to-device variation as a lognormal `jitter` (default **0.12**):
-`tau = c.tau * exp(N(0, jitter))`. `scripts/ch5_figures.py:96-97`
-draws a vertical line at **0.12 labelled "measured scatter"** on the robustness
-figure, and the surrounding text argues the heterogeneous bank keeps its
-advantage "across the whole realistic spread" (sweep 0 → 0.40).
+**Primary estimator.** `scripts/ch5_scatter_audit.py` now uses the screened
+substrate-level `t_half` table produced by the Chapter 4 pipeline, restricts the
+calculation to the replicated 3×3 grid, and computes the SD of ln(t_half) within
+each composition cell. The default jitter is the median across the eight cells
+with replicated finite estimates: **0.2637** (23 substrates). The observed
+cell-SD range, 0.0894–1.0179, is shown as sensitivity context rather than treated
+as one precisely estimated population distribution.
 
-**The problem.** The 0.12 is **not derived from the data anywhere** — it is the
-same number as the default `jitter` argument, re-labelled "measured". The
-`jitter` parameter is exactly σ of ln τ for devices **at fixed composition**, so
-it is directly measurable from `DEVICES_DELAYTIME_PIXEL_INFO.csv`.
+**Secondary estimator.** The earlier **0.846** value is reproducible from the
+older instrument-side fitted τ values (27 devices), but those fits are noisier,
+unscreened by the current Chapter 4 rules, and no longer match the thesis's
+primary timescale estimator. The across-group 1.59 value remains invalid because
+it pools the designed PEO×salt sweep.
 
-**Confound check (this is the important part).** A first naive estimate grouped
-only by the qualitative *Components Group* "SY, PEO, LiTr" and gave σ(ln τ)≈2.0 —
-**but that pools the deliberate PEO×salt mass-ratio sweep** (the comparative
-chapter's whole tuning axis) as if it were random scatter. That is exactly the
-confound the supervisor warned about. Decomposing properly (Ag only, n=31 lead-cell
-devices, device-median ln τ):
-
-| level | σ(ln τ) | what it contains |
-|---|---|---|
-| total within "SY,PEO,LiTr" group | 1.59 | **inflated** — includes designed PEO×salt tuning |
-| within **exact (PEO, salt) cell** | **0.85** | genuine device-to-device scatter (cells ≥3 dev, n=27) |
-| + control RPM & anneal (OLS resid) | 0.91 | RPM/anneal add ~nothing |
-| residual vs **thickness** | ρ=0.07, p=0.70 | thickness does **not** explain it |
-| residual vs **aging/day** | ρ=−0.05, p=0.80 | aging does **not** explain it (day range 1–13) |
-
-So the **confound-checked device-to-device scatter is σ(ln τ) ≈ 0.85**, not 0.12
-(still ~7×) and not the conflated 2.0. It is genuine: unexplained by composition,
-RPM, anneal, film thickness, or aging. Thickness coverage is complete (31/31).
-
-**The claim still holds at the measured value.** Running the reservoir's own
-`mc_curve_seeded` at the measured jitter (verified 2026-06-10): the heterogeneous
-bank still wins at σ=0.85 (total MC 6.11 vs homogeneous 5.19, **+0.92**; cf.
-+2.23 at the old 0.12). The advantage shrinks but stays clearly positive across
-0 → 1.0 — so correcting the number *strengthens honesty without breaking the
-result*, and shows the devices are more diverse than the model assumed.
-
-**What to do (low effort, high payoff).**
-1. `scripts/ch5_scatter_audit.py` recomputes σ(ln τ)≈0.85 with the controls above
-   and writes it to `handouts/ch5_scatter_audit.csv` (single source of truth).
-2. `fig_robustness` in `ch5_figures.py`: extend jitter sweep to ≥1.0, replace the
-   hardcoded 0.12 "measured scatter" line with the audited value, fix the label.
-3. Quantify the scatter in `chapter4_comparative.tex` ("device-to-device scatter
-   within each cell is substantial") and update the `chapter5_temporal.tex`
-   robustness caption/text to state the measured σ≈0.85 and that the advantage
-   holds there.
-4. (Optional) report the fraction of nodes hitting the `nodes_from` clips
-   (α∈[0.05,2], β∈[0.2,2], τ floor) at the measured jitter, for completeness.
+**Model consequence.** Jitter is applied only to the timescale; α and β are not
+perturbed by the same number because there is no common empirical scatter
+estimate for them. With the update bounded by measured peak ratio and N_peak,
+the heterogeneous bank no longer has a resolved total-linear-memory advantage
+(4.52±0.67 vs 4.19±0.42; 7/10 seeds). Its stronger result is nonlinear
+information-processing capacity (10.33±0.87 vs 6.31±0.44 total; nonlinear
+component 4.88 vs 1.84). The robustness figure is therefore a sensitivity plot,
+not evidence that variability is intrinsically beneficial.
 
 ---
 
@@ -177,9 +160,9 @@ for the thesis. Flag only.
 
 ## Recommended order of work
 
-1. **Finding 1** first — correctness fix to a headline claim, nearly free
-   (audit script for σ(ln τ)≈0.85, relabel the line, extend the x-axis).
-   Highest payoff per hour. **Confound-checked; survives.**
+1. **Finding 1** first — implemented with screened substrate-level
+   σ(ln t_half)=0.2637, timescale-only jitter, and the bounded node model. The
+   previous large linear-memory claim is retracted.
 2. **Finding 2** — one new library-wide map figure; reuses existing loaders,
    just drops the `cation=="Li"` filter and adds the HYST window axis. Organise
    by composition (the dominant axis) so it is read as a palette, not a trade-off.

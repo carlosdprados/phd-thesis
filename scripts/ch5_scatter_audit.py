@@ -1,22 +1,21 @@
 #!/usr/bin/env python3
-"""Measured device-to-device scatter of the fading-memory timescale.
+"""Measured between-substrate scatter of the fading-memory timescale.
 
-Run from the repo root:  python3 scripts/ch5_scatter_audit.py
-Reads the (un-versioned) experimental DATABASE in the sibling Nanomem_Devices_Library/.
-Writes the headline number to handouts/ch5_scatter_audit.csv and prints the
-variance decomposition.
+Run from the repo root:  python scripts/ch5_scatter_audit.py
+The primary estimate comes from the screened, substrate-level model-free
+half-times in handouts/ch4_decay_fits.csv. A legacy instrument-fit tau audit is
+retained only as an upper sensitivity reference.
 
 Why this exists
 ---------------
-The reservoir (scripts/ch5_reservoir.py) injects device-to-device variation as a
-lognormal `jitter` on tau/beta/alpha: tau = c.tau * exp(N(0, jitter)). The
-`jitter` parameter is therefore, by construction, the standard deviation of
-ln(tau) for devices AT FIXED COMPOSITION. That quantity is directly measurable.
+The reservoir injects between-substrate variation as log-normal jitter on its
+timescale. Because Chapter 4 defines the model-free t_half as the primary robust
+timescale, the matching estimate is the typical within-cell SD of ln(t_half),
+after junctions have been collapsed to one fabricated-substrate median.
 
-The robustness figure used to annotate a "measured scatter" line at 0.12, which
-was never derived from data. This script derives it, with the confounds the
-supervisor flagged (composition, spin RPM, anneal, film thickness, aging) held
-out, so the figure and the Ch5 text can cite a defensible value.
+The earlier 0.12 line was undocumented. A later 0.85 estimate used the noisier
+instrument-side fitted tau and predated the corrected screening/aggregation.
+Neither is the primary variability parameter for the revised node model.
 
 Key honesty point baked in: a naive estimate that groups only by the qualitative
 Components Group "SY, PEO, LiTr" CONFLATES the deliberate PEO x salt tuning sweep
@@ -33,7 +32,7 @@ OUT = "handouts"
 COMP = "SY, PEO, LiTr"
 METAL = "Ag"
 MIN_DEV_PER_CELL = 3          # cells with enough devices to estimate a within-cell spread
-OLD_CITED = 0.12              # the value the figure used to annotate as "measured"
+OLD_CITED = 0.12
 
 
 def load(fname):
@@ -66,7 +65,31 @@ def ols_resid_std(y, X):
     return float(np.sqrt(np.sum(resid ** 2) / dof))
 
 
+def robust_thalf_scatter():
+    """Median within-cell SD of ln(t_half) on the replicated screened grid."""
+    path = os.path.join(OUT, "ch4_decay_fits.csv")
+    grouped = {}
+    with open(path, newline="") as fh:
+        for row in csv.DictReader(fh):
+            if row.get("cation") != "Li":
+                continue
+            if row.get("peo") not in {"0.3", "0.6", "1.2"}:
+                continue
+            if row.get("salt") not in {"0.045", "0.09", "0.18"}:
+                continue
+            value = fnum(row.get("t_half_s"))
+            if value is not None and value > 0:
+                grouped.setdefault((row["peo"], row["salt"]), []).append(value)
+    cell_sigmas = [float(np.std(np.log(values), ddof=1))
+                   for values in grouped.values() if len(values) >= 2]
+    if not cell_sigmas:
+        raise ValueError("no replicated t_half cells found")
+    return (float(np.median(cell_sigmas)), sum(map(len, grouped.values())),
+            len(cell_sigmas), min(cell_sigmas), max(cell_sigmas))
+
+
 def main():
+    sigma_thalf, n_thalf, n_cells, sigma_min, sigma_max = robust_thalf_scatter()
     lib = {r["device_name"]: r for r in load("UPDATED_DEVICES_LIBRARY.csv")}
     prof = {}
     for r in load("DEVICES_PROFILOMETRY_STATS.csv"):
@@ -146,16 +169,22 @@ def main():
                      for r in rows if r["day"] is not None], dtype=float)
     rho_day = spearman(day, rday) if len(day) > 5 else float("nan")
 
-    headline = sigma_within   # the value the figure/text should cite as `jitter`
+    headline = sigma_thalf
 
     # --- emit single source of truth -------------------------------------------
     os.makedirs(OUT, exist_ok=True)
     out = os.path.join(OUT, "ch5_scatter_audit.csv")
     with open(out, "w", newline="") as fh:
-        w = csv.writer(fh)
+        w = csv.writer(fh, lineterminator="\n")
         w.writerow(["metric", "value", "n", "note"])
-        w.writerow(["sigma_lnTau_within_cell", round(headline, 4), n_within,
-                    "device-to-device scatter at fixed (PEO,salt); = reservoir jitter"])
+        w.writerow(["sigma_lnThalf_within_cell", round(headline, 4), n_thalf,
+                    f"primary: median cell SD on screened substrate t_half; {n_cells} cells"])
+        w.writerow(["sigma_lnThalf_cell_sd_min", round(sigma_min, 4), n_cells,
+                    "minimum across replicated cells"])
+        w.writerow(["sigma_lnThalf_cell_sd_max", round(sigma_max, 4), n_cells,
+                    "maximum across replicated cells; sensitivity bound"])
+        w.writerow(["sigma_lnTau_instrument_legacy", round(sigma_within, 4), n_within,
+                    "secondary: unscreened instrument-fit tau; not primary jitter"])
         w.writerow(["sigma_lnTau_total_group", round(sigma_total, 4), len(devs),
                     "CONFLATED: pools designed PEO x salt sweep -- do not cite"])
         w.writerow(["sigma_lnTau_ctrl_rpm_anneal", round(sigma_ctrl, 4), len(ok),
@@ -168,14 +197,18 @@ def main():
         w.writerow(["thickness_coverage", f"{n_dev_thick}/{len(devs)}", "",
                     "devices with profilometry"])
 
-    print(f"Device-to-device scatter audit  ({COMP} / {METAL}, n={len(devs)} devices)")
+    print("Between-substrate fading-memory scatter audit")
     print("-" * 64)
+    print(f"  PRIMARY median cell SD ln(t_half) : {sigma_thalf:.3f}  "
+          f"[n={n_thalf} substrates, {n_cells} cells]")
+    print(f"  observed cell-SD range            : {sigma_min:.3f} to {sigma_max:.3f}")
+    print("  legacy instrument-fit sensitivity:")
     print(f"  sigma(ln tau) total group         : {sigma_total:.2f}   <- CONFLATED (designed sweep)")
-    print(f"  sigma(ln tau) WITHIN (PEO,salt)    : {sigma_within:.2f}   <- measured scatter [n={n_within}]")
+    print(f"  sigma(ln tau) WITHIN (PEO,salt)    : {sigma_within:.2f}   [n={n_within}]")
     print(f"  + control RPM & anneal (resid)     : {sigma_ctrl:.2f}")
     print(f"  resid vs thickness  rho={rho_thick:+.2f} (n={n_thick}); coverage {n_dev_thick}/{len(devs)}")
     print(f"  resid vs aging/day  rho={rho_day:+.2f} (n={len(day)})")
-    print(f"  previously-cited 'measured scatter': {OLD_CITED}  (~{headline/OLD_CITED:.0f}x too small)")
+    print(f"  previously-cited undocumented value: {OLD_CITED}")
     print(f"\nwrote {out}")
     return headline
 

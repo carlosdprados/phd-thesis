@@ -44,7 +44,8 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ch5_model import load_cards, lead_card                       # noqa: E402
-from ch5_reservoir import nodes_from, run_states, _full, paired_stats  # noqa: E402
+from ch5_reservoir import (memoryless_nodes, nodes_from, run_states, _full,
+                           paired_stats)  # noqa: E402
 from ch5_wesad import (load_raw, load_motion, stream_subject, _ridge_onehot_fit,  # noqa: E402
                        _predict, macro_f1, _roll_mode, LABELS, WASHOUT_S, SMOOTH_S,
                        N_NODES, DT_WES, CHANNELS)
@@ -284,7 +285,7 @@ def make_banks(cards, dt, n_in, seed=7):
     rng = lambda: np.random.default_rng(seed)
     het = nodes_from(_full(cards), N_NODES, rng(), dt=dt, n_in=n_in, sparsity=0.4)
     hom = nodes_from([lead_card(cards)], N_NODES, rng(), dt=dt, n_in=n_in, sparsity=0.4)
-    mem0 = [(0.0, a, w) for (_, a, w) in het]          # memoryless: same masks, no leak
+    mem0 = memoryless_nodes(het)          # memoryless: same masks, no leak
     return het, hom, mem0
 
 

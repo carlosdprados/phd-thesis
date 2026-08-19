@@ -3,7 +3,7 @@
 discrete-time phi (write nonlinearity) (x) lambda (fading memory) (x) f (read)
 device model used by the reservoir-computing demonstrations.
 
-Run from the repo root:  python3 scripts/ch5_model.py
+Run from the repo root:  python scripts/ch5_model.py
 Inputs (produced by scripts/ch4_dynamics_fits.py):
   handouts/ch4_decay_by_cell.csv   -> fading memory tau, beta, t_half, retention60
   handouts/ch4_pulses_by_cell.csv  -> write nonlinearity alpha, peak ratio, N_peak, turnover
@@ -17,13 +17,11 @@ Honesty notes baked in (handout 12 sec 3, sec 9):
   (potentiation at one fixed inter-pulse cadence; decay after potentiation). This
   model COMPOSES them; that composition is an explicit assumption, not a measured
   fact. A varied-cadence pulse-train experiment is the test (future work).
-- Fading memory uses the identified Kohlrausch (tau, beta) where available; for
-  cells without an identified fit it falls back to a single exponential whose tau
-  reproduces the model-free half-life (tau_eff = t_half / ln 2, beta = 1).
+- Fading memory is anchored to the robust model-free half-life in every cell.
+  Identified beta values retain the observed stretch; tau is then derived so the
+  card reproduces the cell-median half-life exactly. Cells without an identified
+  beta use a simple exponential.
 - Read is assumed sub-threshold (state-preserving), as in the Ch2 PoC device.
-
-TODO (next session): leave-one-dataset-out validation against the raw curves;
-per-device parameter spread for the variability envelope; pulse-encoding front end.
 """
 import csv, os, math
 from dataclasses import dataclass
@@ -46,7 +44,7 @@ class ParameterCard:
     cation: str
     peo: str
     salt: str
-    n_dev: int
+    n_dev: int         # retained CSV name; count is fabricated substrates
     # fading memory (DELAYTIME)
     tau: float          # effective Kohlrausch relaxation time [s]
     beta: float         # stretch exponent (1.0 = simple exponential)
@@ -71,12 +69,17 @@ class ParameterCard:
 
     # ---- write nonlinearity: conductance enhancement ratio after N identical pulses ----
     def potentiation_ratio(self, N):
-        """First-order behavioural model: a power-law build-up R ~ N^alpha that
-        saturates/turns over near n_peak at peak_ratio. Calibrated so R(n_peak)=peak_ratio."""
+        """Bounded power-law envelope for the measured pulse build-up.
+
+        The rise is calibrated so R(0)=1 and R(n_peak)=peak_ratio. For cells that
+        turned over in the measured train, the descriptive post-peak roll-off is
+        retained here for plotting; the reservoir node deliberately stops at the
+        measured peak because recovery from turnover was not measured.
+        """
         N = np.asarray(N, dtype=float)
         npk = max(self.n_peak, 1.0)
-        # power-law rise normalised to hit peak_ratio at n_peak
-        rise = self.peak_ratio * np.power(np.clip(N, 1e-9, None) / npk, self.alpha)
+        frac = np.clip(N, 0, None) / npk
+        rise = 1.0 + (self.peak_ratio - 1.0) * np.power(frac, self.alpha)
         r = np.minimum(rise, self.peak_ratio)
         if self.turnover:
             # gentle decline past the peak (decade-scale roll-off); behavioural only
@@ -100,11 +103,11 @@ def load_cards(li_only=True):
             continue
         p = pulses.get(key, {})
         t_half = _f(d.get("t_half_med")) or float("nan")
-        tau_id = _f(d.get("tau_med"))
         beta_id = _f(d.get("beta_med"))
-        identified = tau_id is not None and beta_id is not None
+        identified = beta_id is not None
         if identified:
-            tau, beta = tau_id, beta_id
+            beta = beta_id
+            tau = t_half / (LN2 ** (1.0 / beta))
         elif t_half == t_half:  # not NaN
             tau, beta = t_half / LN2, 1.0   # single-exp reproducing the half-life
         else:

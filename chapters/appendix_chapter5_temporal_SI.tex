@@ -20,18 +20,16 @@ results reproducible without consulting the analysis scripts
 
 \section{Parameter-Card Sourcing}\label{app:ch5_cards}
 
-Each composition cell is reduced to a parameter card
-$(\tau_c,\beta_c,\alpha_c,\text{peak}_c)$ that drives one reservoir node type. The
-values are taken directly from the comparative fits, with no free re-tuning:
+Each replicated composition cell is reduced to a parameter card
+$(t_{1/2,c},\beta_c,\alpha_c,R_{\mathrm{peak},c},N_{\mathrm{peak},c})$ that drives one reservoir node type. The values are taken directly from the comparative summaries, with no free re-tuning:
 \begin{itemize}
-  \item the fading-memory law $\lambda_c(\Delta t)=\exp[-(\Delta t/\tau_c)^{\beta_c}]$ uses the per-cell $(\tau_c,\beta_c)$ of \cref{tab:ch4_decay_by_cell}; for the few cells without an identified stretched fit, a single exponential reproducing the model-free half-life is used instead ($\tau_c=t_{1/2}/\ln 2$, $\beta_c=1$);
-  \item the write nonlinearity uses the per-cell growth exponent $\alpha_c$ and peak enhancement of \cref{tab:ch4_pulses_by_cell};
-  \item the device-to-device spread injected into each bank is the within-cell scatter of those same tables.
+  \item the fading-memory law $\lambda_c(\Delta t)=\exp[-(\Delta t/\tau_c)^{\beta_c}]$ is anchored to the model-free cell-median $t_{1/2,c}$ in \cref{tab:ch4_decay_by_cell}. Where $\beta_c$ is identified, $\tau_c=t_{1/2,c}/(\ln 2)^{1/\beta_c}$; otherwise $\beta_c=1$ and $\tau_c=t_{1/2,c}/\ln 2$;
+  \item the write envelope uses the per-cell growth exponent, peak enhancement, and pulse count at the peak from \cref{tab:ch4_pulses_by_cell}; it is normalised to $G/G_0=1$ at zero effective pulses and capped at the measured peak;
+  \item the injected device-to-device jitter acts only on the timescale and uses the screened substrate-level within-cell scatter in \cref{app:ch5_scatter}. No common jitter is assumed for $\alpha$ or $\beta$.
 \end{itemize}
 The heterogeneous banks of \cref{sec:ch5_benchmarks,sec:ch5_physio} span the
 replicated \PEO{}/\LiTf{} composition cells of \cref{tab:ch4_decay_by_cell}
-($\tau$ from $\approx 3$ to $\approx 26$\,s); the homogeneous control banks are
-jittered copies of the lead cell \PEO{}~0.3/0.09 alone.
+($\tau$ from $\approx 4$ to $\approx 30$\,s); the unreplicated \PEO{}~0.15 cell is excluded. Homogeneous controls are jittered copies of the lead cell \PEO{}~0.3/0.09 alone.
 
 \section{Simulation and Read-out Settings}\label{app:ch5_settings}
 
@@ -55,7 +53,7 @@ leakage.
     \toprule
     Setting & Value \\
     \midrule
-    Node model & $x^{(i)}_n=\lambda_i x^{(i)}_{n-1}+[\max(w_i u_n,0)]^{\alpha_i}$ (\cref{sec:ch5_model}) \\
+    Node model & bounded, peak-calibrated recurrence: leak $x$ by $\lambda_i$, advance pulse progress by at most $\operatorname{clip}(w_i u_n,0,1)/N_{\mathrm{peak},i}$, then map through $x=p^{\alpha_i}$ (\cref{sec:ch5_model}) \\
     Read-out & single linear ridge regression \\
     Bank size $N$ & 24 (benchmarks); 48 (physiology/affect) \\
     Algorithmic variability & 10 random input/bank seeds; means $\pm$ SD and sign consistency reported; seeds are not inferential replicates \\
@@ -72,47 +70,25 @@ leakage.
 
 \section{Measured Device-to-Device Scatter}\label{app:ch5_scatter}
 
-The robustness analysis of \cref{sec:ch5_deploy} (\cref{fig:ch5_robustness})
-injects device-to-device variation as a multiplicative log-normal \emph{jitter} on
-each node's timescale, \(\tau_i=\tau\,e^{\varepsilon}\) with
-\(\varepsilon\sim\mathcal{N}(0,\sigma^2)\); the jitter magnitude \(\sigma\) is, by
-construction, the standard deviation of \(\ln\tau\) across nominally identical
-devices. That quantity is measured directly here, so the dotted ``measured
-scatter'' line in \cref{fig:ch5_robustness} is data-derived rather than assumed.
+The robustness analysis of \cref{sec:ch5_deploy} (\cref{fig:ch5_robustness}) injects variation as multiplicative log-normal jitter on each node's timescale, \(\tau_i=\tau\,e^{\varepsilon}\) with \(\varepsilon\sim\mathcal{N}(0,\sigma^2)\). Because \cref{ch:comparative} defines $t_{1/2}$ as the robust primary timescale, the matching estimate is the within-cell spread of \(\ln t_{1/2}\), after junctions have been collapsed to one median per fabricated substrate.
 
-The estimate uses the fading-memory time constants of every silver
-\PEO{}/\LiTf{} device (\(n=31\)). A naive spread taken across the whole
-\textsf{SY,~PEO,~LiTr} group conflates the \emph{deliberate} \PEO{}\,\(\times\)\,salt
-tuning sweep of \cref{ch:comparative} with random scatter and over-states it
-(\(\sigma\approx\num{1.59}\)); the meaningful quantity is the spread \emph{within}
-each fixed \PEO{}/salt cell, \(\sigma(\ln\tau)\approx\num{0.85}\)
-(\cref{tab:ch5_scatter}). This residual is genuine device-to-device variation: it
-is essentially unchanged after regressing out spin-coating speed and annealing
-(\(\approx\num{0.91}\)), and within-cell residuals show no monotonic dependence on
-film thickness (Spearman \(\rho\approx\num{0.14}\), \(n=31\), complete
-profilometry) or on device age (\(\rho\approx\num{0.05}\)). The measured value is
-roughly seven times the figure previously annotated on the robustness plot, and
-the heterogeneous bank retains its memory-capacity advantage at it
-(\cref{fig:ch5_robustness}), so the realised material diversity is, if anything,
-larger than the simulations assume. The audit is reproduced by
-\texttt{scripts/ch5\_scatter\_audit.py}.
+Across the eight replicated cells with finite estimates ($23$ substrates), the median cell standard deviation is \(\sigma(\ln t_{1/2})=\num{0.2637}\); individual cell estimates range from \num{0.0894} to \num{1.0179}. The median is used as the default jitter, and the range motivates the sensitivity sweep. The value is descriptive rather than a precise population parameter because each cell contains few substrates and batch effects cannot be eliminated. A secondary audit of the older, unscreened instrument-side exponential fits gives \(\sigma(\ln\tau)=\num{0.846}\) within cells ($n=27$) and is retained only as an upper stress-test reference. Pooling the entire composition sweep gives \num{1.59} but is invalid as a within-cell estimate because it includes the deliberately designed composition differences. The audit is reproduced by \texttt{scripts/ch5\_scatter\_audit.py}.
 
 \begin{table}[t]
   \centering
-  \caption[Measured device-to-device scatter of the fading-memory time]{Variance decomposition of \(\ln\tau\) for the silver \PEO{}/\LiTf{} series (\(n=31\) devices). The within-cell value is the measured jitter \(\sigma\); the group-level value is reported only to show the confound it would introduce.}
+  \caption[Measured substrate-to-substrate scatter of the fading-memory time]{Primary and sensitivity estimates for timescale jitter in the silver \PEO{}/\LiTf{} series. The primary value uses screened, model-free substrate $t_{1/2}$ values on the replicated grid; fit-based values are secondary diagnostics.}
   \label{tab:ch5_scatter}
   \footnotesize
   \setlength{\tabcolsep}{5pt}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X r@{}}
     \toprule
-    Estimate of \(\sigma(\ln\tau)\) & Value \\
+    Estimate & Value \\
     \midrule
-    Across \textsf{SY,~PEO,~LiTr} group (conflates designed sweep) & \num{1.59} \\
-    \textbf{Within fixed \PEO{}/salt cell (= measured jitter)} & \textbf{\num{0.85}} \\
-    \quad after regressing out spin speed + anneal & \num{0.91} \\
-    Within-cell residual vs.\ film thickness (Spearman \(\rho\)) & \num{0.14} \\
-    Within-cell residual vs.\ device age (Spearman \(\rho\)) & \num{0.05} \\
-    Value previously annotated on \cref{fig:ch5_robustness} & \num{0.12} \\
+    \textbf{Median within-cell $\sigma(\ln t_{1/2})$; 23 substrates, 8 cells} & \textbf{\num{0.2637}} \\
+    Range of cell-level $\sigma(\ln t_{1/2})$ & \numrange{0.0894}{1.0179} \\
+    Legacy within-cell $\sigma(\ln\tau)$; instrument fits, $n=27$ & \num{0.846} \\
+    Across-group $\sigma(\ln\tau)$; conflates designed sweep & \num{1.59} \\
+    Previously annotated undocumented value & \num{0.12} \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -214,7 +190,7 @@ grid supplies intrinsically, and extending the range (the drive-amplitude variab
 
 \begin{table}[t]
   \centering
-  \caption[Generic echo-state-network control]{Total linear memory capacity ($N=24$, ten matched seeds, means $\pm$\,SD) of the measured device heterogeneous bank versus random echo-state networks of equal size. Relative to the device bank, the same-range ESN differs by $+0.28$ on average and the broad-range ESN by $+1.14$ (positive in all ten seed pairs). These are algorithmic-sensitivity comparisons, not population-level significance tests.}
+  \caption[Generic echo-state-network control]{Total linear memory capacity ($N=24$, ten matched seeds, means $\pm$\,SD) of the measured-card heterogeneous bank versus generic random leaky banks of equal size. The same-range control exceeds the device bank by $0.45$ on average (device higher in $4/10$ seeds); the broad-range control exceeds it by $1.04$ (device higher in $2/10$). These are algorithmic-sensitivity comparisons, not population-level tests.}
   \label{tab:ch5_esn}
   \footnotesize
   \setlength{\tabcolsep}{6pt}
@@ -222,9 +198,9 @@ grid supplies intrinsically, and extending the range (the drive-amplitude variab
     \toprule
     Reservoir ($N=24$) & total MC \\
     \midrule
-    Measured device heterogeneous bank          & $6.4 \pm 0.3$ \\
-    Random ESN, same $\tau$ range ($3$--$26$\,s) & $6.7 \pm 0.3$ \\
-    Random ESN, broad $\tau$ range ($0.5$--$60$\,s) & $7.6 \pm 0.3$ \\
+    Measured-card heterogeneous bank             & $4.52 \pm 0.67$ \\
+    Generic bank, same $\tau$ range ($3$--$30$\,s) & $4.97 \pm 0.78$ \\
+    Generic bank, broad $\tau$ range ($0.5$--$60$\,s) & $5.56 \pm 0.74$ \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -233,20 +209,13 @@ grid supplies intrinsically, and extending the range (the drive-amplitude variab
 composition assumption of \cref{sec:ch5_model}: each node's retention time is
 rescaled with its own write-nonlinearity exponent by a factor $e^{\kappa z}$ ($z$ the
 standardised exponent), modelling the drive--retention coupling the separate-amplitude
-measurement cannot exclude. The heterogeneous bank stays above the homogeneous one for
-every coupling strength swept, so the heterogeneity conclusion does not rest on the
-assumption being exact. The sweep is then \emph{anchored to data}. The gold/\TMPE{}
+measurement cannot exclude. Mean capacity remains slightly higher in the heterogeneous bank across the sweep, but the difference is small and not seed-consistent enough to support an inferential robustness claim. The sweep is then \emph{anchored to data}. The gold/\TMPE{}
 negative-polarity corpus of \cref{ch:comparative} supplies the only direct measurement
 of this coupling: across $28$ single-run potentiation\,$+$\,relaxation traces the
 write-depth and the forgetting time are rank-correlated at $\rho=+0.46$ ($p=0.015$;
 $95\%$ CI $0.10$--$0.71$ by Fisher's $z$). Calibrating $\kappa$ so the simulated
 across-node write--retention correlation matches that figure fixes the data-anchored
-operating point. The nominal composed cards already carry a baseline correlation of
-$\rho=+0.32$ (cells that write more strongly also retain longer), so reproducing the
-measurement needs only a modest extra coupling, $\kappa^{\star}=+0.18$ (CI
-$0.00$--$0.63$), at which the heterogeneous advantage is undiminished (capacity ratio
-$1.45$, positive in all ten seed pairs; the ratio stays above $1.18$ across the whole
-measured CI). The figure is transferred as an order-of-magnitude anchor only -- a
+operating point. The nominal composed cards already carry an across-node rank correlation of about $\rho=+0.57$, so the central external estimate maps to $\kappa^{\star}=0$; the upper confidence limit maps to about $+0.31$. The heterogeneous-to-homogeneous ratio is $1.08$ at both points, and the sweep spans only $1.04$--$1.09$. The figure is transferred as an order-of-magnitude anchor only -- a
 different host, electrode, and polarity -- but it converts the bound from an arbitrary
 range into a data-referenced point and independently confirms the \emph{sign} of the
 coupling the composed model assumes. The calibration ($\kappa$-for-$\rho$ bisection)
@@ -254,21 +223,21 @@ is reproduced by \path{scripts/ch5_reservoir.py}.
 
 \begin{table}[t]
   \centering
-  \caption[Coupling-sensitivity control]{Memory capacity of the heterogeneous and homogeneous banks under an injected drive--retention coupling of strength $\kappa$ ($N=24$, ten seeds; $\kappa=0$ is the nominal composed model, which already carries a baseline across-node write--retention rank correlation $\rho=+0.32$). \emph{Upper block:} an arbitrary symmetric sweep; the heterogeneous advantage is positive in all ten seed pairs at every $\kappa$. \emph{Lower block ($\dagger$):} the data-anchored point, $\kappa^{\star}=+0.18$, calibrated so the simulated correlation reproduces the measured Au/TMPE coupling ($\rho=+0.46$; \cref{ch:comparative}); the advantage is undiminished there. Seed consistency describes sensitivity, not experimental replication.}
+  \caption[Coupling-sensitivity control]{Memory capacity under an injected drive--retention coupling $\kappa$ ($N=24$, ten seeds). The mean ratio remains close to unity throughout. The nominal cards already yield $\rho\approx+0.57$, above the transferred Au/TMPE central estimate of $+0.46$, so the data-anchored central point is $\kappa^{\star}=0$ and the upper confidence point is $+0.31$. Seed consistency describes algorithmic sensitivity, not experimental replication.}
   \label{tab:ch5_coupling}
   \footnotesize
   \setlength{\tabcolsep}{8pt}
-  \begin{tabular}{rccc}
+  \begin{tabular}{rcccc}
     \toprule
-    $\kappa$ & het MC & hom MC & ratio \\
+    $\kappa$ & het MC & hom MC & ratio & het higher \\
     \midrule
-    $-0.50$ & 6.31 & 5.50 & 1.15 \\
-    $-0.25$ & 6.22 & 4.65 & 1.34 \\
-    $\phantom{-}0.00$ & 6.43 & 4.20 & 1.53 \\
-    $+0.25$ & 6.57 & 4.64 & 1.42 \\
-    $+0.50$ & 6.75 & 5.43 & 1.24 \\
+    $-0.50$ & 4.37 & 4.19 & 1.04 & $5/10$ \\
+    $-0.25$ & 4.41 & 4.19 & 1.05 & $7/10$ \\
+    $\phantom{-}0.00^{\dagger}$ & 4.52 & 4.19 & 1.08 & $7/10$ \\
+    $+0.25$ & 4.50 & 4.19 & 1.07 & $7/10$ \\
+    $+0.50$ & 4.59 & 4.19 & 1.09 & $8/10$ \\
     \midrule
-    $+0.18^{\dagger}$ & 6.49 & 4.46 & 1.45 \\
+    $+0.31^{\ddagger}$ & 4.52 & 4.19 & 1.08 & $7/10$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -286,9 +255,9 @@ drive-boosted nodes at $\tau = 120$ and \SI{300}{\second}, a labelled
 extrapolation of the drive-amplitude variable, copying the lead cell's write
 nonlinearity and stretch and overriding only $\tau$ (\path{tonic_cards} in
 \path{scripts/ch5_model.py}). On memory capacity (DT $=\SI{5}{\second}$, $k$ to $40$)
-the extension nearly doubles the long-lag tail beyond \SI{75}{\second}
-($\mathrm{MC}_{k>15}$ from $0.73$ to $1.37$, positive in all ten seed pairs) and raises total
-capacity from $6.4$ to $7.0$. On the physiological-context reconstruction, with the
+the extension raises the long-lag tail beyond \SI{75}{\second}
+($\mathrm{MC}_{k>15}$ from $0.20$ to $0.91$, positive in all ten seed pairs) and raises total
+capacity from $4.52$ to $5.03$. On the physiological-context reconstruction, with the
 target delays extended to $90$ and \SI{120}{\second} so the genuinely tonic context is
 present, the slow-band held-out $R^2$ rises from $0.672$ to $0.690$
 ($+0.019$, positive in all ten seed pairs) and the overall

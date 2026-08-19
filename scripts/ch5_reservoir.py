@@ -3,20 +3,23 @@
 and the homogeneous-vs-heterogeneous comparison that is the crux of the two
 demonstrations (handout 12 sec 5-6).
 
-Run from the repo root:  python3 scripts/ch5_reservoir.py
+Run from the repo root:  python scripts/ch5_reservoir.py
 Depends on scripts/ch5_model.py (parameter cards from the Chapter 4 fits).
 
-Model (first-order, behavioural; honest about its assumptions):
-- Each device is a leaky, nonlinearly-driven node. Rate-coded input u_n in [0,1]
-  drives a compressive write (the measured potentiation exponent alpha), and the
-  state leaks with the device's fading memory between samples:
-      x_n^i = decay_i * x_{n-1}^i + (w_i * u_n) ** alpha_i
-  decay_i = exp(-(dt/tau_i)^beta_i) is the measured Kohlrausch retention over the
-  sample interval dt; w_i is a per-device input gain (the reservoir "mask").
+Model (first-order, behavioural; explicit about its assumptions):
+- Each device is a bounded, leaky, nonlinearly-driven node. The latent state is a
+  fraction of the measured peak enhancement. After leakage, a rate-coded input
+  advances the measured pulse-progress coordinate by at most one effective pulse:
+      x_leak = decay_i * x_{n-1}
+      p_n    = clip(x_leak ** (1/alpha_i) + clip(w_i u_n,0,1)/N_peak_i, 0, 1)
+      x_n    = p_n ** alpha_i
+      G_n/G_0 = 1 + (peak_i - 1) x_n
+  With no leakage and unit input this reproduces the measured power-law envelope
+  and reaches the measured peak at N_peak. The state cannot exceed that peak.
 - Nodes are INDEPENDENT (1T1M bank, no inter-node recurrence) -- diversity comes
-  only from the spread of (tau, beta, alpha) across compositions plus device-to-
-  device scatter (jitter) and the input mask. This is deliberately the hard case
-  for a reservoir, so any heterogeneity benefit shown here is conservative.
+  from the measured parameter cards across compositions, timescale-only within-cell
+  scatter, and the input mask. Turnover beyond the measured peak is not
+  extrapolated because its recovery dynamics were not measured.
 
 Memory Capacity (Jaeger): MC_k = corr^2(ridge prediction, u_{n-k}); total MC =
 sum_k MC_k. A spread of timescales should broaden MC(k) over lags and raise total
@@ -27,6 +30,7 @@ affective-task harness (Demo A binary / Demo B 3-class) is the next script and
 needs the dataset; it is intentionally not here.
 """
 import os, sys
+from dataclasses import dataclass, replace
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -36,28 +40,47 @@ DT = 5.0          # sample interval [s] (affect-signal scale; sets the leak per 
 WASHOUT = 200
 RIDGE = 1e-6
 SEEDS = range(10)  # seeds for the error-bar statistics (banks + input draws)
+DEFAULT_JITTER = 0.264  # median within-cell sigma(ln t_half), Chapter 4 audit
+
+
+@dataclass(frozen=True)
+class ReservoirNode:
+    """One bounded behavioural node at a fixed simulation cadence."""
+
+    decay: float
+    alpha: float
+    w: object
+    peak_ratio: float
+    n_peak: float
+    turnover: bool = False
 
 
 def _full(cards):
-    """Cards usable as nonlinear nodes (need a measured potentiation alpha/peak)."""
-    return [c for c in cards if c.alpha == c.alpha and c.peak_ratio == c.peak_ratio]
+    """Cards from the replicated 3x3 grid usable as nonlinear nodes."""
+    return [c for c in cards
+            if c.peo in {"0.3", "0.6", "1.2"}
+            and c.salt in {"0.045", "0.09", "0.18"}
+            and c.alpha == c.alpha and c.peak_ratio == c.peak_ratio]
 
 
-def nodes_from(base, N, rng, jitter=0.12, dt=DT, n_in=1, sparsity=0.0):
-    """Return per-node (decay, alpha, w) by cycling the given base cards with
-    device-to-device jitter and a random input mask/gain.
+def nodes_from(base, N, rng, jitter=DEFAULT_JITTER, dt=DT, n_in=1, sparsity=0.0):
+    """Return bounded nodes by cycling the given cards with timescale scatter.
 
     decay is computed at sample interval `dt` (s). `n_in` is the number of input
-    channels: for n_in==1 the mask `w` is a scalar (single-channel behaviour is
-    byte-identical to before — same RNG draw order), for n_in>1 each node gets a
+    channels: for n_in==1 the mask `w` is a scalar; for n_in>1 each node gets a
     non-negative input-mask vector of length n_in (a fraction `sparsity` of whose
-    entries are zeroed), so the bank mixes several physiological channels."""
+    entries are zeroed), so the bank mixes several physiological channels.
+
+    `jitter` is applied only as log-normal scatter on the timescale. The earlier
+    implementation also perturbed beta and alpha by this same number even though
+    no common scatter estimate existed for those parameters.
+    """
     nodes = []
     for i in range(N):
         c = base[i % len(base)]
         tau = max(c.tau * float(np.exp(rng.normal(0, jitter))), 1e-2)
-        beta = float(np.clip(c.beta * (1 + rng.normal(0, jitter)), 0.2, 2.0))
-        alpha = float(np.clip(c.alpha * (1 + rng.normal(0, jitter)), 0.05, 2.0))
+        beta = float(np.clip(c.beta, 0.2, 1.0))
+        alpha = float(np.clip(c.alpha, 0.05, 2.0))
         if n_in == 1:
             w = float(np.exp(rng.normal(0, 0.5)))        # input mask / gain (scalar)
         else:
@@ -68,11 +91,18 @@ def nodes_from(base, N, rng, jitter=0.12, dt=DT, n_in=1, sparsity=0.0):
                     m[rng.integers(n_in)] = True         # keep >=1 live channel
                 w = w * m
         decay = float(np.exp(-((dt / tau) ** beta)))
-        nodes.append((decay, alpha, w))
+        nodes.append(ReservoirNode(
+            decay=decay,
+            alpha=alpha,
+            w=w,
+            peak_ratio=max(float(c.peak_ratio), 1.0),
+            n_peak=max(float(c.n_peak), 1.0),
+            turnover=bool(c.turnover),
+        ))
     return nodes
 
 
-def make_nodes(cards, N, heterogeneous, rng, jitter=0.12):
+def make_nodes(cards, N, heterogeneous, rng, jitter=DEFAULT_JITTER):
     """Heterogeneous: cycle all composition cells; homogeneous: N jittered copies
     of the lead node (device-to-device scatter only)."""
     base = _full(cards) if heterogeneous else [lead_card(cards)]
@@ -105,11 +135,11 @@ def random_nodes(N, rng, dt=DT, tau_lo=3.0, tau_hi=26.0, alpha_lo=0.5, alpha_hi=
                     m[rng.integers(n_in)] = True
                 w = w * m
         decay = float(np.exp(-((dt / max(tau, 1e-2)) ** beta)))
-        nodes.append((decay, alpha, w))
+        nodes.append(ReservoirNode(decay, alpha, w, 2.0, 300.0, False))
     return nodes
 
 
-def coupled_nodes(base, N, rng, kappa, jitter=0.12, dt=DT):
+def coupled_nodes(base, N, rng, kappa, jitter=DEFAULT_JITTER, dt=DT):
     """The device bank with an explicit phi<->lambda COUPLING perturbation, the test
     of the composition assumption flagged in sec:ch5_model (write nonlinearity and
     retention were measured at different amplitudes, so their composition could
@@ -124,43 +154,56 @@ def coupled_nodes(base, N, rng, kappa, jitter=0.12, dt=DT):
     for i in range(N):
         c = base[i % len(base)]
         tau = max(c.tau * float(np.exp(rng.normal(0, jitter))), 1e-2)
-        beta = float(np.clip(c.beta * (1 + rng.normal(0, jitter)), 0.2, 2.0))
-        alpha = float(np.clip(c.alpha * (1 + rng.normal(0, jitter)), 0.05, 2.0))
+        beta = float(np.clip(c.beta, 0.2, 1.0))
+        alpha = float(np.clip(c.alpha, 0.05, 2.0))
         w = float(np.exp(rng.normal(0, 0.5)))
-        draws.append((tau, beta, alpha, w))
-    al = np.array([d[2] for d in draws])
+        draws.append((c, tau, beta, alpha, w))
+    al = np.array([d[3] for d in draws])
     z = (al - al.mean()) / (al.std() + 1e-9)
     nodes = []
-    for (tau, beta, alpha, w), zi in zip(draws, z):
+    for (card, tau, beta, alpha, w), zi in zip(draws, z):
         tau_eff = max(tau * float(np.exp(kappa * zi)), 1e-2)
         decay = float(np.exp(-((dt / tau_eff) ** beta)))
-        nodes.append((decay, alpha, w))
+        nodes.append(ReservoirNode(decay, alpha, w, max(card.peak_ratio, 1.0),
+                                   max(card.n_peak, 1.0), bool(card.turnover)))
     return nodes
+
+
+def memoryless_nodes(nodes):
+    """Matched dimensionality/nonlinearity control with the leak removed."""
+    return [replace(node, decay=0.0) for node in nodes]
 
 
 def run_states(nodes, u):
     """Drive the bank with input u and return the state matrix X (T, N).
 
     u may be (T,) single-channel or (T, C) multichannel; each node's drive is the
-    compressive write of its (non-negative) input mix:  relu(W_in . u_n) ** alpha.
+    bounded write of its non-negative input mix. Each full-scale sample represents
+    at most one effective pulse; this pulse-count mapping is a modelling convention,
+    not a validated hardware timing claim.
     """
     u = np.asarray(u, float)
     if u.ndim == 1:
         u = u[:, None]                                   # (T, 1)
     T, C = u.shape
     N = len(nodes)
-    decay = np.array([n[0] for n in nodes])
-    alpha = np.array([n[1] for n in nodes])
-    Win = np.array([np.atleast_1d(n[2]) for n in nodes], float)   # (N, Cw)
+    decay = np.array([node.decay for node in nodes])
+    alpha = np.array([node.alpha for node in nodes])
+    Win = np.array([np.atleast_1d(node.w) for node in nodes], float)   # (N, Cw)
+    peaks = np.array([node.peak_ratio for node in nodes])
+    n_peak = np.array([node.n_peak for node in nodes])
     if Win.shape[1] == 1 and C > 1:
         Win = np.repeat(Win, C, axis=1)                  # broadcast scalar gain
     assert Win.shape[1] == C, f"mask has {Win.shape[1]} channels, input has {C}"
     X = np.zeros((T, N))
-    x = np.zeros(N)
+    x = np.zeros(N)  # normalised enhancement fraction, bounded in [0, 1]
     for n in range(T):
-        drive = np.power(np.clip(Win @ u[n], 0, None), alpha)
-        x = decay * x + drive
-        X[n] = x
+        drive = np.clip(Win @ u[n], 0.0, 1.0)
+        leaked = np.clip(decay * x, 0.0, 1.0)
+        progress = np.power(leaked, 1.0 / alpha)
+        progress = np.clip(progress + drive / n_peak, 0.0, 1.0)
+        x = np.power(progress, alpha)
+        X[n] = 1.0 + (peaks - 1.0) * x
     return X
 
 
@@ -342,7 +385,8 @@ def paired_stats(a, b):
                frac_pos=float(np.mean(d > 0)), p=p, n=len(d), r_rb=r_rb)
 
 
-def mc_curve_seeded(cards, het, N=24, max_k=30, seeds=SEEDS, jitter=0.12):
+def mc_curve_seeded(cards, het, N=24, max_k=30, seeds=SEEDS,
+                    jitter=DEFAULT_JITTER):
     """Seed-averaged MC(k). Each seed draws a fresh random input AND a fresh
     jittered bank, so the spread reflects both the input and device-scatter
     stochasticity. `jitter` is the device-to-device scatter magnitude.
@@ -388,7 +432,7 @@ def composition_sweep(cards, N=16, max_k=30, seeds=SEEDS):
 def random_reservoir_control(cards, N=24, max_k=30, seeds=SEEDS):
     """Generic-ESN control for the matching thesis: total MC of the measured device
     heterogeneous bank vs (i) a random ESN with leaks spread log-uniform over the
-    SAME tau range (3-26 s), and (ii) a random ESN over a BROADER uninformed range
+    SAME approximate tau range (3-30 s), and (ii) a random ESN over a BROADER uninformed range
     (0.5-60 s). Seed-matched paired tests against the device bank."""
     dev, rnd_same, rnd_broad = [], [], []
     for s in seeds:
@@ -396,20 +440,20 @@ def random_reservoir_control(cards, N=24, max_k=30, seeds=SEEDS):
         dev.append(memory_capacity(run_states(
             make_nodes(cards, N, True, np.random.default_rng(s)), u), u, max_k).sum())
         rnd_same.append(memory_capacity(run_states(
-            random_nodes(N, np.random.default_rng(5000 + s), tau_lo=3.0, tau_hi=26.0), u), u, max_k).sum())
+            random_nodes(N, np.random.default_rng(5000 + s), tau_lo=3.0, tau_hi=30.0), u), u, max_k).sum())
         rnd_broad.append(memory_capacity(run_states(
             random_nodes(N, np.random.default_rng(6000 + s), tau_lo=0.5, tau_hi=60.0), u), u, max_k).sum())
     dev, rnd_same, rnd_broad = map(np.array, (dev, rnd_same, rnd_broad))
     print("\nGeneric-ESN control (matching thesis), total MC seed-averaged:")
     print(f"  measured device het bank          {dev.mean():5.2f}+/-{dev.std(ddof=1):.2f}")
-    print(f"  random ESN, same tau range 3-26s  {rnd_same.mean():5.2f}+/-{rnd_same.std(ddof=1):.2f}")
+    print(f"  random ESN, same tau range 3-30s  {rnd_same.mean():5.2f}+/-{rnd_same.std(ddof=1):.2f}")
     print(f"  random ESN, broad range 0.5-60s   {rnd_broad.mean():5.2f}+/-{rnd_broad.std(ddof=1):.2f}")
     for tag, arr in [("vs same-range ESN", rnd_same), ("vs broad-range ESN", rnd_broad)]:
         st = paired_stats(dev, arr)
         print(f"  device {tag}: {st['mean']:+.2f} "
-              f"({int(st['frac_pos']*st['n'])}/{st['n']} seeds, p={st['p']:.1e}, r_rb={st['r_rb']:+.2f})")
-    print("  (device bank ties a same-range random ESN => the resource is the tau"
-          " SPREAD, delivered intrinsically; matching picks the cell for a given task.)")
+              f"({int(st['frac_pos']*st['n'])}/{st['n']} seeds favour device)")
+    print("  (the device bank does not outperform a generic same-range ESN; the"
+          " useful resource is the timescale spread rather than these exact values.)")
     return dict(dev=dev, rnd_same=rnd_same, rnd_broad=rnd_broad)
 
 
@@ -423,7 +467,8 @@ def _spearman(a, b):
     return float((ra * rb).sum() / den) if den > 0 else 0.0
 
 
-def _realized_dr_rho(base, N, kappa, seeds=SEEDS, jitter=0.12, dt=DT):
+def _realized_dr_rho(base, N, kappa, seeds=SEEDS,
+                     jitter=DEFAULT_JITTER, dt=DT):
     """The across-node write->retention rank correlation actually induced in the
     heterogeneous bank at coupling strength kappa: Spearman(alpha_i, tau_eff_i),
     the simulation analogue of the MEASURED Au/TMPE coupling (handout 28, F7:
@@ -436,8 +481,8 @@ def _realized_dr_rho(base, N, kappa, seeds=SEEDS, jitter=0.12, dt=DT):
         rng = np.random.default_rng(7000 + s)
         tau = np.array([max(base[i % len(base)].tau * float(np.exp(rng.normal(0, jitter))), 1e-2)
                         for i in range(N)])
-        al = np.array([float(np.clip(base[i % len(base)].alpha * (1 + rng.normal(0, jitter)),
-                                     0.05, 2.0)) for i in range(N)])
+        al = np.array([float(np.clip(base[i % len(base)].alpha, 0.05, 2.0))
+                       for i in range(N)])
         z = (al - al.mean()) / (al.std() + 1e-9)
         tau_eff = np.maximum(tau * np.exp(kappa * z), 1e-2)
         rhos.append(_spearman(al, tau_eff))
@@ -472,11 +517,9 @@ F7_RHO, F7_RHO_LO, F7_RHO_HI = 0.46, 0.10, 0.71
 
 def coupling_sensitivity(cards, N=24, max_k=30, seeds=SEEDS,
                          kappas=(-0.5, -0.25, 0.0, 0.25, 0.5)):
-    """phi<->lambda coupling robustness: re-run the het-vs-hom memory-capacity
-    comparison with the coupling perturbation of coupled_nodes() swept over kappa,
-    and check that the qualitative conclusions (heterogeneous > homogeneous, and both
-    memory banks > memoryless) survive the assumption. Reports het and hom total MC,
-    their ratio, and the paired het-hom test at each kappa. The sweep is then ANCHORED
+    """phi<->lambda coupling sensitivity: re-run the het-vs-hom memory-capacity
+    comparison with the coupling perturbation of coupled_nodes() swept over kappa.
+    Reports het and hom total MC, their ratio, and paired seed consistency. The sweep is then ANCHORED
     to the one direct measurement of this coupling (Au/TMPE F7, rho=+0.46): kappa is
     calibrated so the simulated across-node write->retention correlation matches it,
     turning the bound from an arbitrary range into a data-referenced operating point."""
@@ -493,18 +536,19 @@ def coupling_sensitivity(cards, N=24, max_k=30, seeds=SEEDS,
         return np.array(het_t), np.array(hom_t)
 
     print("\nphi-lambda coupling sensitivity (total MC vs coupling kappa):")
-    print(f"  {'kappa':>6} {'het MC':>8} {'hom MC':>8} {'ratio':>7} {'het-hom':>9} {'p':>8} {'r_rb':>6}")
+    print(f"  {'kappa':>6} {'het MC':>8} {'hom MC':>8} {'ratio':>7} {'het-hom':>9} {'seeds+':>7}")
     rows = []
     for kp in kappas:
         het_t, hom_t = _het_hom_mc(kp)
         st = paired_stats(het_t, hom_t)
         ratio = het_t.mean() / max(hom_t.mean(), 1e-9)
+        n_pos = int(st["frac_pos"] * st["n"])
         print(f"  {kp:+6.2f} {het_t.mean():8.2f} {hom_t.mean():8.2f} {ratio:7.2f} "
-              f"{st['mean']:+9.2f} {st['p']:8.1e} {st['r_rb']:+6.2f}")
+              f"{st['mean']:+9.2f} {n_pos:2d}/{st['n']:<2d}")
         rows.append((kp, het_t.mean(), hom_t.mean(), ratio, st))
     ratios = [r[3] for r in rows]
-    print(f"  het>hom holds across all kappa (ratio {min(ratios):.2f}-{max(ratios):.2f});"
-          " the heterogeneity conclusion is robust to the composition assumption.")
+    print(f"  mean het/hom ratio spans {min(ratios):.2f}-{max(ratios):.2f};"
+          " this is a sensitivity range, not an inferential robustness claim.")
 
     # ---- data anchor: kappa calibrated to the measured Au/TMPE coupling (F7) ----
     k_star = _kappa_for_rho(base_het, N, F7_RHO, seeds)
@@ -512,18 +556,19 @@ def coupling_sensitivity(cards, N=24, max_k=30, seeds=SEEDS,
     k_hi = _kappa_for_rho(base_het, N, F7_RHO_HI, seeds)
     print("\n  measured-coupling anchor (Au/TMPE F7, rho_target=%.2f, 95%% CI %.2f-%.2f):"
           % (F7_RHO, F7_RHO_LO, F7_RHO_HI))
-    print(f"  {'kappa*':>6} {'het MC':>8} {'hom MC':>8} {'ratio':>7} {'het-hom':>9} {'p':>8} {'r_rb':>6}")
+    print(f"  {'kappa*':>6} {'het MC':>8} {'hom MC':>8} {'ratio':>7} {'het-hom':>9} {'seeds+':>7}")
     anchor = []
     for tag, kp in [("CI-lo", k_lo), ("rho=.46", k_star), ("CI-hi", k_hi)]:
         het_t, hom_t = _het_hom_mc(kp)
         st = paired_stats(het_t, hom_t)
         ratio = het_t.mean() / max(hom_t.mean(), 1e-9)
         rho_chk = _realized_dr_rho(base_het, N, kp, seeds)
+        n_pos = int(st["frac_pos"] * st["n"])
         print(f"  {kp:+6.2f} {het_t.mean():8.2f} {hom_t.mean():8.2f} {ratio:7.2f} "
-              f"{st['mean']:+9.2f} {st['p']:8.1e} {st['r_rb']:+6.2f}   [{tag}, rho={rho_chk:+.2f}]")
+              f"{st['mean']:+9.2f} {n_pos:2d}/{st['n']:<2d}   [{tag}, rho={rho_chk:+.2f}]")
         anchor.append((tag, kp, het_t.mean(), hom_t.mean(), ratio, st))
     print(f"  measured coupling maps to kappa*={k_star:+.2f} (CI {k_lo:+.2f}..{k_hi:+.2f}); "
-          "het>hom holds at the data-anchored operating point, not only across an arbitrary sweep.")
+          "the data-anchored point retains only a small mean capacity difference.")
     return dict(sweep=rows, anchor=anchor, k_star=k_star, k_ci=(k_lo, k_hi))
 
 
@@ -547,8 +592,10 @@ def tonic_mc_control(cards, N=24, max_k=40, seeds=SEEDS):
     print("\nTonic-node extension (memory capacity, max_k=%d at DT=%gs):" % (max_k, DT))
     print(f"  heterogeneous            total MC={het.mean():5.2f}  long-lag(k>15)={het_hi.mean():4.2f}")
     print(f"  + drive-boosted tonic    total MC={ext.mean():5.2f}  long-lag(k>15)={ext_hi.mean():4.2f}")
-    print(f"  gain: total {st_tot['mean']:+.2f} (p={st_tot['p']:.1e}), "
-          f"long-lag {st_hi['mean']:+.2f} (p={st_hi['p']:.1e}, r_rb={st_hi['r_rb']:+.2f}) "
+    print(f"  gain: total {st_tot['mean']:+.2f} "
+          f"({int(st_tot['frac_pos']*st_tot['n'])}/{st_tot['n']} seeds), "
+          f"long-lag {st_hi['mean']:+.2f} "
+          f"({int(st_hi['frac_pos']*st_hi['n'])}/{st_hi['n']} seeds) "
           f"-> tonic nodes extend recall into the minutes-scale tail")
     return dict(het=het, ext=ext, het_hi=het_hi, ext_hi=ext_hi)
 
@@ -574,11 +621,8 @@ def main():
           f"{ratios.mean():.2f}+/-{ratios.std(ddof=1):.2f} "
           f"(per-seed mean over {st['n']} seeds)")
     print(f"paired total-MC gain (het-hom) = {st['mean']:+.2f}+/-{st['sd']:.2f}, "
-          f"{int(st['frac_pos']*st['n'])}/{st['n']} seeds positive, "
-          f"Wilcoxon p={st['p']:.1e}")
-    print("(>1 / p<0.05 means the composition spread broadens memory across"
-          " timescales -- the Demonstration-B claim, on random input.)")
-    assert het_tot.mean() > hom_tot.mean(), "expected heterogeneous bank to have higher total MC"
+          f"{int(st['frac_pos']*st['n'])}/{st['n']} seeds positive")
+    print("(seeds quantify algorithmic sensitivity and are not inferential replicates.)")
 
     # information-processing capacity: linear vs nonlinear split (Dambre 2012)
     print("\nInformation-processing capacity (Dambre), seed-averaged:")
@@ -589,9 +633,10 @@ def main():
               f"linear={r['linear'][0]:5.2f} | nonlinear={r['nonlinear'][0]:5.2f} "
               f"(self {r['nl2_self'][0]:.2f} + cross {r['nl2_cross'][0]:.2f})")
     st_nl = paired_stats(ipc_het["_nonlin_seeds"], ipc_hom["_nonlin_seeds"])
+    n_pos_nl = int(st_nl["frac_pos"] * st_nl["n"])
     print(f"  nonlinear capacity is nonzero -> the compressive write computes "
           f"genuine nonlinear functions; het-hom nonlinear gain "
-          f"{st_nl['mean']:+.2f}, p={st_nl['p']:.1e}")
+          f"{st_nl['mean']:+.2f}, positive in {n_pos_nl}/{st_nl['n']} seeds")
 
     composition_sweep(cards)
     random_reservoir_control(cards, N)

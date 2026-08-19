@@ -1,5 +1,8 @@
 metric,value,n,note
-sigma_lnTau_within_cell,0.846,27,"device-to-device scatter at fixed (PEO,salt); = reservoir jitter"
+sigma_lnThalf_within_cell,0.2637,23,primary: median cell SD on screened substrate t_half; 8 cells
+sigma_lnThalf_cell_sd_min,0.0894,8,minimum across replicated cells
+sigma_lnThalf_cell_sd_max,1.0179,8,maximum across replicated cells; sensitivity bound
+sigma_lnTau_instrument_legacy,0.846,27,secondary: unscreened instrument-fit tau; not primary jitter
 sigma_lnTau_total_group,1.59,31,CONFLATED: pools designed PEO x salt sweep -- do not cite
 sigma_lnTau_ctrl_rpm_anneal,0.9107,27,residual after cell + RPM + anneal
 spearman_resid_thickness,0.1415,31,within-cell residual vs film thickness (expect ~0)

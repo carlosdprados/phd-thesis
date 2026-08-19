@@ -49,7 +49,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from ch5_model import load_cards, lead_card  # noqa: E402
-from ch5_reservoir import _full, nodes_from, run_states  # noqa: E402
+from ch5_reservoir import _full, memoryless_nodes, nodes_from, run_states  # noqa: E402
 import ch5_wesad as W  # noqa: E402
 
 
@@ -165,7 +165,7 @@ def evaluate_condition(raw, cards, condition, seed=None, n_nodes=N_NODES):
         nodes = None
     elif condition == "memoryless":
         nodes = nodes_from(full, n_nodes, rng, dt=DT, n_in=len(W.CHANNELS), sparsity=0.4)
-        nodes = [(0.0, alpha, w) for _, alpha, w in nodes]
+        nodes = memoryless_nodes(nodes)
     elif condition == "homogeneous_fast":
         nodes = nodes_from([fast], n_nodes, rng, dt=DT, n_in=len(W.CHANNELS), sparsity=0.4)
     elif condition == "homogeneous_slow":
@@ -293,7 +293,7 @@ def _evaluate_persubject(raw, cards, condition, seed, n_nodes):
         nodes = None
     elif condition == "memoryless":
         nodes = nodes_from(full, n_nodes, rng, dt=DT, n_in=C, sparsity=0.4)
-        nodes = [(0.0, alpha, w) for _, alpha, w in nodes]
+        nodes = memoryless_nodes(nodes)
     elif condition == "homogeneous_fast":
         nodes = nodes_from([fast], n_nodes, rng, dt=DT, n_in=C, sparsity=0.4)
     elif condition == "homogeneous_slow":
