@@ -462,8 +462,8 @@ def motion_control(raw, motions, cards, scales=(0.0, 0.2, 0.4, 0.6, 0.8),
     print(f"  at scale={hi:g} (per-subject paired vs instantaneous):")
     print(f"    het  - inst = {d_het['mean']:+.3f} (p={d_het['p']:.1e}, r_rb={d_het['r_rb']:+.2f})")
     print(f"    ema1 - inst = {d_ema['mean']:+.3f} (p={d_ema['p']:.1e}, r_rb={d_ema['r_rb']:+.2f})")
-    print("  (memory/low-pass advantage replicates under REAL motion artefact => "
-          "not an artefact of the Gaussian noise model.)")
+    print("  (the paired results above determine whether either temporal method "
+          "separates from the instantaneous control under measured-motion corruption.)")
     return dict(scales=list(scales), acc=acc, d_het=d_het, d_ema=d_ema)
 
 
@@ -483,8 +483,8 @@ def main():
         m = r0[b]
         print(f"  {b:5s} {m['f1']:7.3f} {m['trans_f1']:8.3f} "
               f"{m['latency']:11.1f} {m['far']:11.3f}")
-    print(f"  (onsets scored: {r0['het']['n_onsets']}; latency dominated by the "
-          f"{int(SMOOTH_S):d}s smoothing horizon, comparable across banks)")
+    print(f"  (onsets scored: {r0['het']['n_onsets']}; latency uses the physical "
+          "timeline and is censored at each stress-segment end)")
     st = _paired(r0["het"]["subj_trans"], r0["inst"]["subj_trans"])
     print(f"  transition-F1 het-inst = {st['mean']:+.3f} "
           f"({int(st['frac_pos']*st['n'])}/{st['n']} subjects, Wilcoxon p={st['p']:.1e})")
@@ -492,7 +492,7 @@ def main():
     print(f"  transition-F1 het-memoryless = {stm['mean']:+.3f} (p={stm['p']:.1e}) "
           f"-> isolates the contribution of fading memory")
     print(f"  false alarms: inst {r0['inst']['far']:.3f} -> het {r0['het']['far']:.3f} "
-          f"({100*(1-r0['het']['far']/r0['inst']['far']):.0f}% fewer)")
+          f"(absolute change {r0['het']['far']-r0['inst']['far']:+.3f})")
 
     print("\nNOISE ROBUSTNESS (binary-F1 vs injected sensor-noise sigma; seed-averaged):")
     sw = noise_sweep(raw, cards)

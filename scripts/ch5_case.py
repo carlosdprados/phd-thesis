@@ -79,7 +79,7 @@ def _find_case_dir():
 
 
 CASE_DIR = _find_case_dir()
-CACHE = f"data/case/_cache_v3_causalcal{W.CALIBRATION_S:g}_case_1hz.npz"
+CACHE = f"data/case/_cache_v4_causalcal{W.CALIBRATION_S:g}_case_1hz.npz"
 OUT_CSV = "handouts/ch5_case_results.csv"
 FIG_PATH = "figures/chapter5/case_valence_arousal.pdf"
 
@@ -257,7 +257,9 @@ def ccc(y, p):
 
 def _ridge_fit(F, Y, lam=RIDGE):
     Fb = np.hstack([F, np.ones((len(F), 1))])
-    return np.linalg.solve(Fb.T @ Fb + lam * np.eye(Fb.shape[1]), Fb.T @ Y)
+    gram = Fb.T @ Fb / len(Fb)
+    rhs = Fb.T @ Y / len(Fb)
+    return np.linalg.solve(gram + lam * np.eye(Fb.shape[1]), rhs)
 
 
 def loso(feats):

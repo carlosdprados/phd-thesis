@@ -21,6 +21,8 @@ def test_prefix_scaling_is_unchanged_by_future_samples():
     a = wesad._scale_subject(np.vstack([prefix, future_a]), fs=1.0, calibration_s=20)
     b = wesad._scale_subject(np.vstack([prefix, future_b]), fs=1.0, calibration_s=20)
     assert np.allclose(a[:20], b[:20])
+    assert np.all((b > 0.0) & (b < 1.0))
+    assert b[-1, 0] > a[-1, 0]
 
 
 def test_versioned_cache_rejects_wrong_source_signature(tmp_path):
@@ -55,6 +57,14 @@ def test_binary_loso_retains_unlabelled_timeline_gaps():
         assert len(full_labels) == len(labels)
         assert len(pred) == len(labels)
         assert np.array_equal(full_score, score)
+
+
+def test_classification_ridge_is_invariant_to_dataset_duplication():
+    F = np.array([[0.0], [0.2], [0.8], [1.0]])
+    y = np.array([0, 0, 1, 1])
+    W1 = wesad._ridge_onehot_fit(F, y, [0, 1])
+    W2 = wesad._ridge_onehot_fit(np.tile(F, (3, 1)), np.tile(y, 3), [0, 1])
+    assert np.allclose(W1, W2)
 
 
 def test_onset_metric_counts_stress_segments_separated_by_unlabelled_time():

@@ -112,17 +112,25 @@ def feature_dict(raw, nodes=None, dt=DT, lags=LAGS_S):
 
 def _ridge_fit(F, Y, lam=RIDGE):
     Fb = np.hstack([F, np.ones((len(F), 1))])
-    return np.linalg.solve(Fb.T @ Fb + lam * np.eye(Fb.shape[1]), Fb.T @ Y)
+    gram = Fb.T @ Fb / len(Fb)
+    rhs = Fb.T @ Y / len(Fb)
+    return np.linalg.solve(gram + lam * np.eye(Fb.shape[1]), rhs)
 
 
 def loso_regression(feats, per_subject=False):
-    """LOSO multi-output ridge regression; returns per-target R2 and NRMSE.
+    """LOSO multi-output ridge; returns subject-mean out-of-sample R2 and NRMSE.
+
+    Predictions are clipped to the known [0,1] range of the calibrated streams.
+    For each held-out subject and target, R2 is measured against the deployable
+    training-set-mean predictor, not the held-out subject's mean. This avoids using
+    test-set information in the baseline and remains defined for nearly constant
+    held-out channels.
 
     If `per_subject`, also returns {sid: mean held-out R2 over targets} computed on
     each subject's own block, for the paired het-vs-homogeneous significance test.
     """
     sids = list(feats)
-    y_true, y_pred = [], []
+    subject_r2, subject_nrmse = [], []
     persub = {}
     for sid in sids:
         Ftr = np.vstack([feats[k][0] for k in sids if k != sid])
@@ -136,20 +144,21 @@ def loso_regression(feats, per_subject=False):
 
         Wfit = _ridge_fit((Ftr - f_mu) / f_sd, (Ytr - y_mu) / y_sd)
         Fb = np.hstack([(Fte - f_mu) / f_sd, np.ones((len(Fte), 1))])
-        pred = (Fb @ Wfit) * y_sd + y_mu
-        y_true.append(Yte)
-        y_pred.append(pred)
+        pred = np.clip((Fb @ Wfit) * y_sd + y_mu, 0.0, 1.0)
+        ss_res = np.sum((Yte - pred) ** 2, axis=0)
+        ss_base = np.sum((Yte - y_mu) ** 2, axis=0)
+        valid = ss_base > 1e-10
+        r2_sid = np.full(Yte.shape[1], np.nan)
+        nrmse_sid = np.full(Yte.shape[1], np.nan)
+        r2_sid[valid] = 1.0 - ss_res[valid] / ss_base[valid]
+        nrmse_sid[valid] = np.sqrt(ss_res[valid] / ss_base[valid])
+        subject_r2.append(r2_sid)
+        subject_nrmse.append(nrmse_sid)
         if per_subject:
-            ss_r = np.sum((Yte - pred) ** 2, axis=0)
-            ss_t = np.sum((Yte - Yte.mean(axis=0)) ** 2, axis=0) + 1e-12
-            persub[sid] = float(np.mean(1.0 - ss_r / ss_t))
+            persub[sid] = float(np.nanmean(r2_sid))
 
-    Y = np.vstack(y_true)
-    P = np.vstack(y_pred)
-    ss_res = np.sum((Y - P) ** 2, axis=0)
-    ss_tot = np.sum((Y - Y.mean(axis=0)) ** 2, axis=0) + 1e-12
-    r2 = 1.0 - ss_res / ss_tot
-    nrmse = np.sqrt(np.mean((Y - P) ** 2, axis=0) / (Y.var(axis=0) + 1e-12))
+    r2 = np.nanmean(np.vstack(subject_r2), axis=0)
+    nrmse = np.nanmean(np.vstack(subject_nrmse), axis=0)
     if per_subject:
         return r2, nrmse, persub
     return r2, nrmse

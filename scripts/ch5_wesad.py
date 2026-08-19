@@ -57,7 +57,7 @@ N_NODES = 24          # bank size (equal across all conditions)
 ECG_FS = 700.0        # chest ECG native rate [Hz]
 CHANNELS = ["EDA", "Resp", "Temp", "HR"]   # multichannel (multi-timescale) set
 LABELS = {1: "baseline", 2: "stress", 3: "amusement"}
-CACHE_SCHEMA = "ch5-physio-causal-prefix60-v3"
+CACHE_SCHEMA = "ch5-physio-causal-prefix60-arctan-v4"
 
 DOWNLOAD_MSG = f"""
 WESAD not found at '{WESAD_DIR}'.
@@ -218,7 +218,7 @@ def load_motion(cache=True):
     paths = sorted(glob.glob(os.path.join(WESAD_DIR, "S*", "S*.pkl")))
     signature = _source_signature(paths)
     cache_path = os.path.join(os.path.dirname(WESAD_DIR),
-                              f"_cache_v3_causalcal{CALIBRATION_S:g}_motion_{SLOW_FS:g}hz.npz")
+                              f"_cache_v4_causalcal{CALIBRATION_S:g}_motion_{SLOW_FS:g}hz.npz")
     out = {}
     cached = _load_stream_cache(cache_path, signature, fields=("motion",)) if cache else None
     if cached is not None:
@@ -239,12 +239,19 @@ def load_motion(cache=True):
 
 
 def _scale_subject(U, fs=SLOW_FS, calibration_s=CALIBRATION_S):
-    """Robust scaling fitted only on a fixed initial calibration prefix."""
+    """Monotone robust scaling fitted only on a fixed calibration prefix.
+
+    The 5th/95th percentiles map to 0.25/0.75 through a Cauchy CDF. Unlike hard
+    clipping, this preserves the ordering and finite resolution of later values
+    outside the calibration span while keeping every channel strictly in (0, 1).
+    """
     U = np.asarray(U, float)
     n_cal = min(len(U), max(int(round(calibration_s * fs)), 1))
     lo = np.percentile(U[:n_cal], 5, axis=0)
     hi = np.percentile(U[:n_cal], 95, axis=0)
-    return np.clip((U - lo) / (hi - lo + 1e-9), 0.0, 1.0)
+    centre = 0.5 * (lo + hi)
+    halfspan = 0.5 * (hi - lo) + 1e-9
+    return 0.5 + np.arctan((U - centre) / halfspan) / np.pi
 
 
 # ----------------------------------------------------------------------------
@@ -267,7 +274,7 @@ def load_raw(channels=CHANNELS, cache=True):
     paths = sorted(glob.glob(os.path.join(WESAD_DIR, "S*", "S*.pkl")))
     signature = _source_signature(paths)
     cache_path = os.path.join(os.path.dirname(WESAD_DIR),
-                              f"_cache_v3_causalcal{CALIBRATION_S:g}_"
+                              f"_cache_v4_causalcal{CALIBRATION_S:g}_"
                               f"{'-'.join(channels)}_{SLOW_FS:g}hz.npz")
     raw = {}
     cached = _load_stream_cache(cache_path, signature) if cache else None
@@ -330,7 +337,7 @@ def load_raw_wrist(channels=WRIST_CHANNELS, cache=True):
     paths = sorted(glob.glob(os.path.join(WESAD_DIR, "S*", "S*.pkl")))
     signature = _source_signature(paths)
     cache_path = os.path.join(os.path.dirname(WESAD_DIR),
-                              f"_cache_v3_causalcal{CALIBRATION_S:g}_wrist_"
+                              f"_cache_v4_causalcal{CALIBRATION_S:g}_wrist_"
                               f"{'-'.join(channels)}_{SLOW_FS:g}hz.npz")
     raw = {}
     cached = _load_stream_cache(cache_path, signature) if cache else None
@@ -371,7 +378,9 @@ def _ridge_onehot_fit(F, y, classes, lam=1e-3):
     for i, c in enumerate(classes):
         Y[y == c, i] = 1.0
     Fb = np.hstack([F, np.ones((len(F), 1))])
-    return np.linalg.solve(Fb.T @ Fb + lam * np.eye(Fb.shape[1]), Fb.T @ Y)
+    gram = Fb.T @ Fb / len(Fb)
+    rhs = Fb.T @ Y / len(Fb)
+    return np.linalg.solve(gram + lam * np.eye(Fb.shape[1]), rhs)
 
 
 def _predict(F, W, classes):

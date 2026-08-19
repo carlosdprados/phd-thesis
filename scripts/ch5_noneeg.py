@@ -87,7 +87,7 @@ def load_raw_noneeg(cache=True):
     paths = sorted(glob.glob(os.path.join(NONEEG_DIR, "Subject*")))
     signature = _source_signature([p for p in paths if os.path.isfile(p)])
     cache_path = os.path.join(os.path.dirname(NONEEG_DIR),
-                              f"_cache_v3_causalcal{CALIBRATION_S:g}_noneeg_"
+                              f"_cache_v4_causalcal{CALIBRATION_S:g}_noneeg_"
                               f"{tag}_EDA-Temp-HR_4hz.npz")
     raw = {}
     cached = _load_stream_cache(cache_path, signature) if cache else None
