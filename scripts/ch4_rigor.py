@@ -377,7 +377,7 @@ handles = [plt.Line2D([], [], marker="o", ls="", color=SALTC[s], label=f"salt {s
 handles += [plt.Line2D([], [], marker="o", color=COLORS["gray"], label="PEO median"),
             plt.Line2D([], [], ls="--", color="k", label=fr"$\propto$PEO$^{{{slope_g:.1f}}}$")]
 ax.legend(handles=handles, fontsize=6, frameon=False, loc="lower left")
-figstyle.panel(ax, "", "on-state conductance rises with PEO")
+figstyle.panel(ax, "", "positive overall association with PEO")
 figstyle.save(fig, os.path.join(FIGDIR, "percolation.pdf"))
 
 
