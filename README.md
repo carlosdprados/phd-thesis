@@ -2,7 +2,7 @@
 
 # Polymer-Electrolyte Organic Memristors for Temporal Computing
 
-PhD thesis repository of **Carlos David Prado-Socorro** at the Institute of Molecular Science (ICMol), Universitat de Valencia.
+PhD thesis repository of **Carlos David Prado Socorro** at the Institute of Molecular Science (ICMol), Universitat de Valencia.
 
 [Read the current thesis draft](exports/thesis.pdf) | [Introduction](exports/chapter1_introduction.pdf) | [Proof-of-concept chapter](exports/chapter2_proof_of_concept.pdf) | [Bridge chapter](exports/chapter3_bridge.pdf) | [Comparative chapter](exports/chapter4_comparative.pdf) | [Temporal-computing chapter](exports/chapter5_temporal.pdf) | [Conclusions](exports/chapter6_conclusions.pdf)
 
@@ -106,3 +106,37 @@ make clean          # remove generated LaTeX artefacts
 Run these commands from the repository root. Generated LaTeX files are written to `build/` and excluded from version control.
 
 Regenerating analysis tables and figures from their source measurements has additional data requirements. The experimental archive must be placed as the sibling `../Nanomem_Devices_Library/`; WESAD and PhysioNet Non-EEG must be placed under `data/`. Check all inputs with `make inputs-check`, then use `make reproduce-core`, `make reproduce-physio`, or `make reproduce-all`. These commands intentionally replace tracked derived artifacts. See [`docs/reproducibility.md`](docs/reproducibility.md) for the exact scope, input provenance, and the deliberate exclusion of CASE.
+
+## License and Attribution
+
+Copyright © 2026 **Carlos David Prado Socorro**.
+
+Except where otherwise indicated, the original thesis text, documentation,
+figures, tables, and datasets in this repository are licensed under the
+**Creative Commons Attribution 4.0 International license (CC BY 4.0)**.
+The full terms are in [`LICENSE`](LICENSE). This permits sharing and adaptation,
+including commercial reuse. When sharing these materials or adaptations, credit
+**Carlos David Prado Socorro**, retain the supplied copyright and license notices,
+link to this repository and the license, and indicate any changes.
+
+A suggested attribution is:
+
+> Carlos David Prado Socorro. *Polymer-Electrolyte Organic Memristors for Temporal Computing*.
+> Copyright © 2026 Carlos David Prado Socorro.
+> Source: [phd-thesis](https://github.com/carlosdprados/phd-thesis).
+> Licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+Add a description of any changes if you modified the material. For academic use,
+please also cite the repository version or commit you used and the relevant
+publications identified in the thesis.
+
+The original software in `scripts/` and `tests/`, the `Makefile`,
+`chapters/thesis-format.sty`, and build/tool configuration files are licensed under
+the **MIT License**, provided in [`LICENSE-CODE`](LICENSE-CODE). Copies or substantial
+portions of that software must retain its copyright and license notices.
+
+These licenses apply only to rights held by Carlos David Prado Socorro.
+Third-party datasets (including WESAD, PhysioNet Non-EEG, and CASE), published
+material, and reproduced figures remain subject to their respective rights
+holders' terms and attribution requirements. Their inclusion or discussion here
+does not relicense them.
