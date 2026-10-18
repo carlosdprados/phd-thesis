@@ -1,6 +1,6 @@
 %% ============================================================
-%%  Chapter 5 — Data-Driven Temporal Computing with
-%%              Polymer-Electrolyte Memristor Reservoirs
+%%  Chapter 5 — Temporal Processing with Composition-Selected
+%%              Devices: Designed Filters and Reservoirs
 %%
 %%  NOTE: bound as Chapter 5. Internal labels use the ch5_ prefix and
 %%  figures live in figures/chapter5/, matching the bound order.
@@ -43,18 +43,18 @@
 \providecommand{\siTempRef}[1]{\ifdefined\thesismode\cref{#1}\else Appendix~D\fi}
 
 %% ============================================================
-\chapter{Data-Driven Temporal Computing with Polymer-Electrolyte Memristor Reservoirs}\label{ch:temporal}
+\chapter[Temporal Processing with Composition-Selected Devices]{Temporal Processing with Composition-Selected Devices: Designed Filters and Reservoirs}\label{ch:temporal}
 %% ============================================================
 
 %% ------------------------------------------------------------
 \section{Introduction and Scope}\label{sec:ch5_intro}
 %% ------------------------------------------------------------
 
-\Cref{ch:poc,ch:comparative} established and quantified the slow, volatile response of these polymer-electrolyte composites. Behavioural models fitted to that response are now evaluated on temporal-computing tasks. A reservoir maps a time-varying input onto a high-dimensional dynamical state from which a linear read-out can recover temporal information.
+\Cref{ch:comparative} showed that composition sets the fading-memory time of these devices over about one decade of seconds. This chapter asks what that time constant can be used for. Behavioural models fitted to the measured response are tested in two roles. In the first, one composition, or a pair of compositions, is chosen for its time constant and used as a designed filter; the references are the conventional components for the same job, an $RC$ element with the same half-life and a digital filter. In the second, many devices form a reservoir: a bank of randomly masked nodes whose states feed a trained linear read-out. Banks drawn from one composition are compared with banks spanning several, and linear exponential-moving-average (EMA) banks at the same half-lives serve as controls.
 
-The central comparison is between a bank drawn from one composition and a bank spanning several measured timescales. The latter should help when a target depends on several lags, but need not improve a task dominated by one timescale. Wearable \emph{affective computing} (the recognition of emotional and physiological state) provides a relevant test because its signals contain both fast and slow components. The evaluation proceeds from reservoir benchmarks to physiological streams, \WESAD{} classification, and tests with sensor noise, an independent corpus, and wrist-band data.
+Peripheral physiological signals are the test bed because their timescales overlap those of the devices without rescaling: phasic electrodermal responses, respiration, and heart-rate variability vary over seconds, and tonic levels drift over minutes. The chapter uses synthetic electrodermal signals with known responses, the Wearable Stress and Affect Detection corpus (\WESAD{}), and an independent PhysioNet corpus. Affective computing supplies the tasks and labels; the chapter does not propose a new affect classifier.
 
-All results in this chapter are \emph{in silico}; no new devices were fabricated. Each node is a compact behavioural model parameterised by the fits in \cref{ch:comparative} (\cref{sec:ch5_model}), and every read-out is a single linear ridge regression. Demonstration~A tests whether one composition suffices for a single-timescale feature. Demonstration~B tests whether a composition-diverse bank improves multi-timescale tasks.
+All results in this chapter are \emph{in silico}; no new devices were fabricated. Each node is a compact behavioural model parameterised by the fits in \cref{ch:comparative} (\cref{sec:ch5_model}), and every read-out is a single linear ridge regression.
 
 %% ------------------------------------------------------------
 \section{Measured Behavioural Model}\label{sec:ch5_model}
@@ -186,15 +186,15 @@ Reservoir suitability is first evaluated without an application-specific task. L
 \end{figure}
 
 %% ------------------------------------------------------------
-\section{Affective Computing}\label{sec:ch5_affect}
+\section{Physiological Signals as a Test Bed}\label{sec:ch5_affect}
 %% ------------------------------------------------------------
 
-Affective computing uses physiological signals to infer emotional and physiological state~\cite{Picard1997}. The device timescales, from a few seconds to tens of seconds, overlap the phasic electrodermal, respiration, and heart-rate-variability bands without time rescaling (\cref{tab:ch5_bands}). These signals also contain several timescales at once: phasic electrodermal responses, respiration and heart-rate-variability rhythms over seconds, and tonic levels drifting over minutes~\cite{Boucsein2012EDA,TaskForce1996HRV,ChourpiliadisBhardwaj2022}. \Cref{fig:ch5_tau_coverage} places the measured relaxation time of each composition on the same axis as these physiological bands and shows the minutes-scale range not reached by composition alone.
+Affective computing uses physiological signals to infer emotional and physiological state~\cite{Picard1997}; here its signals and labels serve as a test bed for the device models. The device timescales, from a few seconds to tens of seconds, overlap the phasic electrodermal, respiration, and heart-rate-variability bands without time rescaling (\cref{tab:ch5_bands}). These signals also contain several timescales at once: phasic electrodermal responses, respiration and heart-rate-variability rhythms over seconds, and tonic levels drifting over minutes~\cite{Boucsein2012EDA,TaskForce1996HRV,ChourpiliadisBhardwaj2022}. \Cref{fig:ch5_tau_coverage} places the measured relaxation time of each composition on the same axis as these physiological bands and shows the minutes-scale range not reached by composition alone.
 
 \begin{table}[t]
   \centering
   \small
-  \caption[Affective signal timescales and device coverage]{Characteristic timescales of the peripheral affective signals used in this chapter, and the composition cells whose fading-memory window covers them~\cite{Boucsein2012EDA,TaskForce1996HRV,ChourpiliadisBhardwaj2022}. The grid of \cref{ch:comparative} spans the full range, with the lead \PEO{}~0.3 cells serving the slow LF-HRV band.}
+  \caption[Affective signal timescales and device coverage]{Characteristic timescales of the peripheral signals used in this chapter, and the composition cells whose fading-memory window covers them~\cite{Boucsein2012EDA,TaskForce1996HRV,ChourpiliadisBhardwaj2022}. The grid of \cref{ch:comparative} covers the phasic, respiration, and heart-rate-variability bands; no measured cell reaches the minutes-scale tonic band.}
   \label{tab:ch5_bands}
   \setlength{\tabcolsep}{5pt}
   \begin{tabular}{lll}
@@ -205,7 +205,7 @@ Affective computing uses physiological signals to infer emotional and physiologi
     Respiration      & $\sim$3--5\,s    & mid \PEO{} \\
     HRV, HF band     & $\sim$2.5--7\,s  & mid \PEO{} \\
     HRV, LF band     & $\sim$7--25\,s   & \PEO{}~0.3 ($t_{1/2} \approx 16$--19\,s) \\
-    Tonic SCL        & minutes          & slowest / drive-boosted \\
+    Tonic SCL        & minutes          & not reached by the measured grid \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -266,20 +266,24 @@ Preprocessing is causal. ECG filtering and RR-interval assignment use only compl
 \section{WESAD Affective Classification}\label{sec:ch5_wesad}
 %% ------------------------------------------------------------
 
-The downstream task is affective-state classification from the \WESAD{} physiological streams with a leave-one-subject-out linear read-out. The reservoir and the \SI{15}{\second} causal prediction smoother run on the complete physical timeline; samples with undefined affect labels are excluded only from fitting and scoring. This prevents the smoother from joining labelled blocks separated by long protocol gaps. The study that introduced \WESAD{} reports three-class chest macro-F1 $\approx0.72$ with engineered window features and conventional classifiers under leave-one-subject-out validation~\cite{Schmidt2018WESAD}; the present streaming linear read-out reaches $0.562$ averaged over bank draws (\cref{tab:ch5_sota}). The formulations differ, so this is a scale reference and not a like-for-like ranking.
+The downstream task is affective-state classification from the \WESAD{} physiological streams with a leave-one-subject-out linear read-out. The reservoir and the \SI{15}{\second} causal prediction smoother run on the complete physical timeline; samples with undefined affect labels are excluded only from fitting and scoring. This prevents the smoother from joining labelled blocks separated by long protocol gaps. The study that introduced \WESAD{} reports, with engineered window features and conventional classifiers under leave-one-subject-out validation, chest macro-F1 of \numrange{0.725}{0.744} for the three classes and \numrange{0.904}{0.915} for stress versus non-stress, and \num{0.861} for stress versus non-stress from the wrist~\cite{Schmidt2018WESAD}. The streaming linear read-out of this chapter reaches \num{0.562}, \num{0.799}, and \num{0.756} on the same three tasks (\cref{tab:ch5_sota}). The formulations differ (per-step streaming against windowed features), but a gap of \numrange{0.1}{0.2} is too large to attribute to formulation alone: the device models do not approach an engineered-feature pipeline on these labels.
 
 \begin{table}[t]
   \centering
   \small
-  \caption[Matched WESAD literature comparison]{Matched comparison on three-class \WESAD{} chest signals. Both rows report class-balanced macro-F1 under leave-one-subject-out validation over the same fifteen subjects. The models and temporal formulations still differ, so the table provides a scale reference rather than a superiority claim. Accuracy-only and differently split studies are omitted.}
+  \caption[Matched WESAD literature comparison]{Matched comparison with the study that introduced \WESAD{}. All rows report class-balanced macro-F1 under leave-one-subject-out validation over the same fifteen subjects; binary rows separate stress from baseline and amusement pooled. Schmidt et al.\ give the two best classifiers for each task. This work reports the heterogeneous device bank (three-class: seed mean; binary: clean streams). Accuracy-only and differently split studies are omitted.}
   \label{tab:ch5_sota}
   \setlength{\tabcolsep}{3pt}
-  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}Xcc@{}}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.9cm}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}Xc@{}}
     \toprule
-    Study & Features and read-out & Validation & macro-F1 \\
+    Task & Study & Features and read-out & macro-F1 \\
     \midrule
-    Schmidt et al.\ (2018)~\cite{Schmidt2018WESAD} & engineered window features, AdaBoost/RF & 15-subject LOSO & $\approx0.72$ \\
-    This work & streaming device-model states, linear ridge read-out & 15-subject LOSO & $0.562$ \\
+    Three-class, chest & Schmidt et al.~\cite{Schmidt2018WESAD} & window features; AdaBoost, LDA & 0.725, 0.744 \\
+                       & This work & streaming device states; linear ridge & 0.562 \\
+    Binary, chest      & Schmidt et al.~\cite{Schmidt2018WESAD} & window features; RF, LDA & 0.904, 0.915 \\
+                       & This work & streaming device states; linear ridge & 0.799 \\
+    Binary, wrist      & Schmidt et al.~\cite{Schmidt2018WESAD} & window features; AdaBoost, RF & 0.859, 0.861 \\
+                       & This work & streaming device states; linear ridge & 0.756 \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -391,7 +395,9 @@ These products are not power predictions for the proposed reservoir. They transf
 \section{Matching Device and Task Timescales}\label{sec:ch5_designrules}
 %% ------------------------------------------------------------
 
-Performance depends on the overlap between device and task timescales (\cref{fig:ch5_tau_coverage}). In the single-composition sweep, the strongly stretched \PEO{}~0.6/0.09 cell gives the highest memory capacity for the seconds-scale benchmark (\cref{fig:ch5_composition_sweep}). For the multi-lag physiological task, no single cell covers the full delay range, and the heterogeneous bank gives the highest device-bank score, below the linear EMA bank at the same half-lives (\cref{tab:ch5_physio}).
+\paragraph{Choosing a cell.} For a designed filter, the target corner frequency selects the composition (\cref{tab:ch5_components}). The two fastest cells, with corners near \SI{0.04}{\hertz}, are the baseline removers for electrodermal activity; slower cells smooth over tens of seconds and pass the tonic band. Because stretching lowers the corner, a stretched cell must be chosen by its corner frequency, not by its half-life. Corners above about \SI{0.04}{\hertz} lie outside the replicated grid; the faster host and anion variants of \cref{ch:comparative} (\TMPE{}, \(t_{1/2}\approx\SI{4}{\second}\); TFSI, \(\approx\SI{1}{\second}\)) indicate where faster elements might come from, at survey-level evidence.
+
+\paragraph{Reservoir banks.} Performance depends on the overlap between device and task timescales (\cref{fig:ch5_tau_coverage}). In the single-composition sweep, the strongly stretched \PEO{}~0.6/0.09 cell gives the highest memory capacity for the seconds-scale benchmark (\cref{fig:ch5_composition_sweep}). For the multi-lag physiological task, no single cell covers the full delay range, and the heterogeneous bank gives the highest device-bank score, below the linear EMA bank at the same half-lives (\cref{tab:ch5_physio}).
 
 \paragraph{Effect of timescale breadth.} \Cref{tab:ch5_summary} separates fading memory from timescale breadth and from the device nonlinearity. On random input, breadth raises total linear memory ($+1.22\pm0.41$, positive in $10/10$ seeds) and nonlinear information-processing capacity. On real physiology, heterogeneity gives a $+0.023$ context-reconstruction gain over the stronger homogeneous control, but a linear EMA bank at the same half-lives does better than either. On sustained three-class labels the two device banks tie, and under corruption the homogeneous bank is marginally stronger. The task, not diversity alone, determines the useful distribution.
 
@@ -430,7 +436,9 @@ When one slow timescale dominates, as in the sustained stress labels and the str
 \section{Limitations and Scope Conditions}\label{sec:ch5_limitations}
 %% ------------------------------------------------------------
 
-\paragraph{In silico.} The demonstrations are simulations. Each node is the measured $\phi \otimes \lambda \otimes f$ behavioural model of \cref{sec:ch5_model}, not a bench reservoir. Every figure caption names the data behind it. A wired hardware reservoir remains future work.
+\paragraph{In silico.} The demonstrations are simulations. Each node is the measured $\phi \otimes \lambda \otimes f$ behavioural model of \cref{sec:ch5_model}, not a bench circuit. Every figure caption names the data behind it. Neither a wired filter nor a wired reservoir was built.
+
+\paragraph{Designed filters.} The filter results assume that the conductance enhancement superposes and that the measured large-signal decay also governs small signals around a written state. The composed node predicts a faster small-signal kernel when $\alpha<1$ (\siTempRef{app:ch5_filters}); a small write superposed on a written state would decide between the two. The synthetic generator uses chosen parameter ranges rather than a fitted corpus, and the WESAD stress segment (a speaking task) may add movement-related phasic power; this affects all filters alike. The $RC$ references are ideal components, and footprint, energy, and tolerance were not compared against a fabricated $RC$ element.
 
 \paragraph{The composition assumption.} As detailed in \cref{sec:ch5_model}, write nonlinearity and fading memory were measured separately, at different write amplitudes and one inter-pulse cadence. Combining them assumes that the two regimes are compatible; even the direction and magnitude of the omitted coupling are uncertain for the silver/\PEO{} system. In a sensitivity analysis, each node's retention was rescaled with its write exponent over $\kappa=-0.5$ to $+0.5$. The mean heterogeneous-to-homogeneous capacity ratio stays between $1.29$ and $1.42$, with the heterogeneous bank higher in every seed pair (\siTempRef{app:ch5_controls}). The gold/\TMPE{} negative-polarity measurements provide an external directional reference, $\rho=+0.46$ between write depth and decay half-time across $28$ single-run traces. The nominal cards already have a stronger across-card rank association ($\rho\approx+0.57$), so the central external estimate maps to $\kappa^{\star}=0$ and its upper confidence limit to about $+0.31$; the capacity ratio is $1.38$ and $1.33$ at these points. Because host, electrode, polarity, and protocol differ, this is a sensitivity anchor rather than validation of the composed silver model. A matched-amplitude experiment on the lead composition that varies pulse count and inter-pulse interval together is required.
 
@@ -446,11 +454,13 @@ The strongest robustness results use synthetic, channel-wise corruption and shou
 \section{Summary}\label{sec:ch5_conclusions}
 %% ------------------------------------------------------------
 
-Behavioural models fitted to the measurements of \cref{ch:comparative} support temporal-computing simulations with a linear read-out. Each node follows its measured relaxation kernel and is bounded by the measured potentiation peak and pulse count. Under this model, the heterogeneous bank raises total linear memory from $3.22$ to $4.44$ ($10/10$ seeds) and mean information-processing capacity from $5.18$ to $9.77$. On \WESAD{}, a lead-cell reservoir scores $0.671$ on windowed binary EDA, below a static control ($0.714$). Streaming three-class macro-F1 is $0.562$ for both heterogeneous and homogeneous banks, above linear EMA controls ($0.508$). Under synthetic corruption, the heterogeneous bank retains $0.811$ while instantaneous input falls to $0.641$, and a linear EMA bank at the same half-lives retains $0.808$.
+Read as component cards, the replicated compositions supply time constants of about 4 to \SI{28}{\second} and low-pass corners of \SIrange{0.002}{0.04}{\hertz}. Used as a designed filter, the fastest cell removes the tonic level of electrodermal signals as well as a digital filter (synthetic SCR detection F1 \num{0.713} against \num{0.701}; WESAD chest stress-versus-baseline AUC \num{0.952} against \num{0.951}) and behaves as an $RC$ element with the same half-life. The measured stretch never improves on that element, and two-composition band-passes fall below the phasic band.
+
+Behavioural models fitted to the measurements of \cref{ch:comparative} also support reservoir simulations with a linear read-out. Each node follows its measured relaxation kernel and is bounded by the measured potentiation peak and pulse count. Under this model, the heterogeneous bank raises total linear memory from $3.22$ to $4.44$ ($10/10$ seeds) and mean information-processing capacity from $5.18$ to $9.77$. On \WESAD{}, a lead-cell reservoir scores $0.671$ on windowed binary EDA, below a static control ($0.714$). Streaming three-class macro-F1 is $0.562$ for both heterogeneous and homogeneous banks, above linear EMA controls ($0.508$). Under synthetic corruption, the heterogeneous bank retains $0.811$ while instantaneous input falls to $0.641$, and a linear EMA bank at the same half-lives retains $0.808$.
 
 The additional value of a timescale distribution depends on the task and metric. It is large for random-input memory and nonlinear capacity, modest but subject-resolved for multi-lag physiological reconstruction ($+0.023$ $R^2$ over the slow homogeneous control), and absent for sustained \WESAD{} labels. On reconstruction, a linear EMA bank at the same half-lives does better than any device bank ($0.742$ against $0.707$), so the time constants themselves carry most of the benefit. Noise robustness replicates on the independent Non-EEG corpus and represents temporal filtering rather than a device-specific accuracy advantage.
 
-The next experimental steps are a matched-amplitude pulse protocol that varies pulse count and cadence, a replicated study of chemistry and drive-amplitude heterogeneity, and a wired device bank that tests the behavioural-model predictions in hardware.
+The chapter therefore finds a practical role for the composition-set time constant as a designed filter element, and little added value from random banks over linear filters at the same time constants. The next experimental steps follow from that role: replaying recorded electrodermal signals through a fabricated device, measuring the relaxation of a small write on a written state, and comparing a device with a printed $RC$ element of the same time constant. A matched-amplitude pulse protocol and a replicated chemistry study would then test the model assumptions and extend the range of available time constants.
 
 
 %% ---- Standalone close (skipped when \include'd from thesis.tex) ----
