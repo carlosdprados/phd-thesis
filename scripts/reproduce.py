@@ -52,6 +52,7 @@ PHYSIO_STEPS = (
     Step("WESAD task benchmarks", "ch5_wesad.py"),
     Step("WESAD temporal-context reconstruction", "ch5_physio_context.py"),
     Step("WESAD onset and noise controls", "ch5_onset.py"),
+    Step("Device filter bank for electrodermal activity", "ch5_filterbank.py"),
     Step("PhysioNet Non-EEG replication", "ch5_noneeg.py"),
     Step("Chapter 5 figures", "ch5_figures.py"),
     Step("Deployment calculations", "ch5_deployment.py"),

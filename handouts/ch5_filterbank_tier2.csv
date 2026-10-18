@@ -1,0 +1,11 @@
+design,tier2_mode,lag_s,cal_f1,f1_mean,f1_sd,r_mean,auc_power_mean,max_progress
+device HP PEO1.2/0.045,linearised,0.0,0.7364,0.7461,0.0474,0.3325,0.8294,0.0
+device HP PEO1.2/0.045,"dc read-out, drive 0.05",0.0,0.7005,0.712,0.044,0.6134,0.7827,0.0032
+device HP PEO1.2/0.045,"dc read-out, drive 1",0.0,0.7005,0.712,0.044,0.6134,0.7827,0.0636
+device HP PEO1.2/0.045,"ac read-out, drive 0.05",0.0,0.7368,0.7475,0.0476,0.5265,0.8361,0.0032
+device HP PEO1.2/0.045,"ac read-out, drive 1",0.0,0.7368,0.7475,0.0476,0.5265,0.8361,0.0636
+device BP PEO1.2/0.045 - PEO0.3/0.045,linearised,0.875,0.6115,0.6428,0.0401,0.6964,0.7718,0.0
+device BP PEO1.2/0.045 - PEO0.3/0.045,"dc read-out, drive 0.05",0.375,0.5951,0.6364,0.046,0.0017,0.6743,0.0295
+device BP PEO1.2/0.045 - PEO0.3/0.045,"dc read-out, drive 1",0.375,0.5951,0.6364,0.046,0.0017,0.6743,0.5899
+device BP PEO1.2/0.045 - PEO0.3/0.045,"ac read-out, drive 0.05",0.875,0.6108,0.6385,0.0393,0.6655,0.7449,0.0295
+device BP PEO1.2/0.045 - PEO0.3/0.045,"ac read-out, drive 1",0.875,0.6108,0.6385,0.0393,0.6655,0.7449,0.5899
