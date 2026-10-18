@@ -41,7 +41,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ch5_model import load_cards, lead_card                       # noqa: E402
-from ch5_reservoir import (memoryless_nodes, nodes_from, run_states, _full,
+from ch5_reservoir import (ema_states, memoryless_nodes, nodes_from, run_states, _full,
                            paired_stats)  # noqa: E402
 from ch5_wesad import (load_raw, load_motion, stream_subject, _ridge_onehot_fit,  # noqa: E402
                        _predict, macro_f1, _roll_mode, LABELS, WASHOUT_S, SMOOTH_S,
@@ -138,17 +138,7 @@ def ema(U, taus, dt):
     smoothed signals -- a purely LINEAR multi-timescale filter bank. A single tau is
     the simplest classical smoother; a spread of taus is the linear analogue of the
     device reservoir (same fading-memory low-pass, but no compressive nonlinearity)."""
-    U = np.asarray(U, float)
-    T, C = U.shape
-    cols = []
-    for tau in taus:
-        a = float(np.exp(-dt / max(tau, 1e-3)))          # EMA pole = device retention
-        y = np.empty_like(U)
-        y[0] = U[0]
-        for t in range(1, T):
-            y[t] = a * y[t - 1] + (1.0 - a) * U[t]
-        cols.append(y)
-    return np.hstack(cols)
+    return ema_states(U, taus, dt)
 
 
 def ema_features(raw, dt, taus, sigma=0.0, seed=0):
@@ -310,11 +300,13 @@ def evaluate(raw, cards, dt=DT_WES, sigma=0.0, seed=7, smooth=None):
     C = next(iter(raw.values()))[0].shape[1]
     smooth = int(SMOOTH_S / dt) if smooth is None else smooth
     het, hom, mem0 = make_banks(cards, dt, C, seed)
+    taus = sorted(float(c.rc_tau) for c in _full(cards))
     specs = {
         "inst": instant_features(raw, dt, sigma, seed),
         "mem0": bank_features(mem0, raw, dt, sigma, seed),
         "hom":  bank_features(hom, raw, dt, sigma, seed),
         "het":  bank_features(het, raw, dt, sigma, seed),
+        "emaN": ema_features(raw, dt, taus, sigma, seed),
     }
     out = {}
     for name, feats in specs.items():
@@ -329,7 +321,7 @@ def evaluate(raw, cards, dt=DT_WES, sigma=0.0, seed=7, smooth=None):
 def noise_sweep(raw, cards, sigmas=NOISE_SIGMAS, dt=DT_WES, seeds=(7, 8, 9)):
     """Binary-F1 and false-alarm rate vs injected noise sigma, seed-averaged.
     Returns {bank: {'f1':(mean,sd) per sigma, 'far':(mean,sd) per sigma}}."""
-    banks = ["inst", "mem0", "hom", "het"]
+    banks = ["inst", "mem0", "hom", "het", "emaN"]
     acc = {b: {"f1": [], "far": []} for b in banks}
     for sg in sigmas:
         per_seed = {b: {"f1": [], "far": []} for b in banks}
@@ -353,8 +345,8 @@ def ema_control(raw, cards, sigmas=NOISE_SIGMAS, dt=DT_WES, seeds=(7, 8, 9)):
     Answers two questions a referee will ask: (1) is the reservoir's noise robustness
     just low-pass filtering? (compare ema1/emaN to inst); (2) does the device
     NONLINEARITY add anything over a matched linear filter bank? (het minus emaN)."""
-    taus = sorted(float(c.tau) for c in _full(cards))
-    tau_lead = float(lead_card(cards).tau)
+    taus = sorted(float(c.rc_tau) for c in _full(cards))
+    tau_lead = float(lead_card(cards).rc_tau)
     smooth = int(SMOOTH_S / dt)
     banks = ["inst", "ema1", "emaN", "het"]
     acc = {b: [] for b in banks}
@@ -414,8 +406,8 @@ def motion_control(raw, motions, cards, scales=(0.0, 0.2, 0.4, 0.6, 0.8),
     binary-F1 vs the motion-corruption scale, with per-subject paired tests at the
     strongest level. Confirms (or not) that the memory/low-pass robustness survives a
     data-driven corruption model, not just a Gaussian one."""
-    taus = sorted(float(c.tau) for c in _full(cards))
-    tau_lead = float(lead_card(cards).tau)
+    taus = sorted(float(c.rc_tau) for c in _full(cards))
+    tau_lead = float(lead_card(cards).rc_tau)
     smooth = int(SMOOTH_S / dt)
     C = next(iter(raw.values()))[0].shape[1]
     banks = ["inst", "ema1", "het"]
@@ -479,7 +471,7 @@ def main():
     print("CLEAN streams (sigma=0):")
     r0 = evaluate(raw, cards, sigma=0.0)
     print(f"  {'bank':5s} {'binF1':>7} {'transF1':>8} {'latency[s]':>11} {'falseAlarm':>11}")
-    for b in ("inst", "mem0", "hom", "het"):
+    for b in ("inst", "mem0", "hom", "het", "emaN"):
         m = r0[b]
         print(f"  {b:5s} {m['f1']:7.3f} {m['trans_f1']:8.3f} "
               f"{m['latency']:11.1f} {m['far']:11.3f}")
@@ -498,11 +490,11 @@ def main():
     sw = noise_sweep(raw, cards)
     hdr = "  ".join(f"sig={s:g}" for s in sw["sigmas"])
     print(f"  {'bank':5s}  {hdr}")
-    for b in ("inst", "mem0", "hom", "het"):
+    for b in ("inst", "mem0", "hom", "het", "emaN"):
         vals = "  ".join(f"{m:.3f}" for m, _ in sw["banks"][b]["f1"])
         print(f"  {b:5s}  {vals}")
     print("  false-alarm rate vs sigma:")
-    for b in ("inst", "mem0", "hom", "het"):
+    for b in ("inst", "mem0", "hom", "het", "emaN"):
         vals = "  ".join(f"{m:.3f}" for m, _ in sw["banks"][b]["far"])
         print(f"  {b:5s}  {vals}")
 

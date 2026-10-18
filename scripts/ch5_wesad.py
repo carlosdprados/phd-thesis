@@ -43,7 +43,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ch5_model import load_cards, lead_card  # noqa: E402
-from ch5_reservoir import nodes_from, run_states, _full  # noqa: E402
+from ch5_reservoir import ema_states, nodes_from, run_states, _full  # noqa: E402
 
 WESAD_DIR = "data/wesad/WESAD"
 SLOW_FS = 4.0          # Hz, common slow sampling rate for the physiological channels
@@ -516,6 +516,17 @@ def instant_features(raw, dt):
         Us, ls = stream_subject(U, lab, dt)
         keep = np.isin(ls, list(LABELS)); keep[:wo] = False
         feats[sid] = (Us, ls, keep)
+    return feats
+
+
+def ema_stream_features(raw, dt, taus):
+    """Linear control: EMA-smoothed channels at the given time constants."""
+    wo = int(WASHOUT_S / dt)
+    feats = {}
+    for sid, (U, lab) in raw.items():
+        Us, ls = stream_subject(U, lab, dt)
+        keep = np.isin(ls, list(LABELS)); keep[:wo] = False
+        feats[sid] = (ema_states(Us, taus, dt), ls, keep)
     return feats
 
 

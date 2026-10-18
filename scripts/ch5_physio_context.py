@@ -38,6 +38,8 @@ same node count. Controls are:
   homogeneous fast bank     all nodes from the fastest measured composition
   homogeneous slow bank     all nodes from the lead PEO0.3/salt0.09 composition
   heterogeneous bank        measured composition bank, same node count
+  EMA at the lead half-life linear single-exponential smoother of every channel
+  EMA bank                  linear smoothers at all eight cell half-lives
 """
 import csv
 import glob
@@ -49,7 +51,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from ch5_model import load_cards, lead_card  # noqa: E402
-from ch5_reservoir import _full, memoryless_nodes, nodes_from, run_states  # noqa: E402
+from ch5_reservoir import _full, ema_states, memoryless_nodes, nodes_from, run_states  # noqa: E402
 import ch5_wesad as W  # noqa: E402
 
 
@@ -95,7 +97,7 @@ def lagged_targets(Us, lags=LAGS_S):
     return np.column_stack(feats), meta
 
 
-def feature_dict(raw, nodes=None, dt=DT, lags=LAGS_S):
+def feature_dict(raw, nodes=None, dt=DT, lags=LAGS_S, ema_taus=None):
     """Build {sid: (F, Y)} for one reservoir/control condition."""
     feats = {}
     meta = None
@@ -103,7 +105,10 @@ def feature_dict(raw, nodes=None, dt=DT, lags=LAGS_S):
     for sid, (U, lab) in raw.items():
         Us, ls = W.stream_subject(U, lab, dt)
         Y, meta = lagged_targets(Us, lags)
-        F = Us if nodes is None else run_states(nodes, Us)
+        if ema_taus is not None:
+            F = ema_states(Us, ema_taus, dt)
+        else:
+            F = Us if nodes is None else run_states(nodes, Us)
         keep = np.isin(ls, list(W.LABELS))
         keep[:washout] = False
         feats[sid] = (F[keep], Y[keep])
@@ -164,27 +169,34 @@ def loso_regression(feats, per_subject=False):
     return r2, nrmse
 
 
-def evaluate_condition(raw, cards, condition, seed=None, n_nodes=N_NODES):
+def condition_spec(cards, condition, seed=None, n_nodes=N_NODES):
+    """(nodes, ema_taus) for one reservoir or linear-control condition."""
     full = _full(cards)
     fast = min(full, key=lambda c: c.tau)
     slow = lead_card(cards)
     rng = np.random.default_rng(0 if seed is None else seed)
-
+    C = len(W.CHANNELS)
     if condition == "instantaneous":
-        nodes = None
-    elif condition == "memoryless":
-        nodes = nodes_from(full, n_nodes, rng, dt=DT, n_in=len(W.CHANNELS), sparsity=0.4)
-        nodes = memoryless_nodes(nodes)
-    elif condition == "homogeneous_fast":
-        nodes = nodes_from([fast], n_nodes, rng, dt=DT, n_in=len(W.CHANNELS), sparsity=0.4)
-    elif condition == "homogeneous_slow":
-        nodes = nodes_from([slow], n_nodes, rng, dt=DT, n_in=len(W.CHANNELS), sparsity=0.4)
-    elif condition == "heterogeneous":
-        nodes = nodes_from(full, n_nodes, rng, dt=DT, n_in=len(W.CHANNELS), sparsity=0.4)
-    else:
-        raise ValueError(f"unknown condition: {condition}")
+        return None, None
+    if condition == "ema_lead":
+        return None, [slow.rc_tau]
+    if condition == "ema_bank":
+        return None, sorted(c.rc_tau for c in full)
+    if condition == "memoryless":
+        return memoryless_nodes(nodes_from(full, n_nodes, rng, dt=DT, n_in=C,
+                                           sparsity=0.4)), None
+    if condition == "homogeneous_fast":
+        return nodes_from([fast], n_nodes, rng, dt=DT, n_in=C, sparsity=0.4), None
+    if condition == "homogeneous_slow":
+        return nodes_from([slow], n_nodes, rng, dt=DT, n_in=C, sparsity=0.4), None
+    if condition == "heterogeneous":
+        return nodes_from(full, n_nodes, rng, dt=DT, n_in=C, sparsity=0.4), None
+    raise ValueError(f"unknown condition: {condition}")
 
-    feats, meta = feature_dict(raw, nodes)
+
+def evaluate_condition(raw, cards, condition, seed=None, n_nodes=N_NODES):
+    nodes, ema_taus = condition_spec(cards, condition, seed, n_nodes)
+    feats, meta = feature_dict(raw, nodes, ema_taus=ema_taus)
     r2, nrmse = loso_regression(feats)
     return r2, nrmse, meta
 
@@ -231,6 +243,8 @@ def print_summary(rows):
         ("homogeneous_fast", "homogeneous fast"),
         ("homogeneous_slow", "homogeneous slow"),
         ("heterogeneous", "heterogeneous bank"),
+        ("ema_lead", "EMA, lead half-life"),
+        ("ema_bank", "EMA bank, 8 half-lives"),
     ]
     print("\nPhysiological temporal-context reconstruction")
     print(f"  targets: {', '.join(str(x) + ' s' for x in LAGS_S)} lags "
@@ -276,6 +290,7 @@ def paired_significance(raw, cards, n_nodes=N_NODES, seeds=SEEDS):
     banks = {
         "homogeneous_fast": persubject_over_seeds("homogeneous_fast"),
         "homogeneous_slow": persubject_over_seeds("homogeneous_slow"),
+        "ema_bank": _evaluate_persubject(raw, cards, "ema_bank", None, n_nodes)[2],
     }
     het = persubject_over_seeds("heterogeneous")
     tests = {}
@@ -301,34 +316,17 @@ def paired_significance(raw, cards, n_nodes=N_NODES, seeds=SEEDS):
 
     print("\nPaired heterogeneous-bank comparisons over subjects "
           f"(subject scores averaged over {len(list(seeds))} node draws):")
-    for name in ("homogeneous_fast", "homogeneous_slow"):
+    for name in ("homogeneous_fast", "homogeneous_slow", "ema_bank"):
         st = tests[name]
-        print(f"  het - {name.removeprefix('homogeneous_'):4s}: "
+        print(f"  het - {name.removeprefix('homogeneous_'):8s}: "
               f"mean diff={st['mean']:+.4f} | {st['n_pos']}/{st['n']} subjects positive | "
               f"Wilcoxon p={st['p']:.2e}, Holm p={st['p_holm']:.2e}")
     return tests
 
 
 def _evaluate_persubject(raw, cards, condition, seed, n_nodes):
-    full = _full(cards)
-    fast = min(full, key=lambda c: c.tau)
-    slow = lead_card(cards)
-    rng = np.random.default_rng(0 if seed is None else seed)
-    C = len(W.CHANNELS)
-    if condition == "instantaneous":
-        nodes = None
-    elif condition == "memoryless":
-        nodes = nodes_from(full, n_nodes, rng, dt=DT, n_in=C, sparsity=0.4)
-        nodes = memoryless_nodes(nodes)
-    elif condition == "homogeneous_fast":
-        nodes = nodes_from([fast], n_nodes, rng, dt=DT, n_in=C, sparsity=0.4)
-    elif condition == "homogeneous_slow":
-        nodes = nodes_from([slow], n_nodes, rng, dt=DT, n_in=C, sparsity=0.4)
-    elif condition == "heterogeneous":
-        nodes = nodes_from(full, n_nodes, rng, dt=DT, n_in=C, sparsity=0.4)
-    else:
-        raise ValueError(condition)
-    feats, _ = feature_dict(raw, nodes)
+    nodes, ema_taus = condition_spec(cards, condition, seed, n_nodes)
+    feats, _ = feature_dict(raw, nodes, ema_taus=ema_taus)
     return loso_regression(feats, per_subject=True)
 
 
@@ -403,6 +401,8 @@ def make_figure(rows, path=FIG_PATH):
         ("homogeneous_fast", "homogeneous fast", COLORS["green"]),
         ("homogeneous_slow", "homogeneous slow", COLORS["blue"]),
         ("heterogeneous", "heterogeneous bank", COLORS["red"]),
+        ("ema_lead", "EMA, lead half-life", "#6f6f6f"),
+        ("ema_bank", "EMA bank", "#4d4d4d"),
     ]
     means, errs = [], []
     for cond, _, _ in order:
@@ -417,8 +417,8 @@ def make_figure(rows, path=FIG_PATH):
     group_colors = [COLORS["green"], COLORS["blue"], COLORS["red"]]
     group_text = ["hom. fast", "hom. slow", "heterog."]
 
-    fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.6, 3.1),
-                                 gridspec_kw={"width_ratios": [1.1, 1.2]})
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.6, 3.3),
+                                 gridspec_kw={"width_ratios": [1.45, 1.0]})
     x = np.arange(len(order))
     b1 = a1.bar(x, means, yerr=errs, width=0.65, capsize=3, error_kw={"lw": 0.8})
     style_bars(b1, [c for _, _, c in order])
@@ -468,9 +468,10 @@ def run_benchmark():
 
     rows = []
     conditions = ["instantaneous", "memoryless", "homogeneous_fast",
-                  "homogeneous_slow", "heterogeneous"]
+                  "homogeneous_slow", "heterogeneous", "ema_lead", "ema_bank"]
     for condition in conditions:
-        seeds = [None] if condition == "instantaneous" else list(SEEDS)
+        seeds = ([None] if condition in ("instantaneous", "ema_lead", "ema_bank")
+                 else list(SEEDS))
         for seed in seeds:
             r2, nrmse, meta = evaluate_condition(raw, cards, condition, seed, N_NODES)
             for i, m in enumerate(meta):

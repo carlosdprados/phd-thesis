@@ -24,7 +24,7 @@ the repository
 Each replicated composition cell is reduced to a parameter card
 $(t_{1/2,c},\beta_c,\alpha_c,R_{\mathrm{peak},c},N_{\mathrm{peak},c})$ that drives one reservoir node type. The values are taken directly from the comparative summaries, with no free re-tuning:
 \begin{itemize}
-  \item the fading-memory law $\lambda_c(\Delta t)=\exp[-(\Delta t/\tau_c)^{\beta_c}]$ is anchored to the model-free cell-median $t_{1/2,c}$ in \cref{tab:ch4_decay_by_cell}. Where $\beta_c$ is identified, $\tau_c=t_{1/2,c}/(\ln 2)^{1/\beta_c}$; otherwise $\beta_c=1$ and $\tau_c=t_{1/2,c}/\ln 2$;
+  \item the fading-memory law $\lambda_c(\Delta t)=\exp[-(\Delta t/\tau_c)^{\beta_c}]$ is anchored to the model-free cell-median $t_{1/2,c}$ in \cref{tab:ch4_decay_by_cell}. Where $\beta_c$ is identified, $\tau_c=t_{1/2,c}/(\ln 2)^{1/\beta_c}$; otherwise $\beta_c=1$ and $\tau_c=t_{1/2,c}/\ln 2$. Each node relaxes along the whole sampled kernel, so the simulated decay matches $\lambda_c$ at every delay and every sampling interval (tested in \path{tests/test_ch5_model.py});
   \item the write envelope uses the per-cell growth exponent, peak enhancement, and pulse count at the peak from \cref{tab:ch4_pulses_by_cell}; it is normalised to $G/G_0=1$ at zero effective pulses and capped at the measured peak;
   \item the injected device-to-device jitter acts only on the timescale and uses the screened substrate-level within-cell scatter in \cref{app:ch5_scatter}. No common jitter is assumed for $\alpha$ or $\beta$.
 \end{itemize}
@@ -54,7 +54,8 @@ leakage.
     \toprule
     Setting & Value \\
     \midrule
-    Node model & bounded, peak-calibrated recurrence: leak $x$ by $\lambda_i$, advance pulse progress by at most $\operatorname{clip}(w_i u_n,0,1)/N_{\mathrm{peak},i}$, then map through $x=p^{\alpha_i}$ (\cref{sec:ch5_model}) \\
+    Node model & pulse progress is the causal sum of the clipped drive $\operatorname{clip}(w_i u_n,0,1)/N_{\mathrm{peak},i}$ weighted by the measured kernel $\lambda_i^{1/\alpha_i}$, capped at the measured peak, then mapped through $x=p^{\alpha_i}$ (\cref{sec:ch5_model}). At the peak, the stored history is held as a non-negative sum of exponential modes fitted to the kernel and rescaled \\
+    Linear controls & exponential moving averages of the input channels at $\tau=t_{1/2}/\ln 2$ for the lead cell and for all eight cells, with the same read-out \\
     Read-out & single linear ridge regression \\
     Bank size $N$ & 24 (benchmarks); 48 (physiology/affect) \\
     Algorithmic variability & 10 random input/bank seeds; means $\pm$ SD and sign consistency reported; seeds are not inferential replicates \\
@@ -143,10 +144,10 @@ The deployment-robustness result of \cref{sec:ch5_robust} (\path{scripts/ch5_ons
 is a continuous binary stress detector: at every $\Delta t = \SI{1}{\second}$ step the
 read-out predicts stress (\WESAD{} label~2) versus not-stress (baseline and amusement
 pooled), leave-one-subject-out, with the same single linear ridge read-out and
-$15$-second causal label smoothing used in the streaming task. Four matched banks of
+$15$-second causal label smoothing used in the streaming task. Five matched feature sets of
 $N=24$ nodes are compared on identical input masks: the instantaneous input (no
 memory), a memoryless bank (leak set to zero, dimensionality only), the homogeneous
-lead-only bank, and the heterogeneous composition bank.
+lead-only bank, the heterogeneous composition bank, and a linear EMA bank at the eight cell half-lives.
 
 Sensor corruption is modelled by adding, to the per-subject scaled streams
 (channels in $[0,1]$), independent Gaussian noise of standard deviation $\sigma$ at
@@ -180,10 +181,10 @@ RMS-smoothed over \SI{1}{\second} and scaled from the initial calibration prefix
 deviation at each step is $\text{scale}\times(0.05 + \text{motion})$, with an amplified
 artefact burst where the index exceeds $0.6$, so corruption lands where the wearer
 actually moves. At corruption scale $0.8$, instantaneous, heterogeneous, and EMA
-scores are $0.702$, $0.791$, and $0.810$. The heterogeneous-minus-instantaneous
-subject difference is $+0.087$ ($p=0.084$, not resolved); EMA-minus-instantaneous is
-$+0.112$ ($p=0.035$). Thus the measured-motion control supports conventional
-temporal filtering, not a device-specific effect.
+scores are $0.702$, $0.811$, and $0.809$. The heterogeneous-minus-instantaneous
+subject difference is $+0.111$ ($p=0.055$, not resolved); EMA-minus-instantaneous is
+also $+0.111$ ($p=0.035$). Thus the measured-motion control supports temporal
+filtering, not a device-specific effect.
 
 \section{Control Experiments}\label{app:ch5_controls}
 
@@ -197,17 +198,19 @@ pairs are independent held-out subjects.
 
 \paragraph{Classical-filter control.} \Cref{tab:ch5_filter} is the control behind the
 deployment-robustness reframing of \cref{sec:ch5_robust}: an ordinary exponential
-moving average of the raw channels, fed to the same linear read-out with no
-reservoir, recovers the noise robustness, so the robustness is the generic property
-of a fading-memory low-pass rather than anything specific to the device or its
-nonlinearity. The device's contribution is to \emph{be} that filter, passively and at
+moving average of the raw channels at the device half-lives, fed to the same linear
+read-out with no reservoir, recovers the noise robustness, so the robustness is the
+generic property of a fading-memory low-pass at these time constants rather than
+anything specific to the device nonlinearity. The device's contribution is to \emph{be} that filter, passively and at
 the budget of \cref{app:ch5_deploy}. The cross-corpus and wrist robustness results
 (\cref{tab:ch5_crosscorpus,tab:ch5_wrist}) share this character: there too the gain
-is the low-pass advantage of temporal memory over an instantaneous read.
+is the low-pass advantage of temporal memory over an instantaneous read. On the wrist
+the device bank and the EMA bank do not differ ($p=0.38$); on the Non-EEG corpus the
+device bank exceeds the EMA bank by $0.023$ ($16/20$ subjects, $p=0.017$).
 
 \begin{table}[t]
   \centering
-  \caption[Classical exponential-moving-average control]{Classical-filter control for the continuous stress monitor (binary macro-F1, leave-one-subject-out). Paired at $\sigma=0.4$ over fifteen subjects: EMA(single)$-$instantaneous $=+0.171$ ($p=0.022$, $r_{\mathrm{rb}}=+0.67$); EMA(bank)$-$EMA(single) $=+0.006$ ($p=0.20$); device reservoir$-$EMA(bank) $=-0.052$ ($p=0.030$, $r_{\mathrm{rb}}=-0.63$). The digital linear filter is the stronger control.}
+  \caption[Classical exponential-moving-average control]{Classical-filter control for the continuous stress monitor (binary macro-F1, leave-one-subject-out). Paired at $\sigma=0.4$ over fifteen subjects: EMA(single)$-$instantaneous $=+0.170$ ($p=0.022$, $r_{\mathrm{rb}}=+0.67$); EMA(bank)$-$EMA(single) $=+0.003$ ($p=0.35$); device reservoir$-$EMA(bank) $=-0.002$ ($p=0.64$, $r_{\mathrm{rb}}=-0.14$). The linear filter at the device half-lives matches the device bank.}
   \label{tab:ch5_filter}
   \footnotesize
   \setlength{\tabcolsep}{6pt}
@@ -216,9 +219,9 @@ is the low-pass advantage of temporal memory over an instantaneous read.
     Detector (linear read-out on \dots) & clean & $\sigma=0.4$ \\
     \midrule
     Instantaneous channels (no memory)            & 0.781 & 0.641 \\
-    EMA, single $\tau$ (lead cell)                 & 0.803 & 0.804 \\
-    EMA bank, $\tau$ spread (linear reservoir)     & \textbf{0.807} & \textbf{0.811} \\
-    Device reservoir (nonlinear, heterogeneous)    & 0.791 & 0.775 \\
+    EMA at the lead half-life                      & 0.803 & 0.804 \\
+    EMA bank at the eight half-lives (linear)      & \textbf{0.806} & 0.808 \\
+    Device reservoir (nonlinear, heterogeneous)    & 0.799 & \textbf{0.811} \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -233,7 +236,7 @@ grid supplies intrinsically, and extending the range (the drive-amplitude variab
 
 \begin{table}[t]
   \centering
-  \caption[Generic echo-state-network control]{Total linear memory capacity ($N=24$, ten matched seeds, means $\pm$\,SD) of the measured-card heterogeneous bank versus generic random leaky banks of equal size. The same-range control exceeds the device bank by $0.45$ on average (device higher in $4/10$ seeds); the broad-range control exceeds it by $1.04$ (device higher in $2/10$). These are algorithmic-sensitivity comparisons, not population-level tests.}
+  \caption[Generic echo-state-network control]{Total linear memory capacity ($N=24$, ten matched seeds, means $\pm$\,SD) of the measured-card heterogeneous bank versus generic random leaky banks of equal size. The same-range control exceeds the device bank by $0.53$ on average (device higher in $4/10$ seeds); the broad-range control exceeds it by $1.12$ (device higher in $1/10$). These are algorithmic-sensitivity comparisons, not population-level tests.}
   \label{tab:ch5_esn}
   \footnotesize
   \setlength{\tabcolsep}{6pt}
@@ -241,7 +244,7 @@ grid supplies intrinsically, and extending the range (the drive-amplitude variab
     \toprule
     Reservoir ($N=24$) & total MC \\
     \midrule
-    Measured-card heterogeneous bank             & $4.52 \pm 0.67$ \\
+    Measured-card heterogeneous bank             & $4.44 \pm 0.45$ \\
     Generic bank, same $\tau$ range ($3$--$30$\,s) & $4.97 \pm 0.78$ \\
     Generic bank, broad $\tau$ range ($0.5$--$60$\,s) & $5.56 \pm 0.74$ \\
     \bottomrule
@@ -252,13 +255,13 @@ grid supplies intrinsically, and extending the range (the drive-amplitude variab
 composition assumption of \cref{sec:ch5_model}: each node's retention time is
 rescaled with its own write-nonlinearity exponent by a factor $e^{\kappa z}$ ($z$ the
 standardised exponent), modelling the drive--retention coupling the separate-amplitude
-measurement cannot exclude. Mean capacity remains slightly higher in the heterogeneous bank across the sweep, but the difference is small and not seed-consistent enough to support an inferential robustness claim. The sweep is then \emph{anchored to data}. The gold/\TMPE{}
+measurement cannot exclude. The heterogeneous bank keeps the higher capacity across the sweep (ratio $1.29$--$1.42$, higher in every seed pair). The sweep is then \emph{anchored to data}. The gold/\TMPE{}
 negative-polarity corpus of \cref{ch:comparative} supplies the only direct measurement
 of this coupling: across $28$ single-run potentiation\,$+$\,relaxation traces the
 write-depth and the forgetting time are rank-correlated at $\rho=+0.46$ ($p=0.015$;
 $95\%$ CI $0.10$--$0.71$ by Fisher's $z$). Calibrating $\kappa$ so the simulated
 across-node write--retention correlation matches that figure fixes the data-anchored
-operating point. The nominal composed cards already carry an across-node rank correlation of about $\rho=+0.57$, so the central external estimate maps to $\kappa^{\star}=0$; the upper confidence limit maps to about $+0.31$. The heterogeneous-to-homogeneous ratio is $1.08$ at both points, and the sweep spans only $1.04$--$1.09$. The figure is transferred as an order-of-magnitude anchor only -- a
+operating point. The nominal composed cards already carry an across-node rank correlation of about $\rho=+0.57$, so the central external estimate maps to $\kappa^{\star}=0$; the upper confidence limit maps to about $+0.31$. The heterogeneous-to-homogeneous ratio is $1.38$ at $\kappa^{\star}=0$ and $1.33$ at the upper limit, within the $1.29$--$1.42$ span of the sweep. The figure is transferred as an order-of-magnitude anchor only -- a
 different host, electrode, and polarity -- but it converts the bound from an arbitrary
 range into a data-referenced point and independently confirms the \emph{sign} of the
 coupling the composed model assumes. The calibration ($\kappa$-for-$\rho$ bisection)
@@ -266,7 +269,7 @@ is reproduced by \path{scripts/ch5_reservoir.py}.
 
 \begin{table}[t]
   \centering
-  \caption[Coupling-sensitivity control]{Memory capacity under an injected drive--retention coupling $\kappa$ ($N=24$, ten seeds). The mean ratio remains close to unity throughout. The nominal cards already yield $\rho\approx+0.57$, above the transferred Au/TMPE central estimate of $+0.46$, so the data-anchored central point is $\kappa^{\star}=0$ and the upper confidence point is $+0.31$. Seed consistency describes algorithmic sensitivity, not experimental replication.}
+  \caption[Coupling-sensitivity control]{Memory capacity under an injected drive--retention coupling $\kappa$ ($N=24$, ten seeds). The heterogeneous bank stays above the homogeneous one throughout. The nominal cards already yield $\rho\approx+0.57$, above the transferred Au/TMPE central estimate of $+0.46$, so the data-anchored central point is $\kappa^{\star}=0$ and the upper confidence point is $+0.31$. Seed consistency describes algorithmic sensitivity, not experimental replication.}
   \label{tab:ch5_coupling}
   \footnotesize
   \setlength{\tabcolsep}{8pt}
@@ -274,13 +277,13 @@ is reproduced by \path{scripts/ch5_reservoir.py}.
     \toprule
     $\kappa$ & het MC & hom MC & ratio & het higher \\
     \midrule
-    $-0.50$ & 4.37 & 4.19 & 1.04 & $5/10$ \\
-    $-0.25$ & 4.41 & 4.19 & 1.05 & $7/10$ \\
-    $\phantom{-}0.00^{\dagger}$ & 4.52 & 4.19 & 1.08 & $7/10$ \\
-    $+0.25$ & 4.50 & 4.19 & 1.07 & $7/10$ \\
-    $+0.50$ & 4.59 & 4.19 & 1.09 & $8/10$ \\
+    $-0.50$ & 4.57 & 3.22 & 1.42 & $10/10$ \\
+    $-0.25$ & 4.55 & 3.22 & 1.41 & $10/10$ \\
+    $\phantom{-}0.00^{\dagger}$ & 4.44 & 3.22 & 1.38 & $10/10$ \\
+    $+0.25$ & 4.32 & 3.22 & 1.34 & $10/10$ \\
+    $+0.50$ & 4.17 & 3.22 & 1.29 & $10/10$ \\
     \midrule
-    $+0.31^{\ddagger}$ & 4.52 & 4.19 & 1.08 & $7/10$ \\
+    $+0.31^{\ddagger}$ & 4.29 & 3.22 & 1.33 & $10/10$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -288,7 +291,7 @@ is reproduced by \path{scripts/ch5_reservoir.py}.
 \paragraph{Chance baselines.} Under the streaming three-class protocol of
 \cref{sec:ch5_wesad}, a majority-class predictor scores macro-F1 $0.23$ and a
 stratified-random predictor $0.33$ (leave-one-subject-out, per step), so the
-reservoir's $0.524$ seed-mean score is above both floors. The ten node-mask seeds
+reservoir's $0.562$ seed-mean score is above both floors. The ten node-mask seeds
 quantify algorithmic sensitivity and are not treated as inferential replicates.
 
 \paragraph{Drive-boosted tonic-node extension.} The minutes-scale tonic gap of
@@ -297,13 +300,14 @@ drive-boosted nodes at $\tau = 120$ and \SI{300}{\second}, a labelled
 extrapolation of the drive-amplitude variable, copying the lead cell's write
 nonlinearity and stretch and overriding only $\tau$ (\path{tonic_cards} in
 \path{scripts/ch5_model.py}). On memory capacity (DT $=\SI{5}{\second}$, $k$ to $40$)
-the extension raises the long-lag tail beyond \SI{75}{\second}
-($\mathrm{MC}_{k>15}$ from $0.20$ to $0.91$, positive in all ten seed pairs) and raises total
-capacity from $4.52$ to $5.03$. On the physiological-context reconstruction, with the
-target delays extended to $90$ and \SI{120}{\second} so the genuinely tonic context is
-present, the slow-band held-out $R^2$ rises from $0.587$ to $0.610$.
-The matched-seed gain is $+0.023\pm0.028$ and positive in $8/10$ draws; the overall
-$R^2$ rises by $+0.008$ (\path{tonic_extension} in \path{scripts/ch5_physio_context.py}). Seeds quantify algorithmic sensitivity and are not used for a population-level test. The
+the extension raises the long-lag tail beyond \SI{75}{\second} only slightly
+($\mathrm{MC}_{k>15}$ from $0.82$ to $0.97$, positive in $9/10$ seed pairs) and leaves total
+capacity unchanged ($4.67$ and $4.64$). On the physiological-context reconstruction, with the
+target delays extended to $90$ and \SI{120}{\second} so the tonic context is
+present, the slow-band held-out $R^2$ moves from $0.634$ to $0.637$.
+The matched-seed gain is $+0.003\pm0.022$ and positive in $5/10$ draws; the overall
+$R^2$ changes by $-0.001$ (\path{tonic_extension} in \path{scripts/ch5_physio_context.py}). The
+stretched tails of the measured cells already carry much of the long-lag memory. Seeds quantify algorithmic sensitivity and are not used for a population-level test. The
 extension is not part of the measured composition banks anywhere else in the chapter.
 
 \section{Deployment Envelope}\label{app:ch5_deploy}

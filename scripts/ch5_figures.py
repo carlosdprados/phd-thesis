@@ -318,6 +318,11 @@ def fig_wesad(cards, seeds=range(10)):
         hom.append(W.loso_stream(W.stream_features(m, raw, dt), [1, 2, 3], smooth=sm)[0])
         mem0.append(W.loso_stream(W.stream_features(z, raw, dt), [1, 2, 3], smooth=sm)[0])
     het, hom, mem0 = map(np.array, (het, hom, mem0))
+    lead = lead_card(cards)
+    f1_ema1 = W.loso_stream(W.ema_stream_features(raw, dt, [lead.rc_tau]),
+                            [1, 2, 3], smooth=sm)[0]
+    f1_emaN = W.loso_stream(W.ema_stream_features(
+        raw, dt, sorted(c.rc_tau for c in _full(cards))), [1, 2, 3], smooth=sm)[0]
 
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.6, 3.2),
                                  gridspec_kw={"width_ratios": [1, 1.7]})
@@ -332,12 +337,12 @@ def fig_wesad(cards, seeds=range(10)):
     for x, v in zip([0, 1], [f1A_res, f1A_stat]):
         a1.text(x, v + 0.02, f"{v:.2f}", ha="center", fontsize=7.5)
     # panel (b)
-    labels = ["instantaneous\n(no memory)", "memoryless\nbank (dim.)",
-              "homogeneous\n(memory, 1$\\tau$)", "heterogeneous\n(memory, $\\tau$ spread)"]
-    vals = [f1_inst, mem0.mean(), hom.mean(), het.mean()]
-    errs = [0, mem0.std(), hom.std(), het.std()]
-    cols = ["#9c9c9c", "#6f6f6f", COLORS["blue"], COLORS["red"]]
-    x = np.arange(4)
+    labels = ["instant.\n(no memory)", "memoryless\nbank", "homog.\n(1 $\\tau$)",
+              "heterog.\n($\\tau$ spread)", "EMA\n(lead $t_{1/2}$)", "EMA bank\n(8 $t_{1/2}$)"]
+    vals = [f1_inst, mem0.mean(), hom.mean(), het.mean(), f1_ema1, f1_emaN]
+    errs = [0, mem0.std(), hom.std(), het.std(), 0, 0]
+    cols = ["#9c9c9c", "#6f6f6f", COLORS["blue"], COLORS["red"], "#6f6f6f", "#4d4d4d"]
+    x = np.arange(6)
     bb = a2.bar(x, vals, yerr=errs, width=0.62, capsize=3, error_kw={"lw": 0.8})
     style_bars(bb, cols)
     a2.set_xticks(x); a2.set_xticklabels(labels, fontsize=7.2)
@@ -356,8 +361,12 @@ def fig_wesad(cards, seeds=range(10)):
                 color=c, fontweight="bold")
     fig.tight_layout()
     p = os.path.join(FIGDIR, "wesad_affect.pdf"); fig.savefig(p); plt.close(fig)
+    d = het - hom
     print(f"wrote {p}  (Demo A res {f1A_res:.3f}/static {f1A_stat:.3f}; "
-          f"Demo B inst {f1_inst:.3f} memless {mem0.mean():.3f} hom {hom.mean():.3f} het {het.mean():.3f})")
+          f"Demo B inst {f1_inst:.3f} memless {mem0.mean():.3f}+/-{mem0.std():.3f} "
+          f"hom {hom.mean():.3f}+/-{hom.std():.3f} het {het.mean():.3f}+/-{het.std():.3f} "
+          f"het-hom {d.mean():+.3f}+/-{d.std():.3f} ({int((d > 0).sum())}/{len(d)} seeds) "
+          f"EMA lead {f1_ema1:.3f} EMA bank {f1_emaN:.3f})")
 
 
 def fig_robust_monitoring(cards):
@@ -378,7 +387,8 @@ def fig_robust_monitoring(cards):
     style = {"inst": ("#b0b0b0", "o", "instantaneous (no memory)"),
              "mem0": ("#8c8c8c", "^", "memoryless bank (dim. only)"),
              "hom":  (COLORS["blue"], "s", "homogeneous (memory, 1$\\tau$)"),
-             "het":  (COLORS["red"], "D", "heterogeneous (memory, $\\tau$ spread)")}
+             "het":  (COLORS["red"], "D", "heterogeneous (memory, $\\tau$ spread)"),
+             "emaN": ("#4d4d4d", "x", "linear EMA bank (same half-lives)")}
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.6, 3.2),
                                  gridspec_kw={"width_ratios": [1.45, 1]})
     for b, (col, mk, lab) in style.items():

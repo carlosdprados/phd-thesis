@@ -62,6 +62,11 @@ class ParameterCard:
     def cell(self):
         return f"{self.cation} PEO{self.peo}/salt{self.salt}"
 
+    @property
+    def rc_tau(self):
+        """Time constant of the single-exponential (RC) element with the same half-life."""
+        return self.t_half / LN2
+
     # ---- fading memory: residual fraction of an enhancement after a wait dt [s] ----
     def decay_factor(self, dt):
         dt = np.asarray(dt, dtype=float)

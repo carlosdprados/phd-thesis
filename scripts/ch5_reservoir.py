@@ -8,14 +8,19 @@ Depends on scripts/ch5_model.py (parameter cards from the Chapter 4 fits).
 
 Model (first-order, behavioural; explicit about its assumptions):
 - Each device is a bounded, leaky, nonlinearly-driven node. The latent state is a
-  fraction of the measured peak enhancement. After leakage, a rate-coded input
-  advances the measured pulse-progress coordinate by at most one effective pulse:
-      x_leak = decay_i * x_{n-1}
-      p_n    = clip(x_leak ** (1/alpha_i) + clip(w_i u_n,0,1)/N_peak_i, 0, 1)
+  fraction of the measured peak enhancement. A rate-coded input advances the
+  pulse-progress coordinate p by at most one effective pulse per sample, and p
+  relaxes along h^(1/alpha), where h(t) = exp[-(t/tau)^beta] is the measured
+  relaxation:
+      p_n    = clip(sum_k g_k d_{n-k} / N_peak_i, 0, 1),  g = h^(1/alpha_i)
       x_n    = p_n ** alpha_i
       G_n/G_0 = 1 + (peak_i - 1) x_n
-  With no leakage and unit input this reproduces the measured power-law envelope
-  and reaches the measured peak at N_peak. The state cannot exceed that peak.
+  A single write therefore decays exactly as h, and with no leakage and unit
+  input the node follows the measured power-law envelope to the measured peak.
+  The kernel is carried as a sum of exponential modes fitted once per beta
+  (kww_modes), so the recursion stays bounded and exact at any sample interval.
+  Applying exp[-(dt/tau)^beta] once per step instead would compound into a plain
+  exponential and, for beta < 1, shorten the simulated half-life.
 - Nodes are INDEPENDENT (1T1M bank, no inter-node recurrence) -- diversity comes
   from the measured parameter cards across compositions, timescale-only within-cell
   scatter, and the input mask. Turnover beyond the measured peak is not
@@ -31,7 +36,10 @@ needs the dataset; it is intentionally not here.
 """
 import os, sys
 from dataclasses import dataclass, replace
+from functools import lru_cache
 import numpy as np
+from scipy.optimize import lsq_linear
+from scipy.signal import fftconvolve
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ch5_model import load_cards, lead_card  # noqa: E402
@@ -45,7 +53,13 @@ DEFAULT_JITTER = 0.264  # median within-cell sigma(ln t_half), Chapter 4 audit
 
 @dataclass(frozen=True)
 class ReservoirNode:
-    """One bounded behavioural node at a fixed simulation cadence."""
+    """One bounded behavioural node at a fixed simulation cadence.
+
+    ``decay`` is the one-step retention exp[-(dt/tau)^beta]. When ``tau`` is
+    given, the node relaxes along the full stretched kernel (see kww_modes);
+    without it the node is a single-mode leaky integrator with that one-step
+    retention, which is exact for beta = 1.
+    """
 
     decay: float
     alpha: float
@@ -53,6 +67,45 @@ class ReservoirNode:
     peak_ratio: float
     n_peak: float
     turnover: bool = False
+    tau: float | None = None
+    beta: float = 1.0
+    dt: float | None = None
+
+
+@lru_cache(maxsize=None)
+def kww_modes(beta, n_cand=64):
+    """Non-negative exponential modes of exp(-t^beta) in units of tau.
+
+    Returns (weights, time constants) with sum(weights) = 1. The stretched
+    exponential is completely monotone for 0 < beta <= 1, so a positive mixture
+    of exponentials represents it; on the replicated cards (beta 0.61-0.97)
+    the fit error is below 3e-4.
+    """
+    if beta >= 0.999:
+        return np.array([1.0]), np.array([1.0])
+    theta = np.logspace(-4, 4, n_cand)
+    t = np.concatenate([[0.0], np.logspace(-4, np.log10(60.0), 600)])
+    target = np.exp(-t ** beta)
+    A = np.exp(-t[:, None] / theta[None, :])
+    w = np.ones_like(t)
+    w[0] = 100.0                       # a write registers fully: sum(weights) = 1
+    c = lsq_linear(A * w[:, None], target * w, bounds=(0.0, np.inf), method="bvls").x
+    keep = c > 1e-10
+    return c[keep] / c[keep].sum(), theta[keep]
+
+
+def node_modes(node):
+    """Per-step retention factors and weights of the node's progress kernel.
+
+    The progress coordinate relaxes as h^(1/alpha) = KWW(tau * alpha^(1/beta), beta),
+    so that the enhancement x = p^alpha of a single write decays as h.
+    """
+    if node.tau is None or node.decay == 0.0:
+        a = node.decay ** (1.0 / node.alpha) if node.decay > 0 else 0.0
+        return np.array([1.0]), np.array([a])
+    c, theta = kww_modes(round(float(node.beta), 6))
+    tau_p = node.tau * node.alpha ** (1.0 / node.beta)
+    return c, np.exp(-node.dt / (tau_p * theta))
 
 
 def _full(cards):
@@ -98,6 +151,7 @@ def nodes_from(base, N, rng, jitter=DEFAULT_JITTER, dt=DT, n_in=1, sparsity=0.0)
             peak_ratio=max(float(c.peak_ratio), 1.0),
             n_peak=max(float(c.n_peak), 1.0),
             turnover=bool(c.turnover),
+            tau=tau, beta=beta, dt=dt,
         ))
     return nodes
 
@@ -134,8 +188,10 @@ def random_nodes(N, rng, dt=DT, tau_lo=3.0, tau_hi=26.0, alpha_lo=0.5, alpha_hi=
                 if not m.any():
                     m[rng.integers(n_in)] = True
                 w = w * m
-        decay = float(np.exp(-((dt / max(tau, 1e-2)) ** beta)))
-        nodes.append(ReservoirNode(decay, alpha, w, 2.0, 300.0, False))
+        tau = max(tau, 1e-2)
+        decay = float(np.exp(-((dt / tau) ** beta)))
+        nodes.append(ReservoirNode(decay, alpha, w, 2.0, 300.0, False,
+                                   tau=tau, beta=beta, dt=dt))
     return nodes
 
 
@@ -165,13 +221,14 @@ def coupled_nodes(base, N, rng, kappa, jitter=DEFAULT_JITTER, dt=DT):
         tau_eff = max(tau * float(np.exp(kappa * zi)), 1e-2)
         decay = float(np.exp(-((dt / tau_eff) ** beta)))
         nodes.append(ReservoirNode(decay, alpha, w, max(card.peak_ratio, 1.0),
-                                   max(card.n_peak, 1.0), bool(card.turnover)))
+                                   max(card.n_peak, 1.0), bool(card.turnover),
+                                   tau=tau_eff, beta=beta, dt=dt))
     return nodes
 
 
 def memoryless_nodes(nodes):
     """Matched dimensionality/nonlinearity control with the leak removed."""
-    return [replace(node, decay=0.0) for node in nodes]
+    return [replace(node, decay=0.0, tau=None) for node in nodes]
 
 
 def run_states(nodes, u):
@@ -187,7 +244,6 @@ def run_states(nodes, u):
         u = u[:, None]                                   # (T, 1)
     T, C = u.shape
     N = len(nodes)
-    decay = np.array([node.decay for node in nodes])
     alpha = np.array([node.alpha for node in nodes])
     Win = np.array([np.atleast_1d(node.w) for node in nodes], float)   # (N, Cw)
     peaks = np.array([node.peak_ratio for node in nodes])
@@ -195,16 +251,72 @@ def run_states(nodes, u):
     if Win.shape[1] == 1 and C > 1:
         Win = np.repeat(Win, C, axis=1)                  # broadcast scalar gain
     assert Win.shape[1] == C, f"mask has {Win.shape[1]} channels, input has {C}"
-    X = np.zeros((T, N))
-    x = np.zeros(N)  # normalised enhancement fraction, bounded in [0, 1]
-    for n in range(T):
-        drive = np.clip(Win @ u[n], 0.0, 1.0)
-        leaked = np.clip(decay * x, 0.0, 1.0)
-        progress = np.power(leaked, 1.0 / alpha)
-        progress = np.clip(progress + drive / n_peak, 0.0, 1.0)
-        x = np.power(progress, alpha)
-        X[n] = 1.0 + (peaks - 1.0) * x
-    return X
+    drive = np.clip(u @ Win.T, 0.0, 1.0) / n_peak       # (T, N) progress per sample
+    # Below the measured peak the progress is a linear causal filter of the drive,
+    # evaluated for all nodes at once with the sampled kernel h^(1/alpha). Any node
+    # that reaches its peak is recomputed with the bounded step-by-step recursion.
+    kernels = [progress_kernel(node, T) for node in nodes]
+    G = np.zeros((max(len(k) for k in kernels), N))
+    for i, k in enumerate(kernels):
+        G[:len(k), i] = k
+    progress = fftconvolve(drive, G, axes=0)[:T]
+    for i in np.flatnonzero((progress > 1.0 + 1e-9).any(axis=0)):
+        weight, retain = node_modes(nodes[i])
+        progress[:, i] = _bounded_progress(weight, retain, drive[:, i])
+    x = np.power(np.clip(progress, 0.0, 1.0), alpha)
+    return 1.0 + (peaks - 1.0) * x
+
+
+def progress_kernel(node, n_max, tol=1e-6):
+    """Sampled progress kernel g_k = h(k dt)^(1/alpha).
+
+    The kernel is truncated where the measured relaxation h itself falls below
+    ``tol``, so that the truncation error is bounded on the enhancement x = p^alpha.
+    """
+    if node.tau is None or node.decay == 0.0:
+        if node.decay == 0.0:
+            return np.array([1.0])
+        n = n_max if node.decay >= 1.0 else min(
+            n_max, int(np.ceil(np.log(tol) / np.log(node.decay))) + 1)
+        return node.decay ** (np.arange(n) / node.alpha)
+    t_end = node.tau * np.log(1.0 / tol) ** (1.0 / node.beta)
+    n = min(n_max, int(np.ceil(t_end / node.dt)) + 1)
+    t = np.arange(n) * node.dt
+    return np.exp(-np.power(t / node.tau, node.beta) / node.alpha)
+
+
+def _bounded_progress(weight, retain, drive):
+    """Step-by-step progress of one node, rescaling its modes at the peak."""
+    m = np.zeros_like(weight)
+    out = np.empty(len(drive))
+    for n, d in enumerate(drive):
+        m = retain * m + weight * d
+        p = m.sum()
+        if p > 1.0:
+            m /= p
+            p = 1.0
+        out[n] = p
+    return out
+
+
+def ema_states(u, taus, dt):
+    """Linear control: one exponential moving average per channel and time constant.
+
+    Each column is an RC low-pass y_n = a y_{n-1} + (1 - a) u_n with
+    a = exp(-dt / tau), started in steady state at the first sample. With taus
+    set to the device half-lives divided by ln 2 this is the linear,
+    single-exponential counterpart of a device bank.
+    """
+    from scipy.signal import lfilter
+    u = np.asarray(u, float)
+    if u.ndim == 1:
+        u = u[:, None]
+    cols = []
+    for tau in taus:
+        a = float(np.exp(-dt / max(float(tau), 1e-3)))
+        y, _ = lfilter([1.0 - a], [1.0, -a], u, axis=0, zi=(a * u[:1]))
+        cols.append(y)
+    return np.hstack(cols)
 
 
 def _ridge_predict(Xtr, ytr, Xte):

@@ -54,10 +54,11 @@ def site_comparison(cards):
         i0, i4 = sw["sigmas"].index(0.0), sw["sigmas"].index(0.4)
         rN = O.evaluate(raw, cards, sigma=0.4)             # per-subject scores @ sigma 0.4
         out[name] = dict(
-            f1_0={b: sw["banks"][b]["f1"][i0][0] for b in ("inst", "mem0", "hom", "het")},
-            f1_4={b: sw["banks"][b]["f1"][i4][0] for b in ("inst", "mem0", "hom", "het")},
-            far0={b: sw["banks"][b]["far"][i0][0] for b in ("inst", "hom", "het")},
+            f1_0={b: sw["banks"][b]["f1"][i0][0] for b in ("inst", "mem0", "hom", "het", "emaN")},
+            f1_4={b: sw["banks"][b]["f1"][i4][0] for b in ("inst", "mem0", "hom", "het", "emaN")},
+            far0={b: sw["banks"][b]["far"][i0][0] for b in ("inst", "hom", "het", "emaN")},
             paired=O._paired(rN["het"]["subj_f1"], rN["inst"]["subj_f1"]),
+            paired_ema=O._paired(rN["het"]["subj_f1"], rN["emaN"]["subj_f1"]),
         )
     return out
 
@@ -109,13 +110,16 @@ def main():
         for name, d in cmp.items():
             print(f"  {name}")
             print(f"      {'bank':5s} {'F1 sig0':>8} {'F1 sig0.4':>10} {'FAR sig0':>9}")
-            for b in ("inst", "mem0", "hom", "het"):
+            for b in ("inst", "mem0", "hom", "het", "emaN"):
                 far = d["far0"].get(b)
                 fars = f"{far:9.3f}" if far is not None else f"{'--':>9}"
                 print(f"      {b:5s} {d['f1_0'][b]:8.3f} {d['f1_4'][b]:10.3f} {fars}")
             p = d["paired"]
             print(f"      paired het-inst F1@sig0.4: {p['mean']:+.3f}, "
-                  f"{int(p['frac_pos']*p['n'])}/{p['n']}, p={p['p']:.1e}\n")
+                  f"{int(p['frac_pos']*p['n'])}/{p['n']}, p={p['p']:.1e}")
+            q = d["paired_ema"]
+            print(f"      paired het-emaN F1@sig0.4: {q['mean']:+.3f}, "
+                  f"{int(q['frac_pos']*q['n'])}/{q['n']}, p={q['p']:.1e}\n")
 
     print("(2) DEPLOYMENT COUNTS AND HYBRANE WRITE-ENERGY REFERENCE\n")
     for N in (24, 48):

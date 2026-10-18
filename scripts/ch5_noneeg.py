@@ -125,7 +125,7 @@ def main():
     print("CLEAN streams (sigma=0):")
     r0 = O.evaluate(raw, cards, sigma=0.0)
     print(f"  {'bank':5s} {'binF1':>7} {'transF1':>8} {'falseAlarm':>11}")
-    for b in ("inst", "mem0", "hom", "het"):
+    for b in ("inst", "mem0", "hom", "het", "emaN"):
         m = r0[b]
         print(f"  {b:5s} {m['f1']:7.3f} {m['trans_f1']:8.3f} {m['far']:11.3f}")
     st = O._paired(r0["het"]["subj_f1"], r0["inst"]["subj_f1"])
@@ -135,7 +135,7 @@ def main():
     print("\nNOISE ROBUSTNESS (binary-F1 vs sigma; seed-averaged):")
     sw = O.noise_sweep(raw, cards)
     print(f"  {'bank':5s}  " + "  ".join(f"sig={s:g}" for s in sw["sigmas"]))
-    for b in ("inst", "mem0", "hom", "het"):
+    for b in ("inst", "mem0", "hom", "het", "emaN"):
         print(f"  {b:5s}  " + "  ".join(f"{m:.3f}" for m, _ in sw["banks"][b]["f1"]))
     hi = len(sw["sigmas"]) - 1
     rN = O.evaluate(raw, cards, sigma=sw["sigmas"][hi])
@@ -144,6 +144,10 @@ def main():
           f"vs inst {sw['banks']['inst']['f1'][hi][0]:.3f} "
           f"(advantage {sw['banks']['het']['f1'][hi][0]-sw['banks']['inst']['f1'][hi][0]:+.3f}; "
           f"{int(stN['frac_pos']*stN['n'])}/{stN['n']} subjects, p={stN['p']:.1e})")
+    for a, b in (("emaN", "inst"), ("het", "emaN")):
+        st2 = O._paired(rN[a]["subj_f1"], rN[b]["subj_f1"])
+        print(f"  {a}-{b} binary-F1 at sigma={sw['sigmas'][hi]:g}: {st2['mean']:+.3f} "
+              f"({int(st2['frac_pos']*st2['n'])}/{st2['n']} subjects, p={st2['p']:.1e})")
 
 
 if __name__ == "__main__":
