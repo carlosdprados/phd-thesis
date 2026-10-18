@@ -10,7 +10,9 @@ PhD thesis repository of **Carlos David Prado Socorro** at the Institute of Mole
 
 This thesis studies solution-processed organic memristive devices whose electrical response is shaped by mobile ions inside a polymer composite. These devices do not merely store a static resistance value: their conductance carries a decaying record of recent electrical activity.
 
-The central idea is to use that **fading memory** as a computational resource. The current experimental result is strongest for polymer-electrolyte **composition**: in the replicated `PEO/LiOTf` grid, composition tunes the switching window, pulse integration, and fading-memory time. Host, anion, and cation chemistry are retained as an illustrative, sample-limited tuning landscape rather than as a powered `Li > Na > K` law.
+The central idea is to use that **fading memory** as a circuit property. The experimental result is strongest for polymer-electrolyte **composition**: in the replicated `PEO/LiOTf` grid, composition sets the fading-memory time over roughly 2–20 s, together with the switching window and pulse integration. Each composition therefore acts as a two-terminal element whose time constant is chosen when the film is formulated. Host, anion, and cation chemistry are retained as an illustrative, sample-limited tuning landscape rather than as a powered `Li > Na > K` law.
+
+Simulations of the measured relaxation test two uses of that time constant. As a **designed filter**, a single composition removes the slow baseline of electrodermal signals as accurately as a digital filter, and behaves like an `RC` element with the same half-life. As a **reservoir**, banks of mixed compositions do not exceed linear filtering at the same time constants. The practical case for the devices is therefore a seconds-scale time constant obtained from a printable film without a separate capacitor; the comparison against a printed `RC` element remains to be measured.
 
 <p align="center">
   <img src="figures/chapter1/ch1_fig14_composite_architecture_timescale_ladder.png" alt="Two-terminal polymer-electrolyte composite memristor and its chemically tunable fading-memory timescale" width="100%">
@@ -53,7 +55,7 @@ The comparative chapter keeps that HSAB argument as qualitative framing, but the
 | 2. Proof of concept | A characterised `SY/Hybrane/LiOTf` two-terminal platform with assay-level specimen mapping for analogue switching, retention, EPSC-like response, and STDP | Draft available |
 | 3. Reproducibility and provenance bridge | Diagnoses the `Hybrane` reproducibility collapse, documents the fabrication-provenance methodology, and motivates the transition to the `PEO` platform | Draft available |
 | 4. Comparative study | How **composition** (the `PEO/LiOTf` grid) tunes volatile dynamics — switching, potentiation, and fading memory — and how electrolyte **chemistry** shifts them further as sample-limited side evidence | Draft available |
-| 5. Temporal computing | Data-driven reservoir simulations from Chapter 4 parameter cards: memory-capacity/NARMA benchmarks, WESAD physiological temporal-context reconstruction, and scoped WESAD affective-classification demonstrations | Draft available |
+| 5. Temporal computing | Component cards from Chapter 4: designed filters compared with `RC` and digital filters on synthetic and WESAD electrodermal signals, then reservoir banks (memory-capacity/NARMA/IPC benchmarks, WESAD tasks, PhysioNet replication) against linear-filter controls | Draft available |
 | 6. Conclusions | Contributions, limitations, and future directions | Draft available |
 
 The proof-of-concept chapter expands the published work:
