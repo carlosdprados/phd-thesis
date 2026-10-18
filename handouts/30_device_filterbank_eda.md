@@ -5,7 +5,7 @@
 physiological steps). **Tests:** `tests/test_ch5_filterbank.py`.
 **Figure:** `figures/chapter5/filterbank.pdf` (not referenced by the thesis).
 **Outputs:** `handouts/ch5_filterbank_{design,synthetic,wesad,tier2,device_vs_rc}.csv`.
-**Status: EXPLORATORY.** Not integrated into any chapter.
+**Status: INTEGRATED** as Chapter 5 §"Designed Filters from the Component Cards" and Appendix D (handout 31).
 
 ---
 
@@ -199,8 +199,8 @@ that each card "reproduces the cell-median half-time exactly" holds for a single
 interval, not over a simulated trajectory. A convolution or Prony-series node,
 as used here, would fix it.
 
-**Not changed in this analysis.** It is a decision for the thesis, because every
-Chapter 5 figure would need regenerating.
+**Fixed on 2026-10-18** (commit `61e250f`): nodes now follow the sampled kernel,
+and every Chapter 5 result was regenerated (handout 31).
 
 ## 8. Reproduce
 

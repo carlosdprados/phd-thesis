@@ -309,6 +309,31 @@ def design_space(designs):
     return rows, freqs
 
 
+def lowpass_corner(card, family="device", freqs=None):
+    """-3 dB corner of the single-element low-pass built from a card."""
+    freqs = np.logspace(-4, math.log10(FS / 2 * 0.98), 4000) if freqs is None else freqs
+    z = np.exp(-2j * np.pi * freqs / FS)
+    k = lowpass_kernel(card, family)
+    mag = np.abs(np.polyval(k[::-1], z))
+    return float(freqs[np.argmax(mag < 1.0 / math.sqrt(2.0))])
+
+
+def component_cards(cells):
+    """Component table: each replicated cell as a filter element."""
+    rows = []
+    for c in sorted(cells, key=lambda z: z.t_half):
+        rows.append({
+            "cell": cell_label(c), "n_substrates": c.n_dev,
+            "t_half_s": round(c.t_half, 2), "beta": round(c.beta, 2),
+            "tau_kww_s": round(c.tau, 2), "tau_rc_s": round(c.t_half / LN2, 2),
+            "f_corner_device_hz": round(lowpass_corner(c, "device"), 4),
+            "f_corner_rc_hz": round(lowpass_corner(c, "rc"), 4),
+            "alpha": round(c.alpha, 2), "peak_ratio": round(c.peak_ratio, 1),
+            "n_peak": int(c.n_peak),
+        })
+    return rows
+
+
 # ----------------------------------------------------------------------------
 # E2: synthetic ground truth
 # ----------------------------------------------------------------------------
@@ -878,6 +903,11 @@ def main():
     # E1
     ds_rows, freqs = design_space(designs)
     write_csv(os.path.join(OUT, "ch5_filterbank_design.csv"), ds_rows)
+    cards_rows = component_cards(cells)
+    write_csv(os.path.join(OUT, "ch5_component_cards.csv"), cards_rows)
+    for r in cards_rows:
+        print(f"  {r['cell']:14s} t1/2 {r['t_half_s']:5.2f} s  beta {r['beta']:.2f}  "
+              f"f_c device {r['f_corner_device_hz']:.4f} Hz  RC {r['f_corner_rc_hz']:.4f} Hz")
 
     # E2
     sessions = make_sessions()

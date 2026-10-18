@@ -310,6 +310,107 @@ $R^2$ changes by $-0.001$ (\path{tonic_extension} in \path{scripts/ch5_physio_co
 stretched tails of the measured cells already carry much of the long-lag memory. Seeds quantify algorithmic sensitivity and are not used for a population-level test. The
 extension is not part of the measured composition banks anywhere else in the chapter.
 
+\section{Designed-Filter Analysis}\label{app:ch5_filters}
+
+The designed-filter results of \cref{sec:ch5_filters} are reproduced by
+\path{scripts/ch5_filterbank.py}, with regression tests in
+\path{tests/test_ch5_filterbank.py}. All filters are causal and start in
+steady state at the first sample.
+
+\paragraph{Kernels.} A device low-pass is the measured relaxation
+\(\exp[-(t/\tau_c)^{\beta_c}]\) sampled at \SI{4}{\hertz}, normalised to unit DC
+gain and truncated where it falls below \(10^{-4}\). Every kernel reproduces the
+cell-median half-life to within one sample. The $RC$ reference is a single
+exponential with \(\tau=t_{1/2}/\ln 2\). The digital references are causal
+second-order Butterworth band-pass filters at \SIrange{0.05}{1}{\hertz} (phasic)
+and \SIrange{0.045}{0.25}{\hertz} (sympathetic band~\cite{PosadaQuintero2016EDASymp}).
+
+\paragraph{Synthetic sessions.} Each \SI{40}{\minute} session alternates
+\SI{5}{\minute} calm and aroused blocks. SCR onsets follow a Poisson process at
+nominal rates of 2 and 8 per minute, with a \SI{1}{\second} refractory gap
+(realised rates about 2 and 7 per minute). Each SCR is a Bateman function~\cite{BenedekKaernbach2010}
+with rise constant drawn from \SIrange{0.5}{1.2}{\second}, decay constant from
+\SIrange{2}{7}{\second}, and a log-normal amplitude (median \SI{0.2}{\micro\siemens});
+responses below \SI{0.05}{\micro\siemens} are not scored. The tonic level starts
+between 2 and \SI{12}{\micro\siemens}, drifts with a \SI{300}{\second} correlation
+time, and rises by \SIrange{0.2}{1.0}{\micro\siemens} in aroused blocks with a
+\SI{60}{\second} time constant. The clean condition adds white noise of
+\SI{0.005}{\micro\siemens}, the noisy condition \SI{0.03}{\micro\siemens}, and the
+artefact condition adds one rectangular artefact per minute
+(\SIrange{0.25}{1.5}{\second}, \(\pm\)\SIrange{0.2}{1.5}{\micro\siemens}).
+
+\paragraph{Scoring.} Candidate peaks at least \SI{1}{\second} apart are ranked by
+prominence. For each filter, the lag is the median lag of maximum correlation with
+the true phasic signal on 12 calibration sessions, and the prominence threshold
+maximises pooled F1 on the same sessions. Detections are then matched one-to-one
+to true SCR peaks within \SI{2}{\second} of the expected time on 30 separate test
+sessions. Detection on the noise-free phasic trace itself scores below the
+high-pass filters (F1 \num{0.662} clean), because high-pass filtering separates
+overlapping responses; it is therefore not a ceiling. On WESAD, per-minute
+phasic power is the variance of the filter output within non-overlapping
+\SI{60}{\second} windows inside each protocol segment, and the AUC compares
+stress with baseline windows within each subject. Synthetic sessions are
+summarised by means, standard deviations, and sign counts; subjects are the
+inferential unit for WESAD.
+
+\paragraph{Composed nonlinear node.} In the composed node of
+\cref{sec:ch5_model}, pulse progress relaxes as \(h^{1/\alpha}\) and the
+enhancement is \(x=p^{\alpha}\). Because a power law has no intrinsic scale, the
+drive amplitude cancels from the filter output unless the node saturates, which
+it does not at the drives tested (peak progress \num{0.06} for the high-pass and
+\num{0.59} for the band-pass at full drive). A read-out gain fixed on the
+calibration prefix must match the small-signal slope, which is \(1/\alpha\) times
+the level-matched gain; with a level-matched gain, baseline subtraction is
+incomplete. \Cref{tab:ch5_tier2} lists the results. If the composed model holds,
+the small-signal kernel is \(h^{1/\alpha}\), shorter than \(h\) when
+\(\alpha<1\); for the fastest cell (\(\alpha=\num{0.33}\)) its time constant is
+about \SI{1.3}{\second} and its corner about \SI{0.12}{\hertz}, inside the
+sympathetic band. This prediction rests on the composition assumption and is
+tested by measuring the relaxation of a small write superposed on a written
+state.
+
+\begin{table}[t]
+  \centering
+  \caption[Composed-node sensitivity of the designed filters]{Composed nonlinear node versus the measured-kernel filter (synthetic, clean condition, 30 test sessions). Drive levels of 0.05 and 1 give identical results for both read-outs.}
+  \label{tab:ch5_tier2}
+  \footnotesize
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{4.4cm}cc@{}}
+    \toprule
+    Design & Model & SCR F1 & \(r\) with true phasic \\
+    \midrule
+    High-pass, \PEO{}~1.2/0.045 & measured kernel (linear) & 0.713 & 0.56 \\
+                                & composed, level-matched gain & 0.712 & 0.61 \\
+                                & composed, small-signal gain & 0.748 & 0.53 \\
+                                & kernel \(h^{1/\alpha}\), linear & 0.746 & 0.33 \\
+    Band-pass, \PEO{}~1.2/0.045 $-$ 0.3/0.045 & composed, level-matched gain & 0.636 & 0.00 \\
+                                & composed, small-signal gain & 0.638 & 0.67 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{table}[t]
+  \centering
+  \caption[Measured kernel versus $RC$ element at the same half-life]{Single-device high-pass built from each cell minus the $RC$ element with the same half-life (nominal devices, so only kernel shape differs). Synthetic: mean F1 difference and sessions with a positive difference (of 30). WESAD: mean AUC difference of per-minute phasic power, subjects with a positive difference (of 15), and paired Wilcoxon $p$.}
+  \label{tab:ch5_device_vs_rc}
+  \scriptsize
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}l c c >{\centering\arraybackslash}X >{\centering\arraybackslash}X >{\centering\arraybackslash}X >{\centering\arraybackslash}X >{\centering\arraybackslash}X@{}}
+    \toprule
+    Cell & $t_{1/2}$ (s) & $\beta$ & $\Delta$F1 clean & $\Delta$F1 noisy & $\Delta$F1 artefacts & $\Delta$AUC chest & $\Delta$AUC wrist \\
+    \midrule
+    \PEO{}~1.2/0.045 & 2.74 & 1.00 & $0.000$ (0) & $0.000$ (0) & $0.000$ (0) & $0.000$ (0; --) & $0.000$ (0; --) \\
+    \PEO{}~0.6/0.045 & 2.76 & 0.97 & $0.000$ (6) & $0.000$ (8) & $0.000$ (11) & $-0.001$ (1; 0.26) & $0.000$ (2; 0.28) \\
+    \PEO{}~0.6/0.09 & 3.50 & 0.61 & $-0.012$ (7) & $-0.015$ (4) & $-0.006$ (10) & $-0.009$ (1; 0.01) & $-0.004$ (6; 1.00) \\
+    \PEO{}~0.6/0.18 & 5.54 & 0.61 & $-0.009$ (6) & $-0.012$ (7) & $-0.002$ (16) & $-0.009$ (2; 0.04) & $-0.002$ (5; 0.91) \\
+    \PEO{}~1.2/0.09 & 5.98 & 0.91 & $0.000$ (10) & $0.000$ (13) & $+0.001$ (14) & $-0.001$ (0; 0.11) & $-0.002$ (3; 0.16) \\
+    \PEO{}~1.2/0.18 & 9.04 & 0.87 & $+0.003$ (18) & $-0.006$ (8) & $+0.004$ (17) & $-0.003$ (2; 0.09) & $+0.001$ (5; 0.35) \\
+    \PEO{}~0.3/0.045 & 15.83 & 0.64 & $-0.001$ (13) & $-0.003$ (13) & $-0.007$ (10) & $-0.005$ (3; 0.19) & $-0.001$ (5; 0.72) \\
+    \PEO{}~0.3/0.09 & 19.20 & 0.83 & $0.000$ (13) & $-0.001$ (11) & $0.000$ (11) & $-0.001$ (4; 0.68) & $+0.001$ (5; 0.67) \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
 \section{Deployment Envelope}\label{app:ch5_deploy}
 
 \Cref{tab:ch5_deployment} collects the operating reference quoted in
