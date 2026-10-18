@@ -30,8 +30,8 @@ approach is to use device dynamics to store and transform temporal state. This
 thesis develops a \emph{volatile organic memristive device}: a two-terminal
 element made from an ion-containing polymer--electrolyte composite whose
 conductance retains a decaying record of recent electrical history. The work
-evaluates this controlled \emph{fading memory} as physical leaky integration for
-temporal computing.
+asks whether this \emph{fading memory} can be controlled and what it can be used
+for.
 
 Synaptic measurements on assay-specific junctions of a proof-of-concept platform made from Super~Yellow,
 Hybrane, and lithium triflate cover current--voltage
@@ -45,23 +45,26 @@ fabrication-record methodology and an automated feature pipeline. On the PEO
 platform, a replicated composition series tunes the fading-memory time over
 roughly 2--20\,s. Host, anion and cation substitutions remain a sample-limited
 survey, and the data do not support the hypothesised \ce{Li+} > \ce{Na+} >
-\ce{K+} ordering. Compact behavioural models fitted to the measured
-dynamics drive bounded reservoir-computing simulations. A heterogeneous composition
-bank does not resolve a total linear-memory advantage across random seeds, but raises
-mean information-processing capacity from $6.31$ to $10.33$, chiefly through nonlinear terms. Device-model banks
-encode multi-lag WESAD physiology with a modest heterogeneous-bank advantage
-($R^2=0.701$ versus $0.692$ for the stronger homogeneous control), but the
-heterogeneous increment is absent for sustained affect labels: three-class
-macro-F1 is $0.524$ versus $0.545$ for homogeneous memory. Under strong injected
-noise the temporal bank exceeds instantaneous input on WESAD and an independent
-PhysioNet corpus, while a linear exponential-moving-average control matches or
-exceeds the device model.
+\ce{K+} ordering. Each composition is summarised as a component card with its time
+constant, corner frequency, and a within-cell tolerance of
+$\sigma(\ln t_{1/2})\approx0.26$. Behavioural models that follow the measured
+relaxation are then tested in simulation in two roles. As a designed filter, the
+fastest composition removes the tonic level of electrodermal signals as well as a
+digital filter (synthetic response-detection F1 $0.713$ versus $0.701$; WESAD
+stress-versus-baseline AUC $0.952$ versus $0.951$) and is equivalent to an $RC$
+element with the same half-life. As reservoir banks, mixed compositions raise
+memory and information-processing capacity in every random seed, but on recorded
+physiology a linear filter bank at the same time constants matches or exceeds
+them, except on sustained three-class affect labels (macro-F1 $0.562$ versus
+$0.508$).
 
-The replicated PEO/lithium-triflate series identifies composition as a control
-of fading memory, while the sample-limited chemistry survey does not support the
-proposed cation ordering. Mixed-composition banks broaden temporal memory in
-simulation. The devices relax over seconds, placing them among temporal and
-event-driven neuromorphic hardware.
+The replicated PEO/lithium-triflate series identifies composition as a control of
+fading memory, while the sample-limited chemistry survey does not support the
+proposed cation ordering. Read as component values, the compositions give a
+printable two-terminal element whose seconds-scale time constant is set at
+formulation, without a separate capacitor. Its practical value now depends on the
+bench tests that the simulations motivate: filtering a recorded signal with a
+fabricated device and comparing it with a printed $RC$ element.
 
 %% ============================================================
 \begin{otherlanguage}{spanish}
@@ -77,8 +80,8 @@ dispositivo para almacenar y transformar un estado temporal. Esta tesis
 desarrolla un \emph{dispositivo memristivo orgánico volátil}: un elemento de dos
 terminales fabricado a partir de un compósito polímero--electrolito con iones
 móviles cuya conductancia conserva un registro decreciente de su historia
-eléctrica reciente. El trabajo evalúa esta \emph{memoria evanescente} controlada
-como integración física con fugas para la computación temporal.
+eléctrica reciente. El trabajo examina si esta \emph{memoria evanescente} puede
+controlarse y para qué puede utilizarse.
 
 Las medidas sinápticas realizadas en distintas uniones de una plataforma de prueba de concepto
 fabricada con Super~Yellow, Hybrane y triflato de litio comprenden histéresis
@@ -95,25 +98,30 @@ características. En la plataforma
 de PEO, una serie de composiciones replicada ajusta el tiempo de memoria
 evanescente entre aproximadamente 2 y 20\,s. Las sustituciones de matriz, anión y
 catión siguen siendo un estudio limitado por el tamaño muestral, y los datos no
-respaldan el orden catiónico hipotético \ce{Li+} > \ce{Na+} > \ce{K+}. Los
-modelos de comportamiento compactos ajustados a la dinámica medida
-alimentan simulaciones de computación de reservorio. Un banco heterogéneo no
-resuelve una ventaja en memoria lineal total entre semillas, pero eleva la
-capacidad media de procesamiento de información de $6{,}31$ a $10{,}33$,
-principalmente mediante términos no lineales. En la fisiología multirretardo de
-WESAD aporta una ventaja modesta ($R^2=0{,}701$ frente a $0{,}692$), pero no en
-las etiquetas sostenidas: el macro-F1 de tres clases es $0{,}524$ frente a
-$0{,}545$ con memoria homogénea. Bajo ruido inyectado intenso, el banco temporal
-supera a la entrada instantánea en WESAD y en un corpus PhysioNet independiente,
-aunque un filtro lineal de media móvil exponencial iguala o supera al modelo de
-dispositivo.
+respaldan el orden catiónico hipotético \ce{Li+} > \ce{Na+} > \ce{K+}. Cada
+composición se resume en una ficha de componente con su constante de tiempo, su
+frecuencia de corte y una tolerancia entre dispositivos de
+$\sigma(\ln t_{1/2})\approx0{,}26$. Los modelos de comportamiento que reproducen
+la relajación medida se evalúan después en simulación en dos funciones. Como
+filtro diseñado, la composición más rápida elimina el nivel tónico de la
+actividad electrodérmica con la misma precisión que un filtro digital (F1 de
+detección de respuestas sintéticas $0{,}713$ frente a $0{,}701$; AUC de estrés
+frente a reposo en WESAD $0{,}952$ frente a $0{,}951$) y equivale a un elemento
+$RC$ con la misma semivida. Como bancos de reservorio, las composiciones mixtas
+aumentan la capacidad de memoria y de procesamiento de información en todas las
+semillas aleatorias, pero sobre fisiología registrada un banco de filtros
+lineales con las mismas constantes de tiempo las iguala o supera, salvo en las
+etiquetas afectivas sostenidas de tres clases (macro-F1 $0{,}562$ frente a
+$0{,}508$).
 
 La serie replicada PEO/triflato de litio identifica la composición como variable
 de control de la memoria evanescente, mientras que el estudio químico limitado
-por el tamaño muestral no respalda el orden catiónico propuesto. Los bancos de
-composiciones mixtas amplían la memoria temporal en simulación. Los dispositivos
-se relajan en segundos, lo que los sitúa entre el hardware neuromórfico temporal
-y dirigido por eventos.
+por el tamaño muestral no respalda el orden catiónico propuesto. Leídas como
+valores de componente, las composiciones definen un elemento imprimible de dos
+terminales cuya constante de tiempo, del orden de segundos, se fija en la
+formulación, sin un condensador separado. Su valor práctico depende ahora de los
+ensayos de laboratorio que motivan las simulaciones: filtrar una señal registrada
+con un dispositivo fabricado y compararlo con un elemento $RC$ impreso.
 
 \end{otherlanguage}
 
@@ -131,15 +139,16 @@ dispositiu per a emmagatzemar i transformar un estat temporal. Aquesta tesi
 desenvolupa un \emph{dispositiu memristiu orgànic volàtil}: un element de dos
 terminals fabricat a partir d'un compòsit polímer--electròlit amb ions mòbils la
 conductància del qual conserva un registre decreixent de la seua història
-elèctrica recent. El treball avalua aquesta \emph{memòria evanescent} controlada
-com a integració física amb fugues per a la computació temporal.
+elèctrica recent. El treball examina si aquesta \emph{memòria evanescent} es pot
+controlar i per a què es pot utilitzar.
 
-Les mesures sinàptiques realitzades en un dispositiu de prova de concepte
-fabricat amb Super~Yellow, Hybrane i triflat de liti comprenen histèresi corrent--voltatge,
-potenciació i depressió, corrent postsinàptic excitatori,
-retenció a curt i llarg termini distingibles, i plasticitat dependent del temps
-de dispar. Aquestes respostes s'interpreten mitjançant l'asimetria de mobilitat
-entre l'anió triflat i el catió liti. L'arxiu de fabricació documenta
+Les mesures sinàptiques realitzades en diferents unions d'una plataforma de prova
+de concepte fabricada amb Super~Yellow, Hybrane i triflat de liti comprenen
+histèresi corrent--voltatge, potenciació i depressió, corrent postsinàptic
+excitatori, retenció a curt i llarg termini distingibles, i plasticitat dependent
+del temps de dispar. Una assignació de triflat ràpid i liti lent es conserva com a
+interpretació candidata, però les mesures elèctriques no identifiquen les
+espècies mòbils. L'arxiu de fabricació documenta
 una pèrdua de reproductibilitat a escala de campanya en la línia de Hybrane. El
 canvi a una matriu de poli(òxid d'etilè) restaura una finestra de commutació
 utilitzable i dóna lloc a una metodologia de registre de fabricació i a una
@@ -148,24 +157,29 @@ PEO, una sèrie de
 composicions replicada ajusta el temps de memòria evanescent entre aproximadament
 2 i 20\,s. Les substitucions de matriu, anió i catió continuen sent un estudi
 limitat per la grandària mostral, i les dades no confirmen l'ordre catiònic
-hipotètic \ce{Li+} > \ce{Na+} > \ce{K+}. Els models de comportament
-compactes ajustats a la dinàmica mesurada alimenten simulacions de computació de
-reservori. Un banc heterogeni no resol un avantatge en memòria lineal total entre
-llavors, però eleva la capacitat mitjana de processament d'informació de $6{,}31$
-a $10{,}33$, principalment mitjançant termes no lineals. En la fisiologia
-multiretard de WESAD aporta un avantatge modest ($R^2=0{,}701$ enfront de
-$0{,}692$), però no en les etiquetes sostingudes: el macro-F1 de tres classes és
-$0{,}524$ enfront de $0{,}545$ amb memòria homogènia. Sota soroll injectat intens,
-el banc temporal supera l'entrada instantània en WESAD i en un corpus PhysioNet
-independent, encara que un filtre lineal de mitjana mòbil exponencial iguala o
-supera el model de dispositiu.
+hipotètic \ce{Li+} > \ce{Na+} > \ce{K+}. Cada composició es resumeix en una
+fitxa de component amb la seua constant de temps, la seua freqüència de tall i una
+tolerància entre dispositius de $\sigma(\ln t_{1/2})\approx0{,}26$. Els models de
+comportament que reprodueixen la relaxació mesurada s'avaluen després en simulació
+en dues funcions. Com a filtre dissenyat, la composició més ràpida elimina el
+nivell tònic de l'activitat electrodèrmica amb la mateixa precisió que un filtre
+digital (F1 de detecció de respostes sintètiques $0{,}713$ enfront de $0{,}701$;
+AUC d'estrés enfront de repòs en WESAD $0{,}952$ enfront de $0{,}951$) i equival a
+un element $RC$ amb la mateixa semivida. Com a bancs de reservori, les
+composicions mixtes augmenten la capacitat de memòria i de processament
+d'informació en totes les llavors aleatòries, però sobre fisiologia registrada un
+banc de filtres lineals amb les mateixes constants de temps les iguala o les
+supera, excepte en les etiquetes afectives sostingudes de tres classes (macro-F1
+$0{,}562$ enfront de $0{,}508$).
 
-La sèrie replicada PEO/triflat de liti identifica la composició com a variable
-de control de la memòria evanescent, mentre que l'estudi químic limitat per la
-grandària mostral no confirma l'ordre catiònic proposat. Els bancs de composicions
-mixtes amplien la memòria temporal en simulació. Els dispositius es relaxen en
-segons, fet que els situa entre el maquinari neuromòrfic temporal i el dirigit
-per esdeveniments.
+La sèrie replicada PEO/triflat de liti identifica la composició com a variable de
+control de la memòria evanescent, mentre que l'estudi químic limitat per la
+grandària mostral no confirma l'ordre catiònic proposat. Llegides com a valors de
+component, les composicions defineixen un element imprimible de dos terminals la
+constant de temps del qual, de l'ordre de segons, es fixa en la formulació, sense
+un condensador separat. El seu valor pràctic depèn ara dels assajos de laboratori
+que motiven les simulacions: filtrar un senyal registrat amb un dispositiu
+fabricat i comparar-lo amb un element $RC$ imprès.
 
 \end{otherlanguage}
 
